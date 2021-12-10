@@ -5,6 +5,16 @@ using UnityEngine.SceneManagement;
 
 public class Loader : MonoBehaviour
 {
+    [Header("Emergence Server")]
+    [SerializeField]
+    private string customEmergenceServerLocation;
+
+    [SerializeField]
+    private string nodeURL;
+
+    [SerializeField]
+    private string gameId;
+
     [Header("Keyboard shortcut to open Emergence")]
     [SerializeField]
     private KeyCode key = KeyCode.Tab;
