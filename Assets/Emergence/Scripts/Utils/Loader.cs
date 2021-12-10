@@ -20,6 +20,7 @@ public class Loader : MonoBehaviour
     private void Awake()
     {
         SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+        DontDestroyOnLoad(gameObject);
     }
 
     private void OnDestroy()
@@ -58,6 +59,7 @@ public class Loader : MonoBehaviour
         if (arg0.name.Equals("Emergence"))
         {
             Debug.Log("Loaded");
+            ui.SetActive(false);
         }
     }
 }

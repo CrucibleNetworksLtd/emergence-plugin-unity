@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Emergence/Scenes/Emergence.unity
+    guid: d046979703aa7324ebb8d872d06f6a59
   m_configObjects: {}
