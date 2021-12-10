@@ -614,6 +614,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2003114359}
+  - component: {fileID: 2003114360}
   m_Layer: 0
   m_Name: Emergence Root
   m_TagString: Untagged
@@ -637,3 +638,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2003114360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2003114358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56c30b2ec33939146b5013fd8d885d64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  welcomeScreen: {fileID: 774305839}
+  logInScreen: {fileID: 828806855}
+  dashboardScreen: {fileID: 1131142265}
+  viewPersonaScreen: {fileID: 554483486}
+  editPersonaScreen: {fileID: 691397656}
