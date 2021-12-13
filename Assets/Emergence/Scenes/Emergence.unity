@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311992, g: 0.38074034, b: 0.35872713, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1033,6 +1033,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a9ba7d632df07448a27d21d684af029, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  connectWalletButton: {fileID: 4838606487205759138}
 --- !u!1 &828806855
 GameObject:
   m_ObjectHideFlags: 0
@@ -2004,6 +2005,7 @@ MonoBehaviour:
   dashboardScreen: {fileID: 1131142265}
   viewPersonaScreen: {fileID: 554483486}
   editPersonaScreen: {fileID: 691397656}
+  escButton: {fileID: 675775270}
 --- !u!1 &2056656920
 GameObject:
   m_ObjectHideFlags: 0
@@ -2202,3 +2204,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9f600a28fa650434d81fd4ac09fb0a93, type: 3}
+--- !u!114 &4838606487205759138 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4838606486605529810, guid: 9f600a28fa650434d81fd4ac09fb0a93,
+    type: 3}
+  m_PrefabInstance: {fileID: 4838606487205759137}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

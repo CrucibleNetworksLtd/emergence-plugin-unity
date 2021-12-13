@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EmergenceManager : MonoBehaviour
 {
@@ -20,6 +22,9 @@ public class EmergenceManager : MonoBehaviour
     [SerializeField]
     private GameObject editPersonaScreen;
 
+    [Header("UI Reference")]
+    public Button escButton;
+
     private enum ScreenStates
     {
         Welcome,
@@ -31,9 +36,21 @@ public class EmergenceManager : MonoBehaviour
 
     private ScreenStates state = ScreenStates.Welcome;
 
+    public static EmergenceManager Instance { get; private set; }
     private void Awake()
     {
+        Instance = this;
         ChangeState(this.state);
+        escButton.onClick.AddListener(OnEscButtonPressed);
+    }
+
+    public delegate void ButtonEsc();
+
+    public static event ButtonEsc OnButtonEsc;
+
+    private void OnEscButtonPressed()
+    {
+        OnButtonEsc?.Invoke();
     }
 
     private void ChangeState(ScreenStates state)
