@@ -1,19 +1,25 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Emergence
 {
     public class WelcomeScreen : MonoBehaviour
     {
-        private void Start()
+        public Button connectWalletButton;
+
+        private void Awake()
         {
-            
+            connectWalletButton.onClick.AddListener(OnConnectWallet);
         }
 
-        private void Update()
+        private void OnConnectWallet()
         {
-            
+            EmergenceManager.Instance.ShowLogIn();
         }
+      
     }
+
 }

@@ -3,4 +3,5 @@
 Library/
 Temp/
 obj/
+Server/
 *.csproj

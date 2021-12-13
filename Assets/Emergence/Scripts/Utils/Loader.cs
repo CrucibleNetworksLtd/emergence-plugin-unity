@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -25,12 +27,20 @@ public class Loader : MonoBehaviour
     [SerializeField]
     private bool ctrl = false;
 
+    private bool serverRunning = false;
+
     private GameObject ui;
 
     private void Awake()
     {
         SceneManager.sceneLoaded += SceneManager_sceneLoaded;
         DontDestroyOnLoad(gameObject);
+        EmergenceManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
+    }
+
+    private void EmergenceManager_OnButtonEsc()
+    {
+        CloseOverlay();
     }
 
     private void OnDestroy()
@@ -42,12 +52,18 @@ public class Loader : MonoBehaviour
     {
         if (transform.childCount < 1)
         {
-            Debug.LogError("Missing children");
+            UnityEngine.Debug.LogError("Missing children");
             return;
         }
 
         ui = transform.GetChild(0).gameObject;
         ui.SetActive(false);
+
+        if (!serverRunning) 
+        {
+            StartServer();
+            serverRunning = true;
+        }
     }
 
     private void Update()
@@ -63,13 +79,41 @@ public class Loader : MonoBehaviour
                 SceneManager.LoadSceneAsync("Emergence", LoadSceneMode.Additive);
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            CloseOverlay();
+        }
+
     }
+
+    private void CloseOverlay()
+    {
+        SceneManager.UnloadSceneAsync("Emergence");
+        ui.SetActive(false);
+    }
+
+
     private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
     {
         if (arg0.name.Equals("Emergence"))
         {
-            Debug.Log("Loaded");
+            UnityEngine.Debug.Log("Loaded");
             ui.SetActive(false);
+        }
+    }
+
+
+    private static void StartServer()
+    {
+        try
+        {
+            Process.Start("run-server.bat");
+            UnityEngine.Debug.Log("Running Emergence Server");
+        }
+        catch (Exception e)
+        {
+            UnityEngine.Debug.Log("Server error: " + e.Message);
         }
     }
 }
