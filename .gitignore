@@ -5,3 +5,4 @@ Temp/
 obj/
 Server/
 *.csproj
+.vs/
