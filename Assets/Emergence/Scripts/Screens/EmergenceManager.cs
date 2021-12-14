@@ -4,107 +4,110 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EmergenceManager : MonoBehaviour
+namespace Emergence
 {
-    [Header("Screen references")]
-    [SerializeField]
-    private GameObject welcomeScreen;
-
-    [SerializeField]
-    private GameObject logInScreen;
-
-    [SerializeField]
-    private GameObject dashboardScreen;
-
-    [SerializeField]
-    private GameObject viewPersonaScreen;
-
-    [SerializeField]
-    private GameObject editPersonaScreen;
-
-    [Header("UI Reference")]
-    public Button escButton;
-
-    private enum ScreenStates
+    public class EmergenceManager : MonoBehaviour
     {
-        Welcome,
-        LogIn,
-        Dashboard,
-        ViewPersona,
-        EditPersona,
-    }
+        [Header("Screen references")]
+        [SerializeField]
+        private GameObject welcomeScreen;
 
-    private ScreenStates state = ScreenStates.Welcome;
+        [SerializeField]
+        private GameObject logInScreen;
 
-    public static EmergenceManager Instance { get; private set; }
-    private void Awake()
-    {
-        Instance = this;
-        ChangeState(this.state);
-        escButton.onClick.AddListener(OnEscButtonPressed);
-    }
+        [SerializeField]
+        private GameObject dashboardScreen;
 
-    public delegate void ButtonEsc();
+        [SerializeField]
+        private GameObject viewPersonaScreen;
 
-    public static event ButtonEsc OnButtonEsc;
+        [SerializeField]
+        private GameObject editPersonaScreen;
 
-    private void OnEscButtonPressed()
-    {
-        OnButtonEsc?.Invoke();
-    }
+        [Header("UI Reference")]
+        public Button escButton;
 
-    private void ChangeState(ScreenStates state)
-    {
-        welcomeScreen.SetActive(false);
-        logInScreen.SetActive(false);
-        dashboardScreen.SetActive(false);
-        viewPersonaScreen.SetActive(false);
-        editPersonaScreen.SetActive(false);
-
-        this.state = state;
-
-        switch (state)
+        private enum ScreenStates
         {
-            case ScreenStates.Welcome:
-                welcomeScreen.SetActive(true);
-                break;
-            case ScreenStates.LogIn:
-                logInScreen.SetActive(true);
-                break;
-            case ScreenStates.Dashboard:
-                dashboardScreen.SetActive(true);
-                break;
-            case ScreenStates.ViewPersona:
-                viewPersonaScreen.SetActive(true);
-                break;
-            case ScreenStates.EditPersona:
-                editPersonaScreen.SetActive(true);
-                break;
+            Welcome,
+            LogIn,
+            Dashboard,
+            ViewPersona,
+            EditPersona,
         }
-    }
 
-    public void ShowWelcome()
-    {
-        ChangeState(ScreenStates.Welcome);
-    }
+        private ScreenStates state = ScreenStates.Welcome;
 
-    public void ShowLogIn()
-    {
-        ChangeState(ScreenStates.LogIn);
-    }
+        public static EmergenceManager Instance { get; private set; }
+        private void Awake()
+        {
+            Instance = this;
+            ChangeState(this.state);
+            escButton.onClick.AddListener(OnEscButtonPressed);
+        }
 
-    public void ShowDashboard()
-    {
-        ChangeState(ScreenStates.Dashboard);
-    }
+        public delegate void ButtonEsc();
 
-    public void ShowViewPersona()
-    {
-        ChangeState(ScreenStates.ViewPersona);
-    }
+        public static event ButtonEsc OnButtonEsc;
 
-    public void ShowEditPersona()
-    {
-        ChangeState(ScreenStates.EditPersona);
+        private void OnEscButtonPressed()
+        {
+            OnButtonEsc?.Invoke();
+        }
+
+        private void ChangeState(ScreenStates state)
+        {
+            welcomeScreen.SetActive(false);
+            logInScreen.SetActive(false);
+            dashboardScreen.SetActive(false);
+            viewPersonaScreen.SetActive(false);
+            editPersonaScreen.SetActive(false);
+
+            this.state = state;
+
+            switch (state)
+            {
+                case ScreenStates.Welcome:
+                    welcomeScreen.SetActive(true);
+                    break;
+                case ScreenStates.LogIn:
+                    logInScreen.SetActive(true);
+                    break;
+                case ScreenStates.Dashboard:
+                    dashboardScreen.SetActive(true);
+                    break;
+                case ScreenStates.ViewPersona:
+                    viewPersonaScreen.SetActive(true);
+                    break;
+                case ScreenStates.EditPersona:
+                    editPersonaScreen.SetActive(true);
+                    break;
+            }
+        }
+
+        public void ShowWelcome()
+        {
+            ChangeState(ScreenStates.Welcome);
+        }
+
+        public void ShowLogIn()
+        {
+            ChangeState(ScreenStates.LogIn);
+        }
+
+        public void ShowDashboard()
+        {
+            ChangeState(ScreenStates.Dashboard);
+        }
+
+        public void ShowViewPersona()
+        {
+            ChangeState(ScreenStates.ViewPersona);
+        }
+
+        public void ShowEditPersona()
+        {
+            ChangeState(ScreenStates.EditPersona);
+        }
     }
 }
