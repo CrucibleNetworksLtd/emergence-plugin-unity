@@ -19,9 +19,6 @@ namespace Emergence
         private GameObject dashboardScreen;
 
         [SerializeField]
-        private GameObject viewPersonaScreen;
-
-        [SerializeField]
         private GameObject editPersonaScreen;
 
         [Header("UI Reference")]
@@ -32,7 +29,6 @@ namespace Emergence
             Welcome,
             LogIn,
             Dashboard,
-            ViewPersona,
             EditPersona,
         }
 
@@ -60,7 +56,6 @@ namespace Emergence
             welcomeScreen.SetActive(false);
             logInScreen.SetActive(false);
             dashboardScreen.SetActive(false);
-            viewPersonaScreen.SetActive(false);
             editPersonaScreen.SetActive(false);
 
             this.state = state;
@@ -75,9 +70,6 @@ namespace Emergence
                     break;
                 case ScreenStates.Dashboard:
                     dashboardScreen.SetActive(true);
-                    break;
-                case ScreenStates.ViewPersona:
-                    viewPersonaScreen.SetActive(true);
                     break;
                 case ScreenStates.EditPersona:
                     editPersonaScreen.SetActive(true);
@@ -98,11 +90,6 @@ namespace Emergence
         public void ShowDashboard()
         {
             ChangeState(ScreenStates.Dashboard);
-        }
-
-        public void ShowViewPersona()
-        {
-            ChangeState(ScreenStates.ViewPersona);
         }
 
         public void ShowEditPersona()
