@@ -6,9 +6,9 @@ namespace Emergence
     {
         public struct PersonaSettings
         {
-            bool availableOnSearch;
-            bool receiveContactRequest;
-            bool showStatus;
+            public bool availableOnSearch;
+            public bool receiveContactRequest;
+            public bool showStatus;
         }
 
         public string id;
