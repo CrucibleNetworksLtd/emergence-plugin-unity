@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace Emergence
@@ -14,6 +15,11 @@ namespace Emergence
         [Header("Utilities")]
         [SerializeField]
         private Pool personaButtonPool;
+
+        NetworkManager networkManager = new NetworkManager();
+        private string currentAccessToken;
+
+        private List<Persona> personas;
 
         private void Start()
         {
@@ -55,5 +61,60 @@ namespace Emergence
         {
             // Send to the server the selected persona id, then refresh again
         }
+
+        IEnumerator GetBalance()
+        {
+            UnityEngine.Debug.Log("GetBalance request started");
+            string uri = networkManager.APIBase + "getbalance";
+
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+            {
+                yield return webRequest.SendWebRequest();
+                if (webRequest.responseCode == 200)
+                {
+                    //parse json and get the balance from the result
+                    StartCoroutine(GetAccessToken());
+                }
+
+            }
+        }
+
+        IEnumerator GetAccessToken()
+        {
+            UnityEngine.Debug.Log("GetAccessToken request started");
+            string uri = networkManager.APIBase + "get-access-token";
+            ///save access token
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+            {
+                yield return webRequest.SendWebRequest();
+                if (webRequest.responseCode == 200) 
+                {
+                    //parse json and get access token value
+                    currentAccessToken = webRequest.GetResponseHeader("accessToken");
+                    StartCoroutine(GetPersonas());
+
+                }
+            }
+        }
+
+        IEnumerator GetPersonas()
+        {
+            //throw new NotImplementedException();
+            UnityEngine.Debug.Log("GetPersonas request started");
+            string uri = networkManager.DatabaseAPIPrivate + "personas";
+
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+            {
+                webRequest.SetRequestHeader("Authorization", currentAccessToken);
+                yield return webRequest.SendWebRequest();
+                if (webRequest.responseCode == 200)
+                {
+                    //parse json and get personas
+                    //personas JsonUtility.FromJson
+                }
+
+            }
+        }
+
     }
 }

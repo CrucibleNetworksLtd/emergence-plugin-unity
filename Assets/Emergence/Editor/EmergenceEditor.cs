@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Diagnostics;
 
 namespace Emergence
 {
@@ -8,19 +9,21 @@ namespace Emergence
         [MenuItem("Emergence/Run EVM Server")]
         static void RunEVMServer()
         {
-            Debug.Log("Run EVM Server");
+            UnityEngine.Debug.Log("Run EVM Server");
+            Process.Start("run-server.bat");
         }
 
         [MenuItem("Emergence/Stop EVM Server")]
         static void StopEVMServer()
         {
-            Debug.Log("Stop EVM Server");
+            UnityEngine.Debug.Log("Stop EVM Server");
         }
 
         [MenuItem("Emergence/Restart EVM Server")]
         static void RestartEVMServer()
         {
-            Debug.Log("Restart EVM Server");
+            UnityEngine.Debug.Log("Restart EVM Server");
+            Process.Start("run-server.bat");
         }
     }
 }
