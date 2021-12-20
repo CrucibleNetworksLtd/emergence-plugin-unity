@@ -64,7 +64,7 @@ namespace Emergence
 
         IEnumerator GetBalance()
         {
-            UnityEngine.Debug.Log("GetBalance request started");
+            Debug.Log("GetBalance request started");
             string uri = networkManager.APIBase + "getbalance";
 
             using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
@@ -81,7 +81,7 @@ namespace Emergence
 
         IEnumerator GetAccessToken()
         {
-            UnityEngine.Debug.Log("GetAccessToken request started");
+            Debug.Log("GetAccessToken request started");
             string uri = networkManager.APIBase + "get-access-token";
             ///save access token
             using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
@@ -100,7 +100,7 @@ namespace Emergence
         IEnumerator GetPersonas()
         {
             //throw new NotImplementedException();
-            UnityEngine.Debug.Log("GetPersonas request started");
+            Debug.Log("GetPersonas request started");
             string uri = networkManager.DatabaseAPIPrivate + "personas";
 
             using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))

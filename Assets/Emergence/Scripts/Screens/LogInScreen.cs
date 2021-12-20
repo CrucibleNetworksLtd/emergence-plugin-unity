@@ -129,7 +129,9 @@ namespace Emergence
 
                 if (webRequest.responseCode == 200)
                 {
-                    StartCoroutine(ReinitializeWalletConnect());
+                    // StartCoroutine(ReinitializeWalletConnect());
+                    StartCoroutine(GetBalance());
+                    StartCoroutine(GetAccessToken());
                 }
             }
         }
