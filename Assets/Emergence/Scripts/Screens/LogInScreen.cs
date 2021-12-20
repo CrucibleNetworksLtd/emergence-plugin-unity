@@ -52,15 +52,15 @@ namespace Emergence
 
         private IEnumerator IsConnected()
         {
-            UnityEngine.Debug.Log("IsConnected request started");
+            Debug.Log("IsConnected request started");
             if (!String.IsNullOrEmpty(nodeURL))
             {
-                //UnityEngine.Debug.Log("nodeURL override " + nodeURL);
+                //Debug.Log("nodeURL override " + nodeURL);
             }
             else
             {
                 nodeURL = networkManager.defaultNodeURL;
-                //UnityEngine.Debug.Log("using default url " + networkManager.defaultNodeURL);
+                //Debug.Log("using default url " + networkManager.defaultNodeURL);
             }
 
             // TODO send process id set a reference to the current process and use System.Diagnostics's Process.Id property:int nProcessID = Process.GetCurrentProcess().Id;
@@ -70,87 +70,79 @@ namespace Emergence
             using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
             {
                 yield return webRequest.SendWebRequest();
+                PrintRequestResult("IsConnected", webRequest);
+
                 StartCoroutine(GetQrCode());
                 StartCoroutine(GetHandshake());
-
             }
         }
 
         IEnumerator GetQrCode()
         {
-            UnityEngine.Debug.Log("GetQrCode request started");
+            Debug.Log("GetQrCode request started");
             string url = networkManager.APIBase + "qrcode";
-            UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-            yield return request.SendWebRequest();
-            if (request.isNetworkError || request.isHttpError)
+            UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url);
+            yield return webRequest.SendWebRequest();
+
+            PrintRequestResult("GetQrCode", webRequest);
+
+            if (webRequest.isNetworkError || webRequest.isHttpError)
             {
-                UnityEngine.Debug.Log(request.error);
+                Debug.Log(webRequest.error);
             }
             else 
             { 
-                rawQRImage.texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                rawQRImage.texture = ((DownloadHandlerTexture)webRequest.downloadHandler).texture;
             }
-            UnityEngine.Debug.Log("GetQrCode request completed");
-            //UnityEngine.Debug.Log(request.isDone.ToString() + "QRrequest done");
-            //StartCoroutine(GetWallectConnectUri());
-            
-            
         }
 
         IEnumerator GetWallectConnectUri()
         {
-            //throw new NotImplementedException();
-            UnityEngine.Debug.Log("GetWallectConnectUri request started");
+            Debug.Log("GetWallectConnectUri request started");
             string uri = networkManager.APIBase + "getwalletconnecturi";
 
             using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
             {
                 yield return webRequest.SendWebRequest();
-                UnityEngine.Debug.Log("GetWallectConnectUri request completed");
-                StartCoroutine(GetHandshake());
-
+                PrintRequestResult("GetWallectConnectUri", webRequest);
             }
         }
+
         public IEnumerator GetHandshake()
         {
-            UnityEngine.Debug.Log("GetHandshake request started");
+            Debug.Log("GetHandshake request started");
             if (!String.IsNullOrEmpty(nodeURL))
             {
-                //UnityEngine.Debug.Log("nodeURL override " + nodeURL);
+                //Debug.Log("nodeURL override " + nodeURL);
             }
             else
             {
                 nodeURL = networkManager.defaultNodeURL;
             }
 
-
             string uri = networkManager.APIBase + "handshake" + "?nodeUrl=" + nodeURL;
 
             using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
             {
                 yield return webRequest.SendWebRequest();
+                PrintRequestResult("GetHandshake", webRequest);
 
                 if (webRequest.responseCode == 200)
                 {
-                    //StartCoroutine(GetQrCode());
                     StartCoroutine(ReinitializeWalletConnect());
                 }
-                UnityEngine.Debug.Log("GetHandshake request completed");
             }
-
-            
-
         }
 
         IEnumerator ReinitializeWalletConnect()
         {
-            UnityEngine.Debug.Log("ReinitializeWalletConnect request started");
+            Debug.Log("ReinitializeWalletConnect request started");
             string url = networkManager.APIBase + "reinitializewalletconnect";
 
             using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
             {
                 yield return webRequest.SendWebRequest();
-
+                PrintRequestResult("ReinitializeWalletConnect", webRequest);
                 if (webRequest.responseCode == 200)
                 {
                     //parse json and get the balance from the result
@@ -165,12 +157,13 @@ namespace Emergence
 
         IEnumerator GetAccessToken()
         {
-            UnityEngine.Debug.Log("GetAccessToken request started");
+            Debug.Log("GetAccessToken request started");
             string uri = networkManager.APIBase + "get-access-token";
             ///save access token
             using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
             {
                 yield return webRequest.SendWebRequest();
+                PrintRequestResult("GetAccessToken", webRequest);
                 if (webRequest.responseCode == 200)
                 {
                     //parse json and get access token value
@@ -181,22 +174,30 @@ namespace Emergence
 
         IEnumerator GetBalance()
         {
-            UnityEngine.Debug.Log("GetBalance request started");
+            Debug.Log("GetBalance request started");
             string uri = networkManager.APIBase + "getbalance";
 
             using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
             {
                 yield return webRequest.SendWebRequest();
+                PrintRequestResult("GetBalance", webRequest);
                 if (webRequest.responseCode == 200)
                 {
                     //parse json and get the balance from the result
-                    //StartCoroutine(GetAccessToken());
                 }
-
             }
         }
 
-
+        private void PrintRequestResult(string name, UnityWebRequest request)
+        {
+            Debug.Log(name + " completed " + request.responseCode);
+            if (request.isHttpError || request.isNetworkError)
+            {
+                Debug.LogError(request.error);
+            } else
+            {
+                Debug.Log(request.downloadHandler.text);
+            }
+        }
     }
-
 }

@@ -32,11 +32,11 @@ public class NetworkManager
         try
         {
             System.Diagnostics.Process.Start("run-server.bat");
-            UnityEngine.Debug.Log("Running Emergence Server");
+            Debug.Log("Running Emergence Server");
         }
         catch (Exception e)
         {
-            UnityEngine.Debug.Log("Server error: " + e.Message);
+            Debug.Log("Server error: " + e.Message);
         }
     }
 }
