@@ -48,17 +48,20 @@ namespace Emergence
             switch (state)
             {
                 case ScreenStates.WaitForServer:
+                    Modal.Instance.Show("Waiting for server...");
                     if (!checkingForServer)
                     {
                         checkingForServer = true;
                         NetworkManager.Instance.Ping(() =>
                             {
+                                Modal.Instance.Hide();
                                 Debug.Log("EVM server found");
                                 checkingForServer = false;
-                                ChangeState(ScreenStates.Welcome);
+                                ShowWelcome();
                             },
                             (error, code) =>
                             {
+                                Modal.Instance.Show("Server not found, trying to launch");
                                 Debug.LogWarning("EVM code not running, trying to launch");
 
                                 try
@@ -66,11 +69,15 @@ namespace Emergence
                                     // TODO send process id set a reference to the current process and use System.Diagnostics's Process.Id property:int nProcessID = Process.GetCurrentProcess().Id;
                                     System.Diagnostics.Process.Start("run-server.bat");
                                     Debug.Log("Running Emergence Server");
+                                    Modal.Instance.Hide();
                                     checkingForServer = false;
+                                    ShowWelcome();
                                 }
                                 catch (Exception e)
                                 {
                                     Debug.Log("Server error: " + e.Message);
+                                    ModalPromptOK.Instance.Show("Error running server");
+                                    checkingForServer = false;
                                 }
                             });
                     }
