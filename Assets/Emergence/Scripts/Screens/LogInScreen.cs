@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -172,16 +173,9 @@ namespace Emergence
                 PrintRequestResult("GetAccessToken", webRequest);
                 if (webRequest.responseCode == 200)
                 {
-                    //parse json and get access token value
-                    //currentAccessToken = webRequest.GetResponseHeader("accessToken");
-
-                    //JsonUtility.
-                    AccessTokenResponse accesstoken = SerializationHelper.Deserialize<AccessTokenResponse>(webRequest.downloadHandler.text);
-
-                    Debug.Log("The message is...>>>>"+ accesstoken.message);
-                    //currentAccessToken = accesstoken.message.accessToken.signedMessage;
-                    currentAccessToken = SerializationHelper.Serialize(accesstoken.message);
-
+                    AccessTokenResponse accesstokenResponse = SerializationHelper.Deserialize<AccessTokenResponse>(webRequest.downloadHandler.text);
+                    currentAccessToken = SerializationHelper.Serialize(accesstokenResponse.message.accessToken, false);
+                    
                     if (!String.IsNullOrEmpty(currentAccessToken))
                     {
                         Debug.Log("Start the GetPersonas Coroutine...");
@@ -206,7 +200,6 @@ namespace Emergence
                 PrintRequestResult("GetBalance", webRequest);
                 if (webRequest.responseCode == 200)
                 {
-                    
                     //balanceTextfield.text = webRequest.GetResponseHeader("balance");
                     //parse json and get the balance from the result
                 }
@@ -225,6 +218,10 @@ namespace Emergence
                 PrintRequestResult("GetPersonas", webRequest);
                 if (webRequest.responseCode == 200)
                 {
+                    PersonasResponse personasResponse = SerializationHelper.Deserialize<PersonasResponse>(webRequest.downloadHandler.text);
+
+                    EmergenceState.Personas = personasResponse.personas;
+                    EmergenceState.CurrentPersona = EmergenceState.Personas.FirstOrDefault(p => p.id == personasResponse.selected);
                     EmergenceManager.Instance.ShowDashboard();
                 }
             }

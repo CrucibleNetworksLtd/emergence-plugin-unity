@@ -24,19 +24,34 @@ namespace Emergence
 
         private void Start()
         {
-            // TODO Delete this
-            // Pool usage example
-            GameObject go = personaButtonPool.GetNewObject();
+            for (int i = 0; i < EmergenceState.Personas.Count; i++)
+            {
+                GameObject go = personaButtonPool.GetNewObject();
 
-            go.transform.SetParent(personaScrollContents);
-            go.transform.localScale = Vector3.one; // Sometimes unity breaks the size when reparenting
+                go.transform.SetParent(personaScrollContents);
+                go.transform.localScale = Vector3.one; // Sometimes unity breaks the size when reparenting
 
-            // Fill with persona info
-            PersonaScrollItem psi = go.GetComponent<PersonaScrollItem>();
+                // Fill with persona info
+                PersonaScrollItem psi = go.GetComponent<PersonaScrollItem>();
+                
+                Persona persona = EmergenceState.Personas[i];
+                bool selected = EmergenceState.CurrentPersona.id.Equals(persona.id);
+                psi.Refresh(persona, selected);
 
-            Persona persona = new Persona();
-            bool selected = true;
-            psi.Refresh(persona, selected);
+
+                // Loading images
+                RequestImage.Instance.AskForImage(persona.avatar.url, (url, imageTexture2D) =>
+                {
+                    // success callback
+                    persona.AvatarImage = imageTexture2D;
+                    psi.Refresh(persona, selected);
+                },
+                (url, error, errorCode) =>
+                {
+                    // error callback
+                    Debug.LogError("[" + url + "] " + error + " " + errorCode);
+                });
+            }
 
             // On some awake register to this event
             PersonaScrollItem.OnSelected += PersonaScrollItem_OnSelected;
@@ -45,17 +60,9 @@ namespace Emergence
             PersonaScrollItem.OnSelected -= PersonaScrollItem_OnSelected;
 
             // When done
-            personaButtonPool.ReturnUsedObject(go);
+            //personaButtonPool.ReturnUsedObject(go);
 
-            // Loading images
-            RequestImage.Instance.AskForImage("url", (url, imageTexture2D) =>
-                {
-                    // success callback
-                },
-                (url, error, errorCode) =>
-                {
-                    // error callback
-                });
+
         }
 
         private void Awake()
@@ -70,7 +77,7 @@ namespace Emergence
             {
                 EmergenceManager.Instance.ShowEditPersona();
             }
-            
+
         }
 
         private void PersonaScrollItem_OnSelected(Persona persona)
@@ -103,7 +110,7 @@ namespace Emergence
             using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
             {
                 yield return webRequest.SendWebRequest();
-                if (webRequest.responseCode == 200) 
+                if (webRequest.responseCode == 200)
                 {
                     //parse json and get access token value
                     currentAccessToken = webRequest.GetResponseHeader("accessToken");
