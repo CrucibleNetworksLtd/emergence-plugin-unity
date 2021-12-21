@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Debug = UnityEngine.Debug;
 
 namespace Emergence
 {
@@ -30,14 +28,13 @@ namespace Emergence
         [SerializeField]
         private bool ctrl = false;
 
-        private bool serverRunning = false;
-
         private GameObject ui;
 
         private void Awake()
         {
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             EmergenceManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
+            NetworkManager.Instance.StartEVMServer(nodeURL, gameId);
             DontDestroyOnLoad(gameObject);
         }
 
@@ -50,6 +47,7 @@ namespace Emergence
         {
             SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
             EmergenceManager.OnButtonEsc -= EmergenceManager_OnButtonEsc;
+            NetworkManager.Instance.StopEVMServer();
         }
 
         private void Start()
@@ -62,12 +60,6 @@ namespace Emergence
 
             ui = transform.GetChild(0).gameObject;
             ui.SetActive(false);
-
-            if (!serverRunning)
-            {
-                StartServer();
-                serverRunning = true;
-            }
         }
 
         private void Update()
@@ -88,7 +80,6 @@ namespace Emergence
             {
                 CloseOverlay();
             }
-
         }
 
         private void CloseOverlay()
@@ -97,27 +88,12 @@ namespace Emergence
             ui.SetActive(false);
         }
 
-
         private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
             if (arg0.name.Equals("Emergence"))
             {
                 Debug.Log("Loaded");
                 ui.SetActive(false);
-            }
-        }
-
-
-        private static void StartServer()
-        {
-            try
-            {
-                Process.Start("run-server.bat");
-                Debug.Log("Running Emergence Server");
-            }
-            catch (Exception e)
-            {
-                Debug.Log("Server error: " + e.Message);
             }
         }
     }

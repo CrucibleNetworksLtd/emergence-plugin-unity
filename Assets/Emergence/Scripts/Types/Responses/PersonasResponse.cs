@@ -2,9 +2,9 @@
 
 namespace Emergence
 {
-    public class PersonasResponse
+    public struct PersonasResponse
     {
-        public List<Persona> personas { get; set; }
-        public string selected { get; set; }
+        public List<Persona> personas;
+        public string selected;
     }
 }

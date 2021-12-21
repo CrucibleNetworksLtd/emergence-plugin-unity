@@ -23,31 +23,53 @@ namespace Emergence
         public Toggle showingMyStatusToggle;
         public Toggle receiveContactRequestsToggle;
 
+        public Toggle useThisPersonaAsDefaultToggle;
+
+        public static EditPersonaScreen Instance;
+
+        public Texture2D defaultImage;
+
+        private Dictionary<string, Texture2D> avatarsCache = new Dictionary<string, Texture2D>();
+
         private void Awake()
         {
+            Instance = this;
             createButton.onClick.AddListener(OnCreateClicked);
             backButton.onClick.AddListener(OnBackClicked);
+            AvatarScrollItem.OnAvatarSelected += AvatarScrollItem_OnAvatarSelected;
         }
 
-        public void Refresh(Persona persona)
+        private void OnDestroy()
         {
-            if (persona != null)
-            {
-                nameIF.text = persona.name;
-                bioIF.text = persona.bio;
-                
-                availableOnSearchesToggle.SetIsOnWithoutNotify(persona.settings.availableOnSearch);
-                showingMyStatusToggle.SetIsOnWithoutNotify(persona.settings.showStatus);
-                receiveContactRequestsToggle.SetIsOnWithoutNotify(persona.settings.receiveContactRequest);
+            AvatarScrollItem.OnAvatarSelected -= AvatarScrollItem_OnAvatarSelected;
+        }
 
-                if (persona.AvatarImage)
-                {
-                    personaAvatar.texture = persona.AvatarImage;
-                }
-                 else
-                {
-                    // TODO default image
-                }
+        private string currentAvatarId = string.Empty;
+        private void AvatarScrollItem_OnAvatarSelected(string id)
+        {
+            personaAvatar.texture = avatarsCache[id];
+            currentAvatarId = id;
+        }
+
+        public void Refresh(Persona persona, bool isDefault, bool isNew = false)
+        {
+            nameIF.text = persona.name;
+            bioIF.text = persona.bio;
+
+            availableOnSearchesToggle.SetIsOnWithoutNotify(persona.settings.availableOnSearch);
+            showingMyStatusToggle.SetIsOnWithoutNotify(persona.settings.showStatus);
+            receiveContactRequestsToggle.SetIsOnWithoutNotify(persona.settings.receiveContactRequest);
+
+            useThisPersonaAsDefaultToggle.SetIsOnWithoutNotify(isDefault);
+            useThisPersonaAsDefaultToggle.interactable = !isNew;
+
+            if (persona.AvatarImage)
+            {
+                personaAvatar.texture = persona.AvatarImage;
+            }
+            else
+            {
+                personaAvatar.texture = defaultImage;
             }
 
             // Clear scroll area
@@ -57,15 +79,45 @@ namespace Emergence
                 avatarScrollItemsPool.ReturnUsedObject(child);
             }
 
-            // TODO all avatar images
-            GameObject go = avatarScrollItemsPool.GetNewObject();
-            go.transform.SetParent(avatarScrollRoot);
-            go.transform.localScale = Vector3.one;
+            NetworkManager.Instance.GetAvatars((avatars) =>
+            {
+                avatarsCache.Clear();
+
+                for (int i = 0; i < avatars.Count; i++)
+                {
+                    GameObject go = avatarScrollItemsPool.GetNewObject();
+                    go.transform.SetParent(avatarScrollRoot);
+                    go.transform.localScale = Vector3.one;
+
+                    AvatarScrollItem asi = go.GetComponent<AvatarScrollItem>();
+
+                    Persona.Avatar avatar = avatars[i];
+
+                    asi.Refresh(defaultImage, string.Empty);
+
+                    RequestImage.Instance.AskForImage(avatar.url, (url, imageTexture2D) =>
+                    {
+                        asi.Refresh(imageTexture2D, avatar.id);
+
+                        avatarsCache.Add(avatar.id, imageTexture2D);
+                    },
+                    (url, error, errorCode) =>
+                    {
+                        Debug.LogError("[" + url + "] " + error + " " + errorCode);
+                    });
+                }
+            },
+            (error, code) =>
+            {
+                Debug.LogError("[" + code + "] " + error);
+            });
+
         }
 
         private void OnCreateClicked()
         {
             // TODO Save persona
+            //currentAvatarId
         }
 
         private void OnBackClicked()

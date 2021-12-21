@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,13 +24,16 @@ namespace Emergence
 
         private enum ScreenStates
         {
+            WaitForServer,
             Welcome,
             LogIn,
             Dashboard,
             EditPersona,
         }
 
-        private ScreenStates state = ScreenStates.Welcome;
+        private ScreenStates state = ScreenStates.WaitForServer;
+
+        private bool checkingForServer = false;
 
         public static EmergenceManager Instance { get; private set; }
         private void Awake()
@@ -40,6 +41,41 @@ namespace Emergence
             Instance = this;
             ChangeState(this.state);
             escButton.onClick.AddListener(OnEscButtonPressed);
+        }
+
+        private void Update()
+        {
+            switch (state)
+            {
+                case ScreenStates.WaitForServer:
+                    if (!checkingForServer)
+                    {
+                        checkingForServer = true;
+                        NetworkManager.Instance.Ping(() =>
+                            {
+                                Debug.Log("EVM server found");
+                                checkingForServer = false;
+                                ChangeState(ScreenStates.Welcome);
+                            },
+                            (error, code) =>
+                            {
+                                Debug.LogWarning("EVM code not running, trying to launch");
+
+                                try
+                                {
+                                    // TODO send process id set a reference to the current process and use System.Diagnostics's Process.Id property:int nProcessID = Process.GetCurrentProcess().Id;
+                                    System.Diagnostics.Process.Start("run-server.bat");
+                                    Debug.Log("Running Emergence Server");
+                                    checkingForServer = false;
+                                }
+                                catch (Exception e)
+                                {
+                                    Debug.Log("Server error: " + e.Message);
+                                }
+                            });
+                    }
+                    break;
+            }
         }
 
         public delegate void ButtonEsc();
@@ -62,6 +98,10 @@ namespace Emergence
 
             switch (state)
             {
+                case ScreenStates.WaitForServer:
+                    // TODO modal
+                    Debug.Log("Waiting for server");
+                    break;
                 case ScreenStates.Welcome:
                     welcomeScreen.SetActive(true);
                     break;
@@ -90,6 +130,7 @@ namespace Emergence
         public void ShowDashboard()
         {
             ChangeState(ScreenStates.Dashboard);
+            DashboardScreen.Instance.Refresh();
         }
 
         public void ShowEditPersona()
