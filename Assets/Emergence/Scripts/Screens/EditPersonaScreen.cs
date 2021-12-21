@@ -14,6 +14,7 @@ namespace Emergence
         public Transform avatarScrollRoot;
         public TextMeshProUGUI title;
         public Button createButton;
+        public Button deleteButton;
 
         public TMP_InputField nameIF;
         public TMP_InputField bioIF;
@@ -35,6 +36,7 @@ namespace Emergence
         {
             Instance = this;
             createButton.onClick.AddListener(OnCreateClicked);
+            deleteButton.onClick.AddListener(OnDeleteClicked);
             backButton.onClick.AddListener(OnBackClicked);
             AvatarScrollItem.OnAvatarSelected += AvatarScrollItem_OnAvatarSelected;
         }
@@ -118,6 +120,12 @@ namespace Emergence
         {
             // TODO Save persona
             //currentAvatarId
+        }
+
+        private void OnDeleteClicked()
+        {
+            // TODO delete persona
+            //ModalPromptYESNO.Instance.Show("Delete " + "persona.name", "are you sure?", () => { });
         }
 
         private void OnBackClicked()

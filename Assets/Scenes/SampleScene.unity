@@ -280,6 +280,11 @@ PrefabInstance:
       propertyPath: gameId
       value: e8daf2e1-b556-42fb-a531-2610e142db13
       objectReference: {fileID: 0}
+    - target: {fileID: 6818923702779559294, guid: d11676e3b1baadb4a84528313b89733e,
+        type: 3}
+      propertyPath: cg
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7199307401433611008, guid: d11676e3b1baadb4a84528313b89733e,
         type: 3}
       propertyPath: m_Name
