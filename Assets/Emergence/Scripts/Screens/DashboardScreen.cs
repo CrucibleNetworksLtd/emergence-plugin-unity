@@ -20,6 +20,7 @@ namespace Emergence
         private string currentAccessToken;
 
         private List<Persona> personas;
+        private bool isEdit;
 
         private void Start()
         {
@@ -55,6 +56,21 @@ namespace Emergence
                 {
                     // error callback
                 });
+        }
+
+        private void Awake()
+        {
+            addPersonaButton.onClick.AddListener(OnEditPersona);
+        }
+
+        private void OnEditPersona()
+        {
+            isEdit = true;
+            if (isEdit)
+            {
+                EmergenceManager.Instance.ShowEditPersona();
+            }
+            
         }
 
         private void PersonaScrollItem_OnSelected(Persona persona)

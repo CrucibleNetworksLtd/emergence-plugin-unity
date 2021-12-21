@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 namespace Emergence
 {
+
+
     public class LogInScreen : MonoBehaviour
     {
         [Header("UI References")]
@@ -150,7 +152,9 @@ namespace Emergence
                     //parse json and get the balance from the result
                     StartCoroutine(GetBalance());
                     StartCoroutine(GetAccessToken());
+
                     
+
                 }
                 //get the response status code
                 //StartCoroutine(GetWallectConnectUri());
@@ -169,7 +173,24 @@ namespace Emergence
                 if (webRequest.responseCode == 200)
                 {
                     //parse json and get access token value
-                    currentAccessToken = webRequest.GetResponseHeader("accessToken");
+                    //currentAccessToken = webRequest.GetResponseHeader("accessToken");
+
+                    //JsonUtility.
+                    AccessTokenResponse accesstoken = SerializationHelper.Deserialize<AccessTokenResponse>(webRequest.downloadHandler.text);
+
+                    Debug.Log("The message is...>>>>"+ accesstoken.message);
+                    //currentAccessToken = accesstoken.message.accessToken.signedMessage;
+                    currentAccessToken = SerializationHelper.Serialize(accesstoken.message);
+
+                    if (!String.IsNullOrEmpty(currentAccessToken))
+                    {
+                        Debug.Log("Start the GetPersonas Coroutine...");
+                        StartCoroutine(GetPersonas());
+                    }
+                    else
+                    {
+                        Debug.Log("No access token");
+                    }
                 }
             }
         }
@@ -185,7 +206,26 @@ namespace Emergence
                 PrintRequestResult("GetBalance", webRequest);
                 if (webRequest.responseCode == 200)
                 {
+                    
+                    //balanceTextfield.text = webRequest.GetResponseHeader("balance");
                     //parse json and get the balance from the result
+                }
+            }
+        }
+
+        IEnumerator GetPersonas()
+        {
+            Debug.Log("GetPersonas request started");
+            string uri = networkManager.DatabaseAPIPrivate + "personas";
+
+            using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+            {
+                webRequest.SetRequestHeader("Authorization", currentAccessToken);
+                yield return webRequest.SendWebRequest();
+                PrintRequestResult("GetPersonas", webRequest);
+                if (webRequest.responseCode == 200)
+                {
+                    EmergenceManager.Instance.ShowDashboard();
                 }
             }
         }
