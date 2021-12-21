@@ -23,8 +23,6 @@ namespace Emergence
         public Avatar avatar;
         public PersonaSettings settings;
 
-        private Texture2D avatarImage = null;
-
         public Texture2D AvatarImage
         {
             get;

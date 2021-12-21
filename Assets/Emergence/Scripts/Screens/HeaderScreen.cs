@@ -15,9 +15,18 @@ namespace Emergence
         public Button disconnectButton;
         public RawImage avatar;
 
+        public static HeaderScreen Instance;
+
         private void Awake()
         {
+            Instance = this;
             disconnectButton.onClick.AddListener(OnDisconnectClick);
+        }
+
+        // TODO Update
+        private void EmergenceState_OnBalanceRefreshed(string balance)
+        {
+            walletBalance.text = balance;
         }
 
         private void Start()
@@ -35,9 +44,8 @@ namespace Emergence
             headerInformation.SetActive(true);
         }
 
-        public void Refresh(string balance, string address)
+        public void Refresh(string address)
         {
-            walletBalance.text = balance;
             walletAddress.text = address;
             // TODO add the circle avatar image data
         }

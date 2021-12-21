@@ -1,10 +1,11 @@
 ﻿using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Emergence
 {
-    public class PersonaScrollItem : MonoBehaviour
+    public class PersonaScrollItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         [Header("UI References")]
         [SerializeField]
@@ -22,11 +23,15 @@ namespace Emergence
         [SerializeField]
         private Button selectButton;
 
+        [SerializeField]
+        private Button usePersonaAsCurrentButton;
+
         private Persona persona;
 
         private void Awake()
         {
             selectButton.onClick.AddListener(OnSelectClicked);
+            usePersonaAsCurrentButton.onClick.AddListener(OnUsePersonaAsCurrentClicked);
         }
 
         public delegate void Selected(Persona persona);
@@ -37,14 +42,32 @@ namespace Emergence
             OnSelected?.Invoke(persona);
         }
 
+
+        public static event Selected OnUsePersonaAsCurrent;
+        private void OnUsePersonaAsCurrentClicked()
+        {
+            OnUsePersonaAsCurrent?.Invoke(persona);
+        }
+
         public void Refresh(Persona persona, bool selected)
         {
             this.persona = persona;
 
+            nameText.gameObject.SetActive(false);
             nameText.text = persona.name;
             photo.texture = persona.AvatarImage;
             unselectedBorder.SetActive(!selected);
             selectedBorder.SetActive(selected);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            nameText.gameObject.SetActive(true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            nameText.gameObject.SetActive(false);
         }
     }
 }
