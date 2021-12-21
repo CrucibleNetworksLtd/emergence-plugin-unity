@@ -11,10 +11,16 @@ namespace Emergence
             public bool showStatus;
         }
 
+        public struct Avatar
+        {
+            public string id;
+            public string url;
+        }
+
         public string id;
         public string name;
         public string bio;
-        public string avatar;
+        public Avatar avatar;
         public PersonaSettings settings;
 
         private Texture2D avatarImage = null;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
 
 namespace Emergence
 {
@@ -55,7 +56,7 @@ namespace Emergence
         {
             if (transform.childCount < 1)
             {
-                UnityEngine.Debug.LogError("Missing children");
+                Debug.LogError("Missing children");
                 return;
             }
 
@@ -101,7 +102,7 @@ namespace Emergence
         {
             if (arg0.name.Equals("Emergence"))
             {
-                UnityEngine.Debug.Log("Loaded");
+                Debug.Log("Loaded");
                 ui.SetActive(false);
             }
         }
@@ -112,11 +113,11 @@ namespace Emergence
             try
             {
                 Process.Start("run-server.bat");
-                UnityEngine.Debug.Log("Running Emergence Server");
+                Debug.Log("Running Emergence Server");
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.Log("Server error: " + e.Message);
+                Debug.Log("Server error: " + e.Message);
             }
         }
     }

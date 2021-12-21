@@ -3,8 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NetworkManager : MonoBehaviour
+public class NetworkManager
 {
+
+    public readonly string APIBase = "http://localhost:50733/api/";
+    public readonly string DatabaseAPIPublic = "https://pfy3t4mqjb.execute-api.us-east-1.amazonaws.com/staging/";
+    public readonly string DatabaseAPIPrivate = "https://57l0bi6g53.execute-api.us-east-1.amazonaws.com/staging/";
+    public readonly string defaultNodeURL = "https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134";
+
+
     public IEnumerator PingServer(string url)
     {
         while (true)
@@ -25,11 +32,11 @@ public class NetworkManager : MonoBehaviour
         try
         {
             System.Diagnostics.Process.Start("run-server.bat");
-            UnityEngine.Debug.Log("Running Emergence Server");
+            Debug.Log("Running Emergence Server");
         }
         catch (Exception e)
         {
-            UnityEngine.Debug.Log("Server error: " + e.Message);
+            Debug.Log("Server error: " + e.Message);
         }
     }
 }

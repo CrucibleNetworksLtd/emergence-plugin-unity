@@ -15,7 +15,15 @@ namespace Emergence
         public static Persona CurrentPersona
         {
             get;
-            private set;
+            set;
         }
+
+        public static List<Persona> Personas
+        {
+            get;
+            set;
+        }
+
+        // TODO Move network calls here
     }
 }
