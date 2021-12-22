@@ -34,7 +34,8 @@ namespace Emergence
 
         public void Refresh()
         {
-            while(personaScrollContents.childCount > 0)
+            HeaderScreen.Instance.Show();
+            while (personaScrollContents.childCount > 0)
             {
                 personaButtonPool.ReturnUsedObject(personaScrollContents.GetChild(0).gameObject);
             }
@@ -61,17 +62,6 @@ namespace Emergence
                     {
                         go.transform.SetAsFirstSibling();
                     }
-
-                    // Loading images
-                    RequestImage.Instance.AskForImage(persona.avatar.url, (url, imageTexture2D) =>
-                    {//key is null
-                        persona.AvatarImage = imageTexture2D;
-                        psi.Refresh(persona, selected);
-                    },
-                    (url, error, errorCode) =>
-                    {
-                        Debug.LogError("[" + url + "] " + error + " " + errorCode);
-                    });
                 }
             },
             (error, code) =>

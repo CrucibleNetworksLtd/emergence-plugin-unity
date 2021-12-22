@@ -14,6 +14,8 @@ namespace Emergence
         private float timeRemaining = 0.0f;
         private readonly float QRRefreshTimeOut = 60.0f;
 
+        public static LogInScreen Instance;
+
         private enum States
         {
             Handshake,
@@ -25,14 +27,20 @@ namespace Emergence
 
         private States state = States.Handshake;
 
+        private void Awake()
+        {
+            Instance = this;
+        }
+
         private void Update()
         {
             switch (state)
             {
                 case States.Handshake:
-                    NetworkManager.Instance.Handshake(() => 
+                    NetworkManager.Instance.Handshake((walletAddress) => 
                     {
                         state = States.RefreshAccessToken;
+                        HeaderScreen.Instance.Refresh(walletAddress);
                     }, 
                     (error, code) => 
                     {
@@ -71,6 +79,12 @@ namespace Emergence
                     });
                     break;
             }
+        }
+
+        public void Restart()
+        {
+            state = States.Handshake;
+            timeRemaining = 0.0f;
         }
     }
 }

@@ -144,7 +144,7 @@ namespace Emergence
             }
         }
 
-        public delegate void HandshakeSuccess();
+        public delegate void HandshakeSuccess(string walletAddress);
         public void Handshake(HandshakeSuccess success, GenericError error)
         {
             StartCoroutine(CoroutineHandshake(success, error));
@@ -159,7 +159,7 @@ namespace Emergence
             {
                 yield return request.SendWebRequest();
 
-                PrintRequestResult("GetQrCode", request);
+                PrintRequestResult("Handshake", request);
 
                 if (request.isNetworkError || request.isHttpError)
                 {
@@ -167,7 +167,15 @@ namespace Emergence
                 }
                 else
                 {
-                    success?.Invoke();
+                    HandshakeResponse response = SerializationHelper.Deserialize<HandshakeResponse>(request.downloadHandler.text);
+                    if (response.statusCode != 0)
+                    {
+                        error?.Invoke("Problem with handshake", response.statusCode);
+                    }
+                    else
+                    {
+                        success?.Invoke(response.message.address);
+                    }
                 }
             }
         }
@@ -196,7 +204,8 @@ namespace Emergence
                 }
                 else
                 {
-                    success?.Invoke(request.downloadHandler.text);
+                    GetBalanceResponse response = SerializationHelper.Deserialize<GetBalanceResponse>(request.downloadHandler.text);
+                    success?.Invoke(response.message.balance);
                 }
             }
         }
@@ -212,24 +221,21 @@ namespace Emergence
         {
             Debug.Log("GetAccessToken request started");
             string url = APIBase + "get-access-token";
-            
+
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
                 PrintRequestResult("GetAccessToken", request);
-                if (request.responseCode == 200)
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
                 {
                     AccessTokenResponse accesstokenResponse = SerializationHelper.Deserialize<AccessTokenResponse>(request.downloadHandler.text);
                     currentAccessToken = SerializationHelper.Serialize(accesstokenResponse.message.accessToken, false);
-
-                    if (request.isNetworkError || request.isHttpError)
-                    {
-                        error?.Invoke(request.error, request.responseCode);
-                    }
-                    else
-                    {
-                        success?.Invoke(currentAccessToken);
-                    }
+                    success?.Invoke(currentAccessToken);
                 }
             }
         }
@@ -240,7 +246,7 @@ namespace Emergence
         {
             StartCoroutine(CoroutineGetPersonas(success, error));
         }
-        
+
         private IEnumerator CoroutineGetPersonas(SuccessPersonas success, GenericError error)
         {
             Debug.Log("GetPersonas request started");
@@ -416,6 +422,34 @@ namespace Emergence
                 }
             }
         }
+
+        public delegate void DisconnectSuccess();
+        public void Disconnect(DisconnectSuccess success, GenericError error)
+        {
+            StartCoroutine(CoroutineDisconnect(success, error));
+        }
+
+        private IEnumerator CoroutineDisconnect(DisconnectSuccess success, GenericError error)
+        {
+            Debug.Log("Disconnect request started");
+            string url = APIBase + "killSession";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                yield return request.SendWebRequest();
+                PrintRequestResult("Disconnect request completed", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+
 
         private void PrintRequestResult(string name, UnityWebRequest request)
         {
