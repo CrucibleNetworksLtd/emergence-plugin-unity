@@ -62,17 +62,6 @@ namespace Emergence
                     {
                         go.transform.SetAsFirstSibling();
                     }
-
-                    // Loading images
-                    RequestImage.Instance.AskForImage(persona.avatar.url, (url, imageTexture2D) =>
-                    {
-                        persona.AvatarImage = imageTexture2D;
-                        psi.Refresh(persona, selected);
-                    },
-                    (url, error, errorCode) =>
-                    {
-                        Debug.LogError("[" + url + "] " + error + " " + errorCode);
-                    });
                 }
             },
             (error, code) =>

@@ -32,6 +32,23 @@ namespace Emergence
         {
             selectButton.onClick.AddListener(OnSelectClicked);
             usePersonaAsCurrentButton.onClick.AddListener(OnUsePersonaAsCurrentClicked);
+
+            RequestImage.Instance.OnImageReady += Instance_OnImageReady;
+            RequestImage.Instance.OnImageFailed += Instance_OnImageFailed;
+        }
+
+        private void Instance_OnImageFailed(string url, string error, long errorCode)
+        {
+            Debug.LogError("[" + url + "] [" + errorCode + "] " + error);
+        }
+
+        private void Instance_OnImageReady(string url, Texture2D texture)
+        {
+            if (persona != null && url == persona.avatar.url)
+            {
+                persona.AvatarImage = texture;
+                photo.texture = persona.AvatarImage;
+            }
         }
 
         public delegate void Selected(Persona persona);
@@ -58,6 +75,8 @@ namespace Emergence
             photo.texture = persona.AvatarImage;
             unselectedBorder.SetActive(!selected);
             selectedBorder.SetActive(selected);
+
+            RequestImage.Instance.AskForImage(persona.avatar.url);
         }
 
         public void OnPointerEnter(PointerEventData eventData)

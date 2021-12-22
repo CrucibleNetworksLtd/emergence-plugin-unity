@@ -25,6 +25,11 @@ namespace Emergence
 
         private void Update()
         {
+            if (!headerInformation.activeSelf)
+            {
+                return;
+            }
+
             remainingTime -= Time.deltaTime;
 
             if (remainingTime <= 0.0f)
