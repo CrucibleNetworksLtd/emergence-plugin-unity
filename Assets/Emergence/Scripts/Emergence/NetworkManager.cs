@@ -279,8 +279,11 @@ namespace Emergence
 
             string url = DatabaseAPIPrivate + "persona";
 
-            using (UnityWebRequest request = UnityWebRequest.Post(url, jsonPersona))
+            using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
+                request.uploadHandler.contentType = "application/json";
+
                 request.SetRequestHeader("Authorization", currentAccessToken);
 
                 yield return request.SendWebRequest();
