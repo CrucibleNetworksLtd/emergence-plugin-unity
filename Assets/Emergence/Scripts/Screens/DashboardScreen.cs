@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Emergence
 {
@@ -16,6 +17,11 @@ namespace Emergence
         private Persona currentPersona;
 
         public static DashboardScreen Instance;
+
+        public TextMeshProUGUI titleText;
+        public TextMeshProUGUI contentsText;
+
+        private int numberOfPersonas = 0;
 
         private void Awake()
         {
@@ -34,6 +40,11 @@ namespace Emergence
 
         public void Refresh()
         {
+
+            titleText.text = "Hello,";
+            contentsText.text = "Your wallet has been connected successfully. \n Now, you will neeed to create a persona so you can interact with your friends.";
+
+            Modal.Instance.Show("Loading Personas...");
             HeaderScreen.Instance.Show();
             while (personaScrollContents.childCount > 0)
             {
@@ -63,11 +74,23 @@ namespace Emergence
                         go.transform.SetAsFirstSibling();
                     }
                 }
+
+                numberOfPersonas = personas.Count;
+
+                if (personas.Count>0)
+                {
+                    titleText.text = "Which persona are you going to use?";
+                    contentsText.text = "You can use it as you want to interact with friends and games.";
+                }
+                Modal.Instance.Hide();
+
             },
             (error, code) =>
             {
                 Debug.LogError("[" + code + "] " + error);
+                Modal.Instance.Hide();
             });
+            
         }
 
         private void OnCreatePersona()

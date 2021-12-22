@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -30,6 +31,10 @@ namespace Emergence
 
         public Texture2D defaultImage;
 
+        private Persona currentPersona;
+
+        private int avatarCounter = 0;
+
         private Dictionary<string, Texture2D> avatarsCache = new Dictionary<string, Texture2D>();
 
         private void Awake()
@@ -55,6 +60,8 @@ namespace Emergence
 
         public void Refresh(Persona persona, bool isDefault, bool isNew = false)
         {
+            currentPersona = persona;
+
             nameIF.text = persona.name;
             bioIF.text = persona.bio;
 
@@ -80,7 +87,8 @@ namespace Emergence
                 GameObject child = avatarScrollRoot.GetChild(0).gameObject;
                 avatarScrollItemsPool.ReturnUsedObject(child);
             }
-
+            avatarCounter = 0;
+            Modal.Instance.Show("Retrieving avatar data...");
             NetworkManager.Instance.GetAvatars((avatars) =>
             {
                 avatarsCache.Clear();
@@ -95,37 +103,81 @@ namespace Emergence
 
                     Persona.Avatar avatar = avatars[i];
 
-                    asi.Refresh(defaultImage, string.Empty);
+                    asi.Refresh(defaultImage, string.Empty, String.Empty);
+
+                    avatarCounter++;
 
                     RequestImage.Instance.AskForImage(avatar.url, (url, imageTexture2D) =>
                     {
-                        asi.Refresh(imageTexture2D, avatar.id);
+                        asi.Refresh(imageTexture2D, avatar.id, avatar.url);
 
                         avatarsCache.Add(avatar.id, imageTexture2D);
+                        avatarCounter--;
+                        if (avatarCounter<=0)
+                        {
+                            Modal.Instance.Hide();
+                        }
                     },
                     (url, error, errorCode) =>
                     {
                         Debug.LogError("[" + url + "] " + error + " " + errorCode);
+                        avatarCounter--;
+                        if (avatarCounter <= 0)
+                        {
+                            Modal.Instance.Hide();
+                        }
                     });
                 }
             },
             (error, code) =>
             {
                 Debug.LogError("[" + code + "] " + error);
+                Modal.Instance.Hide();
             });
 
-        }
-
-        private void OnCreateClicked()
-        {
-            // TODO Save persona
-            //currentAvatarId
         }
 
         private void OnDeleteClicked()
         {
             // TODO delete persona
-            //ModalPromptYESNO.Instance.Show("Delete " + "persona.name", "are you sure?", () => { });
+            ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () => {
+                NetworkManager.Instance.DeletePersona(currentPersona, () =>
+                {
+                    //exit
+                    Debug.Log("Deleting Persona");
+                    EmergenceManager.Instance.ShowDashboard();
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            });
+        }
+        private void OnCreateClicked()
+        {
+           
+            //currentPersona.id = "";
+
+            currentPersona.name = nameIF.text;
+            currentPersona.bio = bioIF.text;
+            //newPersona.settings = new Persona.PersonaSettings();
+            currentPersona.settings.availableOnSearch = availableOnSearchesToggle.isOn;
+            currentPersona.settings.receiveContactRequest = receiveContactRequestsToggle.isOn;
+            currentPersona.settings.showStatus = showingMyStatusToggle.isOn;
+            currentPersona.avatar.id = currentAvatarId;
+            currentPersona.avatar.url = "";//currentAvatarURL;
+
+            NetworkManager.Instance.SavePersona(currentPersona, () =>
+            {
+                //exit
+                Debug.Log("Saving Persona");
+                EmergenceManager.Instance.ShowDashboard();
+            },
+            (error, code) =>
+            {
+                Debug.LogError("[" + code + "] " + error);
+            });
+
         }
 
         private void OnBackClicked()
