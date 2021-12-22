@@ -40,6 +40,11 @@ namespace Emergence
 
         public void Refresh()
         {
+
+            titleText.text = "Hello,";
+            contentsText.text = "Your wallet has been connected successfully. \n Now, you will neeed to create a persona so you can interact with your friends.";
+
+            Modal.Instance.Show("Loading Personas...");
             HeaderScreen.Instance.Show();
             while (personaScrollContents.childCount > 0)
             {
@@ -74,15 +79,18 @@ namespace Emergence
 
                 if (personas.Count>0)
                 {
-                    titleText.text = "Hello,";
-                    contentsText.text = "Which persona are you going to use?";
-                }           
+                    titleText.text = "Which persona are you going to use?";
+                    contentsText.text = "You can use it as you want to interact with friends and games.";
+                }
+                Modal.Instance.Hide();
 
             },
             (error, code) =>
             {
                 Debug.LogError("[" + code + "] " + error);
+                Modal.Instance.Hide();
             });
+            
         }
 
         private void OnCreatePersona()

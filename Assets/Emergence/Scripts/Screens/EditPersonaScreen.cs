@@ -33,6 +33,8 @@ namespace Emergence
 
         private Persona currentPersona;
 
+        private int avatarCounter = 0;
+
         private Dictionary<string, Texture2D> avatarsCache = new Dictionary<string, Texture2D>();
 
         private void Awake()
@@ -85,7 +87,8 @@ namespace Emergence
                 GameObject child = avatarScrollRoot.GetChild(0).gameObject;
                 avatarScrollItemsPool.ReturnUsedObject(child);
             }
-
+            avatarCounter = 0;
+            Modal.Instance.Show("Retrieving avatar data...");
             NetworkManager.Instance.GetAvatars((avatars) =>
             {
                 avatarsCache.Clear();
@@ -102,21 +105,34 @@ namespace Emergence
 
                     asi.Refresh(defaultImage, string.Empty, String.Empty);
 
+                    avatarCounter++;
+
                     RequestImage.Instance.AskForImage(avatar.url, (url, imageTexture2D) =>
                     {
                         asi.Refresh(imageTexture2D, avatar.id, avatar.url);
 
                         avatarsCache.Add(avatar.id, imageTexture2D);
+                        avatarCounter--;
+                        if (avatarCounter<=0)
+                        {
+                            Modal.Instance.Hide();
+                        }
                     },
                     (url, error, errorCode) =>
                     {
                         Debug.LogError("[" + url + "] " + error + " " + errorCode);
+                        avatarCounter--;
+                        if (avatarCounter <= 0)
+                        {
+                            Modal.Instance.Hide();
+                        }
                     });
                 }
             },
             (error, code) =>
             {
                 Debug.LogError("[" + code + "] " + error);
+                Modal.Instance.Hide();
             });
 
         }
