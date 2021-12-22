@@ -8,10 +8,10 @@ namespace Emergence
         public static string Serialize<T>(T value, bool pretty = true)
         {
             // UnityEngine
-            return JsonUtility.ToJson(value, pretty);
+            //return JsonUtility.ToJson(value, pretty);
 
             // Newtonsoft Json.NET
-            //return JsonConvert.SerializeObject(value, pretty ? Formatting.Indented : Formatting.None);
+            return JsonConvert.SerializeObject(value, pretty ? Formatting.Indented : Formatting.None);
         }
 
         public static T Deserialize<T>(string serializedState)

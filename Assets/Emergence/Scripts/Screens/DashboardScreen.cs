@@ -64,7 +64,7 @@ namespace Emergence
 
                     // Loading images
                     RequestImage.Instance.AskForImage(persona.avatar.url, (url, imageTexture2D) =>
-                    {
+                    {//key is null
                         persona.AvatarImage = imageTexture2D;
                         psi.Refresh(persona, selected);
                     },

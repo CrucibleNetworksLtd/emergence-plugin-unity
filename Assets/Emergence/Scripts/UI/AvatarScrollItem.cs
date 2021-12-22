@@ -17,6 +17,8 @@ namespace Emergence
 
         private string id;
 
+        private string url;
+
         private void Awake()
         {
             selectButton.onClick.AddListener(OnSelectClicked);
@@ -29,9 +31,10 @@ namespace Emergence
             OnAvatarSelected?.Invoke(id);
         }
 
-        public void Refresh(Texture2D avatar, string id)
+        public void Refresh(Texture2D avatar, string id, string url)
         {
             this.id = id;
+            this.url = url;
             this.avatar.texture = avatar;
 
             ratioFitter.aspectRatio = (float)avatar.width / (float)avatar.height;

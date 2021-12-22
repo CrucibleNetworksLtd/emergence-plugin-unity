@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Newtonsoft.Json;
+using UnityEngine;
 
 namespace Emergence
 {
@@ -23,6 +24,7 @@ namespace Emergence
         public Avatar avatar;
         public PersonaSettings settings;
 
+        [JsonIgnore]
         public Texture2D AvatarImage
         {
             get;

@@ -264,6 +264,69 @@ namespace Emergence
             }
         }
 
+        public delegate void SuccessSavePersona();
+        public void SavePersona(Persona persona, SuccessSavePersona success, GenericError error)
+        {
+            StartCoroutine(CoroutineSavePersona(persona, success, error));
+        }
+
+        private IEnumerator CoroutineSavePersona(Persona persona, SuccessSavePersona success, GenericError error)
+        {
+            Debug.Log("Set Current Persona request started");
+            string jsonPersona = SerializationHelper.Serialize(persona);
+            Debug.Log("Json Persona: " + jsonPersona);
+            Debug.Log("currentAccessToken: " + currentAccessToken);
+
+            string url = DatabaseAPIPrivate + "persona";
+
+            using (UnityWebRequest request = UnityWebRequest.Post(url, jsonPersona))
+            {
+                request.SetRequestHeader("Authorization", currentAccessToken);
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Save Persona", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+
+        public delegate void SuccessDeletePersona();
+        public void DeletePersona(Persona persona, SuccessDeletePersona success, GenericError error)
+        {
+            StartCoroutine(CoroutineDeletePersona(persona, success, error));
+        }
+
+        private IEnumerator CoroutineDeletePersona(Persona persona, SuccessDeletePersona success, GenericError error)
+        {
+            Debug.Log("DeletePersona request started");
+            string url = DatabaseAPIPrivate + "persona/" + persona.id;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "DELETE";
+                request.SetRequestHeader("Authorization", currentAccessToken);
+                yield return request.SendWebRequest();
+                PrintRequestResult("Delete Persona Persona", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+
+
         public delegate void SuccessSetCurrentPersona();
         public void SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, GenericError error)
         {
