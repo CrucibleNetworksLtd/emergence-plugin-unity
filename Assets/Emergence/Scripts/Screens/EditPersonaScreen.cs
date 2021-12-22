@@ -124,7 +124,7 @@ namespace Emergence
         private void OnDeleteClicked()
         {
             // TODO delete persona
-            ModalPromptYESNO.Instance.Show("Delete " + "persona.name", "are you sure?", () => {
+            ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () => {
                 NetworkManager.Instance.DeletePersona(currentPersona, () =>
                 {
                     //exit

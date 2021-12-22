@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Emergence
 {
@@ -16,6 +17,11 @@ namespace Emergence
         private Persona currentPersona;
 
         public static DashboardScreen Instance;
+
+        public TextMeshProUGUI titleText;
+        public TextMeshProUGUI contentsText;
+
+        private int numberOfPersonas = 0;
 
         private void Awake()
         {
@@ -63,6 +69,15 @@ namespace Emergence
                         go.transform.SetAsFirstSibling();
                     }
                 }
+
+                numberOfPersonas = personas.Count;
+
+                if (personas.Count>0)
+                {
+                    titleText.text = "Hello,";
+                    contentsText.text = "Which persona are you going to use?";
+                }           
+
             },
             (error, code) =>
             {

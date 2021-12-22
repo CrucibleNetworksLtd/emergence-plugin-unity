@@ -5144,7 +5144,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000010501678}
+  m_AnchoredPosition: {x: 0, y: -0.000021917547}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1127518487
@@ -5226,6 +5226,8 @@ MonoBehaviour:
   personaScrollContents: {fileID: 2141342403}
   addPersonaButton: {fileID: 664006010}
   personaButtonPool: {fileID: 298836986}
+  titleText: {fileID: 1992027794}
+  contentsText: {fileID: 840061050}
 --- !u!1 &1149184753
 GameObject:
   m_ObjectHideFlags: 0
@@ -5388,7 +5390,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 413390345}
   m_HandleRect: {fileID: 413390344}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
