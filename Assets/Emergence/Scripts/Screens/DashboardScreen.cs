@@ -34,7 +34,8 @@ namespace Emergence
 
         public void Refresh()
         {
-            while(personaScrollContents.childCount > 0)
+            HeaderScreen.Instance.Show();
+            while (personaScrollContents.childCount > 0)
             {
                 personaButtonPool.ReturnUsedObject(personaScrollContents.GetChild(0).gameObject);
             }

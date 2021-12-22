@@ -212,24 +212,21 @@ namespace Emergence
         {
             Debug.Log("GetAccessToken request started");
             string url = APIBase + "get-access-token";
-            
+
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
                 PrintRequestResult("GetAccessToken", request);
-                if (request.responseCode == 200)
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
                 {
                     AccessTokenResponse accesstokenResponse = SerializationHelper.Deserialize<AccessTokenResponse>(request.downloadHandler.text);
                     currentAccessToken = SerializationHelper.Serialize(accesstokenResponse.message.accessToken, false);
-
-                    if (request.isNetworkError || request.isHttpError)
-                    {
-                        error?.Invoke(request.error, request.responseCode);
-                    }
-                    else
-                    {
-                        success?.Invoke(currentAccessToken);
-                    }
+                    success?.Invoke(currentAccessToken);
                 }
             }
         }
@@ -240,7 +237,7 @@ namespace Emergence
         {
             StartCoroutine(CoroutineGetPersonas(success, error));
         }
-        
+
         private IEnumerator CoroutineGetPersonas(SuccessPersonas success, GenericError error)
         {
             Debug.Log("GetPersonas request started");
