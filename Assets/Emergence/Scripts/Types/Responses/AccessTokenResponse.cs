@@ -2,14 +2,14 @@
 {
     public struct AccessTokenResponse
     {
-        public struct AccessToken
+        public class AccessToken
         {
             public string signedMessage;
             public string message;
             public string address;
         }
 
-        public struct Message
+        public class Message
         {
             public AccessToken accessToken;
         }

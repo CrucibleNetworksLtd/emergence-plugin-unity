@@ -64,11 +64,17 @@ namespace Emergence
             // TODO add the circle avatar image data
         }
 
-        public delegate void Disconnect();
-        public static event Disconnect OnDisconnect;
         private void OnDisconnectClick()
         {
-            OnDisconnect?.Invoke();
+            NetworkManager.Instance.Disconnect(() =>
+            {
+                Hide();
+                EmergenceManager.Instance.Restart();
+            },
+            (error, code) => 
+            {
+                Debug.LogError("[" + code + "] " + error);
+            });
         }
     }
 }
