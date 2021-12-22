@@ -144,5 +144,11 @@ namespace Emergence
         {
             ChangeState(ScreenStates.EditPersona);
         }
+
+        public void Restart()
+        {
+            LogInScreen.Instance.Restart();
+            state = ScreenStates.WaitForServer;
+        }
     }
 }

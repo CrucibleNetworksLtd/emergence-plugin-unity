@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,16 +15,36 @@ namespace Emergence
 
         public static HeaderScreen Instance;
 
+        private readonly float refreshTimeOut = 30.0f;
+        private float remainingTime = 0.0f;
         private void Awake()
         {
             Instance = this;
             disconnectButton.onClick.AddListener(OnDisconnectClick);
         }
 
-        // TODO Update
-        private void EmergenceState_OnBalanceRefreshed(string balance)
+        private void Update()
         {
-            walletBalance.text = balance;
+            if (!headerInformation.activeSelf)
+            {
+                return;
+            }
+
+            remainingTime -= Time.deltaTime;
+
+            if (remainingTime <= 0.0f)
+            {
+                remainingTime += refreshTimeOut;
+
+                NetworkManager.Instance.GetBalance((balance) =>
+                {
+                    walletBalance.text = balance;
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
         }
 
         private void Start()
@@ -42,6 +60,7 @@ namespace Emergence
         public void Show()
         {
             headerInformation.SetActive(true);
+            remainingTime = 0.0f;
         }
 
         public void Refresh(string address)
@@ -50,11 +69,17 @@ namespace Emergence
             // TODO add the circle avatar image data
         }
 
-        public delegate void Disconnect();
-        public static event Disconnect OnDisconnect;
         private void OnDisconnectClick()
         {
-            OnDisconnect?.Invoke();
+            NetworkManager.Instance.Disconnect(() =>
+            {
+                Hide();
+                EmergenceManager.Instance.Restart();
+            },
+            (error, code) => 
+            {
+                Debug.LogError("[" + code + "] " + error);
+            });
         }
     }
 }

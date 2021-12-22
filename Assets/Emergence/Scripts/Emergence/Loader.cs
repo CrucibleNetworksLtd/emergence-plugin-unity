@@ -47,6 +47,10 @@ namespace Emergence
         {
             SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
             EmergenceManager.OnButtonEsc -= EmergenceManager_OnButtonEsc;
+        }
+
+        private void OnApplicationQuit()
+        {
             NetworkManager.Instance.StopEVMServer();
         }
 

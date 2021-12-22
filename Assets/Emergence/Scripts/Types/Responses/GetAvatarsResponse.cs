@@ -2,7 +2,7 @@
 
 namespace Emergence
 {
-    public struct GetAvatarsResponse
+    public class GetAvatarsResponse
     {
         public List<Persona.Avatar> avatars;
     }
