@@ -16,6 +16,7 @@ namespace Emergence
         public TextMeshProUGUI title;
         public Button createButton;
         public Button deleteButton;
+        public GameObject deleteTooltip;
 
         public TMP_InputField nameIF;
         public TMP_InputField bioIF;
@@ -139,11 +140,9 @@ namespace Emergence
 
         private void OnDeleteClicked()
         {
-            // TODO delete persona
             ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () => {
                 NetworkManager.Instance.DeletePersona(currentPersona, () =>
                 {
-                    //exit
                     Debug.Log("Deleting Persona");
                     EmergenceManager.Instance.ShowDashboard();
                 },
