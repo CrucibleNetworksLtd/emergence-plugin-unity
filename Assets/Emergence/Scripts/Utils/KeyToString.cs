@@ -1,31 +1,33 @@
 ﻿using UnityEngine;
 
-public static class KeyToString
+namespace Emergence
 {
-
-    private static KeyCode[] keyCodes;
-
-    static KeyToString()
+    public static class KeyToString
     {
-        keyCodes = System.Enum.GetValues(typeof(KeyCode)) as KeyCode[];
-    }
+        private static KeyCode[] keyCodes;
 
-    public static string GetCurrentAlphaKey()
-    {
-        string result = string.Empty;
-        for (int i = 0; i < keyCodes.Length; i++)
+        static KeyToString()
         {
-            // Only alpha chars
-            if (keyCodes[i] >= KeyCode.A && keyCodes[i] <= KeyCode.Z)
-            {
-                if (Input.GetKeyDown(keyCodes[i]))
-                {
-                    result = keyCodes[i].ToString().ToLower();
-                    break;
-                }
-            }
+            keyCodes = System.Enum.GetValues(typeof(KeyCode)) as KeyCode[];
         }
 
-        return result;
+        public static string GetCurrentAlphaKey()
+        {
+            string result = string.Empty;
+            for (int i = 0; i < keyCodes.Length; i++)
+            {
+                // Only alpha chars
+                if (keyCodes[i] >= KeyCode.A && keyCodes[i] <= KeyCode.Z)
+                {
+                    if (Input.GetKeyDown(keyCodes[i]))
+                    {
+                        result = keyCodes[i].ToString().ToLower();
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }
