@@ -60,9 +60,8 @@ namespace Emergence
                     GameObject go = personaButtonPool.GetNewObject();
 
                     go.transform.SetParent(personaScrollContents);
-                    go.transform.localScale = Vector3.one; // Sometimes unity breaks the size when reparenting
+                    go.transform.localScale = Vector3.one;
 
-                    // Fill with persona info
                     PersonaScrollItem psi = go.GetComponent<PersonaScrollItem>();
 
                     Persona persona = personas[i];

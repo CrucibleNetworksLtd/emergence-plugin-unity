@@ -43,6 +43,18 @@ namespace Emergence
             escButton.onClick.AddListener(OnEscButtonPressed);
         }
 
+        private void Start()
+        {
+            // Get all the content size fitters in scroll areas and enable them for runtime
+            // Disabling them on edit time avoids dirtying the scene as soon as it loads
+            ContentSizeFitter[] csf = gameObject.GetComponentsInChildren<ContentSizeFitter>(true);
+
+            for (int i = 0; i < csf.Length; i++)
+            {
+                csf[i].enabled = true;
+            }
+        }
+
         private void Update()
         {
             switch (state)

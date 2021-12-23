@@ -13,6 +13,15 @@ namespace Emergence
         [Header("Tooltips")]
         [SerializeField]
         private string tooltipMessage;
+
+        private void Awake()
+        {
+            if (tooltipPosition == null)
+            {
+                tooltipPosition = GetComponent<RectTransform>();
+            }
+        }
+
         public void OnPointerEnter(PointerEventData eventData)
         {
             Tooltip.Instance.Show(tooltipPosition, tooltipMessage);
