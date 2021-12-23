@@ -20,6 +20,8 @@ namespace Emergence
 
         public static NetworkManager Instance;
 
+        private bool skipWallet = false;
+
         private void Awake()
         {
             Instance = this;
@@ -184,6 +186,12 @@ namespace Emergence
 
         public void GetBalance(BalanceSuccess success, GenericError error)
         {
+            if (skipWallet)
+            {
+                success?.Invoke("No wallet");
+                return;
+            }
+
             StartCoroutine(CoroutineGetBalance(success, error));
         }
 
@@ -426,6 +434,11 @@ namespace Emergence
         public delegate void DisconnectSuccess();
         public void Disconnect(DisconnectSuccess success, GenericError error)
         {
+            if (skipWallet)
+            {
+                return;
+            }
+
             StartCoroutine(CoroutineDisconnect(success, error));
         }
 
@@ -450,6 +463,13 @@ namespace Emergence
             }
         }
 
+        public void SkipWallet(bool skip, string accessTokenJson)
+        {
+            skipWallet = skip;
+
+            AccessTokenResponse at = SerializationHelper.Deserialize<AccessTokenResponse>(accessTokenJson);
+            currentAccessToken = SerializationHelper.Serialize(at.message.accessToken, false);
+        }
 
         private void PrintRequestResult(string name, UnityWebRequest request)
         {
