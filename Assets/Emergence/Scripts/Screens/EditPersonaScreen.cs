@@ -16,6 +16,7 @@ namespace Emergence
         public TextMeshProUGUI title;
         public Button createButton;
         public Button deleteButton;
+        public GameObject deleteTooltip;
 
         public TMP_InputField nameIF;
         public TMP_InputField bioIF;
