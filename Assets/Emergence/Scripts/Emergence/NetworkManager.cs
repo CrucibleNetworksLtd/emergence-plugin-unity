@@ -278,15 +278,15 @@ namespace Emergence
             }
         }
 
-        public delegate void SuccessSavePersona();
-        public void SavePersona(Persona persona, SuccessSavePersona success, GenericError error)
+        public delegate void SuccessCreatePersona();
+        public void CreatePersona(Persona persona, SuccessCreatePersona success, GenericError error)
         {
-            StartCoroutine(CoroutineSavePersona(persona, success, error));
+            StartCoroutine(CoroutineCreatePersona(persona, success, error));
         }
 
-        private IEnumerator CoroutineSavePersona(Persona persona, SuccessSavePersona success, GenericError error)
+        private IEnumerator CoroutineCreatePersona(Persona persona, SuccessCreatePersona success, GenericError error)
         {
-            Debug.Log("Set Current Persona request started");
+            Debug.Log("CreatePersona request started");
             string jsonPersona = SerializationHelper.Serialize(persona);
             Debug.Log("Json Persona: " + jsonPersona);
             Debug.Log("currentAccessToken: " + currentAccessToken);
@@ -295,6 +295,43 @@ namespace Emergence
 
             using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
+                request.uploadHandler.contentType = "application/json";
+
+                request.SetRequestHeader("Authorization", currentAccessToken);
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Save Persona", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+
+        public delegate void SuccessEditPersona();
+        public void EditPersona(Persona persona, SuccessEditPersona success, GenericError error)
+        {
+            StartCoroutine(CoroutineEditPersona(persona, success, error));
+        }
+
+        private IEnumerator CoroutineEditPersona(Persona persona, SuccessEditPersona success, GenericError error)
+        {
+            Debug.Log("Edit Persona request started");
+            string jsonPersona = SerializationHelper.Serialize(persona);
+            Debug.Log("Json Persona: " + jsonPersona);
+            Debug.Log("currentAccessToken: " + currentAccessToken);
+
+            string url = DatabaseAPIPrivate + "persona";
+
+            using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
+            {
+                request.method = "PATCH";
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
                 request.uploadHandler.contentType = "application/json";
 
