@@ -195,12 +195,28 @@ namespace Emergence
             currentPersona.settings.receiveContactRequest = receiveContactRequestsToggle.isOn;
             currentPersona.settings.showStatus = showingMyStatusToggle.isOn;
             currentPersona.avatar.id = currentAvatarId;
-            
 
-            NetworkManager.Instance.CreatePersona(currentPersona, () =>
+            if (string.IsNullOrEmpty(currentPersona.id))
+            {
+                NetworkManager.Instance.CreatePersona(currentPersona, () =>
+                {
+                    //exit
+                    Debug.Log("Saving Persona");
+                    Modal.Instance.Hide();
+                    EmergenceManager.Instance.ShowDashboard();
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                    Modal.Instance.Hide();
+                });
+                return;
+            }
+
+            NetworkManager.Instance.EditPersona(currentPersona, () =>
             {
                 //exit
-                Debug.Log("Saving Persona");
+                Debug.Log("Saving Changes to Persona");
                 Modal.Instance.Hide();
                 EmergenceManager.Instance.ShowDashboard();
             },
