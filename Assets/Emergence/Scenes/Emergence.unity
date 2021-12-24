@@ -3135,7 +3135,8 @@ MonoBehaviour:
   avatarScrollRoot: {fileID: 1127518486}
   title: {fileID: 1294921249}
   welcomeText: {fileID: 1715036780}
-  createButton: {fileID: 1342938549}
+  saveButton: {fileID: 1342938549}
+  saveButtonText: {fileID: 1887838256}
   deleteButton: {fileID: 404409189}
   deleteTooltip: {fileID: 1237211008}
   nameIF: {fileID: 909213497}
@@ -6126,7 +6127,7 @@ PrefabInstance:
     - target: {fileID: 4838606486605529808, guid: 9f600a28fa650434d81fd4ac09fb0a93,
         type: 3}
       propertyPath: m_Name
-      value: Create persona Button
+      value: Save persona Button
       objectReference: {fileID: 0}
     - target: {fileID: 4838606486605529811, guid: 9f600a28fa650434d81fd4ac09fb0a93,
         type: 3}
@@ -8698,6 +8699,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1887353495}
   m_CullTransparentMesh: 0
+--- !u!114 &1887838256 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4838606486419782871, guid: 9f600a28fa650434d81fd4ac09fb0a93,
+    type: 3}
+  m_PrefabInstance: {fileID: 1342938547}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1890609832
 GameObject:
   m_ObjectHideFlags: 0

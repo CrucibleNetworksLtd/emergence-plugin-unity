@@ -15,7 +15,8 @@ namespace Emergence
         public Transform avatarScrollRoot;
         public TextMeshProUGUI title;
         public TextMeshProUGUI welcomeText;
-        public Button createButton;
+        public Button saveButton;
+        public TextMeshProUGUI saveButtonText;
         public Button deleteButton;
         public GameObject deleteTooltip;
 
@@ -42,7 +43,7 @@ namespace Emergence
         private void Awake()
         {
             Instance = this;
-            createButton.onClick.AddListener(OnCreateClicked);
+            saveButton.onClick.AddListener(OnSaveClicked);
             deleteButton.onClick.AddListener(OnDeleteClicked);
             backButton.onClick.AddListener(OnBackClicked);
             useThisPersonaAsDefaultToggle.onValueChanged.AddListener(delegate {
@@ -81,7 +82,7 @@ namespace Emergence
 
         public void Refresh(Persona persona, bool isDefault, bool isNew = false)
         {
-            createButton.GetComponentInChildren<TextMeshProUGUI>().text = isNew ? "Create" : "Save";
+            saveButtonText.text = isNew ? "Create" : "Save";
 
             title.gameObject.SetActive(isNew);
             welcomeText.gameObject.SetActive(isNew);
@@ -180,14 +181,13 @@ namespace Emergence
                 });
             });
         }
-        private void OnCreateClicked()
+        private void OnSaveClicked()
         {
             if (string.IsNullOrEmpty(nameIF.text))
             {
                 return;
             }
             Modal.Instance.Show("Saving Changes...");
-            //currentPersona.id = "";
 
             currentPersona.name = nameIF.text;
             currentPersona.bio = bioIF.text;

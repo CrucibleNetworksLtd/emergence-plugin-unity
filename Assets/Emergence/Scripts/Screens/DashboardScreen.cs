@@ -66,7 +66,7 @@ namespace Emergence
 
                     Persona persona = personas[i];
                     bool selected = false;
-                    if (currentPersona!=null)
+                    if (currentPersona != null)
                     {
                         selected = currentPersona.id.Equals(persona.id);
                     }
