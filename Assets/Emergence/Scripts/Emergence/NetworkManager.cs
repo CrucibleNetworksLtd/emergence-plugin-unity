@@ -279,12 +279,12 @@ namespace Emergence
         }
 
         public delegate void SuccessSavePersona();
-        public void SavePersona(Persona persona, SuccessSavePersona success, GenericError error)
+        public void CreatePersona(Persona persona, SuccessSavePersona success, GenericError error)
         {
-            StartCoroutine(CoroutineSavePersona(persona, success, error));
+            StartCoroutine(CoroutineCreatePersona(persona, success, error));
         }
 
-        private IEnumerator CoroutineSavePersona(Persona persona, SuccessSavePersona success, GenericError error)
+        private IEnumerator CoroutineCreatePersona(Persona persona, SuccessSavePersona success, GenericError error)
         {
             Debug.Log("Set Current Persona request started");
             string jsonPersona = SerializationHelper.Serialize(persona);

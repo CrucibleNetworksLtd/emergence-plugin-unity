@@ -14,6 +14,7 @@ namespace Emergence
         public Pool avatarScrollItemsPool;
         public Transform avatarScrollRoot;
         public TextMeshProUGUI title;
+        public TextMeshProUGUI welcomeText;
         public Button createButton;
         public Button deleteButton;
         public GameObject deleteTooltip;
@@ -44,7 +45,26 @@ namespace Emergence
             createButton.onClick.AddListener(OnCreateClicked);
             deleteButton.onClick.AddListener(OnDeleteClicked);
             backButton.onClick.AddListener(OnBackClicked);
+            useThisPersonaAsDefaultToggle.onValueChanged.AddListener(delegate {
+                ToggleValueChanged(useThisPersonaAsDefaultToggle);
+            });
             AvatarScrollItem.OnAvatarSelected += AvatarScrollItem_OnAvatarSelected;
+        }
+
+        void ToggleValueChanged(Toggle change)
+        {
+            Modal.Instance.Show("Saving Changes...");
+            NetworkManager.Instance.SetCurrentPersona(currentPersona, () =>
+            {
+                Debug.Log("Successfully SetCurrentPersona to " + currentPersona.name);
+                useThisPersonaAsDefaultToggle.interactable = false;
+                Modal.Instance.Hide();
+            },
+            (error, code) =>
+            {
+                Debug.LogError("[" + code + "] " + error);
+                Modal.Instance.Hide();
+            });
         }
 
         private void OnDestroy()
@@ -61,6 +81,15 @@ namespace Emergence
 
         public void Refresh(Persona persona, bool isDefault, bool isNew = false)
         {
+            createButton.GetComponentInChildren<TextMeshProUGUI>().text = isNew ? "Create" : "Save";
+
+            title.gameObject.SetActive(isNew);
+            welcomeText.gameObject.SetActive(isNew);
+
+            deleteButton.gameObject.SetActive(!isNew);
+            deleteTooltip.gameObject.SetActive(!isNew);
+            useThisPersonaAsDefaultToggle.interactable = !isNew && !isDefault;
+
             currentPersona = persona;
 
             nameIF.text = persona.name;
@@ -71,7 +100,6 @@ namespace Emergence
             receiveContactRequestsToggle.SetIsOnWithoutNotify(persona.settings.receiveContactRequest);
 
             useThisPersonaAsDefaultToggle.SetIsOnWithoutNotify(isDefault);
-            useThisPersonaAsDefaultToggle.interactable = !isNew;
 
             if (persona.AvatarImage)
             {
@@ -154,27 +182,32 @@ namespace Emergence
         }
         private void OnCreateClicked()
         {
-           
+            if (string.IsNullOrEmpty(nameIF.text))
+            {
+                return;
+            }
+            Modal.Instance.Show("Saving Changes...");
             //currentPersona.id = "";
 
             currentPersona.name = nameIF.text;
             currentPersona.bio = bioIF.text;
-            //newPersona.settings = new Persona.PersonaSettings();
             currentPersona.settings.availableOnSearch = availableOnSearchesToggle.isOn;
             currentPersona.settings.receiveContactRequest = receiveContactRequestsToggle.isOn;
             currentPersona.settings.showStatus = showingMyStatusToggle.isOn;
             currentPersona.avatar.id = currentAvatarId;
-            currentPersona.avatar.url = "";//currentAvatarURL;
+            
 
-            NetworkManager.Instance.SavePersona(currentPersona, () =>
+            NetworkManager.Instance.CreatePersona(currentPersona, () =>
             {
                 //exit
                 Debug.Log("Saving Persona");
+                Modal.Instance.Hide();
                 EmergenceManager.Instance.ShowDashboard();
             },
             (error, code) =>
             {
                 Debug.LogError("[" + code + "] " + error);
+                Modal.Instance.Hide();
             });
 
         }

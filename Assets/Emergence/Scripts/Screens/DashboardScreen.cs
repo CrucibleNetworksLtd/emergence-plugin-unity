@@ -65,7 +65,12 @@ namespace Emergence
                     PersonaScrollItem psi = go.GetComponent<PersonaScrollItem>();
 
                     Persona persona = personas[i];
-                    bool selected = currentPersona.id.Equals(persona.id);
+                    bool selected = false;
+                    if (currentPersona!=null)
+                    {
+                        selected = currentPersona.id.Equals(persona.id);
+                    }
+                    
                     psi.Refresh(persona, selected);
 
                     if (selected)
@@ -124,6 +129,7 @@ namespace Emergence
         }
         private void PersonaScrollItem_OnUsePersonaAsCurrent(Persona persona)
         {
+            Modal.Instance.Show("Loading Personas...");
             NetworkManager.Instance.SetCurrentPersona(persona, () =>
             {
                 Refresh();
@@ -131,6 +137,7 @@ namespace Emergence
             (error, code) =>
             {
                 Debug.LogError("[" + code + "] " + error);
+                Modal.Instance.Hide();
             });
         }
     }
