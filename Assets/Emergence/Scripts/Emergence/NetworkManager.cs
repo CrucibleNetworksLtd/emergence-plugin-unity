@@ -436,6 +436,7 @@ namespace Emergence
         {
             if (skipWallet)
             {
+                success?.Invoke();
                 return;
             }
 
