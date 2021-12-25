@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Emergence
@@ -71,25 +68,32 @@ namespace Emergence
             bool shortcutPressed = Input.GetKeyDown(key)
                            && (shift && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) || !shift)
                            && (ctrl && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) || !ctrl);
+
             if (shortcutPressed)
             {
-                if (!ui.activeSelf)
+                if (EmergenceManager.Instance == null)
                 {
                     ui.SetActive(true);
                     SceneManager.LoadSceneAsync("Emergence", LoadSceneMode.Additive);
+                }
+                else
+                {
+                    EmergenceManager.Instance.gameObject.SetActive(true);
                 }
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                CloseOverlay();
+                if (EmergenceManager.Instance != null)
+                {
+                    EmergenceManager.Instance.gameObject.SetActive(false);
+                }
             }
         }
 
         private void CloseOverlay()
         {
-            SceneManager.UnloadSceneAsync("Emergence");
-            ui.SetActive(false);
+            EmergenceManager.Instance.gameObject.SetActive(false);
         }
 
         private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
