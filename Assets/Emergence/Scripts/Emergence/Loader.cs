@@ -101,7 +101,7 @@ namespace Emergence
             if (arg0.name.Equals("Emergence"))
             {
                 Debug.Log("Loaded");
-                ui.SetActive(false);
+                ui?.SetActive(false);
             }
         }
     }

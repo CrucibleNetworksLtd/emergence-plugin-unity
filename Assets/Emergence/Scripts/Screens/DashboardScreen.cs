@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
 
 namespace Emergence
 {
@@ -21,7 +22,8 @@ namespace Emergence
         public TextMeshProUGUI titleText;
         public TextMeshProUGUI contentsText;
 
-        private int numberOfPersonas = 0;
+        private HashSet<string> imagesRefreshing = new HashSet<string>();
+        private bool requestingInProgress = false;
 
         private void Awake()
         {
@@ -30,31 +32,37 @@ namespace Emergence
 
             PersonaScrollItem.OnSelected += PersonaScrollItem_OnSelected;
             PersonaScrollItem.OnUsePersonaAsCurrent += PersonaScrollItem_OnUsePersonaAsCurrent;
+            PersonaScrollItem.OnImageCompleted += PersonaScrollItem_OnImageCompleted;
         }
 
         private void OnDestroy()
         {
             PersonaScrollItem.OnSelected -= PersonaScrollItem_OnSelected;
             PersonaScrollItem.OnUsePersonaAsCurrent -= PersonaScrollItem_OnUsePersonaAsCurrent;
+            PersonaScrollItem.OnImageCompleted -= PersonaScrollItem_OnImageCompleted;
         }
 
         public void Refresh()
         {
-
             titleText.text = "Hello,";
             contentsText.text = "Your wallet has been connected successfully. \n Now, you will neeed to create a persona so you can interact with your friends.";
 
-            Modal.Instance.Show("Loading Personas...");
             HeaderScreen.Instance.Show();
             while (personaScrollContents.childCount > 0)
             {
                 personaButtonPool.ReturnUsedObject(personaScrollContents.GetChild(0).gameObject);
             }
 
+            Modal.Instance.Show("Loading Personas...");
+
             NetworkManager.Instance.GetPersonas((personas, currentPersona) =>
             {
+                Modal.Instance.Show("Retrieving avatar images...");
+
                 this.currentPersona = currentPersona;
 
+                requestingInProgress = true;
+                imagesRefreshing.Clear();
                 for (int i = 0; i < personas.Count; i++)
                 {
                     GameObject go = personaButtonPool.GetNewObject();
@@ -70,7 +78,8 @@ namespace Emergence
                     {
                         selected = currentPersona.id.Equals(persona.id);
                     }
-                    
+
+                    imagesRefreshing.Add(persona.id);
                     psi.Refresh(persona, selected);
 
                     if (selected)
@@ -79,22 +88,25 @@ namespace Emergence
                     }
                 }
 
-                numberOfPersonas = personas.Count;
-
-                if (personas.Count>0)
+                if (personas.Count > 0)
                 {
                     titleText.text = "Which persona are you going to use?";
                     contentsText.text = "You can use it as you want to interact with friends and games.";
                 }
-                Modal.Instance.Hide();
 
+                requestingInProgress = false;
+
+                // In case images were already cached
+                if (imagesRefreshing.Count <= 0)
+                {
+                    Modal.Instance.Hide();
+                }
             },
             (error, code) =>
             {
                 Debug.LogError("[" + code + "] " + error);
                 Modal.Instance.Hide();
             });
-            
         }
 
         private void OnCreatePersona()
@@ -116,7 +128,7 @@ namespace Emergence
                     showStatus = true,
                 },
                 AvatarImage = null,
-            }; 
+            };
 
             EditPersonaScreen.Instance.Refresh(persona, true, true);
             EmergenceManager.Instance.ShowEditPersona();
@@ -139,6 +151,22 @@ namespace Emergence
                 Debug.LogError("[" + code + "] " + error);
                 Modal.Instance.Hide();
             });
+        }
+
+        private void PersonaScrollItem_OnImageCompleted(Persona persona, bool success)
+        {
+            if (imagesRefreshing.Contains(persona.id))
+            {
+                imagesRefreshing.Remove(persona.id);
+                if (imagesRefreshing.Count <= 0 && !requestingInProgress)
+                {
+                    Modal.Instance.Hide();
+                }
+            }
+            else if (imagesRefreshing.Count > 0)
+            {
+                Debug.LogWarning("Image completed but not accounted for: [" + persona.id + "][" + persona.avatar.id + "][" + persona.avatar.url + "][" + success + "]");
+            }
         }
     }
 }

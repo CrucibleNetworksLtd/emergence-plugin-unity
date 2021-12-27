@@ -7,7 +7,7 @@ namespace Emergence
     {
         [Header("UI Reference")]
         [SerializeField]
-        private RawImage avatar;
+        private RawImage avatarRawImage;
 
         [SerializeField]
         private Button selectButton;
@@ -15,29 +15,57 @@ namespace Emergence
         [SerializeField]
         private AspectRatioFitter ratioFitter;
 
-        private string id;
+        private Persona.Avatar avatar;
 
-        private string url;
+        public delegate void ImageCompleted(Persona.Avatar avatar, bool success);
+        public static event ImageCompleted OnImageCompleted;
 
         private void Awake()
         {
             selectButton.onClick.AddListener(OnSelectClicked);
+            RequestImage.Instance.OnImageReady += Instance_OnImageReady;
+            RequestImage.Instance.OnImageFailed += Instance_OnImageFailed;
         }
 
-        public delegate void Selected(string id);
+        private void OnDestroy()
+        {
+            RequestImage.Instance.OnImageReady -= Instance_OnImageReady;
+            RequestImage.Instance.OnImageFailed -= Instance_OnImageFailed;
+        }
+
+        public delegate void Selected(Persona.Avatar avatar);
         public static event Selected OnAvatarSelected;
         private void OnSelectClicked()
         {
-            OnAvatarSelected?.Invoke(id);
+            OnAvatarSelected?.Invoke(avatar);
         }
 
-        public void Refresh(Texture2D avatar, string id, string url)
+        public void Refresh(Texture2D texture, Persona.Avatar avatar)
         {
-            this.id = id;
-            this.url = url;
-            this.avatar.texture = avatar;
+            this.avatar = avatar;
+            avatarRawImage.texture = texture;
 
-            ratioFitter.aspectRatio = (float)avatar.width / (float)avatar.height;
+            ratioFitter.aspectRatio = (float)texture.width / (float)texture.height;
+
+            RequestImage.Instance.AskForImage(avatar.url);
+        }
+
+        private void Instance_OnImageReady(string url, Texture2D texture)
+        {
+            if (url.Equals(avatar.url))
+            {
+                avatarRawImage.texture = texture;
+                OnImageCompleted?.Invoke(avatar, true);
+            }
+        }
+
+        private void Instance_OnImageFailed(string url, string error, long errorCode)
+        {
+            if (url.Equals(avatar.url))
+            {
+                Debug.LogError("[" + url + "] " + error + " " + errorCode);
+                OnImageCompleted?.Invoke(avatar, false);
+            }
         }
     }
 }

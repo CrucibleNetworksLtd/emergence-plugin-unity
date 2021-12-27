@@ -28,6 +28,9 @@ namespace Emergence
 
         private Persona persona;
 
+        public delegate void ImageCompleted(Persona persona, bool success);
+        public static event ImageCompleted OnImageCompleted;
+
         private void Awake()
         {
             selectButton.onClick.AddListener(OnSelectClicked);
@@ -37,28 +40,18 @@ namespace Emergence
             RequestImage.Instance.OnImageFailed += Instance_OnImageFailed;
         }
 
-        private void Instance_OnImageFailed(string url, string error, long errorCode)
+        private void OnDestroy()
         {
-            Debug.LogError("[" + url + "] [" + errorCode + "] " + error);
-        }
-
-        private void Instance_OnImageReady(string url, Texture2D texture)
-        {
-            if (persona != null && url == persona.avatar.url)
-            {
-                persona.AvatarImage = texture;
-                photo.texture = persona.AvatarImage;
-            }
+            RequestImage.Instance.OnImageReady -= Instance_OnImageReady;
+            RequestImage.Instance.OnImageFailed -= Instance_OnImageFailed;
         }
 
         public delegate void Selected(Persona persona);
         public static event Selected OnSelected;
-
         private void OnSelectClicked()
         {
             OnSelected?.Invoke(persona);
         }
-
 
         public static event Selected OnUsePersonaAsCurrent;
         private void OnUsePersonaAsCurrentClicked()
@@ -87,6 +80,25 @@ namespace Emergence
         public void OnPointerExit(PointerEventData eventData)
         {
             nameText.gameObject.SetActive(false);
+        }
+
+        private void Instance_OnImageReady(string url, Texture2D texture)
+        {
+            if (persona != null && url == persona.avatar.url)
+            {
+                persona.AvatarImage = texture;
+                photo.texture = persona.AvatarImage;
+                OnImageCompleted?.Invoke(persona, true);
+            }
+        }
+
+        private void Instance_OnImageFailed(string url, string error, long errorCode)
+        {
+            if (persona != null && url == persona.avatar.url)
+            {
+                Debug.LogError("[" + url + "] [" + errorCode + "] " + error);
+                OnImageCompleted?.Invoke(persona, false);
+            }
         }
     }
 }

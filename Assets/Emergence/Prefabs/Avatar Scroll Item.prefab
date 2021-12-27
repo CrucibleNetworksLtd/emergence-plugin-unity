@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0483071cbba580944a6b5cf01cd04b8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatar: {fileID: 4146920368382276221}
+  avatarRawImage: {fileID: 4146920368382276221}
   selectButton: {fileID: 2089673812464069504}
   ratioFitter: {fileID: -2632477849702846701}
 --- !u!1 &5714383595244274806
