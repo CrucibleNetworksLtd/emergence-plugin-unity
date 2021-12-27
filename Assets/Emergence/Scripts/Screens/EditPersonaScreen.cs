@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -9,6 +8,8 @@ namespace Emergence
 {
     public class EditPersonaScreen : MonoBehaviour
     {
+        public static EditPersonaScreen Instance;
+
         [Header("UI References")]
         public Button backButton;
         public Pool avatarScrollItemsPool;
@@ -27,17 +28,12 @@ namespace Emergence
         public Toggle availableOnSearchesToggle;
         public Toggle showingMyStatusToggle;
         public Toggle receiveContactRequestsToggle;
-
         public Toggle useThisPersonaAsDefaultToggle;
-
-        public static EditPersonaScreen Instance;
 
         public Texture2D defaultImage;
 
         private Persona currentPersona;
-
         private int avatarCounter = 0;
-
         private Dictionary<string, Texture2D> avatarsCache = new Dictionary<string, Texture2D>();
 
         private void Awake()
@@ -46,26 +42,8 @@ namespace Emergence
             saveButton.onClick.AddListener(OnSaveClicked);
             deleteButton.onClick.AddListener(OnDeleteClicked);
             backButton.onClick.AddListener(OnBackClicked);
-            useThisPersonaAsDefaultToggle.onValueChanged.AddListener(delegate {
-                ToggleValueChanged(useThisPersonaAsDefaultToggle);
-            });
+            useThisPersonaAsDefaultToggle.onValueChanged.AddListener(OnUseThisPersonaAsDefaultToggled);
             AvatarScrollItem.OnAvatarSelected += AvatarScrollItem_OnAvatarSelected;
-        }
-
-        void ToggleValueChanged(Toggle change)
-        {
-            Modal.Instance.Show("Saving Changes...");
-            NetworkManager.Instance.SetCurrentPersona(currentPersona, () =>
-            {
-                Debug.Log("Successfully SetCurrentPersona to " + currentPersona.name);
-                useThisPersonaAsDefaultToggle.interactable = false;
-                Modal.Instance.Hide();
-            },
-            (error, code) =>
-            {
-                Debug.LogError("[" + code + "] " + error);
-                Modal.Instance.Hide();
-            });
         }
 
         private void OnDestroy()
@@ -123,6 +101,7 @@ namespace Emergence
             {
                 avatarsCache.Clear();
 
+                bool requesting = true;
                 for (int i = 0; i < avatars.Count; i++)
                 {
                     GameObject go = avatarScrollItemsPool.GetNewObject();
@@ -130,9 +109,7 @@ namespace Emergence
                     go.transform.localScale = Vector3.one;
 
                     AvatarScrollItem asi = go.GetComponent<AvatarScrollItem>();
-
                     Persona.Avatar avatar = avatars[i];
-
                     asi.Refresh(defaultImage, string.Empty, String.Empty);
 
                     avatarCounter++;
@@ -142,8 +119,10 @@ namespace Emergence
                         asi.Refresh(imageTexture2D, avatar.id, avatar.url);
 
                         avatarsCache.Add(avatar.id, imageTexture2D);
+
+                        // If this is the last image returned, close the modal
                         avatarCounter--;
-                        if (avatarCounter<=0)
+                        if (avatarCounter <= 0 && !requesting)
                         {
                             Modal.Instance.Hide();
                         }
@@ -151,12 +130,21 @@ namespace Emergence
                     (url, error, errorCode) =>
                     {
                         Debug.LogError("[" + url + "] " + error + " " + errorCode);
+
+                        // If this is the last image returned, close the modal
                         avatarCounter--;
-                        if (avatarCounter <= 0)
+                        if (avatarCounter <= 0 && !requesting)
                         {
                             Modal.Instance.Hide();
                         }
                     });
+                }
+                requesting = false;
+
+                // In case all images were readily returned due to caching
+                if (avatarCounter <= 0)
+                {
+                    Modal.Instance.Hide();
                 }
             },
             (error, code) =>
@@ -164,12 +152,12 @@ namespace Emergence
                 Debug.LogError("[" + code + "] " + error);
                 Modal.Instance.Hide();
             });
-
         }
 
         private void OnDeleteClicked()
         {
-            ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () => {
+            ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () =>
+            {
                 NetworkManager.Instance.DeletePersona(currentPersona, () =>
                 {
                     Debug.Log("Deleting Persona");
@@ -181,6 +169,7 @@ namespace Emergence
                 });
             });
         }
+
         private void OnSaveClicked()
         {
             if (string.IsNullOrEmpty(nameIF.text))
@@ -215,7 +204,6 @@ namespace Emergence
 
             NetworkManager.Instance.EditPersona(currentPersona, () =>
             {
-                //exit
                 Debug.Log("Saving Changes to Persona");
                 Modal.Instance.Hide();
                 EmergenceManager.Instance.ShowDashboard();
@@ -231,6 +219,22 @@ namespace Emergence
         private void OnBackClicked()
         {
             EmergenceManager.Instance.ShowDashboard();
+        }
+
+        private void OnUseThisPersonaAsDefaultToggled(bool isOn)
+        {
+            Modal.Instance.Show("Saving Changes...");
+            NetworkManager.Instance.SetCurrentPersona(currentPersona, () =>
+            {
+                Debug.Log("Successfully SetCurrentPersona to " + currentPersona.name);
+                useThisPersonaAsDefaultToggle.interactable = false;
+                Modal.Instance.Hide();
+            },
+            (error, code) =>
+            {
+                Debug.LogError("[" + code + "] " + error);
+                Modal.Instance.Hide();
+            });
         }
     }
 }
