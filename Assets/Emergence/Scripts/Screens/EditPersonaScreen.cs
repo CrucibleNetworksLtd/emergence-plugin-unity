@@ -61,8 +61,9 @@ namespace Emergence
             {
                 personaAvatar.texture = texture;
             },
-            (uri, error, errorCode) =>
+            (url, error, errorCode) =>
             {
+                Debug.LogError("[" + url + "] " + error + " " + errorCode);
             });
 
             currentAvatarId = avatar.id;

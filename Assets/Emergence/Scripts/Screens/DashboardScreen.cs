@@ -39,6 +39,7 @@ namespace Emergence
         {
             PersonaScrollItem.OnSelected -= PersonaScrollItem_OnSelected;
             PersonaScrollItem.OnUsePersonaAsCurrent -= PersonaScrollItem_OnUsePersonaAsCurrent;
+            PersonaScrollItem.OnImageCompleted -= PersonaScrollItem_OnImageCompleted;
         }
 
         public void Refresh()
