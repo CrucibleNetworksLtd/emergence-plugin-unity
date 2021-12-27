@@ -28,6 +28,9 @@ namespace Emergence
 
         private Persona persona;
 
+        public delegate void ImageCompleted(Persona persona, bool success);
+        public static event ImageCompleted OnImageCompleted;
+
         private void Awake()
         {
             selectButton.onClick.AddListener(OnSelectClicked);
@@ -85,6 +88,7 @@ namespace Emergence
             {
                 persona.AvatarImage = texture;
                 photo.texture = persona.AvatarImage;
+                OnImageCompleted?.Invoke(persona, true);
             }
         }
 
@@ -93,6 +97,7 @@ namespace Emergence
             if (persona != null && url == persona.avatar.url)
             {
                 Debug.LogError("[" + url + "] [" + errorCode + "] " + error);
+                OnImageCompleted?.Invoke(persona, false);
             }
         }
     }
