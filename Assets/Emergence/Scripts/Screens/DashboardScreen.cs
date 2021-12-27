@@ -157,17 +157,15 @@ namespace Emergence
             if (imagesRefreshing.Contains(persona.id))
             {
                 imagesRefreshing.Remove(persona.id);
+                if (imagesRefreshing.Count <= 0 && !requestingInProgress)
+                {
+                    Modal.Instance.Hide();
+                }
             }
             else if (imagesRefreshing.Count > 0)
             {
                 Debug.LogWarning("Image completed but not accounted for: [" + persona.id + "][" + persona.avatar.id + "][" + persona.avatar.url + "][" + success + "]");
             }
-
-            if (imagesRefreshing.Count <= 0 && !requestingInProgress)
-            {
-                Modal.Instance.Hide();
-            }
         }
-
     }
 }

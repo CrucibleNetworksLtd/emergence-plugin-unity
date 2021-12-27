@@ -60,7 +60,7 @@ namespace Emergence
             RequestImage.Instance.AskForImage(avatar.url, (url, texture) =>
             {
                 personaAvatar.texture = texture;
-            }, 
+            },
             (uri, error, errorCode) =>
             {
             });
@@ -224,15 +224,14 @@ namespace Emergence
             if (imagesRefreshing.Contains(avatar.id))
             {
                 imagesRefreshing.Remove(avatar.id);
+                if (imagesRefreshing.Count <= 0 && !requestingInProgress)
+                {
+                    Modal.Instance.Hide();
+                }
             }
             else if (imagesRefreshing.Count > 0)
             {
                 Debug.LogWarning("Image completed but not accounted for: [" + avatar.id + "][" + avatar.url + "][" + success + "]");
-            }
-                
-            if (imagesRefreshing.Count <= 0 && !requestingInProgress)
-            {
-                Modal.Instance.Hide();
             }
         }
     }
