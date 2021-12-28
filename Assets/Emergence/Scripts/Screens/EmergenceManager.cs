@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace Emergence
@@ -64,30 +63,35 @@ namespace Emergence
                     if (!checkingForServer)
                     {
                         checkingForServer = true;
-                        NetworkManager.Instance.Ping(() =>
+                        NetworkManager.Instance.IsConnected((connected) =>
                             {
                                 Modal.Instance.Hide();
                                 Debug.Log("EVM server found");
                                 checkingForServer = false;
-                                ShowWelcome();
+
+                                if (connected && NetworkManager.Instance.HasAccessToken)
+                                {
+                                    ShowDashboard();
+                                }
+                                else
+                                {
+                                    ShowWelcome();
+                                }
                             },
                             (error, code) =>
                             {
                                 Modal.Instance.Show("Server not found, trying to launch");
                                 Debug.LogWarning("EVM code not running, trying to launch");
 
-                                try
+                                if (NetworkManager.Instance.StartEVMServer())
                                 {
-                                    // TODO send process id set a reference to the current process and use System.Diagnostics's Process.Id property:int nProcessID = Process.GetCurrentProcess().Id;
-                                    System.Diagnostics.Process.Start("run-server.bat");
-                                    Debug.Log("Running Emergence Server");
                                     Modal.Instance.Hide();
                                     checkingForServer = false;
                                     ShowWelcome();
                                 }
-                                catch (Exception e)
+                                else
                                 {
-                                    Debug.Log("Server error: " + e.Message);
+                                    Debug.LogWarning("Couldn't launch EVM Server");
                                     ModalPromptOK.Instance.Show("Error running server");
                                     checkingForServer = false;
                                 }

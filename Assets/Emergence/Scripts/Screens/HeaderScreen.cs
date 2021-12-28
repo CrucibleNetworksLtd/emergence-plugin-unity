@@ -43,6 +43,7 @@ namespace Emergence
                 (error, code) =>
                 {
                     Debug.LogError("[" + code + "] " + error);
+                    ModalPromptOK.Instance.Show("Sorry, there was a problem getting your balance, will retry in " + refreshTimeOut.ToString("0") + " seconds");
                 });
             }
         }

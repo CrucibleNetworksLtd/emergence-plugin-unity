@@ -31,7 +31,7 @@ namespace Emergence
         {
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             EmergenceManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
-            NetworkManager.Instance.StartEVMServer(nodeURL, gameId);
+            NetworkManager.Instance.SetupAndStartEVMServer(nodeURL, gameId);
             DontDestroyOnLoad(gameObject);
         }
 
