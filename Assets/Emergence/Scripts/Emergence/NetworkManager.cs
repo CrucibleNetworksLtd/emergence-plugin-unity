@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
+using Debug = UnityEngine.Debug;
 
 namespace Emergence
 {
@@ -21,6 +23,8 @@ namespace Emergence
         public static NetworkManager Instance;
 
         private bool skipWallet = false;
+
+        public delegate void GenericError(string message, long code);
 
         #region Monobehaviour
 
@@ -42,10 +46,23 @@ namespace Emergence
 
         #endregion Monobehaviour
 
+        #region Properties
+
+        public bool HasAccessToken
+        {
+            get
+            {
+                return currentAccessToken.Length > 0;
+            }
+        }
+
+        #endregion Properties
+
         #region EVM Server
 
         #region Start and Stop
-        public void StartEVMServer(string nodeURL, string gameId)
+
+        public void SetupAndStartEVMServer(string nodeURL, string gameId)
         {
             this.nodeURL = defaultNodeURL;
 
@@ -56,61 +73,87 @@ namespace Emergence
 
             this.gameId = gameId;
 
-            Ping(() =>
-            {
+            StartEVMServer();
+        }
 
-            },
-            (error, code) =>
-            {
-                Debug.LogWarning("EVM code not running, trying to launch");
+        private int attempts = 0;
+        public bool StartEVMServer()
+        {
+            bool started = false;
+            Process[] pname = Process.GetProcessesByName("EmergenceEVMLocalServer");
 
-                try
-                {
-                    // TODO send process id set a reference to the current process and use System.Diagnostics's Process.Id property:int nProcessID = Process.GetCurrentProcess().Id;
-                    System.Diagnostics.Process.Start("run-server.bat");
-                    Debug.Log("Running Emergence Server");
-                }
-                catch (Exception e)
-                {
-                    Debug.Log("Server error: " + e.Message);
-                }
-            });
+            if (pname.Length > 0)
+            {
+                Debug.Log("Process for EVM server found");
+                started = true;
+            }
+            else
+            {
+                Debug.LogWarning("Process for EVM server not found, trying to launch");
+                started = LaunchEVMServerProcess();
+            }
+
+            return started;
         }
 
         public void StopEVMServer()
         {
+            Debug.Log("Sending Finish command to EVM Server");
             Finish(() =>
             {
-
+                Debug.Log("EVM Server process Finished successfully");
             },
             (error, code) =>
             {
-                try
-                {
-                    System.Diagnostics.Process.Start("stop-server.bat");
-                    Debug.Log("Stopping Emergence Server");
-                }
-                catch (Exception e)
-                {
-                    Debug.Log("Server error: " + e.Message);
-                }
+                Debug.LogWarning("EVM Server process did not respond to Finish, trying to stop it forcefully");
+                StopEVMServerProcess();
             });
+        }
+
+        private bool LaunchEVMServerProcess()
+        {
+            bool started = false;
+            try
+            {
+                // TODO send process id set a reference to the current process and use System.Diagnostics's Process.Id property:int nProcessID = Process.GetCurrentProcess().Id;
+                Process.Start("run-server.bat");
+                Debug.Log("Running Emergence Server");
+                started = true;
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Server error: " + e.Message);
+            }
+
+            return started;
+        }
+
+        private void StopEVMServerProcess()
+        {
+            try
+            {
+                Debug.Log("Stopping Emergence Server");
+                Process.Start("stop-server.bat");
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Server error: " + e.Message);
+            }
         }
 
         #endregion Start and Stop
 
-        #region Ping
+        #region Is Connected
 
-        public delegate void PingSuccess();
-        public delegate void GenericError(string message, long code);
-        public void Ping(PingSuccess success, GenericError error)
+        public delegate void IsConnectedSuccess(bool connected);
+        public void IsConnected(IsConnectedSuccess success, GenericError error)
         {
-            StartCoroutine(CoroutinePing(success, error));
+            StartCoroutine(CoroutineIsConnected(success, error));
         }
 
-        private IEnumerator CoroutinePing(PingSuccess success, GenericError error)
+        private IEnumerator CoroutineIsConnected(IsConnectedSuccess success, GenericError error)
         {
-            Debug.Log("CoroutinePing request started");
+            Debug.Log("CoroutineIsConnected request started");
 
             string url = APIBase + "isConnected";
 
@@ -125,12 +168,60 @@ namespace Emergence
                 }
                 else
                 {
-                    success?.Invoke();
+                    IsConnectedResponse response = SerializationHelper.Deserialize<IsConnectedResponse>(request.downloadHandler.text);
+                    if (response.statusCode != 0)
+                    {
+                        error?.Invoke("Problem with IsConnected", response.statusCode);
+                    }
+                    else
+                    {
+                        success?.Invoke(response.message.isConnected);
+                    }
                 }
             }
         }
 
-        #endregion Ping
+        #endregion Is Connected
+
+        #region Reinitialize WalletConnect
+
+        public delegate void ReinitializeWalletConnectSuccess(bool disconnected);
+        public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, GenericError error)
+        {
+            StartCoroutine(CoroutineReinitializeWalletConnect(success, error));
+        }
+
+        private IEnumerator CoroutineReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, GenericError error)
+        {
+            Debug.Log("CoroutineReinitializeWalletConnect request started");
+
+            string url = APIBase + "reinitializewalletconnect";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                yield return request.SendWebRequest();
+                PrintRequestResult("ReinitializeWalletConnect", request);
+
+                if (request.isHttpError || request.isNetworkError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    ReinitializeWalletConnectResponse response = SerializationHelper.Deserialize<ReinitializeWalletConnectResponse>(request.downloadHandler.text);
+                    if (response.statusCode != 0)
+                    {
+                        error?.Invoke("Problem with ReinitializeWalletConnect", response.statusCode);
+                    }
+                    else
+                    {
+                        success?.Invoke(response.message.disconnected);
+                    }
+                }
+            }
+        }
+
+        #endregion Reinitialize WalletConnect
 
         #region QR Code
 
@@ -207,7 +298,6 @@ namespace Emergence
         #region Get Balance
 
         public delegate void BalanceSuccess(string balance);
-
         public void GetBalance(BalanceSuccess success, GenericError error)
         {
             if (skipWallet)
@@ -237,7 +327,15 @@ namespace Emergence
                 else
                 {
                     GetBalanceResponse response = SerializationHelper.Deserialize<GetBalanceResponse>(request.downloadHandler.text);
-                    success?.Invoke(response.message.balance);
+
+                    if (response.statusCode != 0)
+                    {
+                        error?.Invoke("Problem with GetBalance", response.statusCode);
+                    }
+                    else
+                    {
+                        success?.Invoke(response.message.balance);
+                    }
                 }
             }
         }
@@ -247,7 +345,6 @@ namespace Emergence
         #region Get Access Token
 
         public delegate void AccessTokenSuccess(string accessToken);
-
         public void GetAccessToken(AccessTokenSuccess success, GenericError error)
         {
             StartCoroutine(CoroutineGetAccessToken(success, error));
@@ -269,9 +366,17 @@ namespace Emergence
                 }
                 else
                 {
-                    AccessTokenResponse accesstokenResponse = SerializationHelper.Deserialize<AccessTokenResponse>(request.downloadHandler.text);
-                    currentAccessToken = SerializationHelper.Serialize(accesstokenResponse.message.accessToken, false);
-                    success?.Invoke(currentAccessToken);
+                    AccessTokenResponse response = SerializationHelper.Deserialize<AccessTokenResponse>(request.downloadHandler.text);
+
+                    if (response.statusCode != 0)
+                    {
+                        error?.Invoke("Problem with GetAccessToken", response.statusCode);
+                    }
+                    else
+                    {
+                        currentAccessToken = SerializationHelper.Serialize(response.message.accessToken, false);
+                        success?.Invoke(currentAccessToken);
+                    }
                 }
             }
         }
@@ -317,6 +422,7 @@ namespace Emergence
 
         #region Finish
 
+        public delegate void SuccessFinish();
         public void Finish(SuccessFinish success, GenericError error)
         {
             StartCoroutine(CoroutineFinish(success, error));
@@ -539,8 +645,6 @@ namespace Emergence
                 }
             }
         }
-
-        public delegate void SuccessFinish();
 
         #endregion AWS API
 

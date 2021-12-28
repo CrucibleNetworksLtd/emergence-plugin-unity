@@ -37,14 +37,15 @@ namespace Emergence
             switch (state)
             {
                 case States.Handshake:
-                    NetworkManager.Instance.Handshake((walletAddress) => 
+                    NetworkManager.Instance.Handshake((walletAddress) =>
                     {
                         state = States.RefreshAccessToken;
                         HeaderScreen.Instance.Refresh(walletAddress);
-                    }, 
-                    (error, code) => 
+                    },
+                    (error, code) =>
                     {
                         Debug.LogError("[" + code + "] " + error);
+                        Reinitialize();
                     });
 
                     state = States.QR;
@@ -61,10 +62,11 @@ namespace Emergence
                         (error, code) =>
                         {
                             Debug.LogError("[" + code + "] " + error);
+                            Reinitialize();
                         });
                     }
 
-                    refreshCounterText.text = Convert.ToInt32(timeRemaining).ToString();
+                    refreshCounterText.text = timeRemaining.ToString("0");
                     break;
                 case States.RefreshAccessToken:
                     state = States.RefreshingAccessToken;
@@ -76,6 +78,7 @@ namespace Emergence
                     (error, code) =>
                     {
                         Debug.LogError("[" + code + "] " + error);
+                        Reinitialize();
                     });
                     break;
             }
@@ -86,5 +89,26 @@ namespace Emergence
             state = States.Handshake;
             timeRemaining = 0.0f;
         }
+
+        private void Reinitialize()
+        {
+            ModalPromptOK.Instance.Show("Sorry, there was a problem with your request", () =>
+            {
+                NetworkManager.Instance.ReinitializeWalletConnect((disconnected) =>
+                {
+                    state = States.Handshake;
+                    timeRemaining = 0.0f;
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                    ModalPromptOK.Instance.Show("Error initializing wallet connection", () =>
+                    {
+                        Reinitialize();
+                    });
+                });
+            });
+        }
+
     }
 }
