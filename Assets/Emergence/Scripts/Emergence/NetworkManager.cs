@@ -22,6 +22,8 @@ namespace Emergence
 
         private bool skipWallet = false;
 
+        #region Monobehaviour
+
         private void Awake()
         {
             Instance = this;
@@ -29,6 +31,7 @@ namespace Emergence
 
         private void Update()
         {
+            // TODO handle access token expiration
             /*
             if (Token expired)
             {
@@ -37,6 +40,11 @@ namespace Emergence
             */
         }
 
+        #endregion Monobehaviour
+
+        #region EVM Server
+
+        #region Start and Stop
         public void StartEVMServer(string nodeURL, string gameId)
         {
             this.nodeURL = defaultNodeURL;
@@ -89,6 +97,10 @@ namespace Emergence
             });
         }
 
+        #endregion Start and Stop
+
+        #region Ping
+
         public delegate void PingSuccess();
         public delegate void GenericError(string message, long code);
         public void Ping(PingSuccess success, GenericError error)
@@ -118,6 +130,10 @@ namespace Emergence
             }
         }
 
+        #endregion Ping
+
+        #region QR Code
+
         public delegate void QRCodeSuccess(Texture2D qrCode);
         public void GetQRCode(QRCodeSuccess success, GenericError error)
         {
@@ -145,6 +161,10 @@ namespace Emergence
                 }
             }
         }
+
+        #endregion QR Code
+
+        #region Handshake
 
         public delegate void HandshakeSuccess(string walletAddress);
         public void Handshake(HandshakeSuccess success, GenericError error)
@@ -182,6 +202,10 @@ namespace Emergence
             }
         }
 
+        #endregion Handshake
+
+        #region Get Balance
+
         public delegate void BalanceSuccess(string balance);
 
         public void GetBalance(BalanceSuccess success, GenericError error)
@@ -218,6 +242,10 @@ namespace Emergence
             }
         }
 
+        #endregion Get Balance
+
+        #region Get Access Token
+
         public delegate void AccessTokenSuccess(string accessToken);
 
         public void GetAccessToken(AccessTokenSuccess success, GenericError error)
@@ -247,6 +275,79 @@ namespace Emergence
                 }
             }
         }
+
+        #endregion Get Access Token
+
+        #region Disconnect Wallet
+
+        public delegate void DisconnectSuccess();
+        public void Disconnect(DisconnectSuccess success, GenericError error)
+        {
+            if (skipWallet)
+            {
+                success?.Invoke();
+                return;
+            }
+
+            StartCoroutine(CoroutineDisconnect(success, error));
+        }
+
+        private IEnumerator CoroutineDisconnect(DisconnectSuccess success, GenericError error)
+        {
+            Debug.Log("Disconnect request started");
+            string url = APIBase + "killSession";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                yield return request.SendWebRequest();
+                PrintRequestResult("Disconnect request completed", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+
+        #endregion Disconnect Wallet
+
+        #region Finish
+
+        public void Finish(SuccessFinish success, GenericError error)
+        {
+            StartCoroutine(CoroutineFinish(success, error));
+        }
+
+        private IEnumerator CoroutineFinish(SuccessFinish success, GenericError error)
+        {
+            Debug.Log("Finish request started");
+            string url = APIBase + "finish";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                yield return request.SendWebRequest();
+                PrintRequestResult("Finish request completed", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+
+        #endregion Finish
+
+        #endregion EVM Server
+
+        #region AWS API
 
         public delegate void SuccessPersonas(List<Persona> personas, Persona currentPersona);
 
@@ -380,7 +481,6 @@ namespace Emergence
             }
         }
 
-
         public delegate void SuccessSetCurrentPersona();
         public void SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, GenericError error)
         {
@@ -442,64 +542,9 @@ namespace Emergence
 
         public delegate void SuccessFinish();
 
-        public void Finish(SuccessFinish success, GenericError error)
-        {
-            StartCoroutine(CoroutineFinish(success, error));
-        }
+        #endregion AWS API
 
-        private IEnumerator CoroutineFinish(SuccessFinish success, GenericError error)
-        {
-            Debug.Log("Finish request started");
-            string url = APIBase + "finish";
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                yield return request.SendWebRequest();
-                PrintRequestResult("Finish request completed", request);
-
-                if (request.isNetworkError || request.isHttpError)
-                {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    success?.Invoke();
-                }
-            }
-        }
-
-        public delegate void DisconnectSuccess();
-        public void Disconnect(DisconnectSuccess success, GenericError error)
-        {
-            if (skipWallet)
-            {
-                success?.Invoke();
-                return;
-            }
-
-            StartCoroutine(CoroutineDisconnect(success, error));
-        }
-
-        private IEnumerator CoroutineDisconnect(DisconnectSuccess success, GenericError error)
-        {
-            Debug.Log("Disconnect request started");
-            string url = APIBase + "killSession";
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                yield return request.SendWebRequest();
-                PrintRequestResult("Disconnect request completed", request);
-
-                if (request.isNetworkError || request.isHttpError)
-                {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    success?.Invoke();
-                }
-            }
-        }
+        #region No Wallet Cheat
 
         public void SkipWallet(bool skip, string accessTokenJson)
         {
@@ -508,6 +553,10 @@ namespace Emergence
             AccessTokenResponse at = SerializationHelper.Deserialize<AccessTokenResponse>(accessTokenJson);
             currentAccessToken = SerializationHelper.Serialize(at.message.accessToken, false);
         }
+
+        #endregion No Wallet Cheat
+
+        #region Debug info
 
         private void PrintRequestResult(string name, UnityWebRequest request)
         {
@@ -521,5 +570,7 @@ namespace Emergence
                 Debug.Log(request.downloadHandler.text);
             }
         }
+
+        #endregion Debug info
     }
 }
