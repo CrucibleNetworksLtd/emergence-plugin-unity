@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,15 +34,37 @@ namespace Emergence
             Instance = this;
         }
 
+        private bool refreshingToken = false;
         private void Update()
         {
-            // TODO handle access token expiration
-            /*
-            if (Token expired)
+            if (EmergenceManager.Instance == null)
             {
-                GetToken();
+                return;
             }
-            */
+
+            bool uiIsVisible = EmergenceManager.Instance.gameObject.activeSelf;
+
+            if (!skipWallet && uiIsVisible && !refreshingToken && HasAccessToken)
+            {
+                long now = DateTimeOffset.Now.ToUnixTimeSeconds();
+
+                if (expiration.expiresOn - now < 0)
+                {
+                    refreshingToken = true;
+                    ModalPromptOK.Instance.Show("Token expired. Check your wallet for renewal", () =>
+                    {
+                        GetAccessToken((token) =>
+                        {
+                            refreshingToken = false;
+                        },
+                        (error, code) =>
+                        {
+                            Debug.LogError("[" + code + "] " + error);
+                            refreshingToken = false;
+                        });
+                    });
+                }
+            }
         }
 
         #endregion Monobehaviour
@@ -374,6 +397,7 @@ namespace Emergence
                     else
                     {
                         currentAccessToken = SerializationHelper.Serialize(response.message.accessToken, false);
+                        ProcessExpiration(response.message.accessToken.message);
                         success?.Invoke(currentAccessToken);
                     }
                 }
@@ -653,13 +677,26 @@ namespace Emergence
         {
             skipWallet = skip;
 
-            AccessTokenResponse at = SerializationHelper.Deserialize<AccessTokenResponse>(accessTokenJson);
-            currentAccessToken = SerializationHelper.Serialize(at.message.accessToken, false);
+            AccessTokenResponse response = SerializationHelper.Deserialize<AccessTokenResponse>(accessTokenJson);
+            currentAccessToken = SerializationHelper.Serialize(response.message.accessToken, false);
+            ProcessExpiration(response.message.accessToken.message);
         }
 
         #endregion No Wallet Cheat
 
-        #region Debug info
+        #region Utilities
+
+        private class Expiration
+        {
+            [JsonProperty("expires-on")]
+            public long expiresOn;
+        }
+
+        private Expiration expiration;
+        private void ProcessExpiration(string expirationMessage)
+        {
+            expiration = SerializationHelper.Deserialize<Expiration>(expirationMessage);
+        }
 
         private bool RequestError(UnityWebRequest request)
         {
@@ -685,6 +722,6 @@ namespace Emergence
             }
         }
 
-        #endregion Debug info
+        #endregion Utilities
     }
 }
