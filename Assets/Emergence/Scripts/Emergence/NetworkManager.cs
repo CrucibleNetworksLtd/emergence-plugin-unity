@@ -76,7 +76,6 @@ namespace Emergence
             StartEVMServer();
         }
 
-        private int attempts = 0;
         public bool StartEVMServer()
         {
             bool started = false;
@@ -162,7 +161,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("IsConnected", request);
 
-                if (request.isHttpError || request.isNetworkError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -202,7 +201,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("ReinitializeWalletConnect", request);
 
-                if (request.isHttpError || request.isNetworkError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -242,7 +241,7 @@ namespace Emergence
 
                 PrintRequestResult("GetQrCode", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -274,7 +273,7 @@ namespace Emergence
 
                 PrintRequestResult("Handshake", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -320,7 +319,7 @@ namespace Emergence
 
                 PrintRequestResult("Get Balance", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -360,7 +359,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("GetAccessToken", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -407,7 +406,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("Disconnect request completed", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -438,7 +437,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("Finish request completed", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -473,7 +472,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("GetPersonas", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -510,7 +509,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("Save Persona", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -547,7 +546,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("Save Persona", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -576,7 +575,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("Delete Persona Persona", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -605,7 +604,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("Set Current Persona", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -634,7 +633,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("Get Avatars", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
@@ -662,10 +661,21 @@ namespace Emergence
 
         #region Debug info
 
+        private bool RequestError(UnityWebRequest request)
+        {
+#if UNITY_2020_1_OR_NEWER
+            return (request.result == UnityWebRequest.Result.ConnectionError ||
+                request.result == UnityWebRequest.Result.ProtocolError ||
+                request.result == UnityWebRequest.Result.DataProcessingError);
+#else
+            return (request.isHttpError || request.isNetworkError);
+#endif
+        }
+
         private void PrintRequestResult(string name, UnityWebRequest request)
         {
             Debug.Log(name + " completed " + request.responseCode);
-            if (request.isHttpError || request.isNetworkError)
+            if (RequestError(request))
             {
                 Debug.LogError(request.error);
             }
