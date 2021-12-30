@@ -107,37 +107,44 @@ namespace Emergence
                 Debug.LogError("[" + code + "] " + error);
                 Modal.Instance.Hide();
             });
-            
-            LoadNFTAvatar();
+           
         }
 
-        private void LoadNFTAvatar() 
+        private void LoadNFTAvatar(Material material) 
         {
             NetworkManager.Instance.LoadContract(() =>
             {
-                //Refresh();
-                Debug.Log("***LoadContract");
-
-                NetworkManager.Instance.ReadContract(() =>
+                NetworkManager.Instance.ReadContract<ReadContractTokenURIResponse>("tokenURI", (response) =>
                 {
-                    //Refresh();
-                    Debug.Log("***ReadContract");
+                    Debug.Log("NTF URL" + response.message.response);
+                    NetworkManager.Instance.GetNFTMetadata(response.message.response, (textureURL) =>
+                    {
+                        RequestImage.Instance.AskForImage(textureURL, (url, texture) =>
+                        {
+                            material.mainTexture = texture;
+                        },
+                        (url, error, errorCode) =>
+                        {
+                            // TODO merge con el mensaje de error del otro branch
+                            Debug.LogError("[" + errorCode + "] " + error);
+                        });
+                    },
+                    (error, code) =>
+                    {
+                        Debug.LogError("[" + code + "] " + error);
+                    });
                 },
                 (error, code) =>
                 {
                     Debug.LogError("[" + code + "] " + error);
-
                 });
 
             },
             (error, code) =>
             {
                 Debug.LogError("[" + code + "] " + error);
-
             });
-
         }
-
 
         private void OnCreatePersona()
         {
