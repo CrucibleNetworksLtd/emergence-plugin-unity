@@ -16,9 +16,13 @@ namespace Emergence
         private readonly string DatabaseAPIPrivate = "https://57l0bi6g53.execute-api.us-east-1.amazonaws.com/staging/";
         private readonly string defaultNodeURL = "https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134";
 
+        private readonly string contractAddress = "0x9498274B8C82B4a3127D67839F2127F2Ae9753f4";
+        private readonly string ABI = "[{'inputs':[{'internalType':'string','name':'name','type':'string'},{'internalType':'string','name':'symbol','type':'string'}],'stateMutability':'nonpayable','type':'constructor'},{'anonymous':false,'inputs':[{'indexed':true,'internalType':'address','name':'owner','type':'address'},{'indexed':true,'internalType':'address','name':'approved','type':'address'},{'indexed':true,'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'Approval','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'internalType':'address','name':'owner','type':'address'},{'indexed':true,'internalType':'address','name':'operator','type':'address'},{'indexed':false,'internalType':'bool','name':'approved','type':'bool'}],'name':'ApprovalForAll','type':'event'},{'anonymous':false,'inputs':[{'indexed':false,'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'TokenMinted','type':'event'},{'anonymous':false,'inputs':[{'indexed':true,'internalType':'address','name':'from','type':'address'},{'indexed':true,'internalType':'address','name':'to','type':'address'},{'indexed':true,'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'Transfer','type':'event'},{'inputs':[{'internalType':'address','name':'to','type':'address'},{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'approve','outputs':[],'stateMutability':'nonpayable','type':'function'},{'inputs':[{'internalType':'address','name':'owner','type':'address'}],'name':'balanceOf','outputs':[{'internalType':'uint256','name':'','type':'uint256'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'getApproved','outputs':[{'internalType':'address','name':'','type':'address'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'address','name':'owner','type':'address'},{'internalType':'address','name':'operator','type':'address'}],'name':'isApprovedForAll','outputs':[{'internalType':'bool','name':'','type':'bool'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'address','name':'player','type':'address'},{'internalType':'string','name':'tokenURI','type':'string'}],'name':'mint','outputs':[{'internalType':'uint256','name':'','type':'uint256'}],'stateMutability':'nonpayable','type':'function'},{'inputs':[],'name':'name','outputs':[{'internalType':'string','name':'','type':'string'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'ownerOf','outputs':[{'internalType':'address','name':'','type':'address'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'address','name':'from','type':'address'},{'internalType':'address','name':'to','type':'address'},{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'safeTransferFrom','outputs':[],'stateMutability':'nonpayable','type':'function'},{'inputs':[{'internalType':'address','name':'from','type':'address'},{'internalType':'address','name':'to','type':'address'},{'internalType':'uint256','name':'tokenId','type':'uint256'},{'internalType':'bytes','name':'_data','type':'bytes'}],'name':'safeTransferFrom','outputs':[],'stateMutability':'nonpayable','type':'function'},{'inputs':[{'internalType':'address','name':'operator','type':'address'},{'internalType':'bool','name':'approved','type':'bool'}],'name':'setApprovalForAll','outputs':[],'stateMutability':'nonpayable','type':'function'},{'inputs':[{'internalType':'bytes4','name':'interfaceId','type':'bytes4'}],'name':'supportsInterface','outputs':[{'internalType':'bool','name':'','type':'bool'}],'stateMutability':'view','type':'function'},{'inputs':[],'name':'symbol','outputs':[{'internalType':'string','name':'','type':'string'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'tokenURI','outputs':[{'internalType':'string','name':'','type':'string'}],'stateMutability':'view','type':'function'},{'inputs':[{'internalType':'address','name':'from','type':'address'},{'internalType':'address','name':'to','type':'address'},{'internalType':'uint256','name':'tokenId','type':'uint256'}],'name':'transferFrom','outputs':[],'stateMutability':'nonpayable','type':'function'}]";
         private string nodeURL = string.Empty;
         private string gameId = string.Empty;
         private string currentAccessToken = string.Empty;
+
+        private string avatarMetadataURI = string.Empty;
 
         public static NetworkManager Instance;
 
@@ -662,7 +666,7 @@ namespace Emergence
 
         #region Debug info
 
-        private void PrintRequestResult(string name, UnityWebRequest request)
+        public void PrintRequestResult(string name, UnityWebRequest request)
         {
             Debug.Log(name + " completed " + request.responseCode);
             if (request.isHttpError || request.isNetworkError)
@@ -676,5 +680,197 @@ namespace Emergence
         }
 
         #endregion Debug info
+
+        #region Contracts
+
+        public delegate void SuccessWriteContract();
+
+        public IEnumerator CoroutineWriteContract(SuccessWriteContract success, GenericError error, string ContractAddress, string ABI, string MethodName)
+        {
+            Debug.Log("WriteContract request started");
+            Debug.Log("currentAccessToken: " + currentAccessToken);
+
+            string url = APIBase + "writeMethod?contractAddress=" + ContractAddress + "&methodName=" + MethodName;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.SetRequestHeader("Authorization", currentAccessToken);
+                yield return request.SendWebRequest();
+                PrintRequestResult("Write Contract", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    //GetAvatarsResponse response = SerializationHelper.Deserialize<GetAvatarsResponse>(request.downloadHandler.text);
+                    //success?.Invoke(response.avatars);
+                }
+            }
+            using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
+            {
+
+                //request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
+                request.uploadHandler.contentType = "application/json";
+
+                request.SetRequestHeader("Content-Type", "application/json");
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Load Contract", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+
+                /*
+                HandshakeResponse response = SerializationHelper.Deserialize<HandshakeResponse>(request.downloadHandler.text);
+                if (response.statusCode != 0)
+                {
+                    error?.Invoke("Problem with handshake", response.statusCode);
+                }
+                else
+                {
+                    //success?.Invoke(response.message.address);
+                }*/
+            }
+        }
+
+        public delegate void SuccessLoadContract();
+
+        public void LoadContract(SuccessLoadContract success, GenericError error)
+        {
+            StartCoroutine(CoroutineLoadContract(success, error));
+        }
+
+        public IEnumerator CoroutineLoadContract(SuccessLoadContract success, GenericError error)
+        {
+            Debug.Log("LoadContract request started");
+
+            Debug.Log("currentAccessToken: " + currentAccessToken);
+
+            var data = new {
+                contractAddress = contractAddress,
+                ABI = ABI
+            };
+
+            string dataString = SerializationHelper.Serialize(data);
+            
+
+            string url = APIBase + "loadContract";
+
+            Debug.Log("LoadContract request started with JSON, calling LoadContract_HttpRequestComplete on request completed. Json sent as part of the request: " + dataString);
+
+
+
+            using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
+            {
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Load Contract", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    Debug.Log("Load Contract DATA: " + request.downloadHandler.data);
+                    success?.Invoke();
+                }
+            }
+        }
+
+        public delegate void SuccessReadContract();
+
+        public void ReadContract(SuccessReadContract success, GenericError error)
+        {
+            StartCoroutine(CoroutineReadContract(success, error));
+        }
+
+        public IEnumerator CoroutineReadContract(SuccessReadContract success, GenericError error)
+        {
+            Debug.Log("ReadContract request started");
+        
+            //content string armar con Json
+            Debug.Log("currentAccessToken: " + currentAccessToken);
+
+            string methodName = "tokenURI";
+
+            string url = APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
+            string[] data = { "1" };
+
+            string dataString = SerializationHelper.Serialize(data);
+
+            using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
+            {
+
+                request.uploadHandler.contentType = "application/json";
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Load Contract", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    Debug.Log("The response message Is: " + request.downloadHandler.text);
+                    //The response message Is: {"statusCode":1,"message":null}
+                    //LoadContractResponse response = SerializationHelper.Deserialize<LoadContractResponse>(request.downloadHandler.text);
+                    success?.Invoke();
+                }
+            }
+        }
+
+        public delegate void SuccessGetNFTAvatar(string avatarJson);
+
+        public void GetNFTAvatar(SuccessGetNFTAvatar success, GenericError error)
+        {
+            StartCoroutine(CoroutineGetNFTAvatar(success, error));
+        }
+
+
+        private IEnumerator CoroutineGetNFTAvatar(SuccessGetNFTAvatar success, GenericError error)
+        {
+            Debug.Log("GetNFTAvatar request started with JSON from " + avatarMetadataURI);
+            string url = avatarMetadataURI;
+
+            //using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                
+                yield return request.SendWebRequest();
+
+                PrintRequestResult("GetNFTAvatar", request);
+
+                if (request.isNetworkError || request.isHttpError)
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    //success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture);
+                }
+            }
+        }
+
+        private void DownloadNFTAvatar(string text)
+        {
+            Debug.Log("DownloadNFTAvatar from" + text);
+            //get image reference, assign the texture 2d
+        }
+
+        #endregion Contracts
     }
 }

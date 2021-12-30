@@ -107,7 +107,37 @@ namespace Emergence
                 Debug.LogError("[" + code + "] " + error);
                 Modal.Instance.Hide();
             });
+            
+            LoadNFTAvatar();
         }
+
+        private void LoadNFTAvatar() 
+        {
+            NetworkManager.Instance.LoadContract(() =>
+            {
+                //Refresh();
+                Debug.Log("***LoadContract");
+
+                NetworkManager.Instance.ReadContract(() =>
+                {
+                    //Refresh();
+                    Debug.Log("***ReadContract");
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+
+                });
+
+            },
+            (error, code) =>
+            {
+                Debug.LogError("[" + code + "] " + error);
+
+            });
+
+        }
+
 
         private void OnCreatePersona()
         {
