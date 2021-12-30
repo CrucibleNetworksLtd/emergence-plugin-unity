@@ -72,8 +72,10 @@ namespace Emergence
 
         private void OnDisconnectClick()
         {
+            Modal.Instance.Show("Disconnecting wallet...");
             NetworkManager.Instance.Disconnect(() =>
             {
+                Modal.Instance.Hide();
                 Hide();
                 EmergenceManager.Instance.Restart();
             },
