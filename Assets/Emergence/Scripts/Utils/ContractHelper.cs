@@ -63,5 +63,33 @@ namespace Emergence
                 error?.Invoke(errorMessage, code);
             });
         }
+
+        public delegate void WriteContractSuccess<T>(T response);
+        public static void WriteContract<T, U>(string contractAddress, string methodName, U body, WriteContractSuccess<T> success, GenericError error)
+        {
+            NetworkManager.Instance.IsConnected((connected) =>
+            {
+                if (connected)
+                {
+                    NetworkManager.Instance.WriteContract<T, U>(contractAddress, methodName, body, (response) =>
+                    {
+                        success?.Invoke(response);
+                    },
+                    (errorMessage, code) =>
+                    {
+                        error?.Invoke(errorMessage, code);
+                    });
+                }
+                else
+                {
+                    Debug.LogError("Write contract wallet not connected");
+                    error?.Invoke("Wallet not connected", 0);
+                }
+            },
+            (errorMessage, code) =>
+            {
+                error?.Invoke(errorMessage, code);
+            });
+        }
     }
 }

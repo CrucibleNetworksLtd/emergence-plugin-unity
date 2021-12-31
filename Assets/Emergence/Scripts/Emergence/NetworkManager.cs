@@ -726,50 +726,41 @@ namespace Emergence
 
         #region Contracts
 
-        public delegate void SuccessWriteContract();
-        public IEnumerator CoroutineWriteContract(SuccessWriteContract success, GenericError error, string ContractAddress, string ABI, string MethodName)
-        {
-            Debug.Log("WriteContract request started");
-            Debug.Log("currentAccessToken: " + currentAccessToken);
+        public delegate void SuccessWriteContract<T>(T response);
 
-            string url = APIBase + "writeMethod?contractAddress=" + ContractAddress + "&methodName=" + MethodName;
+        public void WriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
+        {
+            StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, body, success, error));
+        }
+
+        public IEnumerator CoroutineWriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
+        {
+            Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
+
+            string url = APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
+
+            string dataString = SerializationHelper.Serialize(body, false);
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
-                request.SetRequestHeader("Authorization", currentAccessToken);
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
                 yield return request.SendWebRequest();
                 PrintRequestResult("Write Contract", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
                 else
                 {
-                    //TODO: TEst Write Contracts
-                }
-            }
-            using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
-            {
-
-                request.uploadHandler.contentType = "application/json";
-
-                request.SetRequestHeader("Content-Type", "application/json");
-
-                yield return request.SendWebRequest();
-                PrintRequestResult("Load Contract", request);
-
-                if (request.isNetworkError || request.isHttpError)
-                {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    success?.Invoke();
+                    T response = SerializationHelper.Deserialize<T>(request.downloadHandler.text);
+                    success?.Invoke(response);
                 }
             }
         }
-
 
         public delegate void SuccessLoadContract();
         public void LoadContract(string contractAddress, string ABI, SuccessLoadContract success, GenericError error)
@@ -841,7 +832,7 @@ namespace Emergence
                 yield return request.SendWebRequest();
                 PrintRequestResult("Read Contract", request);
 
-                if (request.isNetworkError || request.isHttpError)
+                if (RequestError(request))
                 {
                     error?.Invoke(request.error, request.responseCode);
                 }
