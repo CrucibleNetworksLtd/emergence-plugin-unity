@@ -723,5 +723,138 @@ namespace Emergence
         }
 
         #endregion Utilities
+
+        #region Contracts
+
+        #region Load Contract
+
+        public delegate void SuccessLoadContract();
+        public void LoadContract(string contractAddress, string ABI, SuccessLoadContract success, GenericError error)
+        {
+            StartCoroutine(CoroutineLoadContract(contractAddress, ABI, success, error));
+        }
+
+        public IEnumerator CoroutineLoadContract(string contractAddress, string ABI, SuccessLoadContract success, GenericError error)
+        {
+            Debug.Log("LoadContract request started");
+
+            Contract data = new Contract()
+            {
+                contractAddress = contractAddress,
+                ABI = ABI
+            };
+
+            string dataString = SerializationHelper.Serialize(data, false);
+            string url = APIBase + "loadContract";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Load Contract", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    LoadContractResponse response = SerializationHelper.Deserialize<LoadContractResponse>(request.downloadHandler.text);
+                    if (response.statusCode != 0)
+                    {
+                        error?.Invoke("Problem loading contract", response.statusCode);
+                    }
+                    else
+                    {
+                        success?.Invoke();
+                    }
+                }
+            }
+        }
+
+        #endregion Load Contract
+
+        #region Read Contract
+
+        public delegate void SuccessReadContract<T>(T response);
+        public void ReadContract<T, U>(string contractAddress, string methodName, U body, SuccessReadContract<T> success, GenericError error)
+        {
+            StartCoroutine(CoroutineReadContract<T, U>(contractAddress, methodName, body, success, error));
+        }
+
+        public IEnumerator CoroutineReadContract<T, U>(string contractAddress, string methodName, U body, SuccessReadContract<T> success, GenericError error)
+        {
+            Debug.Log("ReadContract request started [" + contractAddress + "] / " + methodName);
+
+            string url = APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
+
+            string dataString = SerializationHelper.Serialize(body, false);
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Read Contract", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    T response = SerializationHelper.Deserialize<T>(request.downloadHandler.text);
+                    success?.Invoke(response);
+                }
+            }
+        }
+
+        #endregion Read Contract
+
+        #region Write Contract
+
+        public delegate void SuccessWriteContract<T>(T response);
+        public void WriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
+        {
+            StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, body, success, error));
+        }
+
+        public IEnumerator CoroutineWriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
+        {
+            Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
+
+            string url = APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
+
+            string dataString = SerializationHelper.Serialize(body, false);
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Write Contract", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    T response = SerializationHelper.Deserialize<T>(request.downloadHandler.text);
+                    success?.Invoke(response);
+                }
+            }
+        }
+
+        #endregion Write Contract
+
+        #endregion Contracts
     }
 }

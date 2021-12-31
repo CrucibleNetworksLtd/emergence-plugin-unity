@@ -107,6 +107,7 @@ namespace Emergence
                 Debug.LogError("[" + code + "] " + error);
                 Modal.Instance.Hide();
             });
+
         }
 
         private void OnCreatePersona()
