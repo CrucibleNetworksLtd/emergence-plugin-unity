@@ -1,54 +1,67 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Networking;
+﻿using UnityEngine;
 
 namespace Emergence
 {
     public static class ContractHelper
     {
-        static bool isRequesting = false;
-        public static bool ReadContract(Material copy)
+        public delegate void GenericError(string message, long code);
+
+        public delegate void LoadContractSuccess();
+        public static void LoadContract(string contractAddress, string ABI, LoadContractSuccess success, GenericError error)
         {
-            NetworkManager.Instance.LoadContract(() =>
+            NetworkManager.Instance.IsConnected((connected) =>
             {
-                NetworkManager.Instance.ReadContract<ReadContractTokenURIResponse>("tokenURI", (response) =>
+                if (connected)
                 {
-                    Debug.Log("NTF URL" + response.message.response);
-                    NetworkManager.Instance.GetNFTMetadata(response.message.response, (textureURL) =>
-                    {
-                        RequestImage.Instance.AskForImage(textureURL, (url, texture) =>
+                    NetworkManager.Instance.LoadContract(contractAddress, ABI, () =>
                         {
-                            copy.mainTexture = texture;
-                            isRequesting = false;
+                            success?.Invoke();
                         },
-                        (url, error, errorCode) =>
+                        (errorMessage, code) =>
                         {
-                                // TODO merge con el mensaje de error del otro branch
-                                Debug.LogError("[" + errorCode + "] " + error);
-                            isRequesting = false;
+                            Debug.LogError("[" + code + "] " + errorMessage);
+                            error?.Invoke(errorMessage, code);
                         });
-                    },
-                    (error, code) =>
-                    {
-                        Debug.LogError("[" + code + "] " + error);
-                        isRequesting = false;
-                    });
-                },
-                (error, code) =>
+                }
+                else
                 {
-                    Debug.LogError("[" + code + "] " + error);
-                    isRequesting = false;
-                });
-
+                    Debug.LogError("Read contract wallet not connected");
+                    error?.Invoke("Wallet not connected", 0);
+                }
             },
-          (error, code) =>
-          {
-              Debug.LogError("[" + code + "] " + error);
-              isRequesting = false;
-          });
+            (errorMessage, code) =>
+            {
+                Debug.LogError("[" + code + "] " + errorMessage);
+                error?.Invoke(errorMessage, code);
+            });
+        }
 
-            return isRequesting;
+        public delegate void ReadContractSuccess<T>(T response);
+        public static void ReadContract<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
+        {
+            NetworkManager.Instance.IsConnected((connected) =>
+            {
+                if (connected)
+                {
+                    NetworkManager.Instance.ReadContract<T, U>(contractAddress, methodName, body, (response) =>
+                    {
+                        success?.Invoke(response);
+                    },
+                    (errorMessage, code) =>
+                    {
+                        error?.Invoke(errorMessage, code);
+                    });
+                }
+                else
+                {
+                    Debug.LogError("Read contract wallet not connected");
+                    error?.Invoke("Wallet not connected", 0);
+                }
+            },
+            (errorMessage, code) =>
+            {
+                error?.Invoke(errorMessage, code);
+            });
         }
     }
 }

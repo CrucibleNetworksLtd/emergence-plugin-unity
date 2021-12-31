@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using UnityEngine;
-
-namespace Emergence
+﻿namespace Emergence
 {
     public class Contract
     {
