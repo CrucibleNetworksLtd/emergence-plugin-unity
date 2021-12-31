@@ -726,41 +726,7 @@ namespace Emergence
 
         #region Contracts
 
-        public delegate void SuccessWriteContract<T>(T response);
-
-        public void WriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
-        {
-            StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, body, success, error));
-        }
-
-        public IEnumerator CoroutineWriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
-        {
-            Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
-
-            string url = APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
-
-            string dataString = SerializationHelper.Serialize(body, false);
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                request.method = "POST";
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
-                request.uploadHandler.contentType = "application/json";
-
-                yield return request.SendWebRequest();
-                PrintRequestResult("Write Contract", request);
-
-                if (RequestError(request))
-                {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    T response = SerializationHelper.Deserialize<T>(request.downloadHandler.text);
-                    success?.Invoke(response);
-                }
-            }
-        }
+        #region Load Contract
 
         public delegate void SuccessLoadContract();
         public void LoadContract(string contractAddress, string ABI, SuccessLoadContract success, GenericError error)
@@ -809,6 +775,10 @@ namespace Emergence
             }
         }
 
+        #endregion Load Contract
+
+        #region Read Contract
+
         public delegate void SuccessReadContract<T>(T response);
         public void ReadContract<T, U>(string contractAddress, string methodName, U body, SuccessReadContract<T> success, GenericError error)
         {
@@ -843,6 +813,47 @@ namespace Emergence
                 }
             }
         }
+
+        #endregion Read Contract
+
+        #region Write Contract
+
+        public delegate void SuccessWriteContract<T>(T response);
+        public void WriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
+        {
+            StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, body, success, error));
+        }
+
+        public IEnumerator CoroutineWriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
+        {
+            Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
+
+            string url = APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
+
+            string dataString = SerializationHelper.Serialize(body, false);
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Write Contract", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    T response = SerializationHelper.Deserialize<T>(request.downloadHandler.text);
+                    success?.Invoke(response);
+                }
+            }
+        }
+
+        #endregion Write Contract
 
         #endregion Contracts
     }
