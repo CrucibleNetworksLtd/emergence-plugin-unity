@@ -751,14 +751,12 @@ namespace Emergence
                 }
                 else
                 {
-                    //GetAvatarsResponse response = SerializationHelper.Deserialize<GetAvatarsResponse>(request.downloadHandler.text);
-                    //success?.Invoke(response.avatars);
+                    //TODO: TEst Write Contracts
                 }
             }
             using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
 
-                //request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
                 request.uploadHandler.contentType = "application/json";
 
                 request.SetRequestHeader("Content-Type", "application/json");
@@ -774,17 +772,6 @@ namespace Emergence
                 {
                     success?.Invoke();
                 }
-
-                /*
-                HandshakeResponse response = SerializationHelper.Deserialize<HandshakeResponse>(request.downloadHandler.text);
-                if (response.statusCode != 0)
-                {
-                    error?.Invoke("Problem with handshake", response.statusCode);
-                }
-                else
-                {
-                    //success?.Invoke(response.message.address);
-                }*/
             }
         }
 
@@ -793,13 +780,6 @@ namespace Emergence
         public void LoadContract(SuccessLoadContract success, GenericError error)
         {
             StartCoroutine(CoroutineLoadContract(success, error));
-        }
-
-
-        private class Contract
-        {
-            public string contractAddress;
-            public string ABI;
         }
 
         public IEnumerator CoroutineLoadContract(SuccessLoadContract success, GenericError error)
