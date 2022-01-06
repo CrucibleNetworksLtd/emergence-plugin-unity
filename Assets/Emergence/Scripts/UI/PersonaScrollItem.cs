@@ -69,7 +69,10 @@ namespace Emergence
             unselectedBorder.SetActive(!selected);
             selectedBorder.SetActive(selected);
 
-            RequestImage.Instance.AskForImage(persona.avatar.url);
+            if (!string.IsNullOrEmpty(persona.avatar.url))
+            {
+                RequestImage.Instance.AskForImage(persona.avatar.url);
+            }
         }
 
         public void OnPointerEnter(PointerEventData eventData)

@@ -76,14 +76,15 @@ namespace Emergence
             title.gameObject.SetActive(isNew);
             welcomeText.gameObject.SetActive(isNew);
 
-            deleteButton.gameObject.SetActive(!isNew);
-            deleteTooltip.gameObject.SetActive(!isNew);
+            deleteButton.gameObject.SetActive(!isNew && !isDefault);
+            deleteTooltip.SetActive(!isNew && !isDefault);
             useThisPersonaAsDefaultToggle.interactable = !isNew && !isDefault;
 
             currentPersona = persona;
-
+            currentAvatarId = currentPersona.avatar.id;
             nameIF.text = persona.name;
             bioIF.text = persona.bio;
+
 
             availableOnSearchesToggle.SetIsOnWithoutNotify(persona.settings.availableOnSearch);
             showingMyStatusToggle.SetIsOnWithoutNotify(persona.settings.showStatus);
@@ -142,14 +143,17 @@ namespace Emergence
         {
             ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () =>
             {
+                Modal.Instance.Show("Deleting Persona...");
                 NetworkManager.Instance.DeletePersona(currentPersona, () =>
                 {
                     Debug.Log("Deleting Persona");
+                    Modal.Instance.Hide();
                     EmergenceManager.Instance.ShowDashboard();
                 },
                 (error, code) =>
                 {
                     Debug.LogError("[" + code + "] " + error);
+                    Modal.Instance.Hide();
                 });
             });
         }
@@ -168,7 +172,7 @@ namespace Emergence
             currentPersona.settings.availableOnSearch = availableOnSearchesToggle.isOn;
             currentPersona.settings.receiveContactRequest = receiveContactRequestsToggle.isOn;
             currentPersona.settings.showStatus = showingMyStatusToggle.isOn;
-            currentPersona.avatar.id = currentAvatarId;
+            currentPersona.avatar.id = currentAvatarId != null? currentAvatarId : "";//TODO: Assign default avatar
 
             if (string.IsNullOrEmpty(currentPersona.id))
             {
@@ -176,6 +180,8 @@ namespace Emergence
                 {
                     Debug.Log("Saving Persona");
                     Modal.Instance.Hide();
+                    Debug.Log(currentPersona);
+                    ClearCurrentPersona();
                     EmergenceManager.Instance.ShowDashboard();
                 },
                 (error, code) =>
@@ -188,8 +194,10 @@ namespace Emergence
 
             NetworkManager.Instance.EditPersona(currentPersona, () =>
             {
+
                 Debug.Log("Saving Changes to Persona");
                 Modal.Instance.Hide();
+                ClearCurrentPersona();
                 EmergenceManager.Instance.ShowDashboard();
             },
             (error, code) =>
@@ -201,7 +209,13 @@ namespace Emergence
 
         private void OnBackClicked()
         {
+            ClearCurrentPersona();
             EmergenceManager.Instance.ShowDashboard();
+        }
+
+        private void ClearCurrentPersona()
+        {
+            currentAvatarId = string.Empty;
         }
 
         private void OnUseThisPersonaAsDefaultToggled(bool isOn)
@@ -211,6 +225,8 @@ namespace Emergence
             {
                 Debug.Log("Successfully SetCurrentPersona to " + currentPersona.name);
                 useThisPersonaAsDefaultToggle.interactable = false;
+                deleteButton.gameObject.SetActive(false);
+                deleteTooltip.gameObject.SetActive(false);
                 Modal.Instance.Hide();
             },
             (error, code) =>
