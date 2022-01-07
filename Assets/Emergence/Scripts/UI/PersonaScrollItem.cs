@@ -64,8 +64,11 @@ namespace Emergence
             this.persona = persona;
 
             nameText.gameObject.SetActive(false);
-            nameText.text = persona.name;
-            photo.texture = persona.AvatarImage;
+            nameText.text = persona.name;            
+            if (persona.AvatarImage != null)
+            {
+                photo.texture = persona.AvatarImage;
+            }
             unselectedBorder.SetActive(!selected);
             selectedBorder.SetActive(selected);
 

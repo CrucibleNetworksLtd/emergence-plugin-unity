@@ -55,7 +55,15 @@ namespace Emergence
 
         private string currentAvatarId = string.Empty;
         private void AvatarScrollItem_OnAvatarSelected(Persona.Avatar avatar)
-        {
+        {            
+            currentAvatarId = avatar.id;
+
+            if (currentAvatarId == null)
+            {
+                personaAvatar.texture = defaultImage;
+                return;
+            }
+
             // Image at this point is already cached
             RequestImage.Instance.AskForImage(avatar.url, (url, texture) =>
             {
@@ -64,9 +72,7 @@ namespace Emergence
             (url, error, errorCode) =>
             {
                 Debug.LogError("[" + url + "] " + error + " " + errorCode);
-            });
-
-            currentAvatarId = avatar.id;
+            });            
         }
 
         public void Refresh(Persona persona, bool isDefault, bool isNew = false)
@@ -112,6 +118,9 @@ namespace Emergence
 
             NetworkManager.Instance.GetAvatars((avatars) =>
             {
+                Persona.Avatar defaultAvatar = new Persona.Avatar();
+                avatars.Insert(0, defaultAvatar);
+
                 Modal.Instance.Show("Retrieving avatar images...");
                 requestingInProgress = true;
                 imagesRefreshing.Clear();
@@ -125,12 +134,10 @@ namespace Emergence
                     go.GetComponent<AvatarScrollItem>().Refresh(defaultImage, avatars[i]);
                 }
                 requestingInProgress = false;
-
-                // In case images were already cached
                 if (imagesRefreshing.Count <= 0)
                 {
                     Modal.Instance.Hide();
-                }
+                }                
             },
             (error, code) =>
             {
@@ -241,7 +248,7 @@ namespace Emergence
             if (imagesRefreshing.Contains(avatar.id))
             {
                 imagesRefreshing.Remove(avatar.id);
-                if (imagesRefreshing.Count <= 0 && !requestingInProgress)
+                if (imagesRefreshing.Count <= 1 && !requestingInProgress)
                 {
                     Modal.Instance.Hide();
                 }
