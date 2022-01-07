@@ -64,12 +64,18 @@ namespace Emergence
             this.persona = persona;
 
             nameText.gameObject.SetActive(false);
-            nameText.text = persona.name;
-            photo.texture = persona.AvatarImage;
+            nameText.text = persona.name;            
+            if (persona.AvatarImage != null)
+            {
+                photo.texture = persona.AvatarImage;
+            }
             unselectedBorder.SetActive(!selected);
             selectedBorder.SetActive(selected);
 
-            RequestImage.Instance.AskForImage(persona.avatar.url);
+            if (!string.IsNullOrEmpty(persona.avatar.url))
+            {
+                RequestImage.Instance.AskForImage(persona.avatar.url);
+            }
         }
 
         public void OnPointerEnter(PointerEventData eventData)
