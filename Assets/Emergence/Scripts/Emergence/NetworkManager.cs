@@ -13,9 +13,18 @@ namespace Emergence
     public class NetworkManager : MonoBehaviour
     {
         private readonly string APIBase = "http://localhost:50733/api/";
-        private readonly string DatabaseAPIPublic = "https://pfy3t4mqjb.execute-api.us-east-1.amazonaws.com/staging/";
-        private readonly string DatabaseAPIPrivate = "https://57l0bi6g53.execute-api.us-east-1.amazonaws.com/staging/";
         private readonly string defaultNodeURL = "https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134";
+
+        // Dev
+        private readonly string DatabaseAPIPrivate = "https://57l0bi6g53.execute-api.us-east-1.amazonaws.com/staging/";
+
+        // Staging
+        //private readonly string DatabaseAPIPrivate = "https://x8iq9e5fq1.execute-api.us-east-1.amazonaws.com/staging";
+
+        // Prod
+        //private readonly string DatabaseAPIPrivate = "https://i30mnhu5vg.execute-api.us-east-1.amazonaws.com/prod";
+
+
 
         private string nodeURL = string.Empty;
         private string gameId = string.Empty;
