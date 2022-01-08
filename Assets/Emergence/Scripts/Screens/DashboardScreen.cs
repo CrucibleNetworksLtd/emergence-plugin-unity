@@ -45,9 +45,6 @@ namespace Emergence
 
         public void Refresh()
         {
-            titleText.text = "Hello,";
-            contentsText.text = "Your wallet has been connected successfully. \n Now, you will neeed to create a persona so you can interact with your friends.";
-
             HeaderScreen.Instance.Show();
             while (personaScrollContents.childCount > 0)
             {
@@ -93,6 +90,11 @@ namespace Emergence
                 {
                     titleText.text = "Which persona are you going to use?";
                     contentsText.text = "You can use it as you want to interact with friends and games.";
+                }
+                else
+                {
+                    titleText.text = "Hello,";
+                    contentsText.text = "Your wallet has been connected successfully. \n Now, you will neeed to create a persona so you can interact with your friends.";
                 }
 
                 requestingInProgress = false;
