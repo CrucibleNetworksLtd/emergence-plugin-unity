@@ -21,6 +21,10 @@ namespace Emergence
 
         private void Awake()
         {
+            Loader.Instance.OnEmergenceUIVisibilityChanged.AddListener((visible) => { Debug.Log($"UI visible {visible}"); });
+            Loader.Instance.OnEmergenceUIOpened.AddListener(() => { Debug.Log("UI OPEN"); });
+            Loader.Instance.OnEmergenceUIClosed.AddListener(() => { Debug.Log("UI CLOSED"); });
+
             downloadButton.onClick.AddListener(OnDownloadClicked);
         }
 

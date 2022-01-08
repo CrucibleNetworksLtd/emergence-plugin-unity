@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 namespace Emergence
@@ -27,11 +29,41 @@ namespace Emergence
 
         private GameObject ui;
 
-        public delegate void EmergenceUI(bool visible);
-        public static event EmergenceUI OnEmergenceUI;
+        // Not showing this event in the Inspector because the actual visibility 
+        // parameter value would be overwritten by the value set in the inspector
+        public class EmergenceUIStateChanged : UnityEvent<bool> { }
+
+        [Serializable]
+        public class EmergenceUIOpened: UnityEvent { }
+
+        [Serializable]
+        public class EmergenceUIClosed: UnityEvent { }
+
+        [Header("Events")]
+        public EmergenceUIOpened OnEmergenceUIOpened;
+        public EmergenceUIClosed OnEmergenceUIClosed;
+        public EmergenceUIStateChanged OnEmergenceUIVisibilityChanged;
+
+        public static Loader Instance;
+
+        public bool IsUIVisible
+        {
+            get
+            {
+                return EmergenceManager.Instance != null && EmergenceManager.Instance.IsVisible;
+            }
+        }
 
         private void Awake()
         {
+            if (Instance != null)
+            {
+                Debug.LogError($"Emergence prefab instance already exists, removing this GameObject from the scene [{gameObject.name}]");
+                DestroyImmediate(gameObject);
+                return;
+            }
+
+            Instance = this;
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             EmergenceManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
             DontDestroyOnLoad(gameObject);
@@ -114,7 +146,8 @@ namespace Emergence
                         EmergenceManager.Instance.gameObject.SetActive(true);
                         SaveCursor();
                         UpdateCursor();
-                        OnEmergenceUI?.Invoke(true);
+                        OnEmergenceUIOpened.Invoke();
+                        OnEmergenceUIVisibilityChanged?.Invoke(true);
                     }
                 }
             }
@@ -127,23 +160,8 @@ namespace Emergence
                     {
                         EmergenceManager.Instance.gameObject.SetActive(false);
                         RestoreCursor();
-                        OnEmergenceUI?.Invoke(false);
-                    }
-                    else
-                    {
-                        EmergenceManager.Instance.gameObject.SetActive(true);
-                        OnEmergenceUI?.Invoke(true);
-                        UpdateCursor();
-                        ModalPromptYESNO.Instance.Show("Quit", "Are you sure?", () =>
-                        {
-                            Application.Quit();
-                        },
-                        () =>
-                        {
-                            EmergenceManager.Instance.gameObject.SetActive(false);
-                            OnEmergenceUI?.Invoke(false);
-                            RestoreCursor();
-                        });
+                        OnEmergenceUIClosed.Invoke();
+                        OnEmergenceUIVisibilityChanged?.Invoke(false);
                     }
                 }
             }
@@ -153,7 +171,8 @@ namespace Emergence
         {
             EmergenceManager.Instance.gameObject.SetActive(false);
             RestoreCursor();
-            OnEmergenceUI?.Invoke(false);
+            OnEmergenceUIClosed.Invoke();
+            OnEmergenceUIVisibilityChanged?.Invoke(false);
         }
 
         private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
@@ -165,7 +184,8 @@ namespace Emergence
                 EmergenceManager.Instance.gameObject.SetActive(true);
                 SaveCursor();
                 UpdateCursor();
-                OnEmergenceUI?.Invoke(true);
+                OnEmergenceUIOpened.Invoke();
+                OnEmergenceUIVisibilityChanged?.Invoke(true);
             }
         }
     }
