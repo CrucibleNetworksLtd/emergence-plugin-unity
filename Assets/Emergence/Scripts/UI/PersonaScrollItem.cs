@@ -59,17 +59,29 @@ namespace Emergence
             OnUsePersonaAsCurrent?.Invoke(persona);
         }
 
-        public void Refresh(Persona persona, bool selected)
+        public void Refresh(Texture2D texture, Persona persona, bool selected)
         {
             this.persona = persona;
 
             nameText.gameObject.SetActive(false);
             nameText.text = persona.name;
-            photo.texture = persona.AvatarImage;
+            
+            if (persona.AvatarImage == null)
+            {
+                persona.AvatarImage = texture;
+            }
+            else
+            {
+                photo.texture = persona.AvatarImage;
+            }
+
             unselectedBorder.SetActive(!selected);
             selectedBorder.SetActive(selected);
 
-            RequestImage.Instance.AskForImage(persona.avatar.url);
+            if (!RequestImage.Instance.AskForImage(persona.avatar.url))
+            {
+                OnImageCompleted?.Invoke(persona, false);
+            }
         }
 
         public void OnPointerEnter(PointerEventData eventData)

@@ -138,7 +138,17 @@ namespace Emergence
             try
             {
                 // TODO send process id set a reference to the current process and use System.Diagnostics's Process.Id property:int nProcessID = Process.GetCurrentProcess().Id;
-                Process.Start("run-server.bat");
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.FileName = "Server\\EmergenceEVMLocalServer.exe";
+                // Triple doubled double-quotes are needed for the server to receive CMD params with single double quotes (sigh...)
+                startInfo.Arguments = @"--walletconnect={""""""Name"""""":""""""Crucibletest"""""",""""""Description"""""":""""""UnrealEngine+WalletConnect"""""",""""""Icons"""""":""""""https://crucible.network/wp-content/uploads/2020/10/cropped-crucible_favicon-32x32.png"""""",""""""URL"""""":""""""https://crucible.network""""""}";
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                
+                Process serverProcess = new Process();
+                serverProcess.StartInfo = startInfo;
+                serverProcess.EnableRaisingEvents = true;
+                serverProcess.Start();
+
                 Debug.Log("Running Emergence Server");
                 started = true;
             }
@@ -154,6 +164,7 @@ namespace Emergence
         {
             try
             {
+                // TODO avoid using a bat file
                 Debug.Log("Stopping Emergence Server");
                 Process.Start("stop-server.bat");
             }

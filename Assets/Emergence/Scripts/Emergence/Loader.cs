@@ -27,11 +27,13 @@ namespace Emergence
 
         private GameObject ui;
 
+        public delegate void EmergenceUI(bool visible);
+        public static event EmergenceUI OnEmergenceUI;
+
         private void Awake()
         {
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             EmergenceManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
-            NetworkManager.Instance.SetupAndStartEVMServer(nodeURL, gameId);
             DontDestroyOnLoad(gameObject);
         }
 
@@ -58,11 +60,40 @@ namespace Emergence
                 Debug.LogError("Missing children");
                 return;
             }
+            NetworkManager.Instance.SetupAndStartEVMServer(nodeURL, gameId);
 
             ui = transform.GetChild(0).gameObject;
             ui.SetActive(false);
         }
 
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (hasFocus && EmergenceManager.Instance != null && EmergenceManager.Instance.IsVisible)
+            {
+                UpdateCursor();
+            }
+        }
+
+        private void SaveCursor()
+        {
+            previousCursorLockMode = Cursor.lockState;
+            previousCursorVisible = Cursor.visible;
+        }
+
+        private void UpdateCursor()
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
+        private void RestoreCursor()
+        {
+            Cursor.lockState = previousCursorLockMode;
+            Cursor.visible = previousCursorVisible;
+        }
+
+        private CursorLockMode previousCursorLockMode = CursorLockMode.None;
+        private bool previousCursorVisible = false;
         private void Update()
         {
             bool shortcutPressed = Input.GetKeyDown(key)
@@ -78,7 +109,13 @@ namespace Emergence
                 }
                 else
                 {
-                    EmergenceManager.Instance.gameObject.SetActive(true);
+                    if (!EmergenceManager.Instance.IsVisible)
+                    {
+                        EmergenceManager.Instance.gameObject.SetActive(true);
+                        SaveCursor();
+                        UpdateCursor();
+                        OnEmergenceUI?.Invoke(true);
+                    }
                 }
             }
 
@@ -86,7 +123,28 @@ namespace Emergence
             {
                 if (EmergenceManager.Instance != null)
                 {
-                    EmergenceManager.Instance.gameObject.SetActive(false);
+                    if (EmergenceManager.Instance.IsVisible)
+                    {
+                        EmergenceManager.Instance.gameObject.SetActive(false);
+                        RestoreCursor();
+                        OnEmergenceUI?.Invoke(false);
+                    }
+                    else
+                    {
+                        EmergenceManager.Instance.gameObject.SetActive(true);
+                        OnEmergenceUI?.Invoke(true);
+                        UpdateCursor();
+                        ModalPromptYESNO.Instance.Show("Quit", "Are you sure?", () =>
+                        {
+                            Application.Quit();
+                        },
+                        () =>
+                        {
+                            EmergenceManager.Instance.gameObject.SetActive(false);
+                            OnEmergenceUI?.Invoke(false);
+                            RestoreCursor();
+                        });
+                    }
                 }
             }
         }
@@ -94,6 +152,8 @@ namespace Emergence
         private void CloseOverlay()
         {
             EmergenceManager.Instance.gameObject.SetActive(false);
+            RestoreCursor();
+            OnEmergenceUI?.Invoke(false);
         }
 
         private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
@@ -102,6 +162,10 @@ namespace Emergence
             {
                 Debug.Log("Loaded");
                 ui?.SetActive(false);
+                EmergenceManager.Instance.gameObject.SetActive(true);
+                SaveCursor();
+                UpdateCursor();
+                OnEmergenceUI?.Invoke(true);
             }
         }
     }

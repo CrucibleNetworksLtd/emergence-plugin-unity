@@ -10,6 +10,7 @@ namespace Emergence
         [Header("UI References")]
         public Transform personaScrollContents;
         public Button addPersonaButton;
+        public Texture2D defaultTexture;
 
         [Header("Utilities")]
         [SerializeField]
@@ -80,7 +81,7 @@ namespace Emergence
                     }
 
                     imagesRefreshing.Add(persona.id);
-                    psi.Refresh(persona, selected);
+                    psi.Refresh(defaultTexture, persona, selected);
 
                     if (selected)
                     {

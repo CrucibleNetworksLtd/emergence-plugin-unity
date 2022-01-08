@@ -167,6 +167,12 @@ namespace Emergence
                             Debug.LogError(e.Message);
                             error = true;
                         }
+
+                        if (texture == null)
+                        {
+                            Debug.LogWarning("Couldn't convert downloaded image at " + request.url);
+                            failedCallback?.Invoke(request.url, "Couldn't convert downloaded image", 0);
+                        }
                     }
                     else
                     {

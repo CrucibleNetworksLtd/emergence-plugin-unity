@@ -47,7 +47,10 @@ namespace Emergence
 
             ratioFitter.aspectRatio = (float)texture.width / (float)texture.height;
 
-            RequestImage.Instance.AskForImage(avatar.url);
+            if (!RequestImage.Instance.AskForImage(avatar.url))
+            {
+                OnImageCompleted?.Invoke(avatar, false);
+            }
         }
 
         private void Instance_OnImageReady(string url, Texture2D texture)
