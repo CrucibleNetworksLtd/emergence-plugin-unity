@@ -348,6 +348,11 @@ namespace Emergence
                 return;
             }
 
+            if (disconnectInProgress)
+            {
+                return;
+            }
+
             StartCoroutine(CoroutineGetBalance(success, error));
         }
 
@@ -428,6 +433,7 @@ namespace Emergence
 
         #region Disconnect Wallet
 
+        private bool disconnectInProgress = false;
         public delegate void DisconnectSuccess();
         public void Disconnect(DisconnectSuccess success, GenericError error)
         {
@@ -437,6 +443,7 @@ namespace Emergence
                 return;
             }
 
+            disconnectInProgress = true;
             StartCoroutine(CoroutineDisconnect(success, error));
         }
 
@@ -452,10 +459,12 @@ namespace Emergence
 
                 if (RequestError(request))
                 {
+                    disconnectInProgress = false;
                     error?.Invoke(request.error, request.responseCode);
                 }
                 else
                 {
+                    disconnectInProgress = false;
                     success?.Invoke();
                 }
             }

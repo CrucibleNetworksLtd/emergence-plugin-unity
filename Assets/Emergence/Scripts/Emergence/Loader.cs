@@ -29,8 +29,7 @@ namespace Emergence
 
         private GameObject ui;
 
-        // Not showing this event in the Inspector because the actual visibility 
-        // parameter value would be overwritten by the value set in the inspector
+        [Serializable]
         public class EmergenceUIStateChanged : UnityEvent<bool> { }
 
         [Serializable]
@@ -42,6 +41,10 @@ namespace Emergence
         [Header("Events")]
         public EmergenceUIOpened OnEmergenceUIOpened;
         public EmergenceUIClosed OnEmergenceUIClosed;
+
+        // Not showing this event in the Inspector because the actual visibility 
+        // parameter value would be overwritten by the value set in the inspector
+        [HideInInspector]
         public EmergenceUIStateChanged OnEmergenceUIVisibilityChanged;
 
         public static Loader Instance;

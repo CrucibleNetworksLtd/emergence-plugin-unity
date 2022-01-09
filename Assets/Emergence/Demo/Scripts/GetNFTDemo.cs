@@ -21,10 +21,6 @@ namespace Emergence
 
         private void Awake()
         {
-            Loader.Instance.OnEmergenceUIVisibilityChanged.AddListener((visible) => { Debug.Log($"UI visible {visible}"); });
-            Loader.Instance.OnEmergenceUIOpened.AddListener(() => { Debug.Log("UI OPEN"); });
-            Loader.Instance.OnEmergenceUIClosed.AddListener(() => { Debug.Log("UI CLOSED"); });
-
             downloadButton.onClick.AddListener(OnDownloadClicked);
         }
 
@@ -33,6 +29,10 @@ namespace Emergence
             // This assignment creates a fresh instance of the material,
             // so we don't touch the asset file of the material
             materialInstance = NFTmeshRenderer.material;
+
+            Loader.Instance.OnEmergenceUIVisibilityChanged.AddListener((visible) => { Debug.Log($"UI visible {visible}"); });
+            Loader.Instance.OnEmergenceUIOpened.AddListener(() => { Debug.Log("UI OPEN"); });
+            Loader.Instance.OnEmergenceUIClosed.AddListener(() => { Debug.Log("UI CLOSED"); });
         }
 
         private void OnDownloadClicked()
