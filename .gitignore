@@ -7,3 +7,5 @@ Server/
 *.csproj
 .vs/
 accessToken.json
+*.env.dev*
+*.env.staging*

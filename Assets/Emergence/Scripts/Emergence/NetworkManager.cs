@@ -12,20 +12,6 @@ namespace Emergence
 {
     public class NetworkManager : MonoBehaviour
     {
-        private readonly string APIBase = "http://localhost:50733/api/";
-        private readonly string defaultNodeURL = "https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134";
-
-        // Dev
-        private readonly string DatabaseAPIPrivate = "https://57l0bi6g53.execute-api.us-east-1.amazonaws.com/staging/";
-
-        // Staging
-        //private readonly string DatabaseAPIPrivate = "https://x8iq9e5fq1.execute-api.us-east-1.amazonaws.com/staging";
-
-        // Prod
-        //private readonly string DatabaseAPIPrivate = "https://i30mnhu5vg.execute-api.us-east-1.amazonaws.com/prod";
-
-
-
         private string nodeURL = string.Empty;
         private string gameId = string.Empty;
         private string currentAccessToken = string.Empty;
@@ -34,6 +20,8 @@ namespace Emergence
 
         private bool skipWallet = false;
 
+        private EnvValues envValues = null;
+
         public delegate void GenericError(string message, long code);
 
         #region Monobehaviour
@@ -41,6 +29,39 @@ namespace Emergence
         private void Awake()
         {
             Instance = this;
+            TextAsset envFile;
+
+            try
+            {
+                envFile = Resources.Load<TextAsset>("emergence.env.dev");
+
+                if (envFile == null)
+                {
+                    envFile = Resources.Load<TextAsset>("emergence.env.staging");
+                }
+
+                if (envFile == null)
+                {
+                    envFile = Resources.Load<TextAsset>("emergence.env");
+                }
+
+                if (envFile == null)
+                {
+                    Debug.LogError("emergence.env file missing from Resources folder");
+                    return;
+                }
+
+                envValues = SerializationHelper.Deserialize<EnvValues>(envFile.text);
+
+                if (envValues == null)
+                {
+                    Debug.LogError("emergence.env file is corrupted");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.Message);
+            }
         }
 
         private bool refreshingToken = false;
@@ -96,7 +117,9 @@ namespace Emergence
 
         public void SetupAndStartEVMServer(string nodeURL, string gameId)
         {
-            this.nodeURL = defaultNodeURL;
+            if (!CheckEnv()) { return; }
+
+            this.nodeURL = envValues.defaultNodeURL;
 
             if (!String.IsNullOrEmpty(nodeURL.Trim()))
             {
@@ -110,6 +133,8 @@ namespace Emergence
 
         public bool StartEVMServer()
         {
+            if (!CheckEnv()) { return false; }
+
             bool started = false;
             Process[] pname = Process.GetProcessesByName("EmergenceEVMLocalServer");
 
@@ -129,6 +154,7 @@ namespace Emergence
 
         public void StopEVMServer()
         {
+            if (!CheckEnv()) { return; }
             Debug.Log("Sending Finish command to EVM Server");
             Finish(() =>
             {
@@ -143,6 +169,7 @@ namespace Emergence
 
         private bool LaunchEVMServerProcess()
         {
+            if (!CheckEnv()) { return false; }
             bool started = false;
             try
             {
@@ -171,6 +198,7 @@ namespace Emergence
 
         private void StopEVMServerProcess()
         {
+            if (!CheckEnv()) { return; }
             try
             {
                 // TODO avoid using a bat file
@@ -190,6 +218,7 @@ namespace Emergence
         public delegate void IsConnectedSuccess(bool connected);
         public void IsConnected(IsConnectedSuccess success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineIsConnected(success, error));
         }
 
@@ -197,7 +226,7 @@ namespace Emergence
         {
             Debug.Log("CoroutineIsConnected request started");
 
-            string url = APIBase + "isConnected";
+            string url = envValues.APIBase + "isConnected";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -230,6 +259,7 @@ namespace Emergence
         public delegate void ReinitializeWalletConnectSuccess(bool disconnected);
         public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineReinitializeWalletConnect(success, error));
         }
 
@@ -237,7 +267,7 @@ namespace Emergence
         {
             Debug.Log("CoroutineReinitializeWalletConnect request started");
 
-            string url = APIBase + "reinitializewalletconnect";
+            string url = envValues.APIBase + "reinitializewalletconnect";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -270,13 +300,14 @@ namespace Emergence
         public delegate void QRCodeSuccess(Texture2D qrCode);
         public void GetQRCode(QRCodeSuccess success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineGetQrCode(success, error));
         }
 
         private IEnumerator CoroutineGetQrCode(QRCodeSuccess success, GenericError error)
         {
             Debug.Log("GetQrCode request started");
-            string url = APIBase + "qrcode";
+            string url = envValues.APIBase + "qrcode";
 
             using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
             {
@@ -302,13 +333,14 @@ namespace Emergence
         public delegate void HandshakeSuccess(string walletAddress);
         public void Handshake(HandshakeSuccess success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineHandshake(success, error));
         }
 
         private IEnumerator CoroutineHandshake(HandshakeSuccess success, GenericError error)
         {
             Debug.Log("Handshake request started");
-            string url = APIBase + "handshake" + "?nodeUrl=" + nodeURL;
+            string url = envValues.APIBase + "handshake" + "?nodeUrl=" + nodeURL;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -342,6 +374,8 @@ namespace Emergence
         public delegate void BalanceSuccess(string balance);
         public void GetBalance(BalanceSuccess success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
+
             if (skipWallet)
             {
                 success?.Invoke("No wallet");
@@ -359,7 +393,7 @@ namespace Emergence
         private IEnumerator CoroutineGetBalance(BalanceSuccess success, GenericError error)
         {
             Debug.Log("Get Balance request started");
-            string url = APIBase + "getbalance";
+            string url = envValues.APIBase + "getbalance";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -394,13 +428,14 @@ namespace Emergence
         public delegate void AccessTokenSuccess(string accessToken);
         public void GetAccessToken(AccessTokenSuccess success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineGetAccessToken(success, error));
         }
 
         private IEnumerator CoroutineGetAccessToken(AccessTokenSuccess success, GenericError error)
         {
             Debug.Log("GetAccessToken request started");
-            string url = APIBase + "get-access-token";
+            string url = envValues.APIBase + "get-access-token";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -437,6 +472,8 @@ namespace Emergence
         public delegate void DisconnectSuccess();
         public void Disconnect(DisconnectSuccess success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
+
             if (skipWallet)
             {
                 success?.Invoke();
@@ -450,7 +487,7 @@ namespace Emergence
         private IEnumerator CoroutineDisconnect(DisconnectSuccess success, GenericError error)
         {
             Debug.Log("Disconnect request started");
-            string url = APIBase + "killSession";
+            string url = envValues.APIBase + "killSession";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -477,13 +514,14 @@ namespace Emergence
         public delegate void SuccessFinish();
         public void Finish(SuccessFinish success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineFinish(success, error));
         }
 
         private IEnumerator CoroutineFinish(SuccessFinish success, GenericError error)
         {
             Debug.Log("Finish request started");
-            string url = APIBase + "finish";
+            string url = envValues.APIBase + "finish";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -511,13 +549,14 @@ namespace Emergence
 
         public void GetPersonas(SuccessPersonas success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineGetPersonas(success, error));
         }
 
         private IEnumerator CoroutineGetPersonas(SuccessPersonas success, GenericError error)
         {
             Debug.Log("GetPersonas request started");
-            string url = DatabaseAPIPrivate + "personas";
+            string url = envValues.databaseAPIPrivate + "personas";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -540,6 +579,7 @@ namespace Emergence
         public delegate void SuccessCreatePersona();
         public void CreatePersona(Persona persona, SuccessCreatePersona success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineCreatePersona(persona, success, error));
         }
 
@@ -550,7 +590,7 @@ namespace Emergence
             Debug.Log("Json Persona: " + jsonPersona);
             Debug.Log("currentAccessToken: " + currentAccessToken);
 
-            string url = DatabaseAPIPrivate + "persona";
+            string url = envValues.databaseAPIPrivate + "persona";
 
             using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
@@ -576,6 +616,7 @@ namespace Emergence
         public delegate void SuccessEditPersona();
         public void EditPersona(Persona persona, SuccessEditPersona success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineEditPersona(persona, success, error));
         }
 
@@ -586,7 +627,7 @@ namespace Emergence
             Debug.Log("Json Persona: " + jsonPersona);
             Debug.Log("currentAccessToken: " + currentAccessToken);
 
-            string url = DatabaseAPIPrivate + "persona";
+            string url = envValues.databaseAPIPrivate + "persona";
 
             using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
@@ -613,13 +654,14 @@ namespace Emergence
         public delegate void SuccessDeletePersona();
         public void DeletePersona(Persona persona, SuccessDeletePersona success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineDeletePersona(persona, success, error));
         }
 
         private IEnumerator CoroutineDeletePersona(Persona persona, SuccessDeletePersona success, GenericError error)
         {
             Debug.Log("DeletePersona request started");
-            string url = DatabaseAPIPrivate + "persona/" + persona.id;
+            string url = envValues.databaseAPIPrivate + "persona/" + persona.id;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -642,13 +684,14 @@ namespace Emergence
         public delegate void SuccessSetCurrentPersona();
         public void SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineSetCurrentPersona(persona, success, error));
         }
 
         private IEnumerator CoroutineSetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, GenericError error)
         {
             Debug.Log("Set Current Persona request started");
-            string url = DatabaseAPIPrivate + "setActivePersona/" + persona.id;
+            string url = envValues.databaseAPIPrivate + "setActivePersona/" + persona.id;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -672,13 +715,14 @@ namespace Emergence
 
         public void GetAvatars(SuccessAvatars success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineGetAvatars(success, error));
         }
 
         private IEnumerator CoroutineGetAvatars(SuccessAvatars success, GenericError error)
         {
             Debug.Log("Get Avatars request started");
-            string url = DatabaseAPIPrivate + "userUnlockedAvatars?id=" + gameId;
+            string url = envValues.databaseAPIPrivate + "userUnlockedAvatars?id=" + gameId;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -714,6 +758,11 @@ namespace Emergence
         #endregion No Wallet Cheat
 
         #region Utilities
+
+        private bool CheckEnv()
+        {
+            return envValues != null;
+        }
 
         private class Expiration
         {
@@ -760,6 +809,7 @@ namespace Emergence
         public delegate void SuccessLoadContract();
         public void LoadContract(string contractAddress, string ABI, SuccessLoadContract success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineLoadContract(contractAddress, ABI, success, error));
         }
 
@@ -774,7 +824,7 @@ namespace Emergence
             };
 
             string dataString = SerializationHelper.Serialize(data, false);
-            string url = APIBase + "loadContract";
+            string url = envValues.APIBase + "loadContract";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -811,6 +861,7 @@ namespace Emergence
         public delegate void SuccessReadContract<T>(T response);
         public void ReadContract<T, U>(string contractAddress, string methodName, U body, SuccessReadContract<T> success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineReadContract<T, U>(contractAddress, methodName, body, success, error));
         }
 
@@ -818,7 +869,7 @@ namespace Emergence
         {
             Debug.Log("ReadContract request started [" + contractAddress + "] / " + methodName);
 
-            string url = APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
+            string url = envValues.APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
 
             string dataString = SerializationHelper.Serialize(body, false);
 
@@ -850,6 +901,7 @@ namespace Emergence
         public delegate void SuccessWriteContract<T>(T response);
         public void WriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
         {
+            if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, body, success, error));
         }
 
@@ -857,7 +909,7 @@ namespace Emergence
         {
             Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
 
-            string url = APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
+            string url = envValues.APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
 
             string dataString = SerializationHelper.Serialize(body, false);
 
