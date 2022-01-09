@@ -64,6 +64,7 @@ namespace Emergence
             this.persona = persona;
 
             nameText.gameObject.SetActive(false);
+
             nameText.text = persona.name;
             
             if (persona.AvatarImage == null)

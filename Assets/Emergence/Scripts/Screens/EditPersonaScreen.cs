@@ -55,7 +55,15 @@ namespace Emergence
 
         private string currentAvatarId = string.Empty;
         private void AvatarScrollItem_OnAvatarSelected(Persona.Avatar avatar)
-        {
+        {            
+            currentAvatarId = avatar.id;
+
+            if (currentAvatarId == null)
+            {
+                personaAvatar.texture = defaultImage;
+                return;
+            }
+
             // Image at this point is already cached
             RequestImage.Instance.AskForImage(avatar.url, (url, texture) =>
             {
@@ -64,9 +72,7 @@ namespace Emergence
             (url, error, errorCode) =>
             {
                 Debug.LogError("[" + url + "] " + error + " " + errorCode);
-            });
-
-            currentAvatarId = avatar.id;
+            });            
         }
 
         public void Refresh(Persona persona, bool isDefault, bool isNew = false)
@@ -76,14 +82,15 @@ namespace Emergence
             title.gameObject.SetActive(isNew);
             welcomeText.gameObject.SetActive(isNew);
 
-            deleteButton.gameObject.SetActive(!isNew);
-            deleteTooltip.gameObject.SetActive(!isNew);
+            deleteButton.gameObject.SetActive(!isNew && !isDefault);
+            deleteTooltip.SetActive(!isNew && !isDefault);
             useThisPersonaAsDefaultToggle.interactable = !isNew && !isDefault;
 
             currentPersona = persona;
-
+            currentAvatarId = currentPersona.avatar.id;
             nameIF.text = persona.name;
             bioIF.text = persona.bio;
+
 
             availableOnSearchesToggle.SetIsOnWithoutNotify(persona.settings.availableOnSearch);
             showingMyStatusToggle.SetIsOnWithoutNotify(persona.settings.showStatus);
@@ -111,6 +118,9 @@ namespace Emergence
 
             NetworkManager.Instance.GetAvatars((avatars) =>
             {
+                Persona.Avatar defaultAvatar = new Persona.Avatar();
+                avatars.Insert(0, defaultAvatar);
+
                 Modal.Instance.Show("Retrieving avatar images...");
                 requestingInProgress = true;
                 imagesRefreshing.Clear();
@@ -124,12 +134,10 @@ namespace Emergence
                     go.GetComponent<AvatarScrollItem>().Refresh(defaultImage, avatars[i]);
                 }
                 requestingInProgress = false;
-
-                // In case images were already cached
                 if (imagesRefreshing.Count <= 0)
                 {
                     Modal.Instance.Hide();
-                }
+                }                
             },
             (error, code) =>
             {
@@ -142,14 +150,17 @@ namespace Emergence
         {
             ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () =>
             {
+                Modal.Instance.Show("Deleting Persona...");
                 NetworkManager.Instance.DeletePersona(currentPersona, () =>
                 {
                     Debug.Log("Deleting Persona");
+                    Modal.Instance.Hide();
                     EmergenceManager.Instance.ShowDashboard();
                 },
                 (error, code) =>
                 {
                     Debug.LogError("[" + code + "] " + error);
+                    Modal.Instance.Hide();
                 });
             });
         }
@@ -168,7 +179,7 @@ namespace Emergence
             currentPersona.settings.availableOnSearch = availableOnSearchesToggle.isOn;
             currentPersona.settings.receiveContactRequest = receiveContactRequestsToggle.isOn;
             currentPersona.settings.showStatus = showingMyStatusToggle.isOn;
-            currentPersona.avatar.id = currentAvatarId;
+            currentPersona.avatar.id = currentAvatarId != null? currentAvatarId : "";//TODO: Assign default avatar
 
             if (string.IsNullOrEmpty(currentPersona.id))
             {
@@ -176,6 +187,8 @@ namespace Emergence
                 {
                     Debug.Log("Saving Persona");
                     Modal.Instance.Hide();
+                    Debug.Log(currentPersona);
+                    ClearCurrentPersona();
                     EmergenceManager.Instance.ShowDashboard();
                 },
                 (error, code) =>
@@ -188,8 +201,10 @@ namespace Emergence
 
             NetworkManager.Instance.EditPersona(currentPersona, () =>
             {
+
                 Debug.Log("Saving Changes to Persona");
                 Modal.Instance.Hide();
+                ClearCurrentPersona();
                 EmergenceManager.Instance.ShowDashboard();
             },
             (error, code) =>
@@ -201,7 +216,13 @@ namespace Emergence
 
         private void OnBackClicked()
         {
+            ClearCurrentPersona();
             EmergenceManager.Instance.ShowDashboard();
+        }
+
+        private void ClearCurrentPersona()
+        {
+            currentAvatarId = string.Empty;
         }
 
         private void OnUseThisPersonaAsDefaultToggled(bool isOn)
@@ -211,6 +232,8 @@ namespace Emergence
             {
                 Debug.Log("Successfully SetCurrentPersona to " + currentPersona.name);
                 useThisPersonaAsDefaultToggle.interactable = false;
+                deleteButton.gameObject.SetActive(false);
+                deleteTooltip.gameObject.SetActive(false);
                 Modal.Instance.Hide();
             },
             (error, code) =>
@@ -225,7 +248,7 @@ namespace Emergence
             if (imagesRefreshing.Contains(avatar.id))
             {
                 imagesRefreshing.Remove(avatar.id);
-                if (imagesRefreshing.Count <= 0 && !requestingInProgress)
+                if (imagesRefreshing.Count <= 1 && !requestingInProgress)
                 {
                     Modal.Instance.Hide();
                 }

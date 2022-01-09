@@ -42,10 +42,12 @@ namespace Emergence
 
         public void Refresh(Texture2D texture, Persona.Avatar avatar)
         {
-            this.avatar = avatar;
-            avatarRawImage.texture = texture;
+            if (!string.IsNullOrEmpty(avatar.url))
+            {
+                this.avatar = avatar;
+                avatarRawImage.texture = texture;
 
-            ratioFitter.aspectRatio = (float)texture.width / (float)texture.height;
+                ratioFitter.aspectRatio = (float)texture.width / (float)texture.height;
 
             if (!RequestImage.Instance.AskForImage(avatar.url))
             {
