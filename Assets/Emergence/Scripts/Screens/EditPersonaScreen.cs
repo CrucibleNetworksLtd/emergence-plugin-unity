@@ -176,8 +176,6 @@ namespace Emergence
                 return;
             }
 
-            Modal.Instance.Show("Saving Changes...");
-
             currentPersona.name = nameIF.text;
             currentPersona.bio = bioIF.text;
             currentPersona.settings.availableOnSearch = availableOnSearchesToggle.isOn;
@@ -185,36 +183,43 @@ namespace Emergence
             currentPersona.settings.showStatus = showingMyStatusToggle.isOn;
             currentPersona.avatar = currentAvatar;
 
-            if (string.IsNullOrEmpty(currentPersona.id))
+            ModalPromptYESNO.Instance.Show("", "Are you sure?", () =>
             {
-                NetworkManager.Instance.CreatePersona(currentPersona, () =>
-                {
-                    Debug.Log("Saving Persona");
-                    Modal.Instance.Hide();
-                    Debug.Log(currentPersona);
-                    ClearCurrentPersona();
-                    EmergenceManager.Instance.ShowDashboard();
-                },
-                (error, code) =>
-                {
-                    Debug.LogError("[" + code + "] " + error);
-                    Modal.Instance.Hide();
-                });
-                return;
-            }
+                Modal.Instance.Show("Saving Changes...");
 
-            NetworkManager.Instance.EditPersona(currentPersona, () =>
-            {
-
-                Debug.Log("Saving Changes to Persona");
-                Modal.Instance.Hide();
-                ClearCurrentPersona();
-                EmergenceManager.Instance.ShowDashboard();
-            },
-            (error, code) =>
-            {
-                Debug.LogError("[" + code + "] " + error);
-                Modal.Instance.Hide();
+                if (string.IsNullOrEmpty(currentPersona.id))
+                {
+                    NetworkManager.Instance.CreatePersona(currentPersona, () =>
+                    {
+                        Debug.Log("New Persona saved");
+                        Modal.Instance.Hide();
+                        Debug.Log(currentPersona);
+                        ClearCurrentPersona();
+                        EmergenceManager.Instance.ShowDashboard();
+                    },
+                    (error, code) =>
+                    {
+                        Debug.LogError("[" + code + "] " + error);
+                        Modal.Instance.Hide();
+                        ModalPromptOK.Instance.Show("Error creating persona");
+                    });
+                }
+                else
+                {
+                    NetworkManager.Instance.EditPersona(currentPersona, () =>
+                    {
+                        Debug.Log("Changes to Persona saved");
+                        Modal.Instance.Hide();
+                        ClearCurrentPersona();
+                        EmergenceManager.Instance.ShowDashboard();
+                    },
+                    (error, code) =>
+                    {
+                        Debug.LogError("[" + code + "] " + error);
+                        Modal.Instance.Hide();
+                        ModalPromptOK.Instance.Show("Error creating persona");
+                    });
+                }
             });
         }
 
