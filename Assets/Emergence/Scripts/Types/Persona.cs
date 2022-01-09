@@ -5,14 +5,14 @@ namespace Emergence
 {
     public class Persona
     {
-        public struct PersonaSettings
+        public class PersonaSettings
         {
             public bool availableOnSearch;
             public bool receiveContactRequest;
             public bool showStatus;
         }
 
-        public struct Avatar
+        public class Avatar
         {
             public string id;
             public string url;

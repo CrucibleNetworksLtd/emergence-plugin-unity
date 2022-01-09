@@ -15,8 +15,10 @@ namespace Emergence
         public static ModalPromptYESNO Instance;
 
         public delegate void ModalPromptYesCallback();
+        public delegate void ModalPromptNoCallback();
 
-        private ModalPromptYesCallback callback = null;
+        private ModalPromptYesCallback yesCallback = null;
+        private ModalPromptNoCallback noCallback = null;
         private void Awake()
         {
             Instance = this;
@@ -25,11 +27,12 @@ namespace Emergence
             noButton.onClick.AddListener(OnNoClicked);
         }
 
-        public void Show(string title, string question, ModalPromptYesCallback callback = null)
+        public void Show(string title, string question, ModalPromptYesCallback yesCallback = null, ModalPromptNoCallback noCallback = null)
         {
             label.text = "<b>" + title + "</b> " + question;
             gameObject.SetActive(true);
-            this.callback = callback;
+            this.yesCallback = yesCallback;
+            this.noCallback = noCallback;
             bgBlurredImage.enabled = false;
         }
 
@@ -41,12 +44,13 @@ namespace Emergence
 
         private void OnYesClicked()
         {
-            callback?.Invoke();
+            yesCallback?.Invoke();
             Hide();
         }
 
         private void OnNoClicked()
         {
+            noCallback?.Invoke();
             Hide();
         }
 

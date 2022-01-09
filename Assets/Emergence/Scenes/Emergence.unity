@@ -5242,6 +5242,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   personaScrollContents: {fileID: 2141342403}
   addPersonaButton: {fileID: 664006010}
+  defaultTexture: {fileID: 2800000, guid: bfc305db338beaa498c338b0c5c11a12, type: 3}
   personaButtonPool: {fileID: 298836986}
   titleText: {fileID: 1992027794}
   contentsText: {fileID: 840061050}

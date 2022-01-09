@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Emergence
@@ -35,11 +36,34 @@ namespace Emergence
         private bool checkingForServer = false;
 
         public static EmergenceManager Instance { get; private set; }
+
+        public bool IsVisible
+        {
+            get
+            {
+                return gameObject.activeSelf;
+            }
+        }
+
         private void Awake()
         {
             Instance = this;
             ChangeState(this.state);
             escButton.onClick.AddListener(OnEscButtonPressed);
+
+            GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+
+            for (int i = 0; i < roots.Length; i++)
+            {
+                EventSystem[] ess = roots[i].GetComponentsInChildren<EventSystem>();
+
+                if (ess.Length > 0)
+                {
+                    EventSystem es = gameObject.GetComponentInChildren<EventSystem>();
+                    es.gameObject.SetActive(false);
+                    break;
+                }
+            }
         }
 
         private void Start()

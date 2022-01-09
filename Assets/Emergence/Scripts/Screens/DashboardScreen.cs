@@ -10,6 +10,7 @@ namespace Emergence
         [Header("UI References")]
         public Transform personaScrollContents;
         public Button addPersonaButton;
+        public Texture2D defaultTexture;
 
         [Header("Utilities")]
         [SerializeField]
@@ -70,17 +71,26 @@ namespace Emergence
                     PersonaScrollItem psi = go.GetComponent<PersonaScrollItem>();
 
                     Persona persona = personas[i];
+                    if (persona.avatar != null)
+                    {
+                        if (string.IsNullOrEmpty(persona.avatar.id))
+                        {
+                            persona.avatar = null;
+                        }
+                        else if (string.IsNullOrEmpty(persona.avatar.url))
+                        {
+                            persona.avatar = null;
+                        }
+                    }
+
                     bool selected = false;
                     if (currentPersona != null)
                     {
                         selected = currentPersona.id.Equals(persona.id);
                     }
 
-                    if (persona.avatar.id != null)
-                    {
-                        imagesRefreshing.Add(persona.id);
-                    }
-                    psi.Refresh(persona, selected);
+                    imagesRefreshing.Add(persona.id);
+                    psi.Refresh(defaultTexture, persona, selected);
 
                     if (selected)
                     {

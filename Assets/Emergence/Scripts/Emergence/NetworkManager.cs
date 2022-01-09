@@ -13,9 +13,18 @@ namespace Emergence
     public class NetworkManager : MonoBehaviour
     {
         private readonly string APIBase = "http://localhost:50733/api/";
-        private readonly string DatabaseAPIPublic = "https://pfy3t4mqjb.execute-api.us-east-1.amazonaws.com/staging/";
-        private readonly string DatabaseAPIPrivate = "https://57l0bi6g53.execute-api.us-east-1.amazonaws.com/staging/";
         private readonly string defaultNodeURL = "https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134";
+
+        // Dev
+        private readonly string DatabaseAPIPrivate = "https://57l0bi6g53.execute-api.us-east-1.amazonaws.com/staging/";
+
+        // Staging
+        //private readonly string DatabaseAPIPrivate = "https://x8iq9e5fq1.execute-api.us-east-1.amazonaws.com/staging";
+
+        // Prod
+        //private readonly string DatabaseAPIPrivate = "https://i30mnhu5vg.execute-api.us-east-1.amazonaws.com/prod";
+
+
 
         private string nodeURL = string.Empty;
         private string gameId = string.Empty;
@@ -138,7 +147,17 @@ namespace Emergence
             try
             {
                 // TODO send process id set a reference to the current process and use System.Diagnostics's Process.Id property:int nProcessID = Process.GetCurrentProcess().Id;
-                Process.Start("run-server.bat");
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.FileName = "Server\\EmergenceEVMLocalServer.exe";
+                // Triple doubled double-quotes are needed for the server to receive CMD params with single double quotes (sigh...)
+                startInfo.Arguments = @"--walletconnect={""""""Name"""""":""""""Crucibletest"""""",""""""Description"""""":""""""UnrealEngine+WalletConnect"""""",""""""Icons"""""":""""""https://crucible.network/wp-content/uploads/2020/10/cropped-crucible_favicon-32x32.png"""""",""""""URL"""""":""""""https://crucible.network""""""}";
+                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                
+                Process serverProcess = new Process();
+                serverProcess.StartInfo = startInfo;
+                serverProcess.EnableRaisingEvents = true;
+                serverProcess.Start();
+
                 Debug.Log("Running Emergence Server");
                 started = true;
             }
@@ -154,6 +173,7 @@ namespace Emergence
         {
             try
             {
+                // TODO avoid using a bat file
                 Debug.Log("Stopping Emergence Server");
                 Process.Start("stop-server.bat");
             }
@@ -328,6 +348,11 @@ namespace Emergence
                 return;
             }
 
+            if (disconnectInProgress)
+            {
+                return;
+            }
+
             StartCoroutine(CoroutineGetBalance(success, error));
         }
 
@@ -408,6 +433,7 @@ namespace Emergence
 
         #region Disconnect Wallet
 
+        private bool disconnectInProgress = false;
         public delegate void DisconnectSuccess();
         public void Disconnect(DisconnectSuccess success, GenericError error)
         {
@@ -417,6 +443,7 @@ namespace Emergence
                 return;
             }
 
+            disconnectInProgress = true;
             StartCoroutine(CoroutineDisconnect(success, error));
         }
 
@@ -432,10 +459,12 @@ namespace Emergence
 
                 if (RequestError(request))
                 {
+                    disconnectInProgress = false;
                     error?.Invoke(request.error, request.responseCode);
                 }
                 else
                 {
+                    disconnectInProgress = false;
                     success?.Invoke();
                 }
             }
