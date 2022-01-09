@@ -20,6 +20,8 @@ namespace Emergence
         public delegate void ImageCompleted(Persona.Avatar avatar, bool success);
         public static event ImageCompleted OnImageCompleted;
 
+        private bool waitingForImageRequest = false;
+
         private void Awake()
         {
             selectButton.onClick.AddListener(OnSelectClicked);
@@ -42,14 +44,23 @@ namespace Emergence
 
         public void Refresh(Texture2D texture, Persona.Avatar avatar)
         {
-            if (!string.IsNullOrEmpty(avatar.url))
+            this.avatar = avatar;
+            avatarRawImage.texture = texture;
+            
+            ratioFitter.aspectRatio = (float)texture.width / (float)texture.height;
+
+            // If avatar is null then this avatar scroll item is the default image,
+            // and will never call RequestImage
+            if (avatar != null && avatar.url != null)
             {
-                this.avatar = avatar;
-                avatarRawImage.texture = texture;
-
-                ratioFitter.aspectRatio = (float)texture.width / (float)texture.height;
-
-            if (!RequestImage.Instance.AskForImage(avatar.url))
+                waitingForImageRequest = true;
+                if (!RequestImage.Instance.AskForImage(avatar.url))
+                {
+                    waitingForImageRequest = false;
+                    OnImageCompleted?.Invoke(avatar, false);
+                }
+            }
+            else
             {
                 OnImageCompleted?.Invoke(avatar, false);
             }
@@ -57,17 +68,19 @@ namespace Emergence
 
         private void Instance_OnImageReady(string url, Texture2D texture)
         {
-            if (url.Equals(avatar.url))
+            if (waitingForImageRequest && url.Equals(avatar.url))
             {
                 avatarRawImage.texture = texture;
+                waitingForImageRequest = false;
                 OnImageCompleted?.Invoke(avatar, true);
             }
         }
 
         private void Instance_OnImageFailed(string url, string error, long errorCode)
         {
-            if (url.Equals(avatar.url))
+            if (waitingForImageRequest && url.Equals(avatar.url))
             {
+                waitingForImageRequest = false;
                 Debug.LogError("[" + url + "] " + error + " " + errorCode);
                 OnImageCompleted?.Invoke(avatar, false);
             }

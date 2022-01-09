@@ -21,7 +21,6 @@ namespace Emergence
 
         [Header("UI Reference")]
         public Button escButton;
-        public GameObject eventManager;
 
         private enum ScreenStates
         {

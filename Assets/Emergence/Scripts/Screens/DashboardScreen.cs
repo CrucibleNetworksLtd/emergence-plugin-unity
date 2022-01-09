@@ -71,6 +71,18 @@ namespace Emergence
                     PersonaScrollItem psi = go.GetComponent<PersonaScrollItem>();
 
                     Persona persona = personas[i];
+                    if (persona.avatar != null)
+                    {
+                        if (string.IsNullOrEmpty(persona.avatar.id))
+                        {
+                            persona.avatar = null;
+                        }
+                        else if (string.IsNullOrEmpty(persona.avatar.url))
+                        {
+                            persona.avatar = null;
+                        }
+                    }
+
                     bool selected = false;
                     if (currentPersona != null)
                     {

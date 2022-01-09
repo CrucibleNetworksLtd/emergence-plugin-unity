@@ -31,6 +31,8 @@ namespace Emergence
         public delegate void ImageCompleted(Persona persona, bool success);
         public static event ImageCompleted OnImageCompleted;
 
+        private bool waitingForImageRequest = false;
+
         private void Awake()
         {
             selectButton.onClick.AddListener(OnSelectClicked);
@@ -64,22 +66,28 @@ namespace Emergence
             this.persona = persona;
 
             nameText.gameObject.SetActive(false);
-
             nameText.text = persona.name;
             
             if (persona.AvatarImage == null)
             {
                 persona.AvatarImage = texture;
             }
-            else
-            {
-                photo.texture = persona.AvatarImage;
-            }
+
+            photo.texture = persona.AvatarImage;
 
             unselectedBorder.SetActive(!selected);
             selectedBorder.SetActive(selected);
 
-            if (!RequestImage.Instance.AskForImage(persona.avatar.url))
+            if (persona.avatar != null && persona.avatar.url != null)
+            {
+                waitingForImageRequest = true;
+                if (!RequestImage.Instance.AskForImage(persona.avatar.url))
+                {
+                    waitingForImageRequest = false;
+                    OnImageCompleted?.Invoke(persona, false);
+                }
+            }
+            else
             {
                 OnImageCompleted?.Invoke(persona, false);
             }
@@ -97,18 +105,20 @@ namespace Emergence
 
         private void Instance_OnImageReady(string url, Texture2D texture)
         {
-            if (persona != null && url == persona.avatar.url)
+            if (waitingForImageRequest && url == persona.avatar.url)
             {
                 persona.AvatarImage = texture;
                 photo.texture = persona.AvatarImage;
+                waitingForImageRequest = false;
                 OnImageCompleted?.Invoke(persona, true);
             }
         }
 
         private void Instance_OnImageFailed(string url, string error, long errorCode)
         {
-            if (persona != null && url == persona.avatar.url)
+            if (waitingForImageRequest && url == persona.avatar.url)
             {
+                waitingForImageRequest = false;
                 Debug.LogError("[" + url + "] [" + errorCode + "] " + error);
                 OnImageCompleted?.Invoke(persona, false);
             }
