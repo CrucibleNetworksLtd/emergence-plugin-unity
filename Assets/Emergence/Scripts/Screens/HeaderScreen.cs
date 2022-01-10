@@ -36,7 +36,7 @@ namespace EmergenceSDK
             {
                 remainingTime += refreshTimeOut;
 
-                NetworkManager.Instance.GetBalance((balance) =>
+                Services.Instance.GetBalance((balance) =>
                 {
                     walletBalance.text = balance;
                 },
@@ -73,7 +73,7 @@ namespace EmergenceSDK
         private void OnDisconnectClick()
         {
             Modal.Instance.Show("Disconnecting wallet...");
-            NetworkManager.Instance.Disconnect(() =>
+            Services.Instance.Disconnect(() =>
             {
                 Modal.Instance.Hide();
                 Hide();

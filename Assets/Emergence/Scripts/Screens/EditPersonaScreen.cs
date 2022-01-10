@@ -123,7 +123,7 @@ namespace EmergenceSDK
 
             go.GetComponent<AvatarScrollItem>().Refresh(defaultImage, null);
 
-            NetworkManager.Instance.GetAvatars((avatars) =>
+            Services.Instance.GetAvatars((avatars) =>
             {
                 Modal.Instance.Show("Retrieving avatar images...");
                 requestingInProgress = true;
@@ -155,7 +155,7 @@ namespace EmergenceSDK
             ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () =>
             {
                 Modal.Instance.Show("Deleting Persona...");
-                NetworkManager.Instance.DeletePersona(currentPersona, () =>
+                Services.Instance.DeletePersona(currentPersona, () =>
                 {
                     Debug.Log("Deleting Persona");
                     Modal.Instance.Hide();
@@ -189,7 +189,7 @@ namespace EmergenceSDK
 
                 if (string.IsNullOrEmpty(currentPersona.id))
                 {
-                    NetworkManager.Instance.CreatePersona(currentPersona, () =>
+                    Services.Instance.CreatePersona(currentPersona, () =>
                     {
                         Debug.Log("New Persona saved");
                         Modal.Instance.Hide();
@@ -206,7 +206,7 @@ namespace EmergenceSDK
                 }
                 else
                 {
-                    NetworkManager.Instance.EditPersona(currentPersona, () =>
+                    Services.Instance.EditPersona(currentPersona, () =>
                     {
                         Debug.Log("Changes to Persona saved");
                         Modal.Instance.Hide();
@@ -237,7 +237,7 @@ namespace EmergenceSDK
         private void OnUseThisPersonaAsDefaultToggled(bool isOn)
         {
             Modal.Instance.Show("Saving Changes...");
-            NetworkManager.Instance.SetCurrentPersona(currentPersona, () =>
+            Services.Instance.SetCurrentPersona(currentPersona, () =>
             {
                 Debug.Log("Successfully SetCurrentPersona to " + currentPersona.name);
                 useThisPersonaAsDefaultToggle.interactable = false;

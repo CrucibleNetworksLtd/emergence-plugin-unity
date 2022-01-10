@@ -85,7 +85,7 @@ namespace EmergenceSDK
 
         private void OnApplicationQuit()
         {
-            NetworkManager.Instance.StopEVMServer();
+            Services.Instance.StopEVMServer();
         }
 
         private void Start()
@@ -95,7 +95,7 @@ namespace EmergenceSDK
                 Debug.LogError("Missing children");
                 return;
             }
-            NetworkManager.Instance.SetupAndStartEVMServer(nodeURL, gameId);
+            Services.Instance.SetupAndStartEVMServer(nodeURL, gameId);
 
             ui = transform.GetChild(0).gameObject;
             ui.SetActive(false);

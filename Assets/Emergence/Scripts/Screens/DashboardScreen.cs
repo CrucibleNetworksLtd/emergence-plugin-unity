@@ -53,7 +53,7 @@ namespace EmergenceSDK
 
             Modal.Instance.Show("Loading Personas...");
 
-            NetworkManager.Instance.GetPersonas((personas, currentPersona) =>
+            Services.Instance.GetPersonas((personas, currentPersona) =>
             {
                 Modal.Instance.Show("Retrieving avatar images...");
 
@@ -158,7 +158,7 @@ namespace EmergenceSDK
         private void PersonaScrollItem_OnUsePersonaAsCurrent(Persona persona)
         {
             Modal.Instance.Show("Loading Personas...");
-            NetworkManager.Instance.SetCurrentPersona(persona, () =>
+            Services.Instance.SetCurrentPersona(persona, () =>
             {
                 Refresh();
             },

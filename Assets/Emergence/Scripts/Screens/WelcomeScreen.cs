@@ -45,7 +45,7 @@ namespace EmergenceSDK
 
                         string accessTokenJson = System.IO.File.ReadAllText("accessToken.json");
 
-                        NetworkManager.Instance.SkipWallet(cheatActive, accessTokenJson);
+                        Services.Instance.SkipWallet(cheatActive, accessTokenJson);
                         ScreenManager.Instance.ShowDashboard();
                     }
                 }

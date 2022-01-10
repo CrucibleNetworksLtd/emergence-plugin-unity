@@ -87,13 +87,13 @@ namespace EmergenceSDK
                     if (!checkingForServer)
                     {
                         checkingForServer = true;
-                        NetworkManager.Instance.IsConnected((connected) =>
+                        Services.Instance.IsConnected((connected) =>
                             {
                                 Modal.Instance.Hide();
                                 Debug.Log("EVM server found");
                                 checkingForServer = false;
 
-                                if (connected && NetworkManager.Instance.HasAccessToken)
+                                if (connected && Services.Instance.HasAccessToken)
                                 {
                                     ShowDashboard();
                                 }
@@ -107,7 +107,7 @@ namespace EmergenceSDK
                                 Modal.Instance.Show("Server not found, trying to launch");
                                 Debug.LogWarning("EVM code not running, trying to launch");
 
-                                if (NetworkManager.Instance.StartEVMServer())
+                                if (Services.Instance.StartEVMServer())
                                 {
                                     Modal.Instance.Hide();
                                     checkingForServer = false;

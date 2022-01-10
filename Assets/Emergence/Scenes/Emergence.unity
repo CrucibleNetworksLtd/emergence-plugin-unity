@@ -9906,6 +9906,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6424803330710321988, guid: 4d7e7e52b36648340a446644a6648474,
         type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 256
+      objectReference: {fileID: 0}
+    - target: {fileID: 6424803330710321988, guid: 4d7e7e52b36648340a446644a6648474,
+        type: 3}
       propertyPath: m_enableWordWrapping
       value: 1
       objectReference: {fileID: 0}
