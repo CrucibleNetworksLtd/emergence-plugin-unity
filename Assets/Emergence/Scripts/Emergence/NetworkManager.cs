@@ -67,12 +67,12 @@ namespace Emergence
         private bool refreshingToken = false;
         private void Update()
         {
-            if (EmergenceManager.Instance == null)
+            if (ScreenManager.Instance == null)
             {
                 return;
             }
 
-            bool uiIsVisible = EmergenceManager.Instance.gameObject.activeSelf;
+            bool uiIsVisible = ScreenManager.Instance.gameObject.activeSelf;
 
             if (!skipWallet && uiIsVisible && !refreshingToken && HasAccessToken)
             {

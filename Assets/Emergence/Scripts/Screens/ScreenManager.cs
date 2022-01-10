@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Emergence
 {
-    public class EmergenceManager : MonoBehaviour
+    public class ScreenManager : MonoBehaviour
     {
         [Header("Screen references")]
         [SerializeField]
@@ -35,7 +35,7 @@ namespace Emergence
 
         private bool checkingForServer = false;
 
-        public static EmergenceManager Instance { get; private set; }
+        public static ScreenManager Instance { get; private set; }
 
         public bool IsVisible
         {

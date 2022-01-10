@@ -73,7 +73,7 @@ namespace Emergence
                     NetworkManager.Instance.GetAccessToken((token) =>
                     {
                         state = States.LoginFinished;
-                        EmergenceManager.Instance.ShowDashboard();
+                        ScreenManager.Instance.ShowDashboard();
                     },
                     (error, code) =>
                     {

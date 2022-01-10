@@ -147,13 +147,13 @@ namespace Emergence
             };
 
             EditPersonaScreen.Instance.Refresh(persona, true, true);
-            EmergenceManager.Instance.ShowEditPersona();
+            ScreenManager.Instance.ShowEditPersona();
         }
 
         private void PersonaScrollItem_OnSelected(Persona persona)
         {
             EditPersonaScreen.Instance.Refresh(persona, currentPersona.id == persona.id);
-            EmergenceManager.Instance.ShowEditPersona();
+            ScreenManager.Instance.ShowEditPersona();
         }
         private void PersonaScrollItem_OnUsePersonaAsCurrent(Persona persona)
         {

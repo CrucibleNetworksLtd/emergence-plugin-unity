@@ -46,7 +46,7 @@ namespace Emergence
                         string accessTokenJson = System.IO.File.ReadAllText("accessToken.json");
 
                         NetworkManager.Instance.SkipWallet(cheatActive, accessTokenJson);
-                        EmergenceManager.Instance.ShowDashboard();
+                        ScreenManager.Instance.ShowDashboard();
                     }
                 }
                 else
@@ -60,7 +60,7 @@ namespace Emergence
 
         private void OnConnectWallet()
         {
-            EmergenceManager.Instance.ShowLogIn();
+            ScreenManager.Instance.ShowLogIn();
         }
     }
 }

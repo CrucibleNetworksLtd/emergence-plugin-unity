@@ -77,7 +77,7 @@ namespace Emergence
             {
                 Modal.Instance.Hide();
                 Hide();
-                EmergenceManager.Instance.Restart();
+                ScreenManager.Instance.Restart();
             },
             (error, code) => 
             {

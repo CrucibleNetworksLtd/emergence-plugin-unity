@@ -159,7 +159,7 @@ namespace Emergence
                 {
                     Debug.Log("Deleting Persona");
                     Modal.Instance.Hide();
-                    EmergenceManager.Instance.ShowDashboard();
+                    ScreenManager.Instance.ShowDashboard();
                 },
                 (error, code) =>
                 {
@@ -195,7 +195,7 @@ namespace Emergence
                         Modal.Instance.Hide();
                         Debug.Log(currentPersona);
                         ClearCurrentPersona();
-                        EmergenceManager.Instance.ShowDashboard();
+                        ScreenManager.Instance.ShowDashboard();
                     },
                     (error, code) =>
                     {
@@ -211,7 +211,7 @@ namespace Emergence
                         Debug.Log("Changes to Persona saved");
                         Modal.Instance.Hide();
                         ClearCurrentPersona();
-                        EmergenceManager.Instance.ShowDashboard();
+                        ScreenManager.Instance.ShowDashboard();
                     },
                     (error, code) =>
                     {
@@ -226,7 +226,7 @@ namespace Emergence
         private void OnBackClicked()
         {
             ClearCurrentPersona();
-            EmergenceManager.Instance.ShowDashboard();
+            ScreenManager.Instance.ShowDashboard();
         }
 
         private void ClearCurrentPersona()

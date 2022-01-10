@@ -53,7 +53,7 @@ namespace Emergence
         {
             get
             {
-                return EmergenceManager.Instance != null && EmergenceManager.Instance.IsVisible;
+                return ScreenManager.Instance != null && ScreenManager.Instance.IsVisible;
             }
         }
 
@@ -68,7 +68,7 @@ namespace Emergence
 
             Instance = this;
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
-            EmergenceManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
+            ScreenManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
             DontDestroyOnLoad(gameObject);
         }
 
@@ -80,7 +80,7 @@ namespace Emergence
         private void OnDestroy()
         {
             SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
-            EmergenceManager.OnButtonEsc -= EmergenceManager_OnButtonEsc;
+            ScreenManager.OnButtonEsc -= EmergenceManager_OnButtonEsc;
         }
 
         private void OnApplicationQuit()
@@ -103,7 +103,7 @@ namespace Emergence
 
         private void OnApplicationFocus(bool hasFocus)
         {
-            if (hasFocus && EmergenceManager.Instance != null && EmergenceManager.Instance.IsVisible)
+            if (hasFocus && ScreenManager.Instance != null && ScreenManager.Instance.IsVisible)
             {
                 UpdateCursor();
             }
@@ -137,16 +137,16 @@ namespace Emergence
 
             if (shortcutPressed)
             {
-                if (EmergenceManager.Instance == null)
+                if (ScreenManager.Instance == null)
                 {
                     ui.SetActive(true);
                     SceneManager.LoadSceneAsync("Emergence", LoadSceneMode.Additive);
                 }
                 else
                 {
-                    if (!EmergenceManager.Instance.IsVisible)
+                    if (!ScreenManager.Instance.IsVisible)
                     {
-                        EmergenceManager.Instance.gameObject.SetActive(true);
+                        ScreenManager.Instance.gameObject.SetActive(true);
                         SaveCursor();
                         UpdateCursor();
                         OnEmergenceUIOpened.Invoke();
@@ -157,11 +157,11 @@ namespace Emergence
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (EmergenceManager.Instance != null)
+                if (ScreenManager.Instance != null)
                 {
-                    if (EmergenceManager.Instance.IsVisible)
+                    if (ScreenManager.Instance.IsVisible)
                     {
-                        EmergenceManager.Instance.gameObject.SetActive(false);
+                        ScreenManager.Instance.gameObject.SetActive(false);
                         RestoreCursor();
                         OnEmergenceUIClosed.Invoke();
                         OnEmergenceUIVisibilityChanged?.Invoke(false);
@@ -172,7 +172,7 @@ namespace Emergence
 
         private void CloseOverlay()
         {
-            EmergenceManager.Instance.gameObject.SetActive(false);
+            ScreenManager.Instance.gameObject.SetActive(false);
             RestoreCursor();
             OnEmergenceUIClosed.Invoke();
             OnEmergenceUIVisibilityChanged?.Invoke(false);
@@ -184,7 +184,7 @@ namespace Emergence
             {
                 Debug.Log("Loaded");
                 ui?.SetActive(false);
-                EmergenceManager.Instance.gameObject.SetActive(true);
+                ScreenManager.Instance.gameObject.SetActive(true);
                 SaveCursor();
                 UpdateCursor();
                 OnEmergenceUIOpened.Invoke();
