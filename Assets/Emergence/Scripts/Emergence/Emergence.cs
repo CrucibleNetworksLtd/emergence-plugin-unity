@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace EmergenceSDK
 {
-    public class Loader : MonoBehaviour
+    public class Emergence : MonoBehaviour
     {
         [Header("Emergence Server")]
         [SerializeField]
@@ -47,7 +47,7 @@ namespace EmergenceSDK
         [HideInInspector]
         public EmergenceUIStateChanged OnEmergenceUIVisibilityChanged;
 
-        public static Loader Instance;
+        public static Emergence Instance;
 
         public bool IsUIVisible
         {

@@ -30,9 +30,9 @@ namespace EmergenceSDK
             // so we don't touch the asset file of the material
             materialInstance = NFTmeshRenderer.material;
 
-            Loader.Instance.OnEmergenceUIVisibilityChanged.AddListener((visible) => { Debug.Log($"UI visible {visible}"); });
-            Loader.Instance.OnEmergenceUIOpened.AddListener(() => { Debug.Log("UI OPEN"); });
-            Loader.Instance.OnEmergenceUIClosed.AddListener(() => { Debug.Log("UI CLOSED"); });
+            Emergence.Instance.OnEmergenceUIVisibilityChanged.AddListener((visible) => { Debug.Log($"UI visible {visible}"); });
+            Emergence.Instance.OnEmergenceUIOpened.AddListener(() => { Debug.Log("UI OPEN"); });
+            Emergence.Instance.OnEmergenceUIClosed.AddListener(() => { Debug.Log("UI CLOSED"); });
         }
 
         private void OnDownloadClicked()
