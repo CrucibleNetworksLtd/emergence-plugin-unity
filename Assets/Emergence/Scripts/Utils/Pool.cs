@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class Pool : MonoBehaviour
     {

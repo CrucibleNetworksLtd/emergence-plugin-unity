@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class TooltipHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {

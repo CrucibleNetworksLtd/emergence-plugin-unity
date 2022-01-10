@@ -1,4 +1,4 @@
-﻿namespace Emergence
+﻿namespace EmergenceSDK
 {
     public class IsConnectedResponse
     {

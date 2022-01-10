@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class WelcomeScreen : MonoBehaviour
     {
@@ -45,8 +45,8 @@ namespace Emergence
 
                         string accessTokenJson = System.IO.File.ReadAllText("accessToken.json");
 
-                        NetworkManager.Instance.SkipWallet(cheatActive, accessTokenJson);
-                        EmergenceManager.Instance.ShowDashboard();
+                        Services.Instance.SkipWallet(cheatActive, accessTokenJson);
+                        ScreenManager.Instance.ShowDashboard();
                     }
                 }
                 else
@@ -60,7 +60,7 @@ namespace Emergence
 
         private void OnConnectWallet()
         {
-            EmergenceManager.Instance.ShowLogIn();
+            ScreenManager.Instance.ShowLogIn();
         }
     }
 }

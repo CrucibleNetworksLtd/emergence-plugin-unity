@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class EmergenceEditor : Editor
     {

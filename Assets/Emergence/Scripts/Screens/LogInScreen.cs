@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class LogInScreen : MonoBehaviour
     {
@@ -37,7 +37,7 @@ namespace Emergence
             switch (state)
             {
                 case States.Handshake:
-                    NetworkManager.Instance.Handshake((walletAddress) =>
+                    Services.Instance.Handshake((walletAddress) =>
                     {
                         state = States.RefreshAccessToken;
                         HeaderScreen.Instance.Refresh(walletAddress);
@@ -55,7 +55,7 @@ namespace Emergence
                     if (timeRemaining <= 0.0f)
                     {
                         timeRemaining += QRRefreshTimeOut;
-                        NetworkManager.Instance.GetQRCode((texture) =>
+                        Services.Instance.GetQRCode((texture) =>
                         {
                             rawQRImage.texture = texture;
                         },
@@ -70,10 +70,10 @@ namespace Emergence
                     break;
                 case States.RefreshAccessToken:
                     state = States.RefreshingAccessToken;
-                    NetworkManager.Instance.GetAccessToken((token) =>
+                    Services.Instance.GetAccessToken((token) =>
                     {
                         state = States.LoginFinished;
-                        EmergenceManager.Instance.ShowDashboard();
+                        ScreenManager.Instance.ShowDashboard();
                     },
                     (error, code) =>
                     {
@@ -94,7 +94,7 @@ namespace Emergence
         {
             ModalPromptOK.Instance.Show("Sorry, there was a problem with your request", () =>
             {
-                NetworkManager.Instance.ReinitializeWalletConnect((disconnected) =>
+                Services.Instance.ReinitializeWalletConnect((disconnected) =>
                 {
                     state = States.Handshake;
                     timeRemaining = 0.0f;

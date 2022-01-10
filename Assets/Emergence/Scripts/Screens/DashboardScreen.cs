@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class DashboardScreen : MonoBehaviour
     {
@@ -53,7 +53,7 @@ namespace Emergence
 
             Modal.Instance.Show("Loading Personas...");
 
-            NetworkManager.Instance.GetPersonas((personas, currentPersona) =>
+            Services.Instance.GetPersonas((personas, currentPersona) =>
             {
                 Modal.Instance.Show("Retrieving avatar images...");
 
@@ -147,18 +147,18 @@ namespace Emergence
             };
 
             EditPersonaScreen.Instance.Refresh(persona, true, true);
-            EmergenceManager.Instance.ShowEditPersona();
+            ScreenManager.Instance.ShowEditPersona();
         }
 
         private void PersonaScrollItem_OnSelected(Persona persona)
         {
             EditPersonaScreen.Instance.Refresh(persona, currentPersona.id == persona.id);
-            EmergenceManager.Instance.ShowEditPersona();
+            ScreenManager.Instance.ShowEditPersona();
         }
         private void PersonaScrollItem_OnUsePersonaAsCurrent(Persona persona)
         {
             Modal.Instance.Show("Loading Personas...");
-            NetworkManager.Instance.SetCurrentPersona(persona, () =>
+            Services.Instance.SetCurrentPersona(persona, () =>
             {
                 Refresh();
             },

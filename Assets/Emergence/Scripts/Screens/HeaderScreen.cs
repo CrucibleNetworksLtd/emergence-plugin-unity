@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class HeaderScreen : MonoBehaviour
     {
@@ -36,7 +36,7 @@ namespace Emergence
             {
                 remainingTime += refreshTimeOut;
 
-                NetworkManager.Instance.GetBalance((balance) =>
+                Services.Instance.GetBalance((balance) =>
                 {
                     walletBalance.text = balance;
                 },
@@ -73,11 +73,11 @@ namespace Emergence
         private void OnDisconnectClick()
         {
             Modal.Instance.Show("Disconnecting wallet...");
-            NetworkManager.Instance.Disconnect(() =>
+            Services.Instance.Disconnect(() =>
             {
                 Modal.Instance.Hide();
                 Hide();
-                EmergenceManager.Instance.Restart();
+                ScreenManager.Instance.Restart();
             },
             (error, code) => 
             {

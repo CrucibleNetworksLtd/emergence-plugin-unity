@@ -2,9 +2,9 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Emergence
+namespace EmergenceSDK
 {
-    public class EmergenceManager : MonoBehaviour
+    public class ScreenManager : MonoBehaviour
     {
         [Header("Screen references")]
         [SerializeField]
@@ -35,7 +35,7 @@ namespace Emergence
 
         private bool checkingForServer = false;
 
-        public static EmergenceManager Instance { get; private set; }
+        public static ScreenManager Instance { get; private set; }
 
         public bool IsVisible
         {
@@ -87,13 +87,13 @@ namespace Emergence
                     if (!checkingForServer)
                     {
                         checkingForServer = true;
-                        NetworkManager.Instance.IsConnected((connected) =>
+                        Services.Instance.IsConnected((connected) =>
                             {
                                 Modal.Instance.Hide();
                                 Debug.Log("EVM server found");
                                 checkingForServer = false;
 
-                                if (connected && NetworkManager.Instance.HasAccessToken)
+                                if (connected && Services.Instance.HasAccessToken)
                                 {
                                     ShowDashboard();
                                 }
@@ -107,7 +107,7 @@ namespace Emergence
                                 Modal.Instance.Show("Server not found, trying to launch");
                                 Debug.LogWarning("EVM code not running, trying to launch");
 
-                                if (NetworkManager.Instance.StartEVMServer())
+                                if (Services.Instance.StartEVMServer())
                                 {
                                     Modal.Instance.Hide();
                                     checkingForServer = false;

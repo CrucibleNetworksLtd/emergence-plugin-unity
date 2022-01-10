@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public static class ContractHelper
     {
@@ -9,11 +9,11 @@ namespace Emergence
         public delegate void LoadContractSuccess();
         public static void LoadContract(string contractAddress, string ABI, LoadContractSuccess success, GenericError error)
         {
-            NetworkManager.Instance.IsConnected((connected) =>
+            Services.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    NetworkManager.Instance.LoadContract(contractAddress, ABI, () =>
+                    Services.Instance.LoadContract(contractAddress, ABI, () =>
                         {
                             success?.Invoke();
                         },
@@ -39,11 +39,11 @@ namespace Emergence
         public delegate void ReadContractSuccess<T>(T response);
         public static void ReadContract<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
         {
-            NetworkManager.Instance.IsConnected((connected) =>
+            Services.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    NetworkManager.Instance.ReadContract<T, U>(contractAddress, methodName, body, (response) =>
+                    Services.Instance.ReadContract<T, U>(contractAddress, methodName, body, (response) =>
                     {
                         success?.Invoke(response);
                     },
@@ -67,11 +67,11 @@ namespace Emergence
         public delegate void WriteContractSuccess<T>(T response);
         public static void WriteContract<T, U>(string contractAddress, string methodName, U body, WriteContractSuccess<T> success, GenericError error)
         {
-            NetworkManager.Instance.IsConnected((connected) =>
+            Services.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    NetworkManager.Instance.WriteContract<T, U>(contractAddress, methodName, body, (response) =>
+                    Services.Instance.WriteContract<T, U>(contractAddress, methodName, body, (response) =>
                     {
                         success?.Invoke(response);
                     },

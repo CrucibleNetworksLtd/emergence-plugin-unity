@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class Spinner : MonoBehaviour
     {
