@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class AvatarScrollItem : MonoBehaviour
     {

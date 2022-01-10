@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class GetNFTDemo : MonoBehaviour
     {

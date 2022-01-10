@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using UnityEngine;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class Persona
     {

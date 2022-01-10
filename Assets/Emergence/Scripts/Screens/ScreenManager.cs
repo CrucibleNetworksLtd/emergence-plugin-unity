@@ -2,7 +2,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class ScreenManager : MonoBehaviour
     {

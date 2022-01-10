@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class Loader : MonoBehaviour
     {

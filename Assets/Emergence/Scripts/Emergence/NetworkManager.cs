@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class NetworkManager : MonoBehaviour
     {

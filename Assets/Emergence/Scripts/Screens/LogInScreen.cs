@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class LogInScreen : MonoBehaviour
     {

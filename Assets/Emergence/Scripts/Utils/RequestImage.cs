@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Emergence
+namespace EmergenceSDK
 {
     public class RequestImage : MonoBehaviour
     {
