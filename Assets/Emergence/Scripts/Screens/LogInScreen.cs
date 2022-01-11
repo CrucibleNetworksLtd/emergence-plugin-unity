@@ -55,9 +55,17 @@ namespace EmergenceSDK
                     if (timeRemaining <= 0.0f)
                     {
                         timeRemaining += QRRefreshTimeOut;
-                        Services.Instance.GetQRCode((texture) =>
+                        Services.Instance.ReinitializeWalletConnect((disconnected) =>
                         {
-                            rawQRImage.texture = texture;
+                            Services.Instance.GetQRCode((texture) =>
+                            {
+                                rawQRImage.texture = texture;
+                            },
+                            (error, code) =>
+                            {
+                                Debug.LogError("[" + code + "] " + error);
+                                Reinitialize();
+                            });
                         },
                         (error, code) =>
                         {
