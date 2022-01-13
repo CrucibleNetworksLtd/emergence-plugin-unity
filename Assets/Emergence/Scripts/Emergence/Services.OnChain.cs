@@ -285,13 +285,14 @@ namespace EmergenceSDK
                 return;
             }
 
-            StartCoroutine(CoroutineGetBalance(success, error));
+            StartCoroutine(CoroutineGetBalance(success, error, address));
         }
 
-        private IEnumerator CoroutineGetBalance(BalanceSuccess success, GenericError error)
+        private IEnumerator CoroutineGetBalance(BalanceSuccess success, GenericError error, String address)
         {
             Debug.Log("Get Balance request started");
-            string url = envValues.APIBase + "getbalance";
+
+            string url = envValues.APIBase + "getbalance" + "?nodeUrl=" + this.nodeURL + "&address=" + this.address;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {

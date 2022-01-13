@@ -12,6 +12,8 @@ namespace EmergenceSDK
         private string gameId = string.Empty;
         private string currentAccessToken = string.Empty;
 
+        private string address = string.Empty;
+
         public static Services Instance;
 
         private bool skipWallet = false;
@@ -58,6 +60,11 @@ namespace EmergenceSDK
             {
                 Debug.LogError(e.Message);
             }
+        }
+
+        public void SetWalletAdress(string walletAddress)
+        {
+            address = walletAddress;
         }
 
         private bool refreshingToken = false;
