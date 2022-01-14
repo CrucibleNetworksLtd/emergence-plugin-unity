@@ -260,6 +260,7 @@ namespace EmergenceSDK
                     else
                     {
                         success?.Invoke(response.message.address);
+                        address = (response.message.address);
                     }
                 }
             }
@@ -285,13 +286,14 @@ namespace EmergenceSDK
                 return;
             }
 
-            StartCoroutine(CoroutineGetBalance(success, error));
+            StartCoroutine(CoroutineGetBalance(address, success, error));
         }
 
-        private IEnumerator CoroutineGetBalance(BalanceSuccess success, GenericError error)
+        private IEnumerator CoroutineGetBalance(String address, BalanceSuccess success, GenericError error)
         {
             Debug.Log("Get Balance request started");
-            string url = envValues.APIBase + "getbalance";
+
+            string url = envValues.APIBase + "getbalance" + "?nodeUrl=" + this.nodeURL + "&address=" + this.address;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
