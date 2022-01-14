@@ -260,6 +260,7 @@ namespace EmergenceSDK
                     else
                     {
                         success?.Invoke(response.message.address);
+                        address = (response.message.address);
                     }
                 }
             }
@@ -285,10 +286,10 @@ namespace EmergenceSDK
                 return;
             }
 
-            StartCoroutine(CoroutineGetBalance(success, error, address));
+            StartCoroutine(CoroutineGetBalance(address, success, error));
         }
 
-        private IEnumerator CoroutineGetBalance(BalanceSuccess success, GenericError error, String address)
+        private IEnumerator CoroutineGetBalance(String address, BalanceSuccess success, GenericError error)
         {
             Debug.Log("Get Balance request started");
 

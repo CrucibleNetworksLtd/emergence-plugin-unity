@@ -41,7 +41,6 @@ namespace EmergenceSDK
                     {
                         state = States.RefreshAccessToken;
                         HeaderScreen.Instance.Refresh(walletAddress);
-                        Services.Instance.SetWalletAdress(walletAddress);
                     },
                     (error, code) =>
                     {
