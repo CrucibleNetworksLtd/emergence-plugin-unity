@@ -62,11 +62,6 @@ namespace EmergenceSDK
             }
         }
 
-        public void SetWalletAdress(string walletAddress)
-        {
-            address = walletAddress;
-        }
-
         private bool refreshingToken = false;
         private void Update()
         {
