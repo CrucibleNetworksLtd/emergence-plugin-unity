@@ -268,6 +268,141 @@ namespace EmergenceSDK
 
         #endregion Handshake
 
+        #region Create Wallet
+
+        public delegate void CreateWalletSuccess();
+
+        public void CreateWallet(CreateWalletSuccess success, GenericError e) 
+        {
+            string path = "C:\\dev\\emergence-plugin-unity\\Assets\\Emergence\\Resources\\emergence.env.json";
+            StartCoroutine(CoroutineCreateWallet(path, "sdfsdf", success,  e));
+        }
+
+        private IEnumerator CoroutineCreateWallet(string path, string password, CreateWalletSuccess success, GenericError error)
+        {
+
+            Debug.Log("CreateWallet request started");
+
+            string url = envValues.APIBase + "createWallet" + "?path=" + path + "&password=" + password;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Create Wallet", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+
+        #endregion Create Wallet
+
+        #region Create Key Store
+
+        public delegate void CreateKeyStoreSuccess();
+
+        public void CreateKeyStore(CreateKeyStoreSuccess success, GenericError e)
+        {
+            string path = "C:\\dev\\wallet.json";
+            StartCoroutine(CoroutineKeyStore("529889c7129cbeb7ef41edf8ae7f67337d4ea4b4a0783a3b00ef2519d246afdb",
+                "123123",
+                "0xae6d15962900Ba03aC171f976e9D116619e5452f",
+                path, success, e));
+        }
+
+        private IEnumerator CoroutineKeyStore(string privateKey, string password, string publicKey, string path, CreateKeyStoreSuccess success, GenericError error)
+        {
+
+            Debug.Log("Create KeyStore request started");
+
+            string url = envValues.APIBase + "createKeyStore" + "?privateKey=" + privateKey + "&password=" + password + "?publicKey=" + publicKey + "?path=" + path;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Key Store", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+
+        #endregion Create Key Store
+
+        #region Load Account
+
+        public delegate void LoadAccountSuccess();
+
+        public void LoadAccount(LoadAccountSuccess success, GenericError e)
+        {
+            string path = "C:\\dev\\wallet.json";
+            StartCoroutine(CoroutineLoadAccount("DevAccount1", "test",
+                path,
+                "https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134",
+                success, e));
+        }
+
+        private IEnumerator CoroutineLoadAccount(string name, string password, string path, string nodeURL, LoadAccountSuccess success, GenericError error)
+        {
+            Debug.Log("Load Account request started");
+
+            Account data = new Account()
+            {
+                name = name,
+                password = password,
+                path = path,
+                nodeURL = nodeURL
+            };
+
+            string dataString = SerializationHelper.Serialize(data, false);
+            string url = envValues.APIBase + "loadAccount";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Load Contract", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    LoadContractResponse response = SerializationHelper.Deserialize<LoadContractResponse>(request.downloadHandler.text);
+                    if (response.statusCode != 0)
+                    {
+                        error?.Invoke("Problem loading account", response.statusCode);
+                    }
+                    else
+                    {
+                        success?.Invoke();
+                    }
+                }
+            }
+        }
+
+        #endregion Load Account
+
         #region Get Balance
 
         public delegate void BalanceSuccess(string balance);

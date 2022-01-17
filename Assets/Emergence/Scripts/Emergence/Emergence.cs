@@ -168,6 +168,42 @@ namespace EmergenceSDK
                     }
                 }
             }
+
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                Services.Instance.CreateWallet(() =>
+                {
+                    Debug.Log("Success CreateWallet");
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
+
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                Services.Instance.CreateKeyStore(() =>
+                {
+                    Debug.Log("Success CreateKeyStore");
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
+
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                Services.Instance.CreateKeyStore(() =>
+                {
+                    Debug.Log("Success CreateKeyStore");
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
         }
 
         private void CloseOverlay()
