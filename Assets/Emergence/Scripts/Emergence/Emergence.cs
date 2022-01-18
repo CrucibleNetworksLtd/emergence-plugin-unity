@@ -195,9 +195,22 @@ namespace EmergenceSDK
 
             if (Input.GetKeyDown(KeyCode.L))
             {
-                Services.Instance.CreateKeyStore(() =>
+                Services.Instance.LoadAccount(() =>
                 {
-                    Debug.Log("Success CreateKeyStore");
+                    Debug.Log("Success LoadAccount");
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
+
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                Services.Instance.GetAccessToken((accessToken) =>
+                {
+                    Debug.Log($"Success accesstoken {accessToken}");
+                    ScreenManager.Instance.ShowDashboard();
                 },
                 (error, code) =>
                 {

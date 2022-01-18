@@ -272,15 +272,14 @@ namespace EmergenceSDK
 
         public delegate void CreateWalletSuccess();
 
-        public void CreateWallet(CreateWalletSuccess success, GenericError e) 
+        public void CreateWallet(CreateWalletSuccess success, GenericError error)
         {
-            string path = "C:\\dev\\emergence-plugin-unity\\Assets\\Emergence\\Resources\\emergence.env.json";
-            StartCoroutine(CoroutineCreateWallet(path, "sdfsdf", success,  e));
+            string path = "C:\\dev\\wallet.json";
+            StartCoroutine(CoroutineCreateWallet(path, "password", success, error));
         }
 
         private IEnumerator CoroutineCreateWallet(string path, string password, CreateWalletSuccess success, GenericError error)
         {
-
             Debug.Log("CreateWallet request started");
 
             string url = envValues.APIBase + "createWallet" + "?path=" + path + "&password=" + password;
@@ -309,13 +308,13 @@ namespace EmergenceSDK
 
         public delegate void CreateKeyStoreSuccess();
 
-        public void CreateKeyStore(CreateKeyStoreSuccess success, GenericError e)
+        public void CreateKeyStore(CreateKeyStoreSuccess success, GenericError error)
         {
             string path = "C:\\dev\\wallet.json";
-            StartCoroutine(CoroutineKeyStore("529889c7129cbeb7ef41edf8ae7f67337d4ea4b4a0783a3b00ef2519d246afdb",
-                "123123",
-                "0xae6d15962900Ba03aC171f976e9D116619e5452f",
-                path, success, e));
+            StartCoroutine(CoroutineKeyStore("0cb5384dadcc8ed56d09ade8f87949ab3b7c237c4378621b57dfd3cd7c5046c6",
+                "password",
+                "0xb674c35ca4607EB1CF1c58c36eb69972818770Fd",
+                path, success, error));
         }
 
         private IEnumerator CoroutineKeyStore(string privateKey, string password, string publicKey, string path, CreateKeyStoreSuccess success, GenericError error)
@@ -323,7 +322,7 @@ namespace EmergenceSDK
 
             Debug.Log("Create KeyStore request started");
 
-            string url = envValues.APIBase + "createKeyStore" + "?privateKey=" + privateKey + "&password=" + password + "?publicKey=" + publicKey + "?path=" + path;
+            string url = envValues.APIBase + "createKeyStore" + "?privateKey=" + privateKey + "&password=" + password + "&publicKey=" + publicKey + "&path=" + path;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -349,13 +348,13 @@ namespace EmergenceSDK
 
         public delegate void LoadAccountSuccess();
 
-        public void LoadAccount(LoadAccountSuccess success, GenericError e)
+        public void LoadAccount(LoadAccountSuccess success, GenericError error)
         {
             string path = "C:\\dev\\wallet.json";
-            StartCoroutine(CoroutineLoadAccount("DevAccount1", "test",
+            StartCoroutine(CoroutineLoadAccount("", "password",
                 path,
                 "https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134",
-                success, e));
+                success, error));
         }
 
         private IEnumerator CoroutineLoadAccount(string name, string password, string path, string nodeURL, LoadAccountSuccess success, GenericError error)
@@ -380,7 +379,7 @@ namespace EmergenceSDK
                 request.uploadHandler.contentType = "application/json";
 
                 yield return request.SendWebRequest();
-                PrintRequestResult("Load Contract", request);
+                PrintRequestResult("Load Account", request);
 
                 if (RequestError(request))
                 {
