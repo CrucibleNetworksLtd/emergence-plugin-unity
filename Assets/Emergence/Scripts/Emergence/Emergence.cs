@@ -172,7 +172,7 @@ namespace EmergenceSDK
             if (Input.GetKeyDown(KeyCode.C))
             {
                 string path = "C:\\dev\\wallet.json";
-                string password = "C:\\dev\\wallet.json";
+                string password = "password";
 
                 Services.Instance.CreateWallet(path, password, () =>
                 {
