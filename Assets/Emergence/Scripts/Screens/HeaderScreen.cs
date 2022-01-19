@@ -79,7 +79,7 @@ namespace EmergenceSDK
                 Hide();
                 ScreenManager.Instance.Restart();
             },
-            (error, code) => 
+            (error, code) =>
             {
                 Debug.LogError("[" + code + "] " + error);
             });

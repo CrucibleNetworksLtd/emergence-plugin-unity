@@ -46,7 +46,7 @@ namespace EmergenceSDK
         {
             this.avatar = avatar;
             avatarRawImage.texture = texture;
-            
+
             ratioFitter.aspectRatio = (float)texture.width / (float)texture.height;
 
             // If avatar is null then this avatar scroll item is the default image,
