@@ -268,6 +268,132 @@ namespace EmergenceSDK
 
         #endregion Handshake
 
+        #region Create Wallet
+
+        public delegate void CreateWalletSuccess();
+
+        public void CreateWallet(string path, string password, CreateWalletSuccess success, GenericError error)
+        {
+            StartCoroutine(CoroutineCreateWallet(path, password, success, error));
+        }
+
+        private IEnumerator CoroutineCreateWallet(string path, string password, CreateWalletSuccess success, GenericError error)
+        {
+            Debug.Log("CreateWallet request started");
+
+            string url = envValues.APIBase + "createWallet" + "?path=" + path + "&password=" + password;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Create Wallet", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+
+        #endregion Create Wallet
+
+        #region Create Key Store
+
+        public delegate void CreateKeyStoreSuccess();
+
+        public void CreateKeyStore(string privateKey, string password, string publicKey, string path, CreateKeyStoreSuccess success, GenericError error)
+        {
+            
+            StartCoroutine(CoroutineKeyStore(privateKey, password, publicKey, path, success, error));
+        }
+
+        private IEnumerator CoroutineKeyStore(string privateKey, string password, string publicKey, string path, CreateKeyStoreSuccess success, GenericError error)
+        {
+
+            Debug.Log("Create KeyStore request started");
+
+            string url = envValues.APIBase + "createKeyStore" + "?privateKey=" + privateKey + "&password=" + password + "&publicKey=" + publicKey + "&path=" + path;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Key Store", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+
+        #endregion Create Key Store
+
+        #region Load Account
+
+        public delegate void LoadAccountSuccess();
+
+        public void LoadAccount(string name, string password, string path, string nodeURL, LoadAccountSuccess success, GenericError error)
+        {
+            StartCoroutine(CoroutineLoadAccount(name, password, path, nodeURL, success, error));
+        }
+
+        private IEnumerator CoroutineLoadAccount(string name, string password, string path, string nodeURL, LoadAccountSuccess success, GenericError error)
+        {
+            Debug.Log("Load Account request started");
+
+            Account data = new Account()
+            {
+                name = name,
+                password = password,
+                path = path,
+                nodeURL = nodeURL
+            };
+
+            string dataString = SerializationHelper.Serialize(data, false);
+            string url = envValues.APIBase + "loadAccount";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Load Account", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    LoadContractResponse response = SerializationHelper.Deserialize<LoadContractResponse>(request.downloadHandler.text);
+                    if (response.statusCode != 0)
+                    {
+                        error?.Invoke("Problem loading account", response.statusCode);
+                    }
+                    else
+                    {
+                        success?.Invoke();
+                    }
+                }
+            }
+        }
+
+        #endregion Load Account
+
         #region Get Balance
 
         public delegate void BalanceSuccess(string balance);
