@@ -272,10 +272,9 @@ namespace EmergenceSDK
 
         public delegate void CreateWalletSuccess();
 
-        public void CreateWallet(CreateWalletSuccess success, GenericError error)
+        public void CreateWallet(string path, string password, CreateWalletSuccess success, GenericError error)
         {
-            string path = "C:\\dev\\wallet.json";
-            StartCoroutine(CoroutineCreateWallet(path, "password", success, error));
+            StartCoroutine(CoroutineCreateWallet(path, password, success, error));
         }
 
         private IEnumerator CoroutineCreateWallet(string path, string password, CreateWalletSuccess success, GenericError error)
@@ -308,13 +307,10 @@ namespace EmergenceSDK
 
         public delegate void CreateKeyStoreSuccess();
 
-        public void CreateKeyStore(CreateKeyStoreSuccess success, GenericError error)
+        public void CreateKeyStore(string privateKey, string password, string publicKey, string path, CreateKeyStoreSuccess success, GenericError error)
         {
-            string path = "C:\\dev\\wallet.json";
-            StartCoroutine(CoroutineKeyStore("0cb5384dadcc8ed56d09ade8f87949ab3b7c237c4378621b57dfd3cd7c5046c6",
-                "password",
-                "0xb674c35ca4607EB1CF1c58c36eb69972818770Fd",
-                path, success, error));
+            
+            StartCoroutine(CoroutineKeyStore(privateKey, password, publicKey, path, success, error));
         }
 
         private IEnumerator CoroutineKeyStore(string privateKey, string password, string publicKey, string path, CreateKeyStoreSuccess success, GenericError error)
@@ -348,13 +344,9 @@ namespace EmergenceSDK
 
         public delegate void LoadAccountSuccess();
 
-        public void LoadAccount(LoadAccountSuccess success, GenericError error)
+        public void LoadAccount(string name, string password, string path, string nodeURL, LoadAccountSuccess success, GenericError error)
         {
-            string path = "C:\\dev\\wallet.json";
-            StartCoroutine(CoroutineLoadAccount("", "password",
-                path,
-                "https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134",
-                success, error));
+            StartCoroutine(CoroutineLoadAccount(name, password, path, nodeURL, success, error));
         }
 
         private IEnumerator CoroutineLoadAccount(string name, string password, string path, string nodeURL, LoadAccountSuccess success, GenericError error)

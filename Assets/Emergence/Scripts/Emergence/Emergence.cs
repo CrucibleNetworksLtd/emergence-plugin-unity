@@ -171,7 +171,10 @@ namespace EmergenceSDK
 
             if (Input.GetKeyDown(KeyCode.C))
             {
-                Services.Instance.CreateWallet(() =>
+                string path = "C:\\dev\\wallet.json";
+                string password = "C:\\dev\\wallet.json";
+
+                Services.Instance.CreateWallet(path, password, () =>
                 {
                     Debug.Log("Success CreateWallet");
                 },
@@ -183,7 +186,12 @@ namespace EmergenceSDK
 
             if (Input.GetKeyDown(KeyCode.K))
             {
-                Services.Instance.CreateKeyStore(() =>
+                string privateKey = "0cb5384dadcc8ed56d09ade8f87949ab3b7c237c4378621b57dfd3cd7c5046c6";
+                string password = "password";
+                string publicKey = "0xb674c35ca4607EB1CF1c58c36eb69972818770Fd";
+                string path = "C:\\dev\\wallet.json";
+
+                Services.Instance.CreateKeyStore(privateKey, password, publicKey, path, () =>
                 {
                     Debug.Log("Success CreateKeyStore");
                 },
@@ -195,7 +203,12 @@ namespace EmergenceSDK
 
             if (Input.GetKeyDown(KeyCode.L))
             {
-                Services.Instance.LoadAccount(() =>
+                string name = string.Empty;
+                string password = "password";
+                string path = "C:\\dev\\wallet.json";
+                string nodeURL = "https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134";
+
+                Services.Instance.LoadAccount(name, password, path, nodeURL, () =>
                 {
                     Debug.Log("Success LoadAccount");
                 },
