@@ -201,7 +201,7 @@ namespace EmergenceSDK
                 });
             }
 
-            if (Input.GetKeyDown(KeyCode.L))
+            if (Input.GetKeyDown(KeyCode.B))
             {
                 string name = string.Empty;
                 string password = "password";
