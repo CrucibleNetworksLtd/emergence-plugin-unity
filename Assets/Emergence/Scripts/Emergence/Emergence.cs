@@ -33,10 +33,10 @@ namespace EmergenceSDK
         public class EmergenceUIStateChanged : UnityEvent<bool> { }
 
         [Serializable]
-        public class EmergenceUIOpened: UnityEvent { }
+        public class EmergenceUIOpened : UnityEvent { }
 
         [Serializable]
-        public class EmergenceUIClosed: UnityEvent { }
+        public class EmergenceUIClosed : UnityEvent { }
 
         [Header("Events")]
         public EmergenceUIOpened OnEmergenceUIOpened;
