@@ -1,6 +1,6 @@
 ﻿namespace EmergenceSDK
 {
-    public struct AccessTokenResponse
+    public class AccessTokenResponse
     {
         public class AccessToken
         {

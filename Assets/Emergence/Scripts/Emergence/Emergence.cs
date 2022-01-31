@@ -230,6 +230,31 @@ namespace EmergenceSDK
                     Debug.LogError("[" + code + "] " + error);
                 });
             }
+
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                Services.Instance.GetBalance((balance) =>
+                {
+                    Debug.Log($"Success balance {balance}");
+                    ScreenManager.Instance.ShowDashboard();
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
+
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                Services.Instance.ValidateAccessToken((valid) =>
+                {
+                    Debug.Log($"Valid Access token: {valid}");
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
         }
 
         private void CloseOverlay()

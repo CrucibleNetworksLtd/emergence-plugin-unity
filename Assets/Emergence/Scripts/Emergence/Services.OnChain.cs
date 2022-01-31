@@ -492,6 +492,47 @@ namespace EmergenceSDK
 
         #endregion Get Access Token
 
+        #region Validate Access Token
+
+        public delegate void ValidateAccessTokenSuccess(bool valid);
+        public void ValidateAccessToken(ValidateAccessTokenSuccess success, GenericError error)
+        {
+            if (!CheckEnv()) { return; }
+            StartCoroutine(CoroutineValidateAccessToken(success, error));
+        }
+
+        private IEnumerator CoroutineValidateAccessToken(ValidateAccessTokenSuccess success, GenericError error)
+        {
+            Debug.Log("ValidateAccessToken request started");
+            string url = envValues.APIBase + "validate-access-token" + "?accessToken=" + currentAccessToken;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                yield return request.SendWebRequest();
+                PrintRequestResult("ValidateAccessToken", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    ValidateAccessTokenResponse response = SerializationHelper.Deserialize<ValidateAccessTokenResponse>(request.downloadHandler.text);
+
+                    if (response.statusCode != 0)
+                    {
+                        error?.Invoke("Problem with ValidateAccessToken", response.statusCode);
+                    }
+                    else
+                    {
+                        success?.Invoke(response.message.valid);
+                    }
+                }
+            }
+        }
+
+        #endregion Validate Access Token
+
         #region Disconnect Wallet
 
         private bool disconnectInProgress = false;
