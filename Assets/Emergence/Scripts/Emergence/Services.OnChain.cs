@@ -309,7 +309,7 @@ namespace EmergenceSDK
 
         public void CreateKeyStore(string privateKey, string password, string publicKey, string path, CreateKeyStoreSuccess success, GenericError error)
         {
-            
+
             StartCoroutine(CoroutineKeyStore(privateKey, password, publicKey, path, success, error));
         }
 

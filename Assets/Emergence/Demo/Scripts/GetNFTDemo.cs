@@ -37,29 +37,29 @@ namespace EmergenceSDK
 
         private void OnDownloadClicked()
         {
-                Debug.Log("Requesting NFT");
-                downloadButton.interactable = false;
-                downloadButton.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "Downloading...";
+            Debug.Log("Requesting NFT");
+            downloadButton.interactable = false;
+            downloadButton.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = "Downloading...";
 
-                ContractHelper.LoadContract(contractAddress, ABI, () =>
+            ContractHelper.LoadContract(contractAddress, ABI, () =>
+            {
+                Debug.Log("Contract loaded");
+                ContractHelper.ReadContract<ReadContractTokenURIResponse, string[]>(contractAddress, "tokenURI", data, (response) =>
                 {
-                    Debug.Log("Contract loaded");
-                    ContractHelper.ReadContract<ReadContractTokenURIResponse, string[]>(contractAddress, "tokenURI", data, (response) =>
-                    {
-                        Debug.Log("Contract Read");
-                        StartCoroutine(GetMetadata(response.message.response));
-                    },
-                    (error, code) =>
-                    {
-                        RestoreButton();
-                        Debug.LogError("[" + code + "] " + error);
-                    });
+                    Debug.Log("Contract Read");
+                    StartCoroutine(GetMetadata(response.message.response));
                 },
                 (error, code) =>
                 {
                     RestoreButton();
                     Debug.LogError("[" + code + "] " + error);
                 });
+            },
+            (error, code) =>
+            {
+                RestoreButton();
+                Debug.LogError("[" + code + "] " + error);
+            });
         }
 
         private void RestoreButton()

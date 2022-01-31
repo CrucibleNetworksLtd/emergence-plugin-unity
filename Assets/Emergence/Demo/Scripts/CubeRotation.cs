@@ -5,7 +5,7 @@ public class CubeRotation : MonoBehaviour
     private float x;
     private float y;
     private float z;
-    
+
     private float speedX;
     private float speedY;
     private float speedZ;
