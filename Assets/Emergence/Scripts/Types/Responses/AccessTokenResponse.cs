@@ -9,12 +9,6 @@
             public string address;
         }
 
-        public class Message
-        {
-            public AccessToken accessToken;
-        }
-
-        public int statusCode;
-        public Message message;
+        public AccessToken accessToken;
     }
 }
