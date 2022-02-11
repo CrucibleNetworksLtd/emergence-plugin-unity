@@ -539,7 +539,7 @@ namespace EmergenceSDK
                 {
                     success?.Invoke();
                 }
-             }
+            }
         }
 
         #endregion Load Contract
