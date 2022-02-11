@@ -130,22 +130,9 @@ namespace EmergenceSDK
             {
                 yield return request.SendWebRequest();
                 PrintRequestResult("IsConnected", request);
-
-                if (RequestError(request))
+                if (ProcessRequest<IsConnectedResponse>(request, error, out var response))
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    IsConnectedResponse response = SerializationHelper.Deserialize<IsConnectedResponse>(request.downloadHandler.text);
-                    if (response.statusCode != 0)
-                    {
-                        error?.Invoke("Problem with IsConnected", response.statusCode);
-                    }
-                    else
-                    {
-                        success?.Invoke(response.message.isConnected);
-                    }
+                    success?.Invoke(response.isConnected);
                 }
             }
         }
@@ -171,22 +158,9 @@ namespace EmergenceSDK
             {
                 yield return request.SendWebRequest();
                 PrintRequestResult("ReinitializeWalletConnect", request);
-
-                if (RequestError(request))
+                if (ProcessRequest<ReinitializeWalletConnectResponse>(request, error, out var response))
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    ReinitializeWalletConnectResponse response = SerializationHelper.Deserialize<ReinitializeWalletConnectResponse>(request.downloadHandler.text);
-                    if (response.statusCode != 0)
-                    {
-                        error?.Invoke("Problem with ReinitializeWalletConnect", response.statusCode);
-                    }
-                    else
-                    {
-                        success?.Invoke(response.message.disconnected);
-                    }
+                    success?.Invoke(response.disconnected);
                 }
             }
         }
@@ -243,25 +217,11 @@ namespace EmergenceSDK
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
-
                 PrintRequestResult("Handshake", request);
-
-                if (RequestError(request))
+                if (ProcessRequest<HandshakeResponse>(request, error, out var response))
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    HandshakeResponse response = SerializationHelper.Deserialize<HandshakeResponse>(request.downloadHandler.text);
-                    if (response.statusCode != 0)
-                    {
-                        error?.Invoke("Problem with handshake", response.statusCode);
-                    }
-                    else
-                    {
-                        success?.Invoke(response.message.address);
-                        address = (response.message.address);
-                    }
+                    address = response.address;
+                    success?.Invoke(address);
                 }
             }
         }
@@ -289,12 +249,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Create Wallet", request);
-
-                if (RequestError(request))
-                {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
+                if (ProcessRequest<string>(request, error, out var response))
                 {
                     success?.Invoke();
                 }
@@ -309,7 +264,6 @@ namespace EmergenceSDK
 
         public void CreateKeyStore(string privateKey, string password, string publicKey, string path, CreateKeyStoreSuccess success, GenericError error)
         {
-
             StartCoroutine(CoroutineKeyStore(privateKey, password, publicKey, path, success, error));
         }
 
@@ -326,12 +280,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Key Store", request);
-
-                if (RequestError(request))
-                {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
+                if (ProcessRequest<string>(request, error, out var response))
                 {
                     success?.Invoke();
                 }
@@ -372,22 +321,9 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Load Account", request);
-
-                if (RequestError(request))
+                if (ProcessRequest<LoadContractResponse>(request, error, out var response))
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    LoadContractResponse response = SerializationHelper.Deserialize<LoadContractResponse>(request.downloadHandler.text);
-                    if (response.statusCode != 0)
-                    {
-                        error?.Invoke("Problem loading account", response.statusCode);
-                    }
-                    else
-                    {
-                        success?.Invoke();
-                    }
+                    success?.Invoke();
                 }
             }
         }
@@ -426,23 +362,9 @@ namespace EmergenceSDK
                 yield return request.SendWebRequest();
 
                 PrintRequestResult("Get Balance", request);
-
-                if (RequestError(request))
+                if (ProcessRequest<GetBalanceResponse>(request, error, out var response))
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    GetBalanceResponse response = SerializationHelper.Deserialize<GetBalanceResponse>(request.downloadHandler.text);
-
-                    if (response.statusCode != 0)
-                    {
-                        error?.Invoke("Problem with GetBalance", response.statusCode);
-                    }
-                    else
-                    {
-                        success?.Invoke(response.message.balance);
-                    }
+                    success?.Invoke(response.balance);
                 }
             }
         }
@@ -467,25 +389,11 @@ namespace EmergenceSDK
             {
                 yield return request.SendWebRequest();
                 PrintRequestResult("GetAccessToken", request);
-
-                if (RequestError(request))
+                if (ProcessRequest<AccessTokenResponse>(request, error, out var response))
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    AccessTokenResponse response = SerializationHelper.Deserialize<AccessTokenResponse>(request.downloadHandler.text);
-
-                    if (response.statusCode != 0)
-                    {
-                        error?.Invoke("Problem with GetAccessToken", response.statusCode);
-                    }
-                    else
-                    {
-                        currentAccessToken = SerializationHelper.Serialize(response.message.accessToken, false);
-                        ProcessExpiration(response.message.accessToken.message);
-                        success?.Invoke(currentAccessToken);
-                    }
+                    currentAccessToken = SerializationHelper.Serialize(response.accessToken, false);
+                    ProcessExpiration(response.accessToken.message);
+                    success?.Invoke(currentAccessToken);
                 }
             }
         }
@@ -504,29 +412,16 @@ namespace EmergenceSDK
         private IEnumerator CoroutineValidateAccessToken(ValidateAccessTokenSuccess success, GenericError error)
         {
             Debug.Log("ValidateAccessToken request started");
+
             string url = envValues.APIBase + "validate-access-token" + "?accessToken=" + currentAccessToken;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
                 PrintRequestResult("ValidateAccessToken", request);
-
-                if (RequestError(request))
+                if (ProcessRequest<ValidateAccessTokenResponse>(request, error, out var response))
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    ValidateAccessTokenResponse response = SerializationHelper.Deserialize<ValidateAccessTokenResponse>(request.downloadHandler.text);
-
-                    if (response.statusCode != 0)
-                    {
-                        error?.Invoke("Problem with ValidateAccessToken", response.statusCode);
-                    }
-                    else
-                    {
-                        success?.Invoke(response.message.valid);
-                    }
+                    success?.Invoke(response.valid);
                 }
             }
         }
@@ -612,14 +507,14 @@ namespace EmergenceSDK
 
         #region Load Contract
 
-        public delegate void SuccessLoadContract();
-        public void LoadContract(string contractAddress, string ABI, SuccessLoadContract success, GenericError error)
+        public delegate void LoadContractSuccess();
+        public void LoadContract(string contractAddress, string ABI, LoadContractSuccess success, GenericError error)
         {
             if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineLoadContract(contractAddress, ABI, success, error));
         }
 
-        public IEnumerator CoroutineLoadContract(string contractAddress, string ABI, SuccessLoadContract success, GenericError error)
+        public IEnumerator CoroutineLoadContract(string contractAddress, string ABI, LoadContractSuccess success, GenericError error)
         {
             Debug.Log("LoadContract request started");
 
@@ -640,22 +535,9 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Load Contract", request);
-
-                if (RequestError(request))
+                if (ProcessRequest<LoadContractResponse>(request, error, out var response))
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    LoadContractResponse response = SerializationHelper.Deserialize<LoadContractResponse>(request.downloadHandler.text);
-                    if (response.statusCode != 0)
-                    {
-                        error?.Invoke("Problem loading contract", response.statusCode);
-                    }
-                    else
-                    {
-                        success?.Invoke();
-                    }
+                    success?.Invoke();
                 }
             }
         }
@@ -664,14 +546,14 @@ namespace EmergenceSDK
 
         #region Read Contract
 
-        public delegate void SuccessReadContract<T>(T response);
-        public void ReadContract<T, U>(string contractAddress, string methodName, U body, SuccessReadContract<T> success, GenericError error)
+        public delegate void ReadContractSuccess<T>(T response);
+        public void ReadContract<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
         {
             if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineReadContract<T, U>(contractAddress, methodName, body, success, error));
         }
 
-        public IEnumerator CoroutineReadContract<T, U>(string contractAddress, string methodName, U body, SuccessReadContract<T> success, GenericError error)
+        public IEnumerator CoroutineReadContract<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
         {
             Debug.Log("ReadContract request started [" + contractAddress + "] / " + methodName);
 
@@ -687,14 +569,8 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Read Contract", request);
-
-                if (RequestError(request))
+                if (ProcessRequest<T>(request, error, out var response))
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    T response = SerializationHelper.Deserialize<T>(request.downloadHandler.text);
                     success?.Invoke(response);
                 }
             }
@@ -704,14 +580,14 @@ namespace EmergenceSDK
 
         #region Write Contract
 
-        public delegate void SuccessWriteContract<T>(T response);
-        public void WriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
+        public delegate void WriteContractSuccess<T>(T response);
+        public void WriteContract<T, U>(string contractAddress, string methodName, U body, WriteContractSuccess<T> success, GenericError error)
         {
             if (!CheckEnv()) { return; }
             StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, body, success, error));
         }
 
-        public IEnumerator CoroutineWriteContract<T, U>(string contractAddress, string methodName, U body, SuccessWriteContract<T> success, GenericError error)
+        public IEnumerator CoroutineWriteContract<T, U>(string contractAddress, string methodName, U body, WriteContractSuccess<T> success, GenericError error)
         {
             Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
 
@@ -727,14 +603,8 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Write Contract", request);
-
-                if (RequestError(request))
+                if (ProcessRequest<T>(request, error, out var response))
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    T response = SerializationHelper.Deserialize<T>(request.downloadHandler.text);
                     success?.Invoke(response);
                 }
             }

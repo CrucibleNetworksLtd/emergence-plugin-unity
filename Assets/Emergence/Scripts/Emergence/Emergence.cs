@@ -231,7 +231,7 @@ namespace EmergenceSDK
                 });
             }
 
-            if (Input.GetKeyDown(KeyCode.N))
+            if (Input.GetKeyDown(KeyCode.G))
             {
                 Services.Instance.GetBalance((balance) =>
                 {

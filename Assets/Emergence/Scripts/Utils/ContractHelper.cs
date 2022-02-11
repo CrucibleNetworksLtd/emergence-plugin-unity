@@ -26,7 +26,7 @@ namespace EmergenceSDK
                 else
                 {
                     Debug.LogError("Read contract wallet not connected");
-                    error?.Invoke("Wallet not connected", 0);
+                    error?.Invoke("Wallet not connected", 1);
                 }
             },
             (errorMessage, code) =>
@@ -55,7 +55,7 @@ namespace EmergenceSDK
                 else
                 {
                     Debug.LogError("Read contract wallet not connected");
-                    error?.Invoke("Wallet not connected", 0);
+                    error?.Invoke("Wallet not connected", 1);
                 }
             },
             (errorMessage, code) =>
@@ -83,7 +83,7 @@ namespace EmergenceSDK
                 else
                 {
                     Debug.LogError("Write contract wallet not connected");
-                    error?.Invoke("Wallet not connected", 0);
+                    error?.Invoke("Wallet not connected", 1);
                 }
             },
             (errorMessage, code) =>
