@@ -37,7 +37,7 @@ namespace EmergenceSDK
             switch (state)
             {
                 case States.Handshake:
-                    Services.Instance.Handshake((walletAddress) =>
+                    /*Services.Instance.Handshake((walletAddress) =>
                     {
                         state = States.RefreshAccessToken;
                         HeaderScreen.Instance.Refresh(walletAddress);
@@ -47,7 +47,7 @@ namespace EmergenceSDK
                         Debug.LogError("[" + code + "] " + error);
                         Reinitialize();
                     });
-
+                    */
                     state = States.QR;
                     break;
                 case States.QR:

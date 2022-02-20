@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
+using QRCoder;
+using QRCoder.Unity;
 
 namespace EmergenceSDK
 {
@@ -15,7 +17,8 @@ namespace EmergenceSDK
 
         public void SetupAndStartEVMServer(string nodeURL, string gameId)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
 
             this.nodeURL = envValues.defaultNodeURL;
 
@@ -26,12 +29,17 @@ namespace EmergenceSDK
 
             this.gameId = gameId;
 
+            return;
+
             StartEVMServer();
         }
 
         public bool StartEVMServer()
         {
-            if (!CheckEnv()) { return false; }
+            return true;
+
+            if (!CheckEnv())
+            { return false; }
 
             bool started = false;
             Process[] pname = Process.GetProcessesByName("EmergenceEVMLocalServer");
@@ -52,7 +60,9 @@ namespace EmergenceSDK
 
         public void StopEVMServer()
         {
-            if (!CheckEnv()) { return; }
+            return;
+            if (!CheckEnv())
+            { return; }
             Debug.Log("Sending Finish command to EVM Server");
             Finish(() =>
             {
@@ -67,7 +77,8 @@ namespace EmergenceSDK
 
         private bool LaunchEVMServerProcess()
         {
-            if (!CheckEnv()) { return false; }
+            if (!CheckEnv())
+            { return false; }
             bool started = false;
             try
             {
@@ -96,7 +107,8 @@ namespace EmergenceSDK
 
         private void StopEVMServerProcess()
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
             try
             {
                 // TODO avoid using a bat file
@@ -116,12 +128,17 @@ namespace EmergenceSDK
         public delegate void IsConnectedSuccess(bool connected);
         public void IsConnected(IsConnectedSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
             StartCoroutine(CoroutineIsConnected(success, error));
         }
 
         private IEnumerator CoroutineIsConnected(IsConnectedSuccess success, GenericError error)
         {
+            success?.Invoke(false);
+            yield return null;
+            /*
+
             Debug.Log("CoroutineIsConnected request started");
 
             string url = envValues.APIBase + "isConnected";
@@ -134,7 +151,7 @@ namespace EmergenceSDK
                 {
                     success?.Invoke(response.isConnected);
                 }
-            }
+            }*/
         }
 
         #endregion Is Connected
@@ -144,7 +161,10 @@ namespace EmergenceSDK
         public delegate void ReinitializeWalletConnectSuccess(bool disconnected);
         public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            success?.Invoke(true);
+            return;
+            if (!CheckEnv())
+            { return; }
             StartCoroutine(CoroutineReinitializeWalletConnect(success, error));
         }
 
@@ -172,30 +192,84 @@ namespace EmergenceSDK
         public delegate void QRCodeSuccess(Texture2D qrCode);
         public void GetQRCode(QRCodeSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
             StartCoroutine(CoroutineGetQrCode(success, error));
         }
 
         private IEnumerator CoroutineGetQrCode(QRCodeSuccess success, GenericError error)
         {
-            Debug.Log("GetQrCode request started");
-            string url = envValues.APIBase + "qrcode";
-
-            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+            try
             {
-                yield return request.SendWebRequest();
+                int width = 276;
+                int height = 276;
 
-                PrintRequestResult("GetQrCode", request);
+                QRCodeGenerator qrGenerator = new QRCodeGenerator();
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode("SFGDGSDGFSDGSDGSDGSDF" + nodeURL, QRCodeGenerator.ECCLevel.Q);
 
-                if (RequestError(request))
+                UnityQRCode qrCode = new UnityQRCode(qrCodeData);
+
+                // Copy the URL to the clipboard to allow for manual connection in wallet apps that support it
+                //GUIUtility.systemCopyBuffer = url;
+
+                // Create the QR code as a Texture2D. Note: "pixelsPerModule" means the size of each black-or-white block in the
+                // QR code image. For example, a size of 2 will give us a 138x138 image (too small!), while 20 will give us a
+                // 1380x1380 image (too big!). Here we'll use a value of 10 which gives us a 690x690 pixel image.
+                Texture2D qrTexture = qrCode.GetGraphic(pixelsPerModule: 4);
+
+                // Change the filtering mode to point (i.e. nearest) rather than the default of linear - we want sharp edges on
+                // the blocks, not blurry interpolated edges!
+                qrTexture.filterMode = FilterMode.Point;
+
+                /*
+                // Dictionary<EncodeHintType, object> hints = new Dictionary<EncodeHintType, object>() { { EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.Q } };
+                BarcodeWriter barcodeWriter = new BarcodeWriter()
                 {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
+                    Format = BarcodeFormat.QR_CODE,
+                    Options =
+                    {
+                        Width = width,
+                        Height = height,
+                        Margin = 30,
+                    },
+                };*/
+
+                //Color32[] colors = barcodeWriter.Write(nodeURL);
+                //qrTexture.SetPixels32(colors);
+                qrTexture.Apply();
+                success?.Invoke(qrTexture);
+
+                /*
+                Debug.Log("GetQrCode request started");
+                string url = envValues.APIBase + "qrcode";
+
+                using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
                 {
-                    success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture);
-                }
+                    yield return request.SendWebRequest();
+
+                    PrintRequestResult("GetQrCode", request);
+
+                    if (RequestError(request))
+                    {
+                        error?.Invoke(request.error, request.responseCode);
+                    }
+                    else
+                    {
+                        success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture);
+                    }
+                }*/
             }
+            catch (Exception e)
+            {
+                error?.Invoke(e.Message, 3);
+            }
+
+            yield return null;
+        }
+
+        private IEnumerator File(byte[] vs, string v)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion QR Code
@@ -205,7 +279,8 @@ namespace EmergenceSDK
         public delegate void HandshakeSuccess(string walletAddress);
         public void Handshake(HandshakeSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
             StartCoroutine(CoroutineHandshake(success, error));
         }
 
@@ -335,7 +410,8 @@ namespace EmergenceSDK
         public delegate void BalanceSuccess(string balance);
         public void GetBalance(BalanceSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
 
             if (skipWallet)
             {
@@ -376,7 +452,8 @@ namespace EmergenceSDK
         public delegate void AccessTokenSuccess(string accessToken);
         public void GetAccessToken(AccessTokenSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
             StartCoroutine(CoroutineGetAccessToken(success, error));
         }
 
@@ -405,7 +482,8 @@ namespace EmergenceSDK
         public delegate void ValidateAccessTokenSuccess(bool valid);
         public void ValidateAccessToken(ValidateAccessTokenSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
             StartCoroutine(CoroutineValidateAccessToken(success, error));
         }
 
@@ -434,7 +512,8 @@ namespace EmergenceSDK
         public delegate void DisconnectSuccess();
         public void Disconnect(DisconnectSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
 
             if (skipWallet)
             {
@@ -476,7 +555,8 @@ namespace EmergenceSDK
         public delegate void SuccessFinish();
         public void Finish(SuccessFinish success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
             StartCoroutine(CoroutineFinish(success, error));
         }
 
@@ -510,7 +590,8 @@ namespace EmergenceSDK
         public delegate void LoadContractSuccess();
         public void LoadContract(string contractAddress, string ABI, LoadContractSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
             StartCoroutine(CoroutineLoadContract(contractAddress, ABI, success, error));
         }
 
@@ -549,7 +630,8 @@ namespace EmergenceSDK
         public delegate void ReadContractSuccess<T>(T response);
         public void ReadContract<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
             StartCoroutine(CoroutineReadContract<T, U>(contractAddress, methodName, body, success, error));
         }
 
@@ -583,7 +665,8 @@ namespace EmergenceSDK
         public delegate void WriteContractSuccess<T>(T response);
         public void WriteContract<T, U>(string contractAddress, string methodName, U body, WriteContractSuccess<T> success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!CheckEnv())
+            { return; }
             StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, body, success, error));
         }
 
