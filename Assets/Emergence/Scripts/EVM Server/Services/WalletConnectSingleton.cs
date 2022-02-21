@@ -41,15 +41,13 @@ namespace EmergenceEVMLocalServer.Services
                 Description = clientMetaBody.Description
             };
 
-            _walletConnectProvider = new WalletConnect();
-            _walletConnectProvider.AppData = clientMeta;
+            _walletConnectProvider = new WalletConnect(clientMeta);
         }
 
         public void reInitialize()
         {
             _walletConnectProvider = null;
-            _walletConnectProvider = new WalletConnect();
-            _walletConnectProvider.AppData = clientMeta;
+            _walletConnectProvider = new WalletConnect(clientMeta);
         }
 
         public WalletConnect provider { get => _walletConnectProvider; }

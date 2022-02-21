@@ -6,6 +6,8 @@ using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using QRCoder;
 using QRCoder.Unity;
+using NEthereumPoC.Controllers;
+using EmergenceEVMLocalServer.Services;
 
 namespace EmergenceSDK
 {
@@ -36,6 +38,22 @@ namespace EmergenceSDK
 
         public bool StartEVMServer()
         {
+            string args = string.Empty;
+
+            WalletConnectSingleton walletConnectSingleton = new WalletConnectSingleton(args);
+            IWeb3WalletConnectSingleton web3WalletConnectSingleton = new Web3WalletConnectSingleton();
+            ContractsService contractsService = new ContractsService();
+            AccountsService accountsService = new AccountsService();
+            IWeb3Service webService = new Web3Service();
+
+        
+            var ILC = new IntegrationLibraryController(
+                walletConnectSingleton,
+                web3WalletConnectSingleton, 
+                contractsService, 
+                accountsService, 
+                webService);
+            
             return true;
 
             if (!CheckEnv())
@@ -201,9 +219,6 @@ namespace EmergenceSDK
         {
             try
             {
-                int width = 276;
-                int height = 276;
-
                 QRCodeGenerator qrGenerator = new QRCodeGenerator();
                 QRCodeData qrCodeData = qrGenerator.CreateQrCode("SFGDGSDGFSDGSDGSDGSDF" + nodeURL, QRCodeGenerator.ECCLevel.Q);
 
