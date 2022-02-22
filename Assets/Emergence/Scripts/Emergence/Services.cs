@@ -206,6 +206,41 @@ namespace EmergenceSDK
             return isOk;
         }
 
+        private bool ProcessLocalResponse<T>(string response, out T processed, out string errorMessage, out long statusCode)
+        {
+            bool isOk = true;
+            processed = default;
+            errorMessage = string.Empty;
+            statusCode = 0;
+
+            try
+            {
+                processed = SerializationHelper.Deserialize<BaseResponse<T>>(response).message;
+            }
+            catch (Exception e)
+            {
+                isOk = false;
+                ProcessLocalError(response, out errorMessage, out statusCode);
+            }
+
+            return isOk;
+        }
+
+        private void ProcessLocalError(string errorMessage, out string message, out long statusCode)
+        {
+            try
+            {
+                var error = SerializationHelper.Deserialize<BaseResponse<string>>(errorMessage);
+                message = error.message;
+                statusCode = (long)error.statusCode;
+            }
+            catch (Exception e)
+            {
+                message = e.Message;
+                statusCode = 3L;
+            }
+        }
+
         #endregion Utilities
 
         #region No Wallet Cheat

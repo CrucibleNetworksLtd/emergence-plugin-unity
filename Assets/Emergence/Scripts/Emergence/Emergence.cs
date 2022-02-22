@@ -70,6 +70,14 @@ namespace EmergenceSDK
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             ScreenManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
             DontDestroyOnLoad(gameObject);
+
+#if EVM_SERVER
+            WalletConnectSharp.Unity.WalletConnect walletConnect = GetComponentInChildren<WalletConnectSharp.Unity.WalletConnect>();
+            if (walletConnect != null)
+            {
+                walletConnect.gameObject.SetActive(false);
+            }
+#endif
         }
 
         private void EmergenceManager_OnButtonEsc()

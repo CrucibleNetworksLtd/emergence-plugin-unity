@@ -443,6 +443,12 @@ namespace WalletConnectSharp.Unity
 
         private async Task SaveOrDisconnect()
         {
+            // TODO Report this to WC
+            if (Session == null)
+            {
+                return;
+            }
+
             if (!Session.Connected)
                 return;
             

@@ -17,7 +17,12 @@ namespace EmergenceSDK
         {
             get
             {
-                return true;
+                bool connected = false;
+                if (WCS.Instance.Session != null)
+                {
+                    connected = WCS.Instance.Session.Connected;
+                }
+                return connected;
             }
         }
 
@@ -25,21 +30,38 @@ namespace EmergenceSDK
         {
             get
             {
-                return "";
+                string uri = string.Empty;
+                if (WCS.Instance.Session != null)
+                {
+                    uri = WCS.Instance.Session.URI;
+                }
+                return uri;
             }
         }
 
         public string[] Accounts
         {
-            get;
-            set;
+            get
+            {
+                string[] accounts = null;
+                if (WCS.Instance.Session != null)
+                {
+                    accounts = WCS.Instance.Session.Accounts;
+                }
+                return accounts;
+            }
         }
 
         public bool TransportConnected
         {
             get
             {
-                return true;
+                bool connected = false;
+                if (WCS.Instance.Session != null)
+                {
+                    connected = WCS.Instance.Session.TransportConnected;
+                }
+                return connected;
             }
         }
 
@@ -48,13 +70,24 @@ namespace EmergenceSDK
             return await WCS.Instance.Session.EthSign(address, message);
         }
 
+        public void SetNodeURL(string nodeURL)
+        {
+            WCS.Instance.customBridgeUrl = nodeURL;
+        }
 
         public WalletConnect(ClientMeta clientMeta)
         {
-            if (WCS.Instance != null)
-            {
-                WCS.Instance.CloseSession(true);
-            }
+            WCS.Instance.AppData.Description = clientMeta.Description;
+            WCS.Instance.AppData.URL = clientMeta.URL;
+            WCS.Instance.AppData.Icons = clientMeta.Icons;
+            WCS.Instance.AppData.Name = clientMeta.Name;
+
+            DisconnectLocal();
+        }
+
+        private async void DisconnectLocal()
+        {
+            await Task.Run(() => WCS.Instance.CloseSession(true));
         }
 
         public async Task Connect()
@@ -74,7 +107,7 @@ namespace EmergenceSDK
 
         public void Dispose()
         {
-
+            // No need
         }
 
         public IClient CreateProvider(Uri uri)
@@ -82,12 +115,5 @@ namespace EmergenceSDK
             var wcProtocol = WCS.Instance.Session;
             return wcProtocol.CreateProvider(uri);
         }
-
-        /*
-         *             //var web3 = new Web3(wcProtocol.CreateProvider(new Uri("https://mainnet.infura.io/v3/<infruaId>"));
-            //web3Provider = new Web3(_walletConnect.CreateProvider(new Uri(nodeURI)));
-
-            var wcProtocol = WalletConnect.Instance.Session;
-            web3Provider = new Web3(wcProtocol.CreateProvider(new Uri(nodeURI)));*/
     }
 }

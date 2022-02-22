@@ -4,10 +4,12 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
+#if !EVM_SERVER
 using QRCoder;
 using QRCoder.Unity;
-using NEthereumPoC.Controllers;
 using EmergenceEVMLocalServer.Services;
+#endif
+using NEthereumPoC.Controllers;
 
 namespace EmergenceSDK
 {
@@ -31,31 +33,14 @@ namespace EmergenceSDK
 
             this.gameId = gameId;
 
-            return;
-
             StartEVMServer();
         }
 
+        private IntegrationLibraryController ILC;
+
         public bool StartEVMServer()
         {
-            string args = string.Empty;
-
-            WalletConnectSingleton walletConnectSingleton = new WalletConnectSingleton(args);
-            IWeb3WalletConnectSingleton web3WalletConnectSingleton = new Web3WalletConnectSingleton();
-            ContractsService contractsService = new ContractsService();
-            AccountsService accountsService = new AccountsService();
-            IWeb3Service webService = new Web3Service();
-
-        
-            var ILC = new IntegrationLibraryController(
-                walletConnectSingleton,
-                web3WalletConnectSingleton, 
-                contractsService, 
-                accountsService, 
-                webService);
-            
-            return true;
-
+#if EVM_SERVER
             if (!CheckEnv())
             { return false; }
 
@@ -74,11 +59,39 @@ namespace EmergenceSDK
             }
 
             return started;
+#else
+            WalletConnectSingleton.ClientMetaBody metaBodyArgs = new WalletConnectSingleton.ClientMetaBody()
+            {
+                Name = "Crucibletest",
+                Description = "UnrealEngine+WalletConnect",
+                Icons = "https://crucible.network/wp-content/uploads/2020/10/cropped-crucible_favicon-32x32.png",
+                URL = "https://crucible.network",
+            };
+
+            string args = SerializationHelper.Serialize(metaBodyArgs);
+
+            WalletConnectSingleton walletConnectSingleton = new WalletConnectSingleton(args);
+            IWeb3WalletConnectSingleton web3WalletConnectSingleton = new Web3WalletConnectSingleton();
+            ContractsService contractsService = new ContractsService();
+            AccountsService accountsService = new AccountsService();
+            IWeb3Service webService = new Web3Service();
+
+            walletConnectSingleton.provider.SetNodeURL(nodeURL);
+
+            ILC = new IntegrationLibraryController(
+                walletConnectSingleton,
+                web3WalletConnectSingleton,
+                contractsService,
+                accountsService,
+                webService);
+
+            return true;
+#endif
         }
 
         public void StopEVMServer()
         {
-            return;
+#if EVM_SERVER
             if (!CheckEnv())
             { return; }
             Debug.Log("Sending Finish command to EVM Server");
@@ -91,6 +104,7 @@ namespace EmergenceSDK
                 Debug.LogWarning("EVM Server process did not respond to Finish, trying to stop it forcefully");
                 StopEVMServerProcess();
             });
+#endif
         }
 
         private bool LaunchEVMServerProcess()
@@ -105,7 +119,7 @@ namespace EmergenceSDK
                 startInfo.FileName = "Server\\EmergenceEVMLocalServer.exe";
                 // Triple doubled double-quotes are needed for the server to receive CMD params with single double quotes (sigh...)
                 startInfo.Arguments = @"--walletconnect={""""""Name"""""":""""""Crucibletest"""""",""""""Description"""""":""""""UnrealEngine+WalletConnect"""""",""""""Icons"""""":""""""https://crucible.network/wp-content/uploads/2020/10/cropped-crucible_favicon-32x32.png"""""",""""""URL"""""":""""""https://crucible.network""""""}";
-                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                //startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
                 Process serverProcess = new Process();
                 serverProcess.StartInfo = startInfo;
@@ -146,17 +160,34 @@ namespace EmergenceSDK
         public delegate void IsConnectedSuccess(bool connected);
         public void IsConnected(IsConnectedSuccess success, GenericError error)
         {
+#if EVM_SERVER
             if (!CheckEnv())
             { return; }
             StartCoroutine(CoroutineIsConnected(success, error));
+#else
+            string result;
+            try
+            {
+                result = ILC.IsConnected();
+                if (ProcessLocalResponse<IsConnectedResponse>(result, out var response, out string errorMessage, out long statusCode))
+                {
+                    success?.Invoke(response.isConnected);
+                }
+                else
+                {
+                    error?.Invoke(errorMessage, statusCode);
+                }
+            }
+            catch (Exception e)
+            {
+                ProcessLocalError(e.Message, out var message, out var statusCode);
+                error?.Invoke(message, statusCode);
+            }
+#endif
         }
 
         private IEnumerator CoroutineIsConnected(IsConnectedSuccess success, GenericError error)
         {
-            success?.Invoke(false);
-            yield return null;
-            /*
-
             Debug.Log("CoroutineIsConnected request started");
 
             string url = envValues.APIBase + "isConnected";
@@ -169,7 +200,7 @@ namespace EmergenceSDK
                 {
                     success?.Invoke(response.isConnected);
                 }
-            }*/
+            }
         }
 
         #endregion Is Connected
@@ -179,11 +210,30 @@ namespace EmergenceSDK
         public delegate void ReinitializeWalletConnectSuccess(bool disconnected);
         public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, GenericError error)
         {
-            success?.Invoke(true);
-            return;
+#if EVM_SERVER
             if (!CheckEnv())
             { return; }
             StartCoroutine(CoroutineReinitializeWalletConnect(success, error));
+#else
+            string result;
+            try
+            {
+                result = ILC.ReinitializeWalletConnect();
+                if (ProcessLocalResponse<ReinitializeWalletConnectResponse>(result, out var response, out string errorMessage, out long statusCode))
+                {
+                    success?.Invoke(response.disconnected);
+                }
+                else
+                {
+                    error?.Invoke(errorMessage, statusCode);
+                }
+            }
+            catch (Exception e)
+            {
+                ProcessLocalError(e.Message, out var message, out var statusCode);
+                error?.Invoke(message, statusCode);
+            }
+#endif
         }
 
         private IEnumerator CoroutineReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, GenericError error)
@@ -217,10 +267,35 @@ namespace EmergenceSDK
 
         private IEnumerator CoroutineGetQrCode(QRCodeSuccess success, GenericError error)
         {
-            try
+#if EVM_SERVER
+            Debug.Log("GetQrCode request started");
+            string url = envValues.APIBase + "qrcode";
+
+            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
             {
+                yield return request.SendWebRequest();
+
+                try
+                {
+                    PrintRequestResult("GetQrCode", request);
+
+                    if (RequestError(request))
+                    {
+                        error?.Invoke(request.error, request.responseCode);
+                    }
+                    else
+                    {
+                        success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture);
+                    }
+                }
+                catch (Exception e)
+                {
+                    error?.Invoke(e.Message, 3);
+                }
+            }
+#else
                 QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode("SFGDGSDGFSDGSDGSDGSDF" + nodeURL, QRCodeGenerator.ECCLevel.Q);
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(ILC.GetWalletConnectURI(), QRCodeGenerator.ECCLevel.Q);
 
                 UnityQRCode qrCode = new UnityQRCode(qrCodeData);
 
@@ -253,38 +328,8 @@ namespace EmergenceSDK
                 //qrTexture.SetPixels32(colors);
                 qrTexture.Apply();
                 success?.Invoke(qrTexture);
-
-                /*
-                Debug.Log("GetQrCode request started");
-                string url = envValues.APIBase + "qrcode";
-
-                using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
-                {
-                    yield return request.SendWebRequest();
-
-                    PrintRequestResult("GetQrCode", request);
-
-                    if (RequestError(request))
-                    {
-                        error?.Invoke(request.error, request.responseCode);
-                    }
-                    else
-                    {
-                        success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture);
-                    }
-                }*/
-            }
-            catch (Exception e)
-            {
-                error?.Invoke(e.Message, 3);
-            }
-
+#endif
             yield return null;
-        }
-
-        private IEnumerator File(byte[] vs, string v)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion QR Code
@@ -294,9 +339,35 @@ namespace EmergenceSDK
         public delegate void HandshakeSuccess(string walletAddress);
         public void Handshake(HandshakeSuccess success, GenericError error)
         {
+#if EVM_SERVER
             if (!CheckEnv())
             { return; }
             StartCoroutine(CoroutineHandshake(success, error));
+#else
+            HandshakeLocal(success, error);
+#endif
+        }
+
+        private async void HandshakeLocal(HandshakeSuccess success, GenericError error)
+        {
+            string result;
+            try
+            {
+                result = await ILC.WalletConnectHandShake(nodeURL);
+                if (ProcessLocalResponse<HandshakeResponse>(result, out var response, out string errorMessage, out long statusCode))
+                {
+                    success?.Invoke(response.address);
+                }
+                else
+                {
+                    error?.Invoke(errorMessage, statusCode);
+                }
+            }
+            catch (Exception e)
+            {
+                ProcessLocalError(e.Message, out var message, out var statusCode);
+                error?.Invoke(message, statusCode);
+            }
         }
 
         private IEnumerator CoroutineHandshake(HandshakeSuccess success, GenericError error)
