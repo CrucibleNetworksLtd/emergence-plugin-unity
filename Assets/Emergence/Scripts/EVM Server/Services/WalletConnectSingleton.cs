@@ -1,7 +1,6 @@
 ﻿using EmergenceSDK;
 using System;
 using WalletConnectSharp.Core.Models;
-using WalletConnectSharp.Unity;
 
 namespace EmergenceEVMLocalServer.Services
 {

@@ -1,5 +1,5 @@
-﻿using Nethereum.Web3;
-using WalletConnectSharp.Unity;
+﻿using EmergenceSDK;
+using Nethereum.Web3;
 
 namespace EmergenceEVMLocalServer.Services
 {
