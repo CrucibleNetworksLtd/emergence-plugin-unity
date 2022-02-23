@@ -78,6 +78,12 @@ namespace WalletConnectSharp.Unity.Network
                 return;
             }
 
+            // TODO report this to WC
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
             string url = currentUrl;
             if (url.StartsWith("https"))
                 url = url.Replace("https", "wss");
