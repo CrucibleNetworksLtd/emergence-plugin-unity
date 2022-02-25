@@ -8,6 +8,7 @@ using Debug = UnityEngine.Debug;
 using QRCoder;
 using QRCoder.Unity;
 using EmergenceEVMLocalServer.Services;
+using WCS = WalletConnectSharp.Unity.WalletConnect;
 #endif
 using NEthereumPoC.Controllers;
 
@@ -157,6 +158,14 @@ namespace EmergenceSDK
 
         #region Is Connected
 
+#if !EVM_SEVER
+        public static bool ShouldReinitialize
+        {
+            get;
+            private set;
+        }
+#endif
+
         public delegate void IsConnectedSuccess(bool connected);
         public void IsConnected(IsConnectedSuccess success, GenericError error)
         {
@@ -215,10 +224,31 @@ namespace EmergenceSDK
             { return; }
             StartCoroutine(CoroutineReinitializeWalletConnect(success, error));
 #else
+            StartCoroutine(CoroutineReinitializeWalletConnectLocal(success, error));
+#endif
+        }
+
+#if !EVM_SERVER
+        private IEnumerator CoroutineReinitializeWalletConnectLocal(ReinitializeWalletConnectSuccess success, GenericError error)
+        {
+            GameObject WCSGO = WCS.Instance.gameObject;
+            DestroyImmediate(WCS.Instance);
+            WCSGO.AddComponent(typeof(WCS));
+
+            WCS.Instance.autoSaveAndResume = false;
+            WCS.Instance.connectOnAwake = false;
+            WCS.Instance.connectOnStart = false;
+            WCS.Instance.createNewSessionOnSessionDisconnect = false;
+
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+
             string result;
             try
             {
+                ShouldReinitialize = true;
                 result = ILC.ReinitializeWalletConnect();
+                ShouldReinitialize = false;
                 if (ProcessLocalResponse<ReinitializeWalletConnectResponse>(result, out var response, out string errorMessage, out long statusCode))
                 {
                     success?.Invoke(response.disconnected);
@@ -233,8 +263,8 @@ namespace EmergenceSDK
                 ProcessLocalError(e.Message, out var message, out var statusCode);
                 error?.Invoke(message, statusCode);
             }
-#endif
         }
+#endif
 
         private IEnumerator CoroutineReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, GenericError error)
         {
@@ -294,40 +324,40 @@ namespace EmergenceSDK
                 }
             }
 #else
-                QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode(ILC.GetWalletConnectURI(), QRCodeGenerator.ECCLevel.Q);
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(ILC.GetWalletConnectURI(), QRCodeGenerator.ECCLevel.Q);
 
-                UnityQRCode qrCode = new UnityQRCode(qrCodeData);
+            UnityQRCode qrCode = new UnityQRCode(qrCodeData);
 
-                // Copy the URL to the clipboard to allow for manual connection in wallet apps that support it
-                //GUIUtility.systemCopyBuffer = url;
+            // Copy the URL to the clipboard to allow for manual connection in wallet apps that support it
+            //GUIUtility.systemCopyBuffer = url;
 
-                // Create the QR code as a Texture2D. Note: "pixelsPerModule" means the size of each black-or-white block in the
-                // QR code image. For example, a size of 2 will give us a 138x138 image (too small!), while 20 will give us a
-                // 1380x1380 image (too big!). Here we'll use a value of 10 which gives us a 690x690 pixel image.
-                Texture2D qrTexture = qrCode.GetGraphic(pixelsPerModule: 4);
+            // Create the QR code as a Texture2D. Note: "pixelsPerModule" means the size of each black-or-white block in the
+            // QR code image. For example, a size of 2 will give us a 138x138 image (too small!), while 20 will give us a
+            // 1380x1380 image (too big!). Here we'll use a value of 10 which gives us a 690x690 pixel image.
+            Texture2D qrTexture = qrCode.GetGraphic(pixelsPerModule: 4);
 
-                // Change the filtering mode to point (i.e. nearest) rather than the default of linear - we want sharp edges on
-                // the blocks, not blurry interpolated edges!
-                qrTexture.filterMode = FilterMode.Point;
+            // Change the filtering mode to point (i.e. nearest) rather than the default of linear - we want sharp edges on
+            // the blocks, not blurry interpolated edges!
+            qrTexture.filterMode = FilterMode.Point;
 
-                /*
-                // Dictionary<EncodeHintType, object> hints = new Dictionary<EncodeHintType, object>() { { EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.Q } };
-                BarcodeWriter barcodeWriter = new BarcodeWriter()
+            /*
+            // Dictionary<EncodeHintType, object> hints = new Dictionary<EncodeHintType, object>() { { EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.Q } };
+            BarcodeWriter barcodeWriter = new BarcodeWriter()
+            {
+                Format = BarcodeFormat.QR_CODE,
+                Options =
                 {
-                    Format = BarcodeFormat.QR_CODE,
-                    Options =
-                    {
-                        Width = width,
-                        Height = height,
-                        Margin = 30,
-                    },
-                };*/
+                    Width = width,
+                    Height = height,
+                    Margin = 30,
+                },
+            };*/
 
-                //Color32[] colors = barcodeWriter.Write(nodeURL);
-                //qrTexture.SetPixels32(colors);
-                qrTexture.Apply();
-                success?.Invoke(qrTexture);
+            //Color32[] colors = barcodeWriter.Write(nodeURL);
+            //qrTexture.SetPixels32(colors);
+            qrTexture.Apply();
+            success?.Invoke(qrTexture);
 #endif
             yield return null;
         }
@@ -494,7 +524,13 @@ namespace EmergenceSDK
         #region Get Balance
 
         public delegate void BalanceSuccess(string balance);
+
         public void GetBalance(BalanceSuccess success, GenericError error)
+        {
+            GetBalance(address, success, error);
+        }
+
+        public void GetBalance(string address, BalanceSuccess success, GenericError error)
         {
             if (!CheckEnv())
             { return; }
@@ -510,7 +546,33 @@ namespace EmergenceSDK
                 return;
             }
 
+#if EVM_SERVER
             StartCoroutine(CoroutineGetBalance(address, success, error));
+#else
+            GetBalanceLocal(address, success, error);
+#endif
+        }
+
+        private async void GetBalanceLocal(string address, BalanceSuccess success, GenericError error)
+        {
+            string result;
+            try
+            {
+                result = await ILC.GetBalance(address, nodeURL);
+                if (ProcessLocalResponse<GetBalanceResponse>(result, out var response, out string errorMessage, out long statusCode))
+                {
+                    success?.Invoke(response.balance);
+                }
+                else
+                {
+                    error?.Invoke(errorMessage, statusCode);
+                }
+            }
+            catch (Exception e)
+            {
+                ProcessLocalError(e.Message, out var message, out var statusCode);
+                error?.Invoke(message, statusCode);
+            }
         }
 
         private IEnumerator CoroutineGetBalance(String address, BalanceSuccess success, GenericError error)
@@ -540,7 +602,36 @@ namespace EmergenceSDK
         {
             if (!CheckEnv())
             { return; }
+
+#if EVM_SERVER
             StartCoroutine(CoroutineGetAccessToken(success, error));
+#else
+            GetAccessTokenLocal(success, error);
+#endif
+        }
+
+        private async void GetAccessTokenLocal(AccessTokenSuccess success, GenericError error)
+        {
+            string result;
+            try
+            {
+                result = await ILC.GetAccessToken();
+                if (ProcessLocalResponse<AccessTokenResponse>(result, out var response, out string errorMessage, out long statusCode))
+                {
+                    currentAccessToken = SerializationHelper.Serialize(response.accessToken, false);
+                    ProcessExpiration(response.accessToken.message);
+                    success?.Invoke(currentAccessToken);
+                }
+                else
+                {
+                    error?.Invoke(errorMessage, statusCode);
+                }
+            }
+            catch (Exception e)
+            {
+                ProcessLocalError(e.Message, out var message, out var statusCode);
+                error?.Invoke(message, statusCode);
+            }
         }
 
         private IEnumerator CoroutineGetAccessToken(AccessTokenSuccess success, GenericError error)
@@ -570,7 +661,29 @@ namespace EmergenceSDK
         {
             if (!CheckEnv())
             { return; }
+
+#if EVM_SERVER
             StartCoroutine(CoroutineValidateAccessToken(success, error));
+#else
+            string result;
+            try
+            {
+                result = ILC.ValidateAccessToken(currentAccessToken);
+                if (ProcessLocalResponse<ValidateAccessTokenResponse>(result, out var response, out string errorMessage, out long statusCode))
+                {
+                    success?.Invoke(response.valid);
+                }
+                else
+                {
+                    error?.Invoke(errorMessage, statusCode);
+                }
+            }
+            catch (Exception e)
+            {
+                ProcessLocalError(e.Message, out var message, out var statusCode);
+                error?.Invoke(message, statusCode);
+            }
+#endif
         }
 
         private IEnumerator CoroutineValidateAccessToken(ValidateAccessTokenSuccess success, GenericError error)
@@ -608,7 +721,28 @@ namespace EmergenceSDK
             }
 
             disconnectInProgress = true;
+#if EVM_SERVER
             StartCoroutine(CoroutineDisconnect(success, error));
+#else
+            DisconnectLocal(success, error);
+#endif
+        }
+
+        private async void DisconnectLocal(DisconnectSuccess success, GenericError error)
+        {
+            string result;
+            try
+            {
+                // TODO maybe this requires process anyway?
+                result = await ILC.KillSession();
+                disconnectInProgress = false;
+                success?.Invoke();
+            }
+            catch (Exception e)
+            {
+                ProcessLocalError(e.Message, out var message, out var statusCode);
+                error?.Invoke(message, statusCode);
+            }
         }
 
         private IEnumerator CoroutineDisconnect(DisconnectSuccess success, GenericError error)
@@ -643,7 +777,9 @@ namespace EmergenceSDK
         {
             if (!CheckEnv())
             { return; }
+#if EVM_SERVER
             StartCoroutine(CoroutineFinish(success, error));
+#endif
         }
 
         private IEnumerator CoroutineFinish(SuccessFinish success, GenericError error)
