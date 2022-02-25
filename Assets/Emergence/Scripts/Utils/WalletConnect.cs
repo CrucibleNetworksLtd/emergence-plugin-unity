@@ -75,7 +75,22 @@ namespace EmergenceSDK
             WCS.Instance.customBridgeUrl = nodeURL;
         }
 
+        private ClientMeta clientMeta;
         public WalletConnect(ClientMeta clientMeta)
+        {
+            this.clientMeta = clientMeta;
+            SetValues();
+            if (Services.ShouldReinitialize)
+            {
+                ReconnectLocal();
+            }
+            else
+            {
+                DisconnectLocal();
+            }
+        }
+
+        private void SetValues()
         {
             WCS.Instance.AppData.Description = clientMeta.Description;
             WCS.Instance.AppData.URL = clientMeta.URL;
@@ -88,6 +103,12 @@ namespace EmergenceSDK
         private async void DisconnectLocal()
         {
             await Task.Run(() => WCS.Instance.CloseSession(true));
+        }
+
+        private async void ReconnectLocal()
+        {
+            SetValues();
+            await Connect();
         }
 
         public async Task Connect()
