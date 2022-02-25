@@ -72,11 +72,12 @@ namespace EmergenceSDK
             DontDestroyOnLoad(gameObject);
 
 #if EVM_SERVER
+            /*
             WalletConnectSharp.Unity.WalletConnect walletConnect = GetComponentInChildren<WalletConnectSharp.Unity.WalletConnect>();
             if (walletConnect != null)
             {
                 walletConnect.gameObject.SetActive(false);
-            }
+            }*/
 #endif
         }
 

@@ -2,15 +2,19 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using WalletConnectSharp.Core.Models;
 using WalletConnectSharp.NEthereum;
-using WCS = WalletConnectSharp.Unity.WalletConnect;
+//using WCS = WalletConnectSharp.Unity.WalletConnect;
+
 namespace EmergenceSDK
 {
     /// <summary>
     /// Translation layer for WalletConnectSharp.Unity.WalletConnect to WalletConnectSharp.Desktop
     /// which the EVM server uses
     /// </summary>
+    
+    /*
     public class WalletConnect
     {
         public bool Connected
@@ -75,14 +79,27 @@ namespace EmergenceSDK
             WCS.Instance.customBridgeUrl = nodeURL;
         }
 
+        private ClientMeta clientMeta;
         public WalletConnect(ClientMeta clientMeta)
+        {
+            this.clientMeta = clientMeta;
+            SetValues();
+            if (Services.ShouldReinitialize)
+            {
+                ReconnectLocal();
+            }
+            else
+            {
+                DisconnectLocal();
+            }
+        }
+
+        private void SetValues()
         {
             WCS.Instance.AppData.Description = clientMeta.Description;
             WCS.Instance.AppData.URL = clientMeta.URL;
             WCS.Instance.AppData.Icons = clientMeta.Icons;
             WCS.Instance.AppData.Name = clientMeta.Name;
-
-            DisconnectLocal();
         }
 
         private async void DisconnectLocal()
@@ -90,9 +107,48 @@ namespace EmergenceSDK
             await Task.Run(() => WCS.Instance.CloseSession(true));
         }
 
+        private async void ReconnectLocal()
+        {
+            SetValues();
+            await Connect();
+        }
+
         public async Task Connect()
         {
+            //WCS.Instance.ConnectionStarted += Instance_ConnectionStarted;
+            //WCS.Instance.ConnectionFailed += Instance_ConnectionFailed;
+
+            //hasConnected = false;
+            //hasFailed = false;
+
             await WCS.Instance.Connect();
+            //await WaitForConnection();
+
+            //WCS.Instance.ConnectionStarted -= Instance_ConnectionStarted;
+            //WCS.Instance.ConnectionFailed -= Instance_ConnectionFailed;
+        }
+
+        private bool hasConnected = false;
+        private bool hasFailed = false;
+        private async Task WaitForConnection()
+        {
+            await Task.Run(() =>
+            {
+                while (!hasConnected && !hasFailed)
+                {
+
+                }
+            });
+        }
+
+        private void Instance_ConnectionStarted(object sender, EventArgs e)
+        {
+            hasConnected = true;
+        }
+
+        private void Instance_ConnectionFailed(object sender, EventArgs e)
+        {
+            hasFailed = true;
         }
 
         public async Task Disconnect()
@@ -116,4 +172,5 @@ namespace EmergenceSDK
             return wcProtocol.CreateProvider(uri);
         }
     }
+    */
 }

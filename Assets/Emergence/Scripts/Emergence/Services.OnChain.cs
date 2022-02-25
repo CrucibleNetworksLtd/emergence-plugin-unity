@@ -8,7 +8,8 @@ using Debug = UnityEngine.Debug;
 using QRCoder;
 using QRCoder.Unity;
 using EmergenceEVMLocalServer.Services;
-using WCS = WalletConnectSharp.Unity.WalletConnect;
+//using WCS = WalletConnectSharp.Unity.WalletConnect;
+using WCS = WalletConnectSharp.Desktop.WalletConnect;
 #endif
 using NEthereumPoC.Controllers;
 
@@ -77,7 +78,7 @@ namespace EmergenceSDK
             AccountsService accountsService = new AccountsService();
             IWeb3Service webService = new Web3Service();
 
-            walletConnectSingleton.provider.SetNodeURL(nodeURL);
+            //walletConnectSingleton.provider.SetNodeURL(nodeURL);
 
             ILC = new IntegrationLibraryController(
                 walletConnectSingleton,
@@ -224,13 +225,16 @@ namespace EmergenceSDK
             { return; }
             StartCoroutine(CoroutineReinitializeWalletConnect(success, error));
 #else
-            StartCoroutine(CoroutineReinitializeWalletConnectLocal(success, error));
+            //StartCoroutine(CoroutineReinitializeWalletConnectLocal(success, error));
+            ReinitializeWalletConnectLocal(success, error);
 #endif
         }
 
 #if !EVM_SERVER
-        private IEnumerator CoroutineReinitializeWalletConnectLocal(ReinitializeWalletConnectSuccess success, GenericError error)
+        //private IEnumerator CoroutineReinitializeWalletConnectLocal(ReinitializeWalletConnectSuccess success, GenericError error)
+        private void ReinitializeWalletConnectLocal(ReinitializeWalletConnectSuccess success, GenericError error)
         {
+            /*
             GameObject WCSGO = WCS.Instance.gameObject;
             DestroyImmediate(WCS.Instance);
             WCSGO.AddComponent(typeof(WCS));
@@ -242,7 +246,7 @@ namespace EmergenceSDK
 
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
-
+            */
             string result;
             try
             {

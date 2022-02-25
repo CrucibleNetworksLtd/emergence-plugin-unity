@@ -442,7 +442,7 @@ namespace WalletConnectSharp.Core
         /// <returns></returns>
         private async Task<WCSessionData> CreateSession()
         {
-            EnsureNotDisconnected();
+            //EnsureNotDisconnected();
             
             var data = new WcSessionRequest(DappMetadata, clientId, ChainId);
 

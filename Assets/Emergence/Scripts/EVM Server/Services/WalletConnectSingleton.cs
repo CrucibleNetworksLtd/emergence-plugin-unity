@@ -1,6 +1,7 @@
-﻿using EmergenceSDK;
+﻿//using EmergenceSDK;
 using System;
 using WalletConnectSharp.Core.Models;
+using WalletConnectSharp.Desktop;
 
 namespace EmergenceEVMLocalServer.Services
 {
@@ -24,7 +25,7 @@ namespace EmergenceEVMLocalServer.Services
 
             try
             {
-                clientMetaBody = SerializationHelper.Deserialize<ClientMetaBody>(clientMetadataBody);
+                clientMetaBody = EmergenceSDK.SerializationHelper.Deserialize<ClientMetaBody>(clientMetadataBody);
             }
             catch (Exception e)
             {
