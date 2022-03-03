@@ -12,6 +12,18 @@ namespace EmergenceSDK
 
         #region GetPersonas
 
+        public Persona CurrentPersona
+        {
+            get;
+            private set;
+        }
+
+        public bool GetCurrentPersona(out Persona currentPersona)
+        {
+            currentPersona = CurrentPersona;
+            return currentPersona != null;
+        }
+
         public delegate void SuccessPersonas(List<Persona> personas, Persona currentPersona);
         public void GetPersonas(SuccessPersonas success, GenericError error)
         {
@@ -37,7 +49,8 @@ namespace EmergenceSDK
                 else
                 {
                     PersonasResponse personasResponse = SerializationHelper.Deserialize<PersonasResponse>(request.downloadHandler.text);
-                    success?.Invoke(personasResponse.personas, personasResponse.personas.FirstOrDefault(p => p.id == personasResponse.selected));
+                    CurrentPersona = personasResponse.personas.FirstOrDefault(p => p.id == personasResponse.selected);
+                    success?.Invoke(personasResponse.personas, CurrentPersona);
                 }
             }
         }
