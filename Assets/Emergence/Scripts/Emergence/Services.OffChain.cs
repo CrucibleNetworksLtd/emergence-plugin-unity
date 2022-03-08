@@ -12,18 +12,6 @@ namespace EmergenceSDK
 
         #region GetPersonas
 
-        public Persona CurrentPersona
-        {
-            get;
-            private set;
-        }
-
-        public bool GetCurrentPersona(out Persona currentPersona)
-        {
-            currentPersona = CurrentPersona;
-            return currentPersona != null;
-        }
-
         public delegate void SuccessPersonas(List<Persona> personas, Persona currentPersona);
         public void GetPersonas(SuccessPersonas success, GenericError error)
         {
@@ -57,6 +45,53 @@ namespace EmergenceSDK
 
         #endregion GetPersonas
 
+        #region GetCurrentPersona
+
+        public Persona CurrentPersona
+        {
+            get;
+            private set;
+        }
+
+        public bool GetCurrentPersona(out Persona currentPersona)
+        {
+            currentPersona = CurrentPersona;
+            return currentPersona != null;
+        }
+
+        public delegate void SuccessGetCurrentPersona(Persona currentPersona);
+        public void GetCurrentPersona(SuccessGetCurrentPersona success, GenericError error)
+        {
+            if (!CheckEnv()) { return; }
+            StartCoroutine(CoroutineGetCurrentPersona(success, error));
+        }
+
+        private IEnumerator CoroutineGetCurrentPersona(SuccessGetCurrentPersona success, GenericError error)
+        {
+            Debug.Log("GetCurrentPersona request started");
+            string url = envValues.databaseAPIPrivate + "persona";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.SetRequestHeader("Authorization", currentAccessToken);
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Get Current Persona", request);
+
+                if (RequestError(request))
+                {
+                    error?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    CurrentPersona = SerializationHelper.Deserialize<Persona>(request.downloadHandler.text);
+                    success?.Invoke(CurrentPersona);
+                }
+            }
+        }
+
+        #endregion GetCurrentPersona
+
         #region CreatePersona
 
         public delegate void SuccessCreatePersona();
@@ -70,8 +105,6 @@ namespace EmergenceSDK
         {
             Debug.Log("CreatePersona request started");
             string jsonPersona = SerializationHelper.Serialize(persona);
-            Debug.Log("Json Persona: " + jsonPersona);
-            Debug.Log("currentAccessToken: " + currentAccessToken);
 
             string url = envValues.databaseAPIPrivate + "persona";
 
@@ -111,8 +144,6 @@ namespace EmergenceSDK
         {
             Debug.Log("Edit Persona request started");
             string jsonPersona = SerializationHelper.Serialize(persona);
-            Debug.Log("Json Persona: " + jsonPersona);
-            Debug.Log("currentAccessToken: " + currentAccessToken);
 
             string url = envValues.databaseAPIPrivate + "persona";
 

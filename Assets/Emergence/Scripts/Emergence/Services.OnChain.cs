@@ -13,7 +13,7 @@ namespace EmergenceSDK
 
         #region Start and Stop
 
-        public void SetupAndStartEVMServer(string nodeURL, string gameId)
+        public void SetupAndStartEVMServer(string nodeURL, string gameId, bool hidden = true)
         {
             if (!CheckEnv()) { return; }
 
@@ -26,10 +26,10 @@ namespace EmergenceSDK
 
             this.gameId = gameId;
 
-            StartEVMServer();
+            StartEVMServer(hidden);
         }
 
-        public bool StartEVMServer()
+        public bool StartEVMServer(bool hidden = true)
         {
             if (!CheckEnv()) { return false; }
 
@@ -44,7 +44,7 @@ namespace EmergenceSDK
             else
             {
                 Debug.LogWarning("Process for EVM server not found, trying to launch");
-                started = LaunchEVMServerProcess();
+                started = LaunchEVMServerProcess(hidden);
             }
 
             return started;
@@ -65,7 +65,7 @@ namespace EmergenceSDK
             });
         }
 
-        private bool LaunchEVMServerProcess()
+        private bool LaunchEVMServerProcess(bool hidden)
         {
             if (!CheckEnv()) { return false; }
             bool started = false;
@@ -76,7 +76,11 @@ namespace EmergenceSDK
                 startInfo.FileName = "Server\\EmergenceEVMLocalServer.exe";
                 // Triple doubled double-quotes are needed for the server to receive CMD params with single double quotes (sigh...)
                 startInfo.Arguments = @"--walletconnect={""""""Name"""""":""""""Crucibletest"""""",""""""Description"""""":""""""UnrealEngine+WalletConnect"""""",""""""Icons"""""":""""""https://crucible.network/wp-content/uploads/2020/10/cropped-crucible_favicon-32x32.png"""""",""""""URL"""""":""""""https://crucible.network""""""}";
-                startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
+                if (hidden)
+                {
+                    startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                }
 
                 Process serverProcess = new Process();
                 serverProcess.StartInfo = startInfo;
