@@ -12,8 +12,6 @@ namespace EmergenceSDK
         private string gameId = string.Empty;
         private string currentAccessToken = string.Empty;
 
-        private string address = string.Empty;
-
         public static Services Instance;
 
         private bool skipWallet = false;
@@ -53,7 +51,7 @@ namespace EmergenceSDK
 
                 if (envValues == null)
                 {
-                    Debug.LogError("emergence.env file is corrupted");
+                    Debug.LogError("emergence.env file is corrupted or missing");
                 }
             }
             catch (Exception e)
@@ -96,18 +94,6 @@ namespace EmergenceSDK
         }
 
         #endregion Monobehaviour
-
-        #region Properties
-
-        public bool HasAccessToken
-        {
-            get
-            {
-                return currentAccessToken.Length > 0;
-            }
-        }
-
-        #endregion Properties
 
         #region Utilities
 

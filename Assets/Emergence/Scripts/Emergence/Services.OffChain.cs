@@ -47,10 +47,22 @@ namespace EmergenceSDK
 
         #region GetCurrentPersona
 
+        public delegate void PersonaUpdated(Persona persona);
+        public static event PersonaUpdated OnCurrentPersonaUpdated;
+
+        private Persona cachedPersona;
         public Persona CurrentPersona
         {
-            get;
-            private set;
+            get
+            {
+                return cachedPersona;
+            }
+
+            private set
+            {
+                cachedPersona = value;
+                OnCurrentPersonaUpdated?.Invoke(cachedPersona);
+            }
         }
 
         public bool GetCurrentPersona(out Persona currentPersona)
@@ -232,6 +244,7 @@ namespace EmergenceSDK
                 }
                 else
                 {
+                    CurrentPersona = persona;
                     success?.Invoke();
                 }
             }

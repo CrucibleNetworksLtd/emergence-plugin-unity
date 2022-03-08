@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 
 namespace EmergenceSDK
@@ -10,6 +12,8 @@ namespace EmergenceSDK
     public partial class Services
     {
         #region EVM Server
+
+        private const int DEFAULT_PORT = 57000;
 
         #region Start and Stop
 
@@ -19,7 +23,7 @@ namespace EmergenceSDK
 
             this.nodeURL = envValues.defaultNodeURL;
 
-            if (!String.IsNullOrEmpty(nodeURL.Trim()))
+            if (!string.IsNullOrEmpty(nodeURL.Trim()))
             {
                 this.nodeURL = nodeURL;
             }
@@ -38,7 +42,11 @@ namespace EmergenceSDK
 
             if (pname.Length > 0)
             {
-                Debug.Log("Process for EVM server found");
+                Debug.LogWarning("Existing process for EVM server found, trying connecting with the default port. This might fail if the EVM server was started with another port.");
+
+                string url = BuildLocalServerURL(DEFAULT_PORT);
+                envValues.APIBase = url + "api/";
+
                 started = true;
             }
             else
@@ -65,17 +73,90 @@ namespace EmergenceSDK
             });
         }
 
+        private int CheckFreePort(int port)
+        {
+            int foundPort = -1;
+            try
+            {
+                TcpListener listener = new TcpListener(IPAddress.Loopback, port);
+                listener.Start();
+                foundPort = ((IPEndPoint)listener.LocalEndpoint).Port;
+                listener.Stop();
+            }
+            catch (Exception e)
+            {
+                // If the code gets here we know it's basically that the port it's being used
+                string message = e.Message;
+            }
+
+            return foundPort;
+        }
+
+        private int GetNextFreePort()
+        {
+            int lookingPort = DEFAULT_PORT;
+
+            while (lookingPort < 65535)
+            {
+                int port = CheckFreePort(lookingPort);
+
+                if (port < DEFAULT_PORT)
+                {
+                    Debug.Log($"Port {lookingPort} is taken, checking next port...");
+                    lookingPort++;
+                    continue;
+                }
+
+                Debug.Log($"Found free port {port}");
+                return port;
+            }
+
+            Debug.LogError("Couldn't find a free port!");
+            return -1;
+        }
+
+        private string BuildLocalServerURL(int forcedPort = 0)
+        {
+            // Look for free ports and update APIBase with it
+            string serverURL = "http://localhost";
+
+            if (envValues.APIBase != null && envValues.APIBase.Trim().Length > 0)
+            {
+                serverURL = envValues.APIBase;
+            }
+
+            UriBuilder uriBuilder = new UriBuilder(serverURL);
+            if (forcedPort > 0)
+            {
+                uriBuilder.Port = forcedPort;
+            }
+            else
+            {
+                uriBuilder.Port = GetNextFreePort();
+            }
+
+            return uriBuilder.ToString();
+        }
+
         private bool LaunchEVMServerProcess(bool hidden)
         {
             if (!CheckEnv()) { return false; }
             bool started = false;
             try
             {
-                // TODO send process id set a reference to the current process and use System.Diagnostics's Process.Id property:int nProcessID = Process.GetCurrentProcess().Id;
+                hidden = false;
+                
+                string url = BuildLocalServerURL();
+                envValues.APIBase = url + "api/";
+
+                string urls = " --urls=\"" + url + "\"";
+                string walletConnect = @" --walletconnect={""""""Name"""""":""""""Crucibletest"""""",""""""Description"""""":""""""UnityEngine+WalletConnect"""""",""""""Icons"""""":""""""https://crucible.network/wp-content/uploads/2020/10/cropped-crucible_favicon-32x32.png"""""",""""""URL"""""":""""""https://crucible.network""""""}";
+                string processId = " --processid=" + Process.GetCurrentProcess().Id;
+
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.FileName = "Server\\EmergenceEVMLocalServer.exe";
                 // Triple doubled double-quotes are needed for the server to receive CMD params with single double quotes (sigh...)
-                startInfo.Arguments = @"--walletconnect={""""""Name"""""":""""""Crucibletest"""""",""""""Description"""""":""""""UnrealEngine+WalletConnect"""""",""""""Icons"""""":""""""https://crucible.network/wp-content/uploads/2020/10/cropped-crucible_favicon-32x32.png"""""",""""""URL"""""":""""""https://crucible.network""""""}";
+                startInfo.Arguments = urls + walletConnect + processId;
 
                 if (hidden)
                 {
@@ -206,6 +287,32 @@ namespace EmergenceSDK
 
         #region Handshake
 
+        #region Handshake Address Properties
+
+        private string address = string.Empty;
+
+        public bool HasAddress
+        {
+            get
+            {
+                return address != null && address.Trim() != string.Empty;
+            }
+        }
+
+        public string Address
+        {
+            get
+            {
+                return address;
+            }
+            private set
+            {
+                address = value;
+            }
+        }
+
+        #endregion Handshake Address Properties
+
         public delegate void HandshakeSuccess(string walletAddress);
         public void Handshake(HandshakeSuccess success, GenericError error)
         {
@@ -224,8 +331,8 @@ namespace EmergenceSDK
                 PrintRequestResult("Handshake", request);
                 if (ProcessRequest<HandshakeResponse>(request, error, out var response))
                 {
-                    address = response.address;
-                    success?.Invoke(address);
+                    Address = response.address;
+                    success?.Invoke(Address);
                 }
             }
         }
@@ -352,14 +459,14 @@ namespace EmergenceSDK
                 return;
             }
 
-            StartCoroutine(CoroutineGetBalance(address, success, error));
+            StartCoroutine(CoroutineGetBalance(Address, success, error));
         }
 
-        private IEnumerator CoroutineGetBalance(String address, BalanceSuccess success, GenericError error)
+        private IEnumerator CoroutineGetBalance(string address, BalanceSuccess success, GenericError error)
         {
             Debug.Log("Get Balance request started");
 
-            string url = envValues.APIBase + "getbalance" + "?nodeUrl=" + this.nodeURL + "&address=" + this.address;
+            string url = envValues.APIBase + "getbalance" + "?nodeUrl=" + nodeURL + "&address=" + address;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -376,6 +483,30 @@ namespace EmergenceSDK
         #endregion Get Balance
 
         #region Get Access Token
+
+        #region Properties
+
+        public bool HasAccessToken
+        {
+            get
+            {
+                return currentAccessToken.Length > 0;
+            }
+        }
+
+        public string AccessToken
+        {
+            get
+            {
+                return currentAccessToken;
+            }
+            private set
+            {
+                currentAccessToken = value;
+            }
+        }
+
+        #endregion Properties
 
         public delegate void AccessTokenSuccess(string accessToken);
         public void GetAccessToken(AccessTokenSuccess success, GenericError error)
