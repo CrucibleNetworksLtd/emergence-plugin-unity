@@ -23,7 +23,7 @@ namespace EmergenceSDK
         }
 
         private void Init()
-        { 
+        {
             freeObjects = new List<GameObject>();
             usedObjects = new List<GameObject>();
 

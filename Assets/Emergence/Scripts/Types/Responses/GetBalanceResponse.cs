@@ -2,12 +2,6 @@
 {
     public class GetBalanceResponse
     {
-        public class Message
-        {
-            public string balance;
-        }
-
-        public int statusCode;
-        public Message message;
+        public string balance;
     }
 }

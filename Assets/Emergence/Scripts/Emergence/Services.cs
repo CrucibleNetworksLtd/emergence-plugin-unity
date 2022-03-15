@@ -51,7 +51,7 @@ namespace EmergenceSDK
 
                 if (envValues == null)
                 {
-                    Debug.LogError("emergence.env file is corrupted");
+                    Debug.LogError("emergence.env file is corrupted or missing");
                 }
             }
             catch (Exception e)
@@ -95,18 +95,6 @@ namespace EmergenceSDK
 
         #endregion Monobehaviour
 
-        #region Properties
-
-        public bool HasAccessToken
-        {
-            get
-            {
-                return currentAccessToken.Length > 0;
-            }
-        }
-
-        #endregion Properties
-
         #region Utilities
 
         private bool CheckEnv()
@@ -128,13 +116,21 @@ namespace EmergenceSDK
 
         private bool RequestError(UnityWebRequest request)
         {
+            bool error = false;
 #if UNITY_2020_1_OR_NEWER
-            return (request.result == UnityWebRequest.Result.ConnectionError ||
+            error = (request.result == UnityWebRequest.Result.ConnectionError ||
                 request.result == UnityWebRequest.Result.ProtocolError ||
                 request.result == UnityWebRequest.Result.DataProcessingError);
 #else
-            return (request.isHttpError || request.isNetworkError);
+            error = (request.isHttpError || request.isNetworkError);
 #endif
+
+            if (error && request.responseCode == 512)
+            {
+                error = false;
+            }
+
+            return error;
         }
 
         private void PrintRequestResult(string name, UnityWebRequest request)
@@ -150,6 +146,52 @@ namespace EmergenceSDK
             }
         }
 
+        private bool ProcessRequest<T>(UnityWebRequest request, GenericError error, out T response)
+        {
+            bool isOk = false;
+            response = default(T);
+
+            if (RequestError(request))
+            {
+                error?.Invoke(request.error, request.responseCode);
+            }
+            else
+            {
+                BaseResponse<T> okresponse;
+                BaseResponse<string> errorResponse;
+                if (!ProcessResponse(request, out okresponse, out errorResponse))
+                {
+                    error?.Invoke(errorResponse.message, (long)errorResponse.statusCode);
+                }
+                else
+                {
+                    isOk = true;
+                    response = okresponse.message;
+                }
+            }
+
+            return isOk;
+        }
+
+        private bool ProcessResponse<T>(UnityWebRequest request, out BaseResponse<T> response, out BaseResponse<string> errorResponse)
+        {
+            bool isOk = true;
+            errorResponse = null;
+            response = null;
+
+            if (request.responseCode == 512)
+            {
+                isOk = false;
+                errorResponse = SerializationHelper.Deserialize<BaseResponse<string>>(request.downloadHandler.text);
+            }
+            else
+            {
+                response = SerializationHelper.Deserialize<BaseResponse<T>>(request.downloadHandler.text);
+            }
+
+            return isOk;
+        }
+
         #endregion Utilities
 
         #region No Wallet Cheat
@@ -158,7 +200,7 @@ namespace EmergenceSDK
         {
             skipWallet = skip;
 
-            AccessTokenResponse response = SerializationHelper.Deserialize<AccessTokenResponse>(accessTokenJson);
+            BaseResponse<AccessTokenResponse> response = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(accessTokenJson);
             currentAccessToken = SerializationHelper.Serialize(response.message.accessToken, false);
             ProcessExpiration(response.message.accessToken.message);
         }

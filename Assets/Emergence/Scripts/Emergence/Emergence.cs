@@ -7,15 +7,22 @@ namespace EmergenceSDK
 {
     public class Emergence : MonoBehaviour
     {
-        [Header("Emergence Server")]
-        [SerializeField]
-        private string customEmergenceServerLocation;
+        [Header("Emergence Configuration")]
+        //[SerializeField]
+        //private string customEmergenceServerLocation;
 
         [SerializeField]
         private string nodeURL;
 
         [SerializeField]
         private string gameId;
+
+        [Header("EVM Server")]
+        [SerializeField]
+        private bool launchEVMServerOnAwake = false;
+
+        [SerializeField]
+        private bool launchEVMServerOnStart = true;
 
         [Header("Keyboard shortcut to open Emergence")]
         [SerializeField]
@@ -33,10 +40,10 @@ namespace EmergenceSDK
         public class EmergenceUIStateChanged : UnityEvent<bool> { }
 
         [Serializable]
-        public class EmergenceUIOpened: UnityEvent { }
+        public class EmergenceUIOpened : UnityEvent { }
 
         [Serializable]
-        public class EmergenceUIClosed: UnityEvent { }
+        public class EmergenceUIClosed : UnityEvent { }
 
         [Header("Events")]
         public EmergenceUIOpened OnEmergenceUIOpened;
@@ -57,8 +64,53 @@ namespace EmergenceSDK
             }
         }
 
+        #region Overlay
+
+        public void OpenOverlay()
+        {
+            if (ScreenManager.Instance == null)
+            {
+                ui.SetActive(true);
+                SceneManager.LoadSceneAsync("Emergence", LoadSceneMode.Additive);
+            }
+            else
+            {
+                if (!ScreenManager.Instance.IsVisible)
+                {
+                    ScreenManager.Instance.gameObject.SetActive(true);
+                    SaveCursor();
+                    UpdateCursor();
+                    OnEmergenceUIOpened.Invoke();
+                    OnEmergenceUIVisibilityChanged?.Invoke(true);
+                }
+            }
+        }
+
+        public void CloseOverlay()
+        {
+            if (ScreenManager.Instance == null)
+            {
+                return;
+            }
+
+            ScreenManager.Instance.gameObject.SetActive(false);
+            RestoreCursor();
+            OnEmergenceUIClosed.Invoke();
+            OnEmergenceUIVisibilityChanged?.Invoke(false);
+        }
+
+        #endregion Overlay
+
+        #region Monobehaviour
+
         private void Awake()
         {
+            if (transform.childCount < 1)
+            {
+                Debug.LogError("Missing children");
+                return;
+            }
+
             if (Instance != null)
             {
                 Debug.LogError($"Emergence prefab instance already exists, removing this GameObject from the scene [{gameObject.name}]");
@@ -70,11 +122,11 @@ namespace EmergenceSDK
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
             ScreenManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
             DontDestroyOnLoad(gameObject);
-        }
 
-        private void EmergenceManager_OnButtonEsc()
-        {
-            CloseOverlay();
+            if (launchEVMServerOnAwake)
+            {
+                Services.Instance.SetupAndStartEVMServer(nodeURL, gameId);
+            }
         }
 
         private void OnDestroy()
@@ -95,10 +147,131 @@ namespace EmergenceSDK
                 Debug.LogError("Missing children");
                 return;
             }
-            Services.Instance.SetupAndStartEVMServer(nodeURL, gameId);
+
+            if (launchEVMServerOnStart && !launchEVMServerOnAwake)
+            {
+                Services.Instance.SetupAndStartEVMServer(nodeURL, gameId);
+            }
 
             ui = transform.GetChild(0).gameObject;
             ui.SetActive(false);
+        }
+
+        private void Update()
+        {
+            bool shortcutPressed = Input.GetKeyDown(key)
+                           && (shift && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) || !shift)
+                           && (ctrl && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) || !ctrl);
+
+            if (shortcutPressed)
+            {
+                OpenOverlay();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (ScreenManager.Instance != null)
+                {
+                    if (ScreenManager.Instance.IsVisible)
+                    {
+                        ScreenManager.Instance.gameObject.SetActive(false);
+                        RestoreCursor();
+                        OnEmergenceUIClosed.Invoke();
+                        OnEmergenceUIVisibilityChanged?.Invoke(false);
+                    }
+                }
+            }
+
+            #region Tests
+            /*
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                string path = "C:\\dev\\wallet.json";
+                string password = "password";
+
+                Services.Instance.CreateWallet(path, password, () =>
+                {
+                    Debug.Log("Success CreateWallet");
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
+
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                string privateKey = "0cb5384dadcc8ed56d09ade8f87949ab3b7c237c4378621b57dfd3cd7c5046c6";
+                string password = "password";
+                string publicKey = "0xb674c35ca4607EB1CF1c58c36eb69972818770Fd";
+                string path = "C:\\dev\\wallet.json";
+
+                Services.Instance.CreateKeyStore(privateKey, password, publicKey, path, () =>
+                {
+                    Debug.Log("Success CreateKeyStore");
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
+
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                string name = string.Empty;
+                string password = "password";
+                string path = "C:\\dev\\wallet.json";
+                string nodeURL = "https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134";
+
+                Services.Instance.LoadAccount(name, password, path, nodeURL, () =>
+                {
+                    Debug.Log("Success LoadAccount");
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
+
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                Services.Instance.GetAccessToken((accessToken) =>
+                {
+                    Debug.Log($"Success accesstoken {accessToken}");
+                    ScreenManager.Instance.ShowDashboard();
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
+
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                Services.Instance.GetBalance((balance) =>
+                {
+                    Debug.Log($"Success balance {balance}");
+                    ScreenManager.Instance.ShowDashboard();
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }
+
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                Services.Instance.ValidateAccessToken((valid) =>
+                {
+                    Debug.Log($"Valid Access token: {valid}");
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                });
+            }*/
+
+            #endregion Tests
         }
 
         private void OnApplicationFocus(bool hasFocus)
@@ -108,6 +281,13 @@ namespace EmergenceSDK
                 UpdateCursor();
             }
         }
+
+        #endregion Monobehaviour
+
+        #region Cursor Handling
+
+        private CursorLockMode previousCursorLockMode = CursorLockMode.None;
+        private bool previousCursorVisible = false;
 
         private void SaveCursor()
         {
@@ -127,62 +307,15 @@ namespace EmergenceSDK
             Cursor.visible = previousCursorVisible;
         }
 
-        private CursorLockMode previousCursorLockMode = CursorLockMode.None;
-        private bool previousCursorVisible = false;
-        private void Update()
-        {
-            bool shortcutPressed = Input.GetKeyDown(key)
-                           && (shift && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) || !shift)
-                           && (ctrl && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) || !ctrl);
+        #endregion Cursor Handling
 
-            if (shortcutPressed)
-            {
-                if (ScreenManager.Instance == null)
-                {
-                    ui.SetActive(true);
-                    SceneManager.LoadSceneAsync("Emergence", LoadSceneMode.Additive);
-                }
-                else
-                {
-                    if (!ScreenManager.Instance.IsVisible)
-                    {
-                        ScreenManager.Instance.gameObject.SetActive(true);
-                        SaveCursor();
-                        UpdateCursor();
-                        OnEmergenceUIOpened.Invoke();
-                        OnEmergenceUIVisibilityChanged?.Invoke(true);
-                    }
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                if (ScreenManager.Instance != null)
-                {
-                    if (ScreenManager.Instance.IsVisible)
-                    {
-                        ScreenManager.Instance.gameObject.SetActive(false);
-                        RestoreCursor();
-                        OnEmergenceUIClosed.Invoke();
-                        OnEmergenceUIVisibilityChanged?.Invoke(false);
-                    }
-                }
-            }
-        }
-
-        private void CloseOverlay()
-        {
-            ScreenManager.Instance.gameObject.SetActive(false);
-            RestoreCursor();
-            OnEmergenceUIClosed.Invoke();
-            OnEmergenceUIVisibilityChanged?.Invoke(false);
-        }
+        #region Events
 
         private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
             if (arg0.name.Equals("Emergence"))
             {
-                Debug.Log("Loaded");
+                Debug.Log("Emergence overlay scene Loaded");
                 ui?.SetActive(false);
                 ScreenManager.Instance.gameObject.SetActive(true);
                 SaveCursor();
@@ -191,5 +324,12 @@ namespace EmergenceSDK
                 OnEmergenceUIVisibilityChanged?.Invoke(true);
             }
         }
+
+        private void EmergenceManager_OnButtonEsc()
+        {
+            CloseOverlay();
+        }
+
+        #endregion Events
     }
 }

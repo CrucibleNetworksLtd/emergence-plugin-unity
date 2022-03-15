@@ -13,10 +13,10 @@ namespace EmergenceSDK
 
         [SerializeField]
         private TextMeshProUGUI nameText;
-        
+
         [SerializeField]
         private GameObject unselectedBorder;
-        
+
         [SerializeField]
         private GameObject selectedBorder;
 
@@ -67,7 +67,7 @@ namespace EmergenceSDK
 
             nameText.gameObject.SetActive(false);
             nameText.text = persona.name;
-            
+
             if (persona.AvatarImage == null)
             {
                 persona.AvatarImage = texture;
