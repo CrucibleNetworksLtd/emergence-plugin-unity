@@ -9,6 +9,7 @@ namespace EmergenceSDK
     {
         [Header("UI References")]
         public RawImage rawQRImage;
+        public Button backButton;
         public TextMeshProUGUI refreshCounterText;
 
         private float timeRemaining = 0.0f;
