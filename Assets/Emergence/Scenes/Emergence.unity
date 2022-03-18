@@ -183,7 +183,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 3bedaddf6d7a52e4c91e3894781d9d9e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 26b7ffff190e284438a7593eb3a328a3, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -1008,10 +1008,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   welcomeScreen: {fileID: 774305839}
+  screensRoot: {fileID: 944004606}
   logInScreen: {fileID: 828806855}
   dashboardScreen: {fileID: 1131142265}
   editPersonaScreen: {fileID: 691397656}
   escButton: {fileID: 675775270}
+  escButtonOnboarding: {fileID: 2015215749792626180}
 --- !u!1001 &1857972300590158598
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1250,6 +1252,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5c8123bb36e7e604593b36e9381d636e, type: 3}
+--- !u!114 &2015215749792626180 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4205822567193802909, guid: 5c8123bb36e7e604593b36e9381d636e,
+    type: 3}
+  m_PrefabInstance: {fileID: 2015215749792626179}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2583192939086709428
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1551,6 +1565,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 853661493}
     m_Modifications:
+    - target: {fileID: 3645589912001868587, guid: 03f1f56cd756eb143ab1411767675e20,
+        type: 3}
+      propertyPath: cg
+      value: 
+      objectReference: {fileID: 1304431393}
     - target: {fileID: 3645589912001868588, guid: 03f1f56cd756eb143ab1411767675e20,
         type: 3}
       propertyPath: m_Pivot.x
@@ -1780,6 +1799,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Modal OK Prompt Panel
       objectReference: {fileID: 0}
+    - target: {fileID: 5544713163666299641, guid: 75428009f36b88d44a672c4d7067fa6a,
+        type: 3}
+      propertyPath: cg
+      value: 
+      objectReference: {fileID: 1304431393}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 75428009f36b88d44a672c4d7067fa6a, type: 3}
 --- !u!1001 &5765809111596229301
@@ -2018,6 +2042,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Prompt YES NO Panel
       objectReference: {fileID: 0}
+    - target: {fileID: 5914516605091492006, guid: 3712c468ba8c611438ea1fd8fdd2c2fe,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5914516605091492058, guid: 3712c468ba8c611438ea1fd8fdd2c2fe,
         type: 3}
       propertyPath: bgBlurredImage
@@ -2204,7 +2233,7 @@ PrefabInstance:
     - target: {fileID: 7628767004925639386, guid: 7d3ad471ec0802f48bd3e52d1992faed,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.0006746957
+      value: 0.000017595314
       objectReference: {fileID: 0}
     - target: {fileID: 7628767005033938129, guid: 7d3ad471ec0802f48bd3e52d1992faed,
         type: 3}

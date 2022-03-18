@@ -56,6 +56,8 @@ namespace EmergenceSDK
 
         public static Emergence Instance;
 
+        public const string HAS_LOGGED_IN_ONCE_KEY = "HasLoggedInOnce";
+
         public bool IsUIVisible
         {
             get
@@ -63,6 +65,7 @@ namespace EmergenceSDK
                 return ScreenManager.Instance != null && ScreenManager.Instance.IsVisible;
             }
         }
+
 
         #region Overlay
 
@@ -78,6 +81,7 @@ namespace EmergenceSDK
                 if (!ScreenManager.Instance.IsVisible)
                 {
                     ScreenManager.Instance.gameObject.SetActive(true);
+                    ScreenManager.Instance.ResetToOnBoardingIfNeeded();
                     SaveCursor();
                     UpdateCursor();
                     OnEmergenceUIOpened.Invoke();
