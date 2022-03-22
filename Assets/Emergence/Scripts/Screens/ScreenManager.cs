@@ -11,6 +11,9 @@ namespace EmergenceSDK
         private GameObject welcomeScreen;
 
         [SerializeField]
+        private GameObject screensRoot;
+
+        [SerializeField]
         private GameObject logInScreen;
 
         [SerializeField]
@@ -21,6 +24,7 @@ namespace EmergenceSDK
 
         [Header("UI Reference")]
         public Button escButton;
+        public Button escButtonOnboarding;
 
         private enum ScreenStates
         {
@@ -50,6 +54,7 @@ namespace EmergenceSDK
             Instance = this;
             ChangeState(this.state);
             escButton.onClick.AddListener(OnEscButtonPressed);
+            escButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
 
             GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
 
@@ -125,8 +130,15 @@ namespace EmergenceSDK
             }
         }
 
-        public delegate void ButtonEsc();
+        public void ResetToOnBoardingIfNeeded()
+        {
+            if (PlayerPrefs.GetInt(Emergence.HAS_LOGGED_IN_ONCE_KEY, 0) == 0)
+            {
+                ChangeState(ScreenStates.Welcome);
+            }
+        }
 
+        public delegate void ButtonEsc();
         public static event ButtonEsc OnButtonEsc;
 
         private void OnEscButtonPressed()
@@ -151,22 +163,33 @@ namespace EmergenceSDK
                     break;
                 case ScreenStates.Welcome:
                     welcomeScreen.SetActive(true);
+                    screensRoot.SetActive(false);
                     break;
                 case ScreenStates.LogIn:
                     logInScreen.SetActive(true);
+                    screensRoot.SetActive(false);
                     break;
                 case ScreenStates.Dashboard:
+                    screensRoot.SetActive(true);
                     dashboardScreen.SetActive(true);
                     break;
                 case ScreenStates.EditPersona:
                     editPersonaScreen.SetActive(true);
+                    screensRoot.SetActive(true);
                     break;
             }
         }
 
         public void ShowWelcome()
         {
-            ChangeState(ScreenStates.Welcome);
+            if (PlayerPrefs.GetInt(Emergence.HAS_LOGGED_IN_ONCE_KEY, 0) > 0)
+            {
+                ShowLogIn();
+            }
+            else
+            {
+                ChangeState(ScreenStates.Welcome);
+            }
         }
 
         public void ShowLogIn()

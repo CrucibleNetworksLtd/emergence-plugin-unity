@@ -82,6 +82,7 @@ namespace EmergenceSDK
                     Services.Instance.GetAccessToken((token) =>
                     {
                         state = States.LoginFinished;
+                        PlayerPrefs.SetInt(Emergence.HAS_LOGGED_IN_ONCE_KEY, 1);
                         ScreenManager.Instance.ShowDashboard();
                     },
                     (error, code) =>
