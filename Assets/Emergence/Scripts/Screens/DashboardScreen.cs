@@ -96,13 +96,12 @@ namespace EmergenceSDK
                     }
                 }
 
+                //TODO: add hide show logic for the big create persona button and scroll panel
                 if (personas.Count > 0)
                 {
-  
                 }
                 else
-                {
-                    
+                {                    
                 }
 
                 requestingInProgress = false;
