@@ -9,6 +9,7 @@ namespace EmergenceSDK
     {
         [Header("UI References")]
         public Transform personaScrollContents;
+        public Transform detailsPanel;
         public Button addPersonaButton;
         public Texture2D defaultTexture;
 
@@ -19,9 +20,6 @@ namespace EmergenceSDK
         private Persona currentPersona;
 
         public static DashboardScreen Instance;
-
-        public TextMeshProUGUI titleText;
-        public TextMeshProUGUI contentsText;
 
         private HashSet<string> imagesRefreshing = new HashSet<string>();
         private bool requestingInProgress = false;
@@ -100,13 +98,11 @@ namespace EmergenceSDK
 
                 if (personas.Count > 0)
                 {
-                    titleText.text = "Which persona are you going to use?";
-                    contentsText.text = "You can use it as you want to interact with friends and games.";
+  
                 }
                 else
                 {
-                    titleText.text = "Hello,";
-                    contentsText.text = "Your wallet has been connected successfully. \n Now, you will neeed to create a persona so you can interact with your friends.";
+                    
                 }
 
                 requestingInProgress = false;
