@@ -101,7 +101,7 @@ namespace EmergenceSDK
                 {
                 }
                 else
-                {                    
+                {
                 }
 
                 requestingInProgress = false;
