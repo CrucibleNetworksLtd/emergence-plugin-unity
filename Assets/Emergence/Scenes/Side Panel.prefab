@@ -980,7 +980,7 @@ PrefabInstance:
     - target: {fileID: 2679250790351363120, guid: 31d104362047c1d4f90a73dffb1d6c6f,
         type: 3}
       propertyPath: tooltipMessage
-      value: My Collection
+      value: Collection
       objectReference: {fileID: 0}
     - target: {fileID: 8249730057981654952, guid: 31d104362047c1d4f90a73dffb1d6c6f,
         type: 3}
@@ -1418,7 +1418,7 @@ PrefabInstance:
     - target: {fileID: 2679250790351363120, guid: 31d104362047c1d4f90a73dffb1d6c6f,
         type: 3}
       propertyPath: tooltipMessage
-      value: Personas
+      value: My Personas
       objectReference: {fileID: 0}
     - target: {fileID: 8249730057981654952, guid: 31d104362047c1d4f90a73dffb1d6c6f,
         type: 3}
