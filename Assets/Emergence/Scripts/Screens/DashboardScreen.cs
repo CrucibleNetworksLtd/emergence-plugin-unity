@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using System.Collections.Generic;
 
 namespace EmergenceSDK
@@ -9,9 +8,23 @@ namespace EmergenceSDK
     {
         [Header("UI References")]
         public Transform personaScrollContents;
-        public Transform detailsPanel;
         public Button addPersonaButton;
+
+        [Header("UI Sidebar References")]
+        // Sidebar New persona for when the user has no personas
+        public Button addPersonaSidebarButton1;
+
+        // Sidebar Avatar and New persona for when the user has at least one persona
+        public Button addPersonaSidebarButton2;
+        public RawImage sidebarAvatar;
+        public GameObject sidebarWithPersonas;
+
+        [Header("UI Detail Panel References")]
+        public GameObject detailsPanel;
+
+        [Header("Default Texture")]
         public Texture2D defaultTexture;
+
 
         [Header("Utilities")]
         [SerializeField]
@@ -28,14 +41,25 @@ namespace EmergenceSDK
         {
             Instance = this;
             addPersonaButton.onClick.AddListener(OnCreatePersona);
+            addPersonaSidebarButton1.onClick.AddListener(OnCreatePersona);
+            addPersonaSidebarButton2.onClick.AddListener(OnCreatePersona);
 
             PersonaScrollItem.OnSelected += PersonaScrollItem_OnSelected;
             PersonaScrollItem.OnUsePersonaAsCurrent += PersonaScrollItem_OnUsePersonaAsCurrent;
             PersonaScrollItem.OnImageCompleted += PersonaScrollItem_OnImageCompleted;
+
+            sidebarAvatar.texture = defaultTexture;
+            detailsPanel.SetActive(false);
+
+            UIForNoPersonas();
         }
 
         private void OnDestroy()
         {
+            addPersonaButton.onClick.RemoveListener(OnCreatePersona);
+            addPersonaSidebarButton1.onClick.RemoveListener(OnCreatePersona);
+            addPersonaSidebarButton2.onClick.RemoveListener(OnCreatePersona);
+
             PersonaScrollItem.OnSelected -= PersonaScrollItem_OnSelected;
             PersonaScrollItem.OnUsePersonaAsCurrent -= PersonaScrollItem_OnUsePersonaAsCurrent;
             PersonaScrollItem.OnImageCompleted -= PersonaScrollItem_OnImageCompleted;
@@ -96,12 +120,13 @@ namespace EmergenceSDK
                     }
                 }
 
-                //TODO: add hide show logic for the big create persona button and scroll panel
                 if (personas.Count > 0)
                 {
+                    UIForPersonas();
                 }
                 else
                 {
+                    UIForNoPersonas();
                 }
 
                 requestingInProgress = false;
@@ -117,7 +142,6 @@ namespace EmergenceSDK
                 Debug.LogError("[" + code + "] " + error);
                 Modal.Instance.Hide();
             });
-
         }
 
         private void OnCreatePersona()
@@ -166,6 +190,14 @@ namespace EmergenceSDK
 
         private void PersonaScrollItem_OnImageCompleted(Persona persona, bool success)
         {
+            if (currentPersona != null)
+            {
+                if (currentPersona.id.Equals(persona.id))
+                {
+                    sidebarAvatar.texture = persona.AvatarImage;
+                }
+            }
+
             if (imagesRefreshing.Contains(persona.id))
             {
                 imagesRefreshing.Remove(persona.id);
@@ -178,6 +210,20 @@ namespace EmergenceSDK
             {
                 Debug.LogWarning("Image completed but not accounted for: [" + persona.id + "][" + persona.avatar.id + "][" + persona.avatar.url + "][" + success + "]");
             }
+        }
+
+        private void UIForNoPersonas()
+        {
+            addPersonaButton.transform.parent.gameObject.SetActive(true);
+            addPersonaSidebarButton1.gameObject.SetActive(true);
+            sidebarWithPersonas.SetActive(false);
+        }
+
+        private void UIForPersonas()
+        {
+            addPersonaButton.transform.parent.gameObject.SetActive(false);
+            addPersonaSidebarButton1.gameObject.SetActive(false);
+            sidebarWithPersonas.SetActive(true);
         }
     }
 }

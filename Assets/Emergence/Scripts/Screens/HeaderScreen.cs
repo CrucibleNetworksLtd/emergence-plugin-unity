@@ -10,8 +10,9 @@ namespace EmergenceSDK
         public GameObject headerInformation;
         public TextMeshProUGUI walletBalance;
         public TextMeshProUGUI walletAddress;
+        public Button menuButton;
+        public Button disconnectModalButton;
         public Button disconnectButton;
-        public RawImage avatar;
 
         public static HeaderScreen Instance;
 
@@ -20,7 +21,16 @@ namespace EmergenceSDK
         private void Awake()
         {
             Instance = this;
+            menuButton.onClick.AddListener(OnMenuOpenClick);
             disconnectButton.onClick.AddListener(OnDisconnectClick);
+            disconnectModalButton.onClick.AddListener(OnMenuCloseClick);
+        }
+
+        private void OnDestroy()
+        {
+            menuButton.onClick.RemoveListener(OnMenuOpenClick);
+            disconnectButton.onClick.RemoveListener(OnDisconnectClick);
+            disconnectModalButton.onClick.RemoveListener(OnMenuCloseClick);
         }
 
         private void Update()
@@ -66,8 +76,17 @@ namespace EmergenceSDK
 
         public void Refresh(string address)
         {
-            walletAddress.text = address;
-            // TODO add the circle avatar image data
+            walletAddress.text = address.Substring(0, 6) + "..." + address.Substring(address.Length - 4, 4);
+        }
+
+        private void OnMenuOpenClick()
+        {
+            disconnectModalButton.gameObject.SetActive(true);
+        }
+
+        private void OnMenuCloseClick()
+        {
+            disconnectModalButton.gameObject.SetActive(false);
         }
 
         private void OnDisconnectClick()
