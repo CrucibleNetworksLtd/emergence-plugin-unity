@@ -13,7 +13,7 @@ namespace EmergenceSDK
         public Button menuButton;
         public Button disconnectModalButton;
         public Button disconnectButton;
-        
+
         public static HeaderScreen Instance;
 
         private readonly float refreshTimeOut = 30.0f;
