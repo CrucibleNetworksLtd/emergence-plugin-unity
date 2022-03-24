@@ -92,6 +92,17 @@ namespace EmergenceSDK
                     });
                     break;
             }
+
+
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                Debug.Log("CHEAT ACTIVATED!");
+
+                string accessTokenJson = System.IO.File.ReadAllText("accessToken.json");
+
+                Services.Instance.SkipWallet(true, accessTokenJson);
+                ScreenManager.Instance.ShowDashboard();
+            }
         }
 
         public void Restart()

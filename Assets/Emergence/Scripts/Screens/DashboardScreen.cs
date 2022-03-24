@@ -36,6 +36,8 @@ namespace EmergenceSDK
 
         private void OnDestroy()
         {
+            addPersonaButton.onClick.RemoveListener(OnCreatePersona);
+
             PersonaScrollItem.OnSelected -= PersonaScrollItem_OnSelected;
             PersonaScrollItem.OnUsePersonaAsCurrent -= PersonaScrollItem_OnUsePersonaAsCurrent;
             PersonaScrollItem.OnImageCompleted -= PersonaScrollItem_OnImageCompleted;

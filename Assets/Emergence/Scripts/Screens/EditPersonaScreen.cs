@@ -49,6 +49,10 @@ namespace EmergenceSDK
 
         private void OnDestroy()
         {
+            saveButton.onClick.RemoveListener(OnSaveClicked);
+            deleteButton.onClick.RemoveListener(OnDeleteClicked);
+            backButton.onClick.RemoveListener(OnBackClicked);
+            useThisPersonaAsDefaultToggle.onValueChanged.RemoveListener(OnUseThisPersonaAsDefaultToggled);
             AvatarScrollItem.OnAvatarSelected -= AvatarScrollItem_OnAvatarSelected;
             AvatarScrollItem.OnImageCompleted -= AvatarScrollItem_OnImageCompleted;
         }

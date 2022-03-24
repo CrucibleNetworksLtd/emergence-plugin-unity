@@ -44,6 +44,9 @@ namespace EmergenceSDK
 
         private void OnDestroy()
         {
+            selectButton.onClick.RemoveListener(OnSelectClicked);
+            usePersonaAsCurrentButton.onClick.RemoveListener(OnUsePersonaAsCurrentClicked);
+
             RequestImage.Instance.OnImageReady -= Instance_OnImageReady;
             RequestImage.Instance.OnImageFailed -= Instance_OnImageFailed;
         }

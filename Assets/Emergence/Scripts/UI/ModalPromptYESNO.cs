@@ -27,6 +27,12 @@ namespace EmergenceSDK
             noButton.onClick.AddListener(OnNoClicked);
         }
 
+        private void OnDestroy()
+        {
+            yesButton.onClick.RemoveListener(OnYesClicked);
+            noButton.onClick.RemoveListener(OnNoClicked);
+        }
+
         public void Show(string title, string question, ModalPromptYesCallback yesCallback = null, ModalPromptNoCallback noCallback = null)
         {
             label.text = "<b>" + title + "</b> " + question;

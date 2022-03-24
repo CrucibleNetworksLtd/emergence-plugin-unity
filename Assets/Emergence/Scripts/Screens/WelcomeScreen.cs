@@ -38,6 +38,14 @@ namespace EmergenceSDK
             Reset();
         }
 
+        private void OnDestroy()
+        {
+            skipButton.onClick.RemoveListener(OnConnectWallet);
+            space1Button.onClick.RemoveListener(OnNext);
+            space2Button.onClick.RemoveListener(OnNext);
+            space3Button.onClick.RemoveListener(OnNext);
+        }
+
         private void OnEnable()
         {
             Reset();

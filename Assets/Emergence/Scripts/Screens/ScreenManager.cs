@@ -26,6 +26,9 @@ namespace EmergenceSDK
         public Button escButton;
         public Button escButtonOnboarding;
 
+        [SerializeField]
+        public GameObject disconnectModal;
+
         private enum ScreenStates
         {
             WaitForServer,
@@ -69,6 +72,12 @@ namespace EmergenceSDK
                     break;
                 }
             }
+        }
+
+        private void OnDestroy()
+        {
+            escButton.onClick.RemoveListener(OnEscButtonPressed);
+            escButtonOnboarding.onClick.RemoveListener(OnEscButtonPressed);
         }
 
         private void Start()
@@ -152,6 +161,7 @@ namespace EmergenceSDK
             logInScreen.SetActive(false);
             dashboardScreen.SetActive(false);
             editPersonaScreen.SetActive(false);
+            disconnectModal.SetActive(false);
 
             this.state = state;
 
