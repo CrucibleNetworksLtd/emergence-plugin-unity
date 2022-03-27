@@ -1285,6 +1285,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5967331893223697484}
+  - component: {fileID: 4005651391567919076}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -1311,6 +1312,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &4005651391567919076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5967331893223697485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &5967331893301077910
 GameObject:
   m_ObjectHideFlags: 0
@@ -1362,15 +1377,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 954e73b6e322f0842b604df441b875d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 0.25
-  spacing: 45
+  duration: 0.1
   arrowLeftButton: {fileID: 373858550199600595}
   arrowRightButton: {fileID: 1905034834182404519}
   scrollItemsRoot: {fileID: 5967331893223697484}
-  dist0: 1
-  dist1: 0.8
-  dist2: 0.7
-  dist3: 0.7
 --- !u!1 &5967331893429713654
 GameObject:
   m_ObjectHideFlags: 0
@@ -1428,10 +1438,17 @@ MonoBehaviour:
   personaScrollContents: {fileID: 5967331893223697484}
   addPersonaButton: {fileID: 5967331893891599349}
   addPersonaSidebarButton1: {fileID: 0}
+  activePersonaButton: {fileID: 0}
   addPersonaSidebarButton2: {fileID: 0}
   sidebarAvatar: {fileID: 0}
   sidebarWithPersonas: {fileID: 0}
   detailsPanel: {fileID: 3678978677902216626}
+  detailsTitleText: {fileID: 1258754063469396090}
+  detailsBioText: {fileID: 3448474228057659459}
+  detailsActivateButton: {fileID: 5011503363801675835}
+  detailsActivateButtonText: {fileID: 5467678053265531199}
+  detailsEditButton: {fileID: 5404963996825219727}
+  detailsDeleteButton: {fileID: 2045251851}
   defaultTexture: {fileID: 2800000, guid: bfc305db338beaa498c338b0c5c11a12, type: 3}
   personaButtonPool: {fileID: 5967331894794683765}
 --- !u!1 &5967331893891599351

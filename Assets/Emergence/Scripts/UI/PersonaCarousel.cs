@@ -7,31 +7,27 @@ namespace EmergenceSDK
     {
         [Header("Configuration")]
         public float duration = 0.5f;
-        public float spacing = 30.0f;
 
         [Header("UI References")]
         public Button arrowLeftButton;
         public Button arrowRightButton;
         public Transform scrollItemsRoot;
 
+        public static PersonaCarousel Instance;
+
+        private Transform[] items;
         private float timeCounter = 0.0f;
         private bool started = false;
-        private int count = 0;
-        private int selected = 0;
-        private float originalItemWidth = 0;
-        private bool refreshing = true;
-        private int diff;
-        private int previousSelected;
+        private int count = 0; // Total items
+        private int selected = 0; // Target item
+        private int previousSelected; // Previous target item
+        private float originalItemWidth = 0; // To avoid hardcoding the item width
+        private bool refreshing = true; // For spreading FX
+        private int diff; // Cached movement amount
+        private int activePersonaIndex = 0;
 
-        public static PersonaCarousel Instance;
-        private Transform[] items;
-
-
-        // 1 - scroll normal
-        // 2 - centrado en selected
-        // 3 - escala segun position
-        // 4 - distancia segun position
-        // 5 - maximo visible segun ancho
+        public delegate void ArrowClicked(int index);
+        public static event ArrowClicked OnArrowClicked;
 
         private void Awake()
         {
@@ -57,24 +53,8 @@ namespace EmergenceSDK
 
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                GoToPosition(1);
+                GoToPosition(count - 1);
             }
-
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                GoToPosition(2);
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                GoToPosition(3);
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                GoToPosition(4);
-            }
-
             if (!started)
             {
                 return;
@@ -115,6 +95,7 @@ namespace EmergenceSDK
             if (position < count)
             {
                 GoToPosition(position);
+                OnArrowClicked?.Invoke(position);
             }
         }
 
@@ -124,6 +105,7 @@ namespace EmergenceSDK
             if (position >= 0)
             {
                 GoToPosition(position);
+                OnArrowClicked?.Invoke(position);
             }
         }
 
@@ -181,8 +163,19 @@ namespace EmergenceSDK
 
             selected = selectedIndex;
             previousSelected = selected;
+            activePersonaIndex = selected;
             refreshing = true;
-            GoToPosition(selectedIndex);
+            GoToPosition(activePersonaIndex);
+        }
+
+        public void GoToActivePersona()
+        {
+            if (refreshing)
+            {
+                return;
+            }
+
+            GoToPosition(activePersonaIndex);
         }
 
         private void PositionAndScaleItem(int position, float t)
@@ -192,50 +185,32 @@ namespace EmergenceSDK
             int startPosition = position - previousSelected;
             int endPosition = position - selected;
 
-            float startScale = GetScaleForPosition(startPosition);
-            float endScale = GetScaleForPosition(endPosition);
+            float startScale = GetScalePerPosition(startPosition);
+            float endScale = GetScalePerPosition(endPosition);
             float scale = Mathf.Lerp(startScale, endScale, t);
 
-            float separation = scale * originalItemWidth + spacing;
+            float startSeparation = GetDistancePerPosition(startPosition);
+            float endSeparation = GetDistancePerPosition(endPosition);
+            float separation = Mathf.Lerp(startSeparation, endSeparation, t) * originalItemWidth;
 
-            
-            switch (Mathf.Abs(startPosition))
-            {
-                case 1:
-                    /*startScale = GetScaleForPosition(startPosition + 1);
-                    endScale = GetScaleForPosition(endPosition + 1);
-                    separation += Mathf.Lerp(startScale, endScale, t) * originalItemWidth + spacing;*/
-                    separation += originalItemWidth * dist0;
-                    break;
-                case 2:
-                    /*startScale = GetScaleForPosition(startPosition + 1);
-                    endScale = GetScaleForPosition(endPosition + 1);
-                    separation += Mathf.Lerp(startScale, endScale, t) * originalItemWidth + spacing;
-
-                    startScale = GetScaleForPosition(startPosition + 2);
-                    endScale = GetScaleForPosition(endPosition + 2);
-                    separation += Mathf.Lerp(startScale, endScale, t) * originalItemWidth + spacing;*/
-                    separation += originalItemWidth * dist1;
-                    break;
-                case 3:
-                    separation += originalItemWidth * dist2;
-                    break;
-            }
-            
             if (refreshing)
             {
+                // Spreading effect
                 item.localPosition = Vector2.right * t * (diff + position - selected) * separation;
             }
             else
             {
-                item.localPosition = Vector2.right * Mathf.Lerp(startPosition, endPosition, t) * separation; //* (originalItemWidth + spacing);
+                // Carousel
+                item.localPosition = Vector2.right * Mathf.Lerp(startPosition, endPosition, t) * separation;
             }
 
             item.localScale = Vector3.one * scale;
         }
 
-        private float GetScaleForPosition(int position)
+        private float GetScalePerPosition(int position)
         {
+            // These values were picked to match the reference design, can be replaced by a proper formula
+            // to be used for an infinite number of items, instead of 5
             float result = 0.0f;
             switch (Mathf.Abs(position))
             {
@@ -254,13 +229,31 @@ namespace EmergenceSDK
             }
             return result;
         }
-        [Range(0.0f, 4.0f)]
-        public float dist0 = 1.0f;
-        [Range(0.0f, 4.0f)]
-        public float dist1 = 0.8f;
-        [Range(0.0f, 4.0f)]
-        public float dist2 = 0.7f;
-        [Range(0.0f, 4.0f)]
-        public float dist3 = 0.7f;
+
+        private float GetDistancePerPosition(int position)
+        {
+            // These values were picked to match the reference design, can be replaced by a proper formula
+            // to be used for an infinite number of items, instead of 5
+            float result = 0.0f;
+            switch (Mathf.Abs(position))
+            {
+                case 0:
+                    result = 1.0f;
+                    break;
+                case 1:
+                    result = 0.85f;
+                    break;
+                case 2:
+                    result = 0.75f;
+                    break;
+                case 3:
+                    result = 0.45f;
+                    break;
+                default:
+                    result = 0.45f;
+                    break;
+            }
+            return result;
+        }
     }
 }
