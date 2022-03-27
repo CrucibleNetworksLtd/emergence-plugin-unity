@@ -124,7 +124,7 @@ namespace EmergenceSDK
 
                     go.transform.SetParent(personaScrollContents);
                     go.transform.localScale = Vector3.one;
-                    
+
                     scrollItems.Add(personaScrollContents.GetChild(i).GetComponent<PersonaScrollItem>());
 
                     Persona persona = personas[i];
@@ -159,7 +159,7 @@ namespace EmergenceSDK
                     imagesRefreshing.Add(persona.id);
                     scrollItems[i].Refresh(defaultTexture, persona, i == selectedIndex);
                 }
-                
+
                 personasList.Clear();
                 for (int i = 0; i < personaScrollContents.childCount; i++)
                 {
@@ -254,7 +254,7 @@ namespace EmergenceSDK
         }
 
         private void OnEditPersona()
-        { 
+        {
             EditPersonaScreen.Instance.Refresh(selectedPersona, activePersona.id == selectedPersona.id);
             ScreenManager.Instance.ShowEditPersona();
         }
