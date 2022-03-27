@@ -99,6 +99,7 @@ namespace EmergenceSDK
 
         public void Refresh()
         {
+            detailsPanel.SetActive(false);
             HeaderScreen.Instance.Show();
             while (personaScrollContents.childCount > 0)
             {
