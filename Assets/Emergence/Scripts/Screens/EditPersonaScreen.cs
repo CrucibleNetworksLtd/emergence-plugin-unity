@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -115,12 +115,12 @@ namespace EmergenceSDK
                 editGOs[i].SetActive(!isNew);
             }
 
+
             // If creating, first show avatar selection
             panelAvatar.SetActive(isNew);
             panelInformation.SetActive(!isNew);
 
             nextButtonText.text = isNew ? "Next" : "Save";
-
             deleteButton.gameObject.SetActive(!isNew && !isDefault);
 
             currentPersona = persona;
@@ -325,6 +325,11 @@ namespace EmergenceSDK
             panelAvatar.SetActive(true);
             panelInformation.SetActive(false);
             state = States.EditAvatar;
+        }
+
+        private void OnReplaceAvatarClicked()
+        {
+
         }
 
         private void ClearCurrentPersona()
