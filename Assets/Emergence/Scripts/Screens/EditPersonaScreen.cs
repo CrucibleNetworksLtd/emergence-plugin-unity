@@ -9,25 +9,34 @@ namespace EmergenceSDK
     {
         public static EditPersonaScreen Instance;
 
-        [Header("UI References")]
+        [Header("UI References Footer")]
+        public GameObject panelInformation;
+        public GameObject panelAvatar;
         public Button backButton;
-        public Pool avatarScrollItemsPool;
-        public Transform avatarScrollRoot;
-        public TextMeshProUGUI title;
-        public TextMeshProUGUI welcomeText;
-        public Button saveButton;
-        public TextMeshProUGUI saveButtonText;
-        public Button deleteButton;
-        public GameObject deleteTooltip;
+        public Button nextButton;
+        public TextMeshProUGUI nextButtonText;
+        public TextMeshProUGUI backButtonText;
 
-        public TMP_InputField nameIF;
-        public TMP_InputField bioIF;
+        public Button replaceAvatarButton;
+        public RawImage personaAvatarBackground;
         public RawImage personaAvatar;
 
+        [Header("UI References Avatar Panel")]
+        public Transform avatarScrollRoot;
+        public Pool avatarScrollItemsPool;
+
+        [Header("UI References Information Panel")]
+        public TMP_InputField nameIF;
+        public TMP_InputField bioIF;
         public Toggle availableOnSearchesToggle;
         public Toggle showingMyStatusToggle;
         public Toggle receiveContactRequestsToggle;
-        public Toggle useThisPersonaAsDefaultToggle;
+        public Button deleteButton;
+
+        [Header("UI References Edit / Create")]
+        public GameObject[] editGOs;
+        public GameObject[] createGOs;
+
 
         public Texture2D defaultImage;
 
@@ -39,20 +48,20 @@ namespace EmergenceSDK
         private void Awake()
         {
             Instance = this;
-            saveButton.onClick.AddListener(OnSaveClicked);
+            nextButton.onClick.AddListener(OnNextClicked);
             deleteButton.onClick.AddListener(OnDeleteClicked);
             backButton.onClick.AddListener(OnBackClicked);
-            useThisPersonaAsDefaultToggle.onValueChanged.AddListener(OnUseThisPersonaAsDefaultToggled);
+            replaceAvatarButton.onClick.AddListener(OnReplaceAvatarClicked);
             AvatarScrollItem.OnAvatarSelected += AvatarScrollItem_OnAvatarSelected;
             AvatarScrollItem.OnImageCompleted += AvatarScrollItem_OnImageCompleted;
         }
 
         private void OnDestroy()
         {
-            saveButton.onClick.RemoveListener(OnSaveClicked);
+            nextButton.onClick.RemoveListener(OnNextClicked);
             deleteButton.onClick.RemoveListener(OnDeleteClicked);
             backButton.onClick.RemoveListener(OnBackClicked);
-            useThisPersonaAsDefaultToggle.onValueChanged.RemoveListener(OnUseThisPersonaAsDefaultToggled);
+            replaceAvatarButton.onClick.RemoveListener(OnReplaceAvatarClicked);
             AvatarScrollItem.OnAvatarSelected -= AvatarScrollItem_OnAvatarSelected;
             AvatarScrollItem.OnImageCompleted -= AvatarScrollItem_OnImageCompleted;
         }
@@ -65,6 +74,7 @@ namespace EmergenceSDK
             if (currentAvatar == null)
             {
                 personaAvatar.texture = defaultImage;
+                personaAvatarBackground.texture = defaultImage;
                 return;
             }
 
@@ -72,6 +82,7 @@ namespace EmergenceSDK
             RequestImage.Instance.AskForImage(avatar.url, (url, texture) =>
             {
                 personaAvatar.texture = texture;
+                personaAvatarBackground.texture = texture;
             },
             (url, error, errorCode) =>
             {
@@ -81,14 +92,23 @@ namespace EmergenceSDK
 
         public void Refresh(Persona persona, bool isDefault, bool isNew = false)
         {
-            saveButtonText.text = isNew ? "Create" : "Save";
+            for (int i = 0; i < createGOs.Length; i++)
+            {
+                createGOs[i].SetActive(isNew);
+            }
 
-            title.gameObject.SetActive(isNew);
-            welcomeText.gameObject.SetActive(isNew);
+            for (int i = 0; i < editGOs.Length; i++)
+            {
+                editGOs[i].SetActive(!isNew);
+            }
+
+            // If creating, first show avatar
+            panelAvatar.SetActive(isNew);
+            panelInformation.SetActive(!isNew);
+
+            nextButtonText.text = isNew ? "Create" : "Save";
 
             deleteButton.gameObject.SetActive(!isNew && !isDefault);
-            deleteTooltip.SetActive(!isNew && !isDefault);
-            useThisPersonaAsDefaultToggle.interactable = !isNew && !isDefault;
 
             currentPersona = persona;
             currentAvatar = currentPersona.avatar;
@@ -100,15 +120,15 @@ namespace EmergenceSDK
             showingMyStatusToggle.SetIsOnWithoutNotify(persona.settings.showStatus);
             receiveContactRequestsToggle.SetIsOnWithoutNotify(persona.settings.receiveContactRequest);
 
-            useThisPersonaAsDefaultToggle.SetIsOnWithoutNotify(isDefault);
-
             if (persona.AvatarImage)
             {
                 personaAvatar.texture = persona.AvatarImage;
+                personaAvatarBackground.texture = persona.AvatarImage;
             }
             else
             {
                 personaAvatar.texture = defaultImage;
+                personaAvatarBackground.texture = defaultImage;
             }
 
             // Clear scroll area
@@ -173,7 +193,7 @@ namespace EmergenceSDK
             });
         }
 
-        private void OnSaveClicked()
+        private void OnNextClicked()
         {
             if (string.IsNullOrEmpty(nameIF.text))
             {
@@ -233,18 +253,23 @@ namespace EmergenceSDK
             ScreenManager.Instance.ShowDashboard();
         }
 
+        private void OnReplaceAvatarClicked()
+        {
+
+        }
+
         private void ClearCurrentPersona()
         {
             currentAvatar = null;
         }
 
+        /*
         private void OnUseThisPersonaAsDefaultToggled(bool isOn)
         {
             Modal.Instance.Show("Saving Changes...");
             Services.Instance.SetCurrentPersona(currentPersona, () =>
             {
                 Debug.Log("Successfully SetCurrentPersona to " + currentPersona.name);
-                useThisPersonaAsDefaultToggle.interactable = false;
                 deleteButton.gameObject.SetActive(false);
                 deleteTooltip.gameObject.SetActive(false);
                 Modal.Instance.Hide();
@@ -254,7 +279,7 @@ namespace EmergenceSDK
                 Debug.LogError("[" + code + "] " + error);
                 Modal.Instance.Hide();
             });
-        }
+        }*/
 
         private void AvatarScrollItem_OnImageCompleted(Persona.Avatar avatar, bool success)
         {

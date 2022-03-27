@@ -23,20 +23,25 @@ namespace EmergenceSDK
         [SerializeField]
         private Button selectButton;
 
-        [SerializeField]
-        private Button usePersonaAsCurrentButton;
-
-        private Persona persona;
+        public Persona Persona
+        {
+            get;
+            private set;
+        }
 
         public delegate void ImageCompleted(Persona persona, bool success);
         public static event ImageCompleted OnImageCompleted;
 
         private bool waitingForImageRequest = false;
+        public int Index
+        {
+            get;
+            private set;
+        }
 
         private void Awake()
         {
             selectButton.onClick.AddListener(OnSelectClicked);
-            usePersonaAsCurrentButton.onClick.AddListener(OnUsePersonaAsCurrentClicked);
 
             RequestImage.Instance.OnImageReady += Instance_OnImageReady;
             RequestImage.Instance.OnImageFailed += Instance_OnImageFailed;
@@ -45,29 +50,22 @@ namespace EmergenceSDK
         private void OnDestroy()
         {
             selectButton.onClick.RemoveListener(OnSelectClicked);
-            usePersonaAsCurrentButton.onClick.RemoveListener(OnUsePersonaAsCurrentClicked);
 
             RequestImage.Instance.OnImageReady -= Instance_OnImageReady;
             RequestImage.Instance.OnImageFailed -= Instance_OnImageFailed;
         }
 
-        public delegate void Selected(Persona persona);
+        public delegate void Selected(Persona persona, int childIndex);
         public static event Selected OnSelected;
         private void OnSelectClicked()
         {
-            OnSelected?.Invoke(persona);
-        }
-
-        public static event Selected OnUsePersonaAsCurrent;
-        private void OnUsePersonaAsCurrentClicked()
-        {
-            OnUsePersonaAsCurrent?.Invoke(persona);
+            OnSelected?.Invoke(Persona, Index);
         }
 
         public void Refresh(Texture2D texture, Persona persona, bool selected)
         {
-            this.persona = persona;
-
+            this.Persona = persona;
+            Index = this.transform.GetSiblingIndex();
             nameText.gameObject.SetActive(false);
             nameText.text = persona.name;
 
@@ -108,22 +106,22 @@ namespace EmergenceSDK
 
         private void Instance_OnImageReady(string url, Texture2D texture)
         {
-            if (waitingForImageRequest && url == persona.avatar.url)
+            if (waitingForImageRequest && url == Persona.avatar.url)
             {
-                persona.AvatarImage = texture;
-                photo.texture = persona.AvatarImage;
+                Persona.AvatarImage = texture;
+                photo.texture = Persona.AvatarImage;
                 waitingForImageRequest = false;
-                OnImageCompleted?.Invoke(persona, true);
+                OnImageCompleted?.Invoke(Persona, true);
             }
         }
 
         private void Instance_OnImageFailed(string url, string error, long errorCode)
         {
-            if (waitingForImageRequest && url == persona.avatar.url)
+            if (waitingForImageRequest && url == Persona.avatar.url)
             {
                 waitingForImageRequest = false;
                 Debug.LogError("[" + url + "] [" + errorCode + "] " + error);
-                OnImageCompleted?.Invoke(persona, false);
+                OnImageCompleted?.Invoke(Persona, false);
             }
         }
     }
