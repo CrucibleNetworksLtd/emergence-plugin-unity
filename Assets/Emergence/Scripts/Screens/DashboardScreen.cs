@@ -7,6 +7,7 @@ namespace EmergenceSDK
     public class DashboardScreen : MonoBehaviour
     {
         [Header("UI References")]
+        public GameObject personasScrollPanel;
         public Transform personaScrollContents;
         public Button addPersonaButton;
 
@@ -45,7 +46,6 @@ namespace EmergenceSDK
             addPersonaSidebarButton2.onClick.AddListener(OnCreatePersona);
 
             PersonaScrollItem.OnSelected += PersonaScrollItem_OnSelected;
-            PersonaScrollItem.OnUsePersonaAsCurrent += PersonaScrollItem_OnUsePersonaAsCurrent;
             PersonaScrollItem.OnImageCompleted += PersonaScrollItem_OnImageCompleted;
 
             sidebarAvatar.texture = defaultTexture;
@@ -61,7 +61,6 @@ namespace EmergenceSDK
             addPersonaSidebarButton2.onClick.RemoveListener(OnCreatePersona);
 
             PersonaScrollItem.OnSelected -= PersonaScrollItem_OnSelected;
-            PersonaScrollItem.OnUsePersonaAsCurrent -= PersonaScrollItem_OnUsePersonaAsCurrent;
             PersonaScrollItem.OnImageCompleted -= PersonaScrollItem_OnImageCompleted;
         }
 
@@ -83,14 +82,17 @@ namespace EmergenceSDK
 
                 requestingInProgress = true;
                 imagesRefreshing.Clear();
+
+                List<PersonaScrollItem> scrollItems = new List<PersonaScrollItem>();
+                int selectedIndex = 0;
                 for (int i = 0; i < personas.Count; i++)
                 {
                     GameObject go = personaButtonPool.GetNewObject();
 
                     go.transform.SetParent(personaScrollContents);
                     go.transform.localScale = Vector3.one;
-
-                    PersonaScrollItem psi = go.GetComponent<PersonaScrollItem>();
+                    
+                    scrollItems.Add(personaScrollContents.GetChild(i).GetComponent<PersonaScrollItem>());
 
                     Persona persona = personas[i];
                     if (persona.avatar != null)
@@ -109,16 +111,23 @@ namespace EmergenceSDK
                     if (currentPersona != null)
                     {
                         selected = currentPersona.id.Equals(persona.id);
-                    }
 
-                    imagesRefreshing.Add(persona.id);
-                    psi.Refresh(defaultTexture, persona, selected);
-
-                    if (selected)
-                    {
-                        go.transform.SetAsFirstSibling();
+                        if (selected)
+                        {
+                            selectedIndex = i;
+                        }
                     }
                 }
+
+                scrollItems[selectedIndex].transform.SetSiblingIndex(Mathf.FloorToInt(personas.Count / 2));
+                for (int i = 0; i < personas.Count; i++)
+                {
+                    Persona persona = personas[i];
+                    imagesRefreshing.Add(persona.id);
+                    scrollItems[i].Refresh(defaultTexture, persona, i == selectedIndex);
+                }
+
+                PersonaCarousel.Instance.Refresh(Mathf.FloorToInt(personas.Count / 2));
 
                 if (personas.Count > 0)
                 {
@@ -169,11 +178,14 @@ namespace EmergenceSDK
             ScreenManager.Instance.ShowEditPersona();
         }
 
-        private void PersonaScrollItem_OnSelected(Persona persona)
+        private void PersonaScrollItem_OnSelected(Persona persona, int position)
         {
+            // TODO put information on screen instead of edit
+            return;
             EditPersonaScreen.Instance.Refresh(persona, currentPersona.id == persona.id);
             ScreenManager.Instance.ShowEditPersona();
         }
+
         private void PersonaScrollItem_OnUsePersonaAsCurrent(Persona persona)
         {
             Modal.Instance.Show("Loading Personas...");
@@ -217,6 +229,7 @@ namespace EmergenceSDK
             addPersonaButton.transform.parent.gameObject.SetActive(true);
             addPersonaSidebarButton1.gameObject.SetActive(true);
             sidebarWithPersonas.SetActive(false);
+            personasScrollPanel.SetActive(false);
         }
 
         private void UIForPersonas()
@@ -224,6 +237,7 @@ namespace EmergenceSDK
             addPersonaButton.transform.parent.gameObject.SetActive(false);
             addPersonaSidebarButton1.gameObject.SetActive(false);
             sidebarWithPersonas.SetActive(true);
+            personasScrollPanel.SetActive(true);
         }
     }
 }
