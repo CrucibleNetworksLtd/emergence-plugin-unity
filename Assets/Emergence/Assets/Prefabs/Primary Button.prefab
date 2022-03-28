@@ -98,7 +98,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -240,8 +240,8 @@ MonoBehaviour:
   m_SpriteState:
     m_HighlightedSprite: {fileID: 21300000, guid: 1a3889525afe5944d84540feb5281cb0,
       type: 3}
-    m_PressedSprite: {fileID: 21300000, guid: 1a3889525afe5944d84540feb5281cb0, type: 3}
-    m_SelectedSprite: {fileID: 21300000, guid: 1a3889525afe5944d84540feb5281cb0, type: 3}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
     m_DisabledSprite: {fileID: 21300000, guid: c0b095e82f3356d4188d64c21bdb52a3, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal

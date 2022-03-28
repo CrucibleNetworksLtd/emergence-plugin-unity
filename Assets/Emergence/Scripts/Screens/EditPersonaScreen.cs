@@ -75,6 +75,25 @@ namespace EmergenceSDK
             AvatarScrollItem.OnImageCompleted -= AvatarScrollItem_OnImageCompleted;
         }
 
+        private void Update()
+        {
+            switch (state)
+            {
+                case States.CreateAvatar:
+                    nextButton.interactable = true;
+                    break;
+                case States.CreateInformation:
+                    nextButton.interactable = nameIF.text.Length >= 3;
+                    break;
+                case States.EditInformation:
+                    nextButton.interactable = nameIF.text.Length >= 3;
+                    break;
+                case States.EditAvatar:
+                    nextButton.interactable = true;
+                    break;
+            }
+        }
+
         private Persona.Avatar currentAvatar = null;
         private Persona.Avatar existingAvatar;
         private void AvatarScrollItem_OnAvatarSelected(Persona.Avatar avatar)
@@ -229,6 +248,8 @@ namespace EmergenceSDK
             switch (state)
             {
                 case States.CreateAvatar:
+                    backButtonText.text = "Back";
+                    nextButtonText.text = "Save";
                     currentPersona.avatar = currentAvatar;
                     panelAvatar.SetActive(false);
                     panelInformation.SetActive(true);
@@ -296,6 +317,8 @@ namespace EmergenceSDK
                     ScreenManager.Instance.ShowDashboard();
                     break;
                 case States.CreateInformation:
+                    backButtonText.text = "Back";
+                    nextButtonText.text = "Next";
                     panelAvatar.SetActive(true);
                     panelInformation.SetActive(false);
                     state = States.CreateAvatar;
@@ -327,33 +350,10 @@ namespace EmergenceSDK
             state = States.EditAvatar;
         }
 
-        private void OnReplaceAvatarClicked()
-        {
-
-        }
-
         private void ClearCurrentPersona()
         {
             currentAvatar = null;
         }
-
-        /*
-        private void OnUseThisPersonaAsDefaultToggled(bool isOn)
-        {
-            Modal.Instance.Show("Saving Changes...");
-            Services.Instance.SetCurrentPersona(currentPersona, () =>
-            {
-                Debug.Log("Successfully SetCurrentPersona to " + currentPersona.name);
-                deleteButton.gameObject.SetActive(false);
-                deleteTooltip.gameObject.SetActive(false);
-                Modal.Instance.Hide();
-            },
-            (error, code) =>
-            {
-                Debug.LogError("[" + code + "] " + error);
-                Modal.Instance.Hide();
-            });
-        }*/
 
         private void AvatarScrollItem_OnImageCompleted(Persona.Avatar avatar, bool success)
         {
