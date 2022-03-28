@@ -64,7 +64,7 @@ namespace EmergenceSDK
             sidebarAvatar.texture = defaultTexture;
             detailsPanel.SetActive(false);
 
-            UIForNoPersonas();
+            HideUI();
         }
 
         private void PersonaCarousel_OnArrowClicked(int index)
@@ -99,6 +99,7 @@ namespace EmergenceSDK
 
         public void Refresh()
         {
+            HideUI();
             detailsPanel.SetActive(false);
             HeaderScreen.Instance.Show();
             while (personaScrollContents.childCount > 0)
@@ -226,7 +227,7 @@ namespace EmergenceSDK
             {
                 return;
             }
-            // TODO put information on screen instead of edit
+
             detailsPanel.SetActive(true);
 
             selectedPersona = persona;
@@ -301,6 +302,14 @@ namespace EmergenceSDK
             {
                 Debug.LogWarning("Image completed but not accounted for: [" + persona.id + "][" + persona.avatar.id + "][" + persona.avatar.url + "][" + success + "]");
             }
+        }
+
+        private void HideUI()
+        {
+            addPersonaButton.transform.parent.gameObject.SetActive(false);
+            addPersonaSidebarButton1.gameObject.SetActive(false);
+            sidebarWithPersonas.SetActive(false);
+            personasScrollPanel.SetActive(false);
         }
 
         private void UIForNoPersonas()

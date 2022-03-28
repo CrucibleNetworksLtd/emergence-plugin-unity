@@ -46,15 +46,6 @@ namespace EmergenceSDK
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Alpha0))
-            {
-                GoToPosition(0);
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                GoToPosition(count - 1);
-            }
             if (!started)
             {
                 return;
