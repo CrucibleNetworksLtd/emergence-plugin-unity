@@ -15,7 +15,9 @@ namespace EmergenceSDK
 
         public static PersonaCarousel Instance;
 
-        private Transform[] items;
+        private PersonaScrollItem[] items;
+        private Material[] itemMaterials;
+        
         private float timeCounter = 0.0f;
         private bool started = false;
         private int count = 0; // Total items
@@ -25,6 +27,9 @@ namespace EmergenceSDK
         private bool refreshing = true; // For spreading FX
         private int diff; // Cached movement amount
         private int activePersonaIndex = 0;
+
+        private const float MAX_BLUR = 30.0f;
+        private const float MAX_SIZE = 4.0f;
 
         public delegate void ArrowClicked(int index);
         public static event ArrowClicked OnArrowClicked;
@@ -115,10 +120,10 @@ namespace EmergenceSDK
 
             for (int i = 0; i < count; i++)
             {
-                items[i].SetAsFirstSibling();
+                items[i].transform.SetAsFirstSibling();
             }
 
-            items[selected].SetAsLastSibling();
+            items[selected].transform.SetAsLastSibling();
 
             SetZOrder(selected + 1, count - 2);
             SetZOrder(selected - 1, count - 3);
@@ -132,7 +137,7 @@ namespace EmergenceSDK
         {
             if (index < count && index > 0)
             {
-                items[index].SetSiblingIndex(order);
+                items[index].transform.SetSiblingIndex(order);
             }
         }
 
@@ -145,11 +150,12 @@ namespace EmergenceSDK
                 originalItemWidth = scrollItemsRoot.GetChild(0).GetComponent<RectTransform>().rect.width;
             }
 
-            items = new Transform[scrollItemsRoot.childCount];
-
+            items = new PersonaScrollItem[scrollItemsRoot.childCount];
+            itemMaterials = new Material[scrollItemsRoot.childCount];
             for (int i = 0; i < scrollItemsRoot.childCount; i++)
             {
-                items[i] = scrollItemsRoot.GetChild(i);
+                items[i] = scrollItemsRoot.GetChild(i).GetComponent<PersonaScrollItem>();
+                itemMaterials[i] = items[i].Material;
             }
 
             selected = selectedIndex;
@@ -171,7 +177,7 @@ namespace EmergenceSDK
 
         private void PositionAndScaleItem(int position, float t)
         {
-            Transform item = items[position];
+            Transform itemTransform = items[position].transform;
 
             int startPosition = position - previousSelected;
             int endPosition = position - selected;
@@ -187,15 +193,18 @@ namespace EmergenceSDK
             if (refreshing)
             {
                 // Spreading effect
-                item.localPosition = Vector2.right * t * (diff + position - selected) * separation;
+                itemTransform.localPosition = Vector2.right * t * (diff + position - selected) * separation;
             }
             else
             {
                 // Carousel
-                item.localPosition = Vector2.right * Mathf.Lerp(startPosition, endPosition, t) * separation;
+                itemTransform.localPosition = Vector2.right * Mathf.Lerp(startPosition, endPosition, t) * separation;
             }
 
-            item.localScale = Vector3.one * scale;
+            itemTransform.localScale = Vector3.one * scale;
+            itemMaterials[position].SetFloat("_BlurAmount", MAX_BLUR - MAX_BLUR * scale);
+            itemMaterials[position].SetFloat("_Size", 1.0f + (MAX_SIZE - MAX_SIZE * scale));
+            items[position].FixUnityStencilBug();
         }
 
         private float GetScalePerPosition(int position)

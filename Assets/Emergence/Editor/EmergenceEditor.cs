@@ -12,25 +12,26 @@ namespace EmergenceSDK
     {
         private const string basePath = "Emergence/";
 
+        // TODO Refactor current EVM server runtime methods to share parameters with this editor script
+        /*
         [MenuItem(basePath + "Run EVM Server", priority = 1)]
         private static void RunEVMServer()
         {
-            Debug.Log("Run EVM Server");
-            Process.Start("run-server.bat");
+
         }
 
         [MenuItem(basePath + "Stop EVM Server", priority = 2)]
         private static void StopEVMServer()
         {
-            Debug.Log("Stop EVM Server");
+
         }
 
         [MenuItem(basePath + "Restart EVM Server", priority = 3)]
         private static void RestartEVMServer()
         {
-            Debug.Log("Restart EVM Server");
-            Process.Start("run-server.bat");
+
         }
+        */
 
         [MenuItem(basePath + "Unzip local EVM server", priority = 20)]
         private static void UnzipLocalServer()
