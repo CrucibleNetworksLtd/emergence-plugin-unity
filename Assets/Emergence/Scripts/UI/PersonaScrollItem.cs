@@ -12,6 +12,9 @@ namespace EmergenceSDK
         private RawImage photo;
 
         [SerializeField]
+        private Mask mask;
+
+        [SerializeField]
         private TextMeshProUGUI nameText;
 
         [SerializeField]
@@ -37,6 +40,28 @@ namespace EmergenceSDK
         {
             get;
             private set;
+        }
+
+        private Material clonedMaterial;
+        public Material Material
+        {
+            get
+            {
+                if (clonedMaterial == null)
+                {
+                    clonedMaterial = Instantiate(photo.material);
+                    clonedMaterial.name = gameObject.name;
+                    photo.material = clonedMaterial;
+                }
+
+                return clonedMaterial;
+            }
+        }
+
+        public void FixUnityStencilBug()
+        {
+            // https://forum.unity.com/threads/masked-ui-elements-shader-not-updating.371542/
+            MaskUtilities.NotifyStencilStateChanged(mask);
         }
 
         private void Awake()
