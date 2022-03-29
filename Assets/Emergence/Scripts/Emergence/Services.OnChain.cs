@@ -404,12 +404,12 @@ namespace EmergenceSDK
 
         public delegate void LoadAccountSuccess();
 
-        public void LoadAccount(string name, string password, string path, string nodeURL, LoadAccountSuccess success, GenericError error)
+        public void LoadAccount(string name, string password, string path, string nodeURL, string chainId, LoadAccountSuccess success, GenericError error)
         {
-            StartCoroutine(CoroutineLoadAccount(name, password, path, nodeURL, success, error));
+            StartCoroutine(CoroutineLoadAccount(name, password, path, nodeURL, chainId, success, error));
         }
 
-        private IEnumerator CoroutineLoadAccount(string name, string password, string path, string nodeURL, LoadAccountSuccess success, GenericError error)
+        private IEnumerator CoroutineLoadAccount(string name, string password, string path, string nodeURL, string chainId, LoadAccountSuccess success, GenericError error)
         {
             Debug.Log("Load Account request started");
 
@@ -418,7 +418,8 @@ namespace EmergenceSDK
                 name = name,
                 password = password,
                 path = path,
-                nodeURL = nodeURL
+                nodeURL = nodeURL,
+                chainId = chainId
             };
 
             string dataString = SerializationHelper.Serialize(data, false);
@@ -716,17 +717,26 @@ namespace EmergenceSDK
         #region Write Contract
 
         public delegate void WriteContractSuccess<T>(T response);
-        public void WriteContract<T, U>(string contractAddress, string methodName, U body, WriteContractSuccess<T> success, GenericError error)
+        public void WriteContract<T, U>(string contractAddress, string methodName, string localAccountName, string gasPrice, U body, WriteContractSuccess<T> success, GenericError error)
         {
             if (!CheckEnv()) { return; }
-            StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, body, success, error));
+            StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, localAccountName, gasPrice, body, success, error));
         }
 
-        public IEnumerator CoroutineWriteContract<T, U>(string contractAddress, string methodName, U body, WriteContractSuccess<T> success, GenericError error)
+        public IEnumerator CoroutineWriteContract<T, U>(string contractAddress, string methodName, string localAccountName, string gasPrice, U body, WriteContractSuccess<T> success, GenericError error)
         {
             Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
 
-            string url = envValues.APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
+            string gasPriceString = String.Empty;
+            string localAccountNameString = String.Empty;
+
+            if (gasPrice != String.Empty && localAccountName != String.Empty)
+            {
+                gasPriceString = "&gasPrice=" + gasPrice;
+                localAccountNameString = "&localAccountName=" + localAccountName;
+            }
+
+            string url = envValues.APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName + localAccountNameString + gasPriceString;
 
             string dataString = SerializationHelper.Serialize(body, false);
 
