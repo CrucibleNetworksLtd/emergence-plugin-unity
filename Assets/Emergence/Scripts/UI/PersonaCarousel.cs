@@ -17,7 +17,7 @@ namespace EmergenceSDK
 
         private PersonaScrollItem[] items;
         private Material[] itemMaterials;
-        
+
         private float timeCounter = 0.0f;
         private bool started = false;
         private int count = 0; // Total items
