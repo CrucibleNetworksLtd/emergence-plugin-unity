@@ -63,8 +63,6 @@ namespace EmergenceSDK
             PersonaCarousel.OnArrowClicked += PersonaCarousel_OnArrowClicked;
             sidebarAvatar.texture = defaultTexture;
             detailsPanel.SetActive(false);
-
-            HideUI();
         }
 
         private void PersonaCarousel_OnArrowClicked(int index)
@@ -82,6 +80,11 @@ namespace EmergenceSDK
 
             PersonaScrollItem_OnSelected(activePersona, -1);
             PersonaCarousel.Instance.GoToActivePersona();
+        }
+
+        private void Start()
+        {
+            HideUI();
         }
 
         private void OnDestroy()
