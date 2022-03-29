@@ -728,15 +728,11 @@ namespace EmergenceSDK
             Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
 
             string gasPriceString = String.Empty;
-            if (gasPrice != "" && localAccountName != "")
-            {
-                gasPriceString = "&gasPrice=" + gasPrice;
-            }
-
             string localAccountNameString = String.Empty;
 
-            if (localAccountName != String.Empty)
+            if (gasPrice != String.Empty && localAccountName != String.Empty)
             {
+                gasPriceString = "&gasPrice=" + gasPrice;
                 localAccountNameString = "&localAccountName=" + localAccountName;
             }
 
