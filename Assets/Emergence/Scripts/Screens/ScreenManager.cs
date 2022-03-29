@@ -55,7 +55,6 @@ namespace EmergenceSDK
         private void Awake()
         {
             Instance = this;
-            ChangeState(this.state);
             escButton.onClick.AddListener(OnEscButtonPressed);
             escButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
 
@@ -90,6 +89,8 @@ namespace EmergenceSDK
             {
                 csf[i].enabled = true;
             }
+
+            ChangeState(this.state);
         }
 
         private void Update()
