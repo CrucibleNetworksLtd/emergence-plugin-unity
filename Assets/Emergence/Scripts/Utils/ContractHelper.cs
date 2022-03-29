@@ -65,13 +65,13 @@ namespace EmergenceSDK
         }
 
         public delegate void WriteContractSuccess<T>(T response);
-        public static void WriteContract<T, U>(string contractAddress, string methodName, U body, WriteContractSuccess<T> success, GenericError error)
+        public static void WriteContract<T, U>(string contractAddress, string methodName, string localAccountName, string gasprice, U body, WriteContractSuccess<T> success, GenericError error)
         {
             Services.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.WriteContract<T, U>(contractAddress, methodName, body, (response) =>
+                    Services.Instance.WriteContract<T, U>(contractAddress, methodName, localAccountName, gasprice, body, (response) =>
                     {
                         success?.Invoke(response);
                     },
