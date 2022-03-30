@@ -37,11 +37,6 @@ namespace EmergenceSDK
                 else
                 {
                     PersonasResponse personasResponse = SerializationHelper.Deserialize<PersonasResponse>(request.downloadHandler.text);
-                    if (personasResponse.personas == null)
-                    {
-                        personasResponse.personas = new List<Persona>();
-                    }
-
                     CurrentPersona = personasResponse.personas.FirstOrDefault(p => p.id == personasResponse.selected);
                     success?.Invoke(personasResponse.personas, CurrentPersona);
                 }

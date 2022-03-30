@@ -157,7 +157,11 @@ namespace EmergenceSDK
                     }
                 }
 
-                scrollItems[selectedIndex].transform.SetSiblingIndex(Mathf.FloorToInt(personas.Count / 2));
+                if (scrollItems.Count > 0)
+                {
+                    scrollItems[selectedIndex].transform.SetSiblingIndex(Mathf.FloorToInt(personas.Count / 2));
+                }
+
                 for (int i = 0; i < personas.Count; i++)
                 {
                     Persona persona = personas[i];
