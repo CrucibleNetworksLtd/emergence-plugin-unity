@@ -6,6 +6,7 @@ using System.IO;
 
 using UnityEngine;
 using System.IO.Compression;
+using System;
 
 namespace EmergenceSDK
 {
@@ -37,9 +38,17 @@ namespace EmergenceSDK
         [MenuItem(basePath + "Unzip local EVM server", priority = 20)]
         private static void UnzipLocalServer()
         {
-            string compressedFile = Path.Combine(Application.dataPath, "Emergence/Server Installation/Server.zip");
-            string decompressionPath = Directory.GetParent(Application.dataPath).FullName;
-            ZipFile.ExtractToDirectory(compressedFile, decompressionPath);
+            try
+            {
+                string compressedFile = Path.Combine(Application.dataPath, "Emergence/Server Installation/Server.zip");
+                string decompressionPath = Directory.GetParent(Application.dataPath).FullName;
+                ZipFile.ExtractToDirectory(compressedFile, decompressionPath);
+                Debug.Log("Server files extracted");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.Message);
+            }
         }
     }
 }
