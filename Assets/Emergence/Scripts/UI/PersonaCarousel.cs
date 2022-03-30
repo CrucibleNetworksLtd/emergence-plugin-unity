@@ -123,7 +123,10 @@ namespace EmergenceSDK
                 items[i].transform.SetAsFirstSibling();
             }
 
-            items[selected].transform.SetAsLastSibling();
+            if (count > 0)
+            {
+                items[selected].transform.SetAsLastSibling();
+            }
 
             SetZOrder(selected + 1, count - 2);
             SetZOrder(selected - 1, count - 3);

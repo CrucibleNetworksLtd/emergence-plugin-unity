@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using System.IO;
@@ -42,3 +43,4 @@ namespace EmergenceSDK
         }
     }
 }
+#endif
