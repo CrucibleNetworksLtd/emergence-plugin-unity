@@ -144,8 +144,6 @@ namespace EmergenceSDK
             bool started = false;
             try
             {
-                hidden = false;
-
                 string url = BuildLocalServerURL();
                 envValues.APIBase = url + "api/";
 
