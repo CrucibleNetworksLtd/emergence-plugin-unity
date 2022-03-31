@@ -91,7 +91,7 @@ namespace EmergenceSDK
         {
             this.Persona = persona;
             Index = this.transform.GetSiblingIndex();
-            nameText.gameObject.SetActive(false);
+            nameText.transform.parent.gameObject.SetActive(false);
             nameText.text = persona.name;
 
             if (persona.AvatarImage == null)
@@ -121,12 +121,12 @@ namespace EmergenceSDK
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            nameText.gameObject.SetActive(true);
+            nameText.transform.parent.gameObject.SetActive(true);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            nameText.gameObject.SetActive(false);
+            nameText.transform.parent.gameObject.SetActive(false);
         }
 
         private void Instance_OnImageReady(string url, Texture2D texture)

@@ -139,7 +139,8 @@ namespace EmergenceSDK
             panelAvatar.SetActive(isNew);
             panelInformation.SetActive(!isNew);
 
-            nextButtonText.text = isNew ? "Next" : "Save";
+            nextButtonText.text = isNew ? "Persona Information" : "Save Changes";
+            backButtonText.text = isNew ? "Back" : "Cancel";
             deleteButton.gameObject.SetActive(!isNew && !isDefault);
 
             currentPersona = persona;
@@ -248,8 +249,8 @@ namespace EmergenceSDK
             switch (state)
             {
                 case States.CreateAvatar:
-                    backButtonText.text = "Back";
-                    nextButtonText.text = "Save";
+                    backButtonText.text = "Select Avatar";
+                    nextButtonText.text = "Create Persona";
                     currentPersona.avatar = currentAvatar;
                     panelAvatar.SetActive(false);
                     panelInformation.SetActive(true);
@@ -302,7 +303,7 @@ namespace EmergenceSDK
                     panelInformation.SetActive(true);
                     replaceAvatarButton.gameObject.SetActive(true);
                     backButtonText.text = "Back";
-                    nextButtonText.text = "Save";
+                    nextButtonText.text = "Confirm Avatar";
                     state = States.EditInformation;
                     break;
             }
@@ -318,7 +319,7 @@ namespace EmergenceSDK
                     break;
                 case States.CreateInformation:
                     backButtonText.text = "Back";
-                    nextButtonText.text = "Next";
+                    nextButtonText.text = "Persona Information";
                     panelAvatar.SetActive(true);
                     panelInformation.SetActive(false);
                     state = States.CreateAvatar;
@@ -331,8 +332,8 @@ namespace EmergenceSDK
                     currentPersona.avatar = existingAvatar;
                     AvatarScrollItem_OnAvatarSelected(existingAvatar);
                     replaceAvatarButton.gameObject.SetActive(true);
-                    backButtonText.text = "Back";
-                    nextButtonText.text = "Save";
+                    backButtonText.text = "Cancel";
+                    nextButtonText.text = "Save Changes";
                     panelAvatar.SetActive(false);
                     panelInformation.SetActive(true);
                     state = States.EditInformation;
@@ -344,7 +345,7 @@ namespace EmergenceSDK
         {
             replaceAvatarButton.gameObject.SetActive(false);
             backButtonText.text = "Cancel";
-            nextButtonText.text = "Change";
+            nextButtonText.text = "Confirm Avatar";
             panelAvatar.SetActive(true);
             panelInformation.SetActive(false);
             state = States.EditAvatar;
