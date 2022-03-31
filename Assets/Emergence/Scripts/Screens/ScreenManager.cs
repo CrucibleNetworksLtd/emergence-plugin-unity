@@ -25,6 +25,7 @@ namespace EmergenceSDK
         [Header("UI Reference")]
         public Button escButton;
         public Button escButtonOnboarding;
+        public Button escButtonLogin;
 
         [SerializeField]
         public GameObject disconnectModal;
@@ -57,6 +58,7 @@ namespace EmergenceSDK
             Instance = this;
             escButton.onClick.AddListener(OnEscButtonPressed);
             escButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
+            escButtonLogin.onClick.AddListener(OnEscButtonPressed);
 
             GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
 
@@ -77,6 +79,7 @@ namespace EmergenceSDK
         {
             escButton.onClick.RemoveListener(OnEscButtonPressed);
             escButtonOnboarding.onClick.RemoveListener(OnEscButtonPressed);
+            escButtonLogin.onClick.RemoveListener(OnEscButtonPressed);
         }
 
         private void Start()
