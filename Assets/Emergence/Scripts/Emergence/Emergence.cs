@@ -17,6 +17,9 @@ namespace EmergenceSDK
         [SerializeField]
         private string gameId;
 
+        [SerializeField]
+        private string tokenSymbol = "MATIC";
+
         [Header("EVM Server")]
         [SerializeField]
         private bool launchEVMServerOnAwake = false;
@@ -66,6 +69,13 @@ namespace EmergenceSDK
             }
         }
 
+        public string TokenSymbol
+        {
+            get
+            {
+                return tokenSymbol;
+            }
+        }
 
         #region Overlay
 

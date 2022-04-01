@@ -48,7 +48,17 @@ namespace EmergenceSDK
 
                 Services.Instance.GetBalance((balance) =>
                 {
-                    walletBalance.text = balance;
+                    string converted = UnitConverter.Convert(balance, UnitConverter.EtherUnitType.WEI, UnitConverter.EtherUnitType.ETHER, ",");
+                    string[] splitted = converted.Split(new string[] { "," }, System.StringSplitOptions.None);
+
+                    string result = splitted[0];
+
+                    if (splitted.Length == 2)
+                    {
+                        result += "." + splitted[1].Substring(0, UnitConverter.SIGNIFICANT_DIGITS);
+                    }
+
+                    walletBalance.text = result + " " + Emergence.Instance.TokenSymbol;
                 },
                 (error, code) =>
                 {
