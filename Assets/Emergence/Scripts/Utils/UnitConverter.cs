@@ -37,7 +37,7 @@ namespace EmergenceSDK
                 string afterComa = splitted[1];
 
                 string t = Convert(source, beforeComa, afterComa, sourceUnit, targetUnit, comaSeparator);
-                
+
                 string u = RemoveTrailingDecimals(t, comaSeparator);
 
                 return u;
