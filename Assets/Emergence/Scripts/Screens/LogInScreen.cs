@@ -88,7 +88,8 @@ namespace EmergenceSDK
                     break;
             }
 
-
+            #region Test
+            /*
             if (Input.GetKeyDown(KeyCode.B))
             {
                 Debug.Log("CHEAT ACTIVATED!");
@@ -97,7 +98,8 @@ namespace EmergenceSDK
 
                 Services.Instance.SkipWallet(true, accessTokenJson);
                 ScreenManager.Instance.ShowDashboard();
-            }
+            }*/
+            #endregion Test
         }
 
         public void Restart()
