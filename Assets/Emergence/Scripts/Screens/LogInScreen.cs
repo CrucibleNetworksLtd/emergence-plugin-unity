@@ -1,5 +1,4 @@
-﻿using System;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +8,7 @@ namespace EmergenceSDK
     {
         [Header("UI References")]
         public RawImage rawQRImage;
+        public Button backButton;
         public TextMeshProUGUI refreshCounterText;
 
         private float timeRemaining = 0.0f;
@@ -18,14 +18,13 @@ namespace EmergenceSDK
 
         private enum States
         {
-            Handshake,
             QR,
             RefreshAccessToken,
             RefreshingAccessToken,
             LoginFinished,
         }
 
-        private States state = States.Handshake;
+        private States state = States.QR;
 
         private void Awake()
         {
@@ -36,20 +35,6 @@ namespace EmergenceSDK
         {
             switch (state)
             {
-                case States.Handshake:
-                    Services.Instance.Handshake((walletAddress) =>
-                    {
-                        state = States.RefreshAccessToken;
-                        HeaderScreen.Instance.Refresh(walletAddress);
-                    },
-                    (error, code) =>
-                    {
-                        Debug.LogError("[" + code + "] " + error);
-                        Reinitialize();
-                    });
-
-                    state = States.QR;
-                    break;
                 case States.QR:
                     timeRemaining -= Time.deltaTime;
                     if (timeRemaining <= 0.0f)
@@ -57,6 +42,17 @@ namespace EmergenceSDK
                         timeRemaining += QRRefreshTimeOut;
                         Services.Instance.ReinitializeWalletConnect((disconnected) =>
                         {
+                            Services.Instance.Handshake((walletAddress) =>
+                            {
+                                state = States.RefreshAccessToken;
+                                HeaderScreen.Instance.Refresh(walletAddress);
+                            },
+                            (error, code) =>
+                            {
+                                Debug.LogError("[" + code + "] " + error);
+                                Reinitialize();
+                            });
+
                             Services.Instance.GetQRCode((texture) =>
                             {
                                 rawQRImage.texture = texture;
@@ -81,6 +77,7 @@ namespace EmergenceSDK
                     Services.Instance.GetAccessToken((token) =>
                     {
                         state = States.LoginFinished;
+                        PlayerPrefs.SetInt(Emergence.HAS_LOGGED_IN_ONCE_KEY, 1);
                         ScreenManager.Instance.ShowDashboard();
                     },
                     (error, code) =>
@@ -90,11 +87,24 @@ namespace EmergenceSDK
                     });
                     break;
             }
+
+            #region Test
+            /*
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                Debug.Log("CHEAT ACTIVATED!");
+
+                string accessTokenJson = System.IO.File.ReadAllText("accessToken.json");
+
+                Services.Instance.SkipWallet(true, accessTokenJson);
+                ScreenManager.Instance.ShowDashboard();
+            }*/
+            #endregion Test
         }
 
         public void Restart()
         {
-            state = States.Handshake;
+            state = States.QR;
             timeRemaining = 0.0f;
         }
 
@@ -102,19 +112,8 @@ namespace EmergenceSDK
         {
             ModalPromptOK.Instance.Show("Sorry, there was a problem with your request", () =>
             {
-                Services.Instance.ReinitializeWalletConnect((disconnected) =>
-                {
-                    state = States.Handshake;
-                    timeRemaining = 0.0f;
-                },
-                (error, code) =>
-                {
-                    Debug.LogError("[" + code + "] " + error);
-                    ModalPromptOK.Instance.Show("Error initializing wallet connection", () =>
-                    {
-                        Reinitialize();
-                    });
-                });
+                state = States.QR;
+                timeRemaining = 0.0f;
             });
         }
 

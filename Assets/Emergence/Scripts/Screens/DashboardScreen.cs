@@ -1,27 +1,49 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using System.Collections.Generic;
+using TMPro;
 
 namespace EmergenceSDK
 {
     public class DashboardScreen : MonoBehaviour
     {
         [Header("UI References")]
+        public GameObject personasScrollPanel;
         public Transform personaScrollContents;
         public Button addPersonaButton;
+
+        [Header("UI Sidebar References")]
+        // Sidebar New persona for when the user has no personas
+        public Button addPersonaSidebarButton1;
+
+        // Sidebar Avatar and New persona for when the user has at least one persona
+        public Button activePersonaButton;
+        public Button addPersonaSidebarButton2;
+        public RawImage sidebarAvatar;
+        public GameObject sidebarWithPersonas;
+
+        [Header("UI Detail Panel References")]
+        public GameObject detailsPanel;
+        public TextMeshProUGUI detailsTitleText;
+        public TextMeshProUGUI detailsBioText;
+        public Button detailsActivateButton;
+        public TextMeshProUGUI detailsActivateButtonText;
+        public Button detailsEditButton;
+        public Button detailsDeleteButton;
+
+        [Header("Default Texture")]
         public Texture2D defaultTexture;
+
 
         [Header("Utilities")]
         [SerializeField]
         private Pool personaButtonPool;
 
-        private Persona currentPersona;
+        private Persona activePersona;
+        private Persona selectedPersona;
+        private List<Persona> personasList = new List<Persona>();
 
         public static DashboardScreen Instance;
-
-        public TextMeshProUGUI titleText;
-        public TextMeshProUGUI contentsText;
 
         private HashSet<string> imagesRefreshing = new HashSet<string>();
         private bool requestingInProgress = false;
@@ -30,21 +52,58 @@ namespace EmergenceSDK
         {
             Instance = this;
             addPersonaButton.onClick.AddListener(OnCreatePersona);
-
+            addPersonaSidebarButton1.onClick.AddListener(OnCreatePersona);
+            addPersonaSidebarButton2.onClick.AddListener(OnCreatePersona);
+            activePersonaButton.onClick.AddListener(OnActivePersonaClicked);
+            detailsActivateButton.onClick.AddListener(OnUsePersonaAsCurrent);
+            detailsEditButton.onClick.AddListener(OnEditPersona);
+            detailsDeleteButton.onClick.AddListener(OnDeletePersona);
             PersonaScrollItem.OnSelected += PersonaScrollItem_OnSelected;
-            PersonaScrollItem.OnUsePersonaAsCurrent += PersonaScrollItem_OnUsePersonaAsCurrent;
             PersonaScrollItem.OnImageCompleted += PersonaScrollItem_OnImageCompleted;
+            PersonaCarousel.OnArrowClicked += PersonaCarousel_OnArrowClicked;
+            sidebarAvatar.texture = defaultTexture;
+            detailsPanel.SetActive(false);
+        }
+
+        private void PersonaCarousel_OnArrowClicked(int index)
+        {
+            selectedPersona = personasList[index];
+            PersonaScrollItem_OnSelected(selectedPersona, -1);
+        }
+
+        private void OnActivePersonaClicked()
+        {
+            if (activePersona == null)
+            {
+                return;
+            }
+
+            PersonaScrollItem_OnSelected(activePersona, -1);
+            PersonaCarousel.Instance.GoToActivePersona();
+        }
+
+        private void Start()
+        {
+            HideUI();
         }
 
         private void OnDestroy()
         {
+            addPersonaButton.onClick.RemoveListener(OnCreatePersona);
+            addPersonaSidebarButton1.onClick.RemoveListener(OnCreatePersona);
+            addPersonaSidebarButton2.onClick.RemoveListener(OnCreatePersona);
+            activePersonaButton.onClick.RemoveListener(OnActivePersonaClicked);
+            detailsActivateButton.onClick.RemoveListener(OnUsePersonaAsCurrent);
+            detailsEditButton.onClick.RemoveListener(OnEditPersona);
+            detailsDeleteButton.onClick.RemoveListener(OnDeletePersona);
             PersonaScrollItem.OnSelected -= PersonaScrollItem_OnSelected;
-            PersonaScrollItem.OnUsePersonaAsCurrent -= PersonaScrollItem_OnUsePersonaAsCurrent;
             PersonaScrollItem.OnImageCompleted -= PersonaScrollItem_OnImageCompleted;
         }
 
         public void Refresh()
         {
+            HideUI();
+            detailsPanel.SetActive(false);
             HeaderScreen.Instance.Show();
             while (personaScrollContents.childCount > 0)
             {
@@ -57,10 +116,13 @@ namespace EmergenceSDK
             {
                 Modal.Instance.Show("Retrieving avatar images...");
 
-                this.currentPersona = currentPersona;
+                this.activePersona = currentPersona;
 
                 requestingInProgress = true;
                 imagesRefreshing.Clear();
+
+                List<PersonaScrollItem> scrollItems = new List<PersonaScrollItem>();
+                int selectedIndex = 0;
                 for (int i = 0; i < personas.Count; i++)
                 {
                     GameObject go = personaButtonPool.GetNewObject();
@@ -68,7 +130,7 @@ namespace EmergenceSDK
                     go.transform.SetParent(personaScrollContents);
                     go.transform.localScale = Vector3.one;
 
-                    PersonaScrollItem psi = go.GetComponent<PersonaScrollItem>();
+                    scrollItems.Add(personaScrollContents.GetChild(i).GetComponent<PersonaScrollItem>());
 
                     Persona persona = personas[i];
                     if (persona.avatar != null)
@@ -87,27 +149,44 @@ namespace EmergenceSDK
                     if (currentPersona != null)
                     {
                         selected = currentPersona.id.Equals(persona.id);
-                    }
 
-                    imagesRefreshing.Add(persona.id);
-                    psi.Refresh(defaultTexture, persona, selected);
-
-                    if (selected)
-                    {
-                        go.transform.SetAsFirstSibling();
+                        if (selected)
+                        {
+                            selectedIndex = i;
+                        }
                     }
                 }
+
+                if (scrollItems.Count > 0)
+                {
+                    scrollItems[selectedIndex].transform.SetSiblingIndex(Mathf.FloorToInt(personas.Count / 2));
+                }
+
+                for (int i = 0; i < personas.Count; i++)
+                {
+                    Persona persona = personas[i];
+                    imagesRefreshing.Add(persona.id);
+                    scrollItems[i].Refresh(defaultTexture, persona, i == selectedIndex);
+                }
+
+                personasList.Clear();
+                for (int i = 0; i < personaScrollContents.childCount; i++)
+                {
+                    personasList.Add(personaScrollContents.GetChild(i).GetComponent<PersonaScrollItem>().Persona);
+                }
+
+                PersonaCarousel.Instance.Refresh(Mathf.FloorToInt(personas.Count / 2));
 
                 if (personas.Count > 0)
                 {
-                    titleText.text = "Which persona are you going to use?";
-                    contentsText.text = "You can use it as you want to interact with friends and games.";
+                    UIForPersonas();
                 }
                 else
                 {
-                    titleText.text = "Hello,";
-                    contentsText.text = "Your wallet has been connected successfully. \n Now, you will neeed to create a persona so you can interact with your friends.";
+                    UIForNoPersonas();
                 }
+
+                PersonaScrollItem_OnSelected(activePersona, -1);
 
                 requestingInProgress = false;
 
@@ -122,7 +201,6 @@ namespace EmergenceSDK
                 Debug.LogError("[" + code + "] " + error);
                 Modal.Instance.Hide();
             });
-
         }
 
         private void OnCreatePersona()
@@ -150,15 +228,30 @@ namespace EmergenceSDK
             ScreenManager.Instance.ShowEditPersona();
         }
 
-        private void PersonaScrollItem_OnSelected(Persona persona)
+        private void PersonaScrollItem_OnSelected(Persona persona, int position)
         {
-            EditPersonaScreen.Instance.Refresh(persona, currentPersona.id == persona.id);
-            ScreenManager.Instance.ShowEditPersona();
+            if (persona == null)
+            {
+                return;
+            }
+
+            detailsPanel.SetActive(true);
+
+            selectedPersona = persona;
+
+            bool active = persona.id == activePersona.id;
+
+            detailsTitleText.text = persona.name;
+            detailsBioText.text = persona.bio;
+            detailsDeleteButton.interactable = !active;
+            detailsActivateButton.interactable = !active;
+            detailsActivateButtonText.text = active ? "ACTIVE" : "ACTIVATE";
         }
-        private void PersonaScrollItem_OnUsePersonaAsCurrent(Persona persona)
+
+        private void OnUsePersonaAsCurrent()
         {
             Modal.Instance.Show("Loading Personas...");
-            Services.Instance.SetCurrentPersona(persona, () =>
+            Services.Instance.SetCurrentPersona(selectedPersona, () =>
             {
                 Refresh();
             },
@@ -169,8 +262,41 @@ namespace EmergenceSDK
             });
         }
 
+        private void OnEditPersona()
+        {
+            EditPersonaScreen.Instance.Refresh(selectedPersona, activePersona.id == selectedPersona.id);
+            ScreenManager.Instance.ShowEditPersona();
+        }
+
+        private void OnDeletePersona()
+        {
+            ModalPromptYESNO.Instance.Show("Delete " + selectedPersona.name, "are you sure?", () =>
+            {
+                Modal.Instance.Show("Deleting Persona...");
+                Services.Instance.DeletePersona(selectedPersona, () =>
+                {
+                    Debug.Log("Deleting Persona");
+                    Modal.Instance.Hide();
+                    Refresh();
+                },
+                (error, code) =>
+                {
+                    Debug.LogError("[" + code + "] " + error);
+                    Modal.Instance.Hide();
+                });
+            });
+        }
+
         private void PersonaScrollItem_OnImageCompleted(Persona persona, bool success)
         {
+            if (activePersona != null)
+            {
+                if (activePersona.id.Equals(persona.id))
+                {
+                    sidebarAvatar.texture = persona.AvatarImage;
+                }
+            }
+
             if (imagesRefreshing.Contains(persona.id))
             {
                 imagesRefreshing.Remove(persona.id);
@@ -183,6 +309,30 @@ namespace EmergenceSDK
             {
                 Debug.LogWarning("Image completed but not accounted for: [" + persona.id + "][" + persona.avatar.id + "][" + persona.avatar.url + "][" + success + "]");
             }
+        }
+
+        private void HideUI()
+        {
+            addPersonaButton.transform.parent.gameObject.SetActive(false);
+            addPersonaSidebarButton1.gameObject.SetActive(false);
+            sidebarWithPersonas.SetActive(false);
+            personasScrollPanel.SetActive(false);
+        }
+
+        private void UIForNoPersonas()
+        {
+            addPersonaButton.transform.parent.gameObject.SetActive(true);
+            addPersonaSidebarButton1.gameObject.SetActive(true);
+            sidebarWithPersonas.SetActive(false);
+            personasScrollPanel.SetActive(false);
+        }
+
+        private void UIForPersonas()
+        {
+            addPersonaButton.transform.parent.gameObject.SetActive(false);
+            addPersonaSidebarButton1.gameObject.SetActive(false);
+            sidebarWithPersonas.SetActive(true);
+            personasScrollPanel.SetActive(true);
         }
     }
 }

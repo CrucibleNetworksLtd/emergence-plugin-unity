@@ -17,6 +17,9 @@ namespace EmergenceSDK
         [SerializeField]
         private string gameId;
 
+        [SerializeField]
+        private string tokenSymbol = "MATIC";
+
         [Header("EVM Server")]
         [SerializeField]
         private bool launchEVMServerOnAwake = false;
@@ -56,11 +59,21 @@ namespace EmergenceSDK
 
         public static Emergence Instance;
 
+        public const string HAS_LOGGED_IN_ONCE_KEY = "HasLoggedInOnce";
+
         public bool IsUIVisible
         {
             get
             {
                 return ScreenManager.Instance != null && ScreenManager.Instance.IsVisible;
+            }
+        }
+
+        public string TokenSymbol
+        {
+            get
+            {
+                return tokenSymbol;
             }
         }
 
@@ -78,6 +91,7 @@ namespace EmergenceSDK
                 if (!ScreenManager.Instance.IsVisible)
                 {
                     ScreenManager.Instance.gameObject.SetActive(true);
+                    ScreenManager.Instance.ResetToOnBoardingIfNeeded();
                     SaveCursor();
                     UpdateCursor();
                     OnEmergenceUIOpened.Invoke();

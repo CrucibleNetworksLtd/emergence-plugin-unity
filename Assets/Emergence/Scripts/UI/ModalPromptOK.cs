@@ -23,9 +23,13 @@ namespace EmergenceSDK
             okButton.onClick.AddListener(OnOkClicked);
         }
 
+        private void OnDestroy()
+        {
+            okButton.onClick.RemoveListener(OnOkClicked);
+        }
+
         public void Show(string message, ModalPromptOkCallback callback = null)
         {
-            cg.alpha = 0.5f;
             label.text = message;
             gameObject.SetActive(true);
             this.callback = callback;
@@ -33,7 +37,6 @@ namespace EmergenceSDK
 
         public void Hide()
         {
-            cg.alpha = 1.0f;
             gameObject.SetActive(false);
         }
 
