@@ -12,6 +12,9 @@ namespace EmergenceSDK
         //private string customEmergenceServerLocation;
 
         [SerializeField]
+        public bool LaunchHidden = true;
+
+        [SerializeField]
         private string nodeURL;
 
         [SerializeField]
@@ -65,6 +68,7 @@ namespace EmergenceSDK
         {
             get
             {
+
                 return ScreenManager.Instance != null && ScreenManager.Instance.IsVisible;
             }
         }
@@ -139,7 +143,7 @@ namespace EmergenceSDK
 
             if (launchEVMServerOnAwake)
             {
-                Services.Instance.SetupAndStartEVMServer(nodeURL, gameId);
+                LocalEmergenceServer.Instance.LaunchLocalServerProcess(LaunchHidden);
             }
         }
 
@@ -151,7 +155,7 @@ namespace EmergenceSDK
 
         private void OnApplicationQuit()
         {
-            Services.Instance.StopEVMServer();
+            LocalEmergenceServer.Instance.KillLocalServerProcess();
         }
 
         private void Start()
@@ -164,7 +168,7 @@ namespace EmergenceSDK
 
             if (launchEVMServerOnStart && !launchEVMServerOnAwake)
             {
-                Services.Instance.SetupAndStartEVMServer(nodeURL, gameId);
+                LocalEmergenceServer.Instance.LaunchLocalServerProcess(LaunchHidden);
             }
 
             ui = transform.GetChild(0).gameObject;

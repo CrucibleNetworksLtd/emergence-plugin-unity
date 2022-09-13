@@ -17,6 +17,11 @@ namespace EmergenceSDK
 
         #region Start and Stop
 
+
+
+#if DEBUG
+        [Obsolete("Used updated API", true)]
+#endif        
         public void SetupAndStartEVMServer(string nodeURL, string gameId, bool hidden = true)
         {
             if (!CheckEnv()) { return; }
@@ -33,6 +38,9 @@ namespace EmergenceSDK
             StartEVMServer(hidden);
         }
 
+#if DEBUG
+        [Obsolete("Used updated API", true)]
+#endif        
         public bool StartEVMServer(bool hidden = true)
         {
             if (!CheckEnv()) { return false; }
@@ -58,6 +66,9 @@ namespace EmergenceSDK
             return started;
         }
 
+#if DEBUG
+        [Obsolete("Used updated API", true)]
+#endif        
         public void StopEVMServer()
         {
             if (!CheckEnv()) { return; }

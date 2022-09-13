@@ -524,6 +524,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4578423665131851711, guid: d11676e3b1baadb4a84528313b89733e,
         type: 3}
+      propertyPath: LaunchHidden
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4578423665131851711, guid: d11676e3b1baadb4a84528313b89733e,
+        type: 3}
       propertyPath: OnEmergenceUIStateChanged.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}

@@ -114,7 +114,7 @@ namespace EmergenceSDK
             expiration = SerializationHelper.Deserialize<Expiration>(expirationMessage);
         }
 
-        private bool RequestError(UnityWebRequest request)
+        internal static bool RequestError(UnityWebRequest request)
         {
             bool error = false;
 #if UNITY_2020_1_OR_NEWER
@@ -133,7 +133,7 @@ namespace EmergenceSDK
             return error;
         }
 
-        private void PrintRequestResult(string name, UnityWebRequest request)
+        internal static void PrintRequestResult(string name, UnityWebRequest request)
         {
             Debug.Log(name + " completed " + request.responseCode);
             if (RequestError(request))

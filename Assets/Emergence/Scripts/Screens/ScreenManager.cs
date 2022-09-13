@@ -125,18 +125,20 @@ namespace EmergenceSDK
                                 Modal.Instance.Show("Server not found, trying to launch");
                                 Debug.LogWarning("EVM code not running, trying to launch");
 
-                                if (Services.Instance.StartEVMServer())
-                                {
-                                    Modal.Instance.Hide();
-                                    checkingForServer = false;
-                                    ShowWelcome();
-                                }
-                                else
-                                {
-                                    Debug.LogWarning("Couldn't launch EVM Server");
-                                    ModalPromptOK.Instance.Show("Error running server");
-                                    checkingForServer = false;
-                                }
+                                LocalEmergenceServer.Instance.LaunchLocalServerProcess();
+                                Modal.Instance.Hide();
+                                checkingForServer = false;
+                                ShowWelcome();
+
+                                //if (LocalEmergenceServer.Instance.LaunchLocalServerProcess())
+                                //{
+                                //}
+                                //else
+                                //{
+                                //    Debug.LogWarning("Couldn't launch EVM Server");
+                                //    ModalPromptOK.Instance.Show("Error running server");
+                                //    checkingForServer = false;
+                                //}
                             });
                     }
                     break;
