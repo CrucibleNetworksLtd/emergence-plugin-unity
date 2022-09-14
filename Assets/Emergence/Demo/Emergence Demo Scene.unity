@@ -170,6 +170,39 @@ MonoBehaviour:
   - 1
   NFTmeshRenderer: {fileID: 583928923}
   downloadButton: {fileID: 1493749686}
+--- !u!1 &51037821 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7199307401433611008, guid: d11676e3b1baadb4a84528313b89733e,
+    type: 3}
+  m_PrefabInstance: {fileID: 889691113}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &51037822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 51037821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3621d27f4d229c646aae8cea4aa420de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: 9
+  shift: 1
+  ctrl: 0
+  OnEmergenceUIOpened:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEmergenceUIClosed:
+    m_PersistentCalls:
+      m_Calls: []
+  CachedPersonaUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  OnEmergenceUIVisibilityChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &583928921
 GameObject:
   m_ObjectHideFlags: 0
@@ -1083,7 +1116,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 889691113}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 51037821}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf5e56923886cf145b8fd0a4509cd821, type: 3}
