@@ -146,7 +146,7 @@ namespace EmergenceSDK
             }
         }
 
-        private bool ProcessRequest<T>(UnityWebRequest request, GenericError error, out T response)
+        public bool ProcessRequest<T>(UnityWebRequest request, GenericError error, out T response)
         {
             bool isOk = false;
             response = default(T);
@@ -173,7 +173,7 @@ namespace EmergenceSDK
             return isOk;
         }
 
-        private bool ProcessResponse<T>(UnityWebRequest request, out BaseResponse<T> response, out BaseResponse<string> errorResponse)
+        public bool ProcessResponse<T>(UnityWebRequest request, out BaseResponse<T> response, out BaseResponse<string> errorResponse)
         {
             bool isOk = true;
             errorResponse = null;

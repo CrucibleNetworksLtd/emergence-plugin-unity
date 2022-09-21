@@ -91,5 +91,34 @@ namespace EmergenceSDK
                 error?.Invoke(errorMessage, code);
             });
         }
+
+        public delegate void GetTransactionStatusSuccess<T>(T response);
+        public static void GetTransactionStatus<T, U>(string transactionHash, string nodeURL, U body, GetTransactionStatusSuccess<T> success, GenericError error)
+        {
+            Services.Instance.IsConnected((connected) =>
+            {
+                if (connected)
+                {
+                    Services.Instance.GetTransactionStatus<T, U>(transactionHash, nodeURL, body, (response) =>
+                    {
+                        success?.Invoke(response);
+                    },
+                    (errorMessage, code) =>
+                    {
+                        error?.Invoke(errorMessage, code);
+                    });
+                }
+                else
+                {
+                    Debug.LogError("Read contract wallet not connected");
+                    error?.Invoke("Wallet not connected", 1);
+                }
+            },
+            (errorMessage, code) =>
+            {
+                error?.Invoke(errorMessage, code);
+            });
+        }
+
     }
 }

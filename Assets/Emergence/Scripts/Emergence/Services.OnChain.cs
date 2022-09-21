@@ -260,6 +260,36 @@ namespace EmergenceSDK
         }
 
         #endregion Reinitialize WalletConnect
+        #region Request to Sign WalletConnect
+        public delegate void RequestToSignSuccess(string signedMessage);
+        public void RequestToSignWalletConnect(string messageToSign, RequestToSignSuccess success, GenericError error)
+        {
+            if (!CheckEnv()) { return; }
+            StartCoroutine(CoroutineRequestToSignWalletConnect(messageToSign, success, error));
+        }
+
+        private IEnumerator CoroutineRequestToSignWalletConnect(string messageToSign, RequestToSignSuccess success, GenericError error)
+        {
+            Debug.Log("CoroutineRequestToSignWalletConnect request started");
+            var content = "{\"message\": \"" + messageToSign + "\"}";
+
+            string url = envValues.APIBase + "request-to-sign";
+
+            using (UnityWebRequest request = UnityWebRequest.Post(url, content))
+            {
+                request.method = "POST";
+                request.uploadHandler.contentType = "application/json";
+                request.SetRequestHeader("accept", "application/json");
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("ReinitializeWalletConnect", request);
+                if (ProcessRequest<RequestToSignResponse>(request, error, out var response))
+                {
+                    success?.Invoke(response.SignedMessage);
+                }
+            }
+        }
+        #endregion
 
         #region QR Code
 
@@ -442,7 +472,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Load Account", request);
-                if (ProcessRequest<LoadContractResponse>(request, error, out var response))
+                if (ProcessRequest<LoadAccountResponse>(request, error, out var response))
                 {
                     success?.Invoke();
                 }
@@ -688,6 +718,71 @@ namespace EmergenceSDK
         }
 
         #endregion Load Contract
+
+        #region GetTransactionStatus
+        internal void GetTransactionStatus<T, U>(string transactionHash, string nodeURL, U body, Action<T> success, GenericError error)
+        {
+            if (!CheckEnv()) { return; }
+            StartCoroutine(CoroutineGetTransactionStatus<T, U>(transactionHash, nodeURL, body, success, error));
+        }
+
+        private IEnumerator CoroutineGetTransactionStatus<T, U>(string transactionHash, string nodeURL, U body, Action<T> success, GenericError error)
+        {
+            Debug.Log("Get Transaction Status request started [" + transactionHash + "] / " + nodeURL);
+
+            string url = envValues.APIBase + "GetTransactionStatus?transactionHash=" + transactionHash + "&nodeURL=" + nodeURL;
+
+            string dataString = SerializationHelper.Serialize(body, false);
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Read Contract", request);
+                if (ProcessRequest<GetTransactionStatusResponse>(request, error, out var response))
+                {
+                    success?.Invoke(response);
+                }
+            }
+        }
+        #endregion
+
+        #region GetBlockNumber
+
+        public delegate void GetBlockNumberSuccess<T>(T response);
+        internal void GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body, GetBlockNumberSuccess<T> success, GenericError error)
+        {
+            if (!CheckEnv()) { return; }
+            StartCoroutine(CoroutineGetBlockNumber<T, U>(transactionHash, nodeURL, body, success, error));
+        }
+
+        private IEnumerator CoroutineGetBlockNumber<T, U>(string transactionHash, string nodeURL, U body, GetBlockNumberSuccess<T> success, GenericError error)
+        {
+            Debug.Log("Get Block Number request started [" + transactionHash + "] / " + nodeURL);
+
+            string url = envValues.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
+
+            string dataString = SerializationHelper.Serialize(body, false);
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Get Block Number", request);
+                if (ProcessRequest<T>(request, error, out var response))
+                {
+                    success?.Invoke(response);
+                }
+            }
+        }
+        #endregion
+
 
         #region Read Contract
 

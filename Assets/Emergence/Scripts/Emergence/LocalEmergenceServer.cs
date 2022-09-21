@@ -147,6 +147,22 @@ namespace EmergenceSDK
             return envValues != null;
         }
 
+        public EnvValues Environment()
+        {
+            if (!CheckEnv())
+            {
+                string err = "Missing env values. Ensure that a proper environment file is available in the project.";
+                Debug.LogError(err);
+                throw new ArgumentNullException(err);
+            }
+            else
+            {
+                return envValues;
+            }
+        }
+
+
+
         private string BuildLocalServerURL(int forcedPort = 0)
         {
             // Look for free ports and update APIBase with it
