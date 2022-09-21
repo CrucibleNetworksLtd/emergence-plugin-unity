@@ -19,7 +19,7 @@ namespace EmergenceSDK
                 string CustomIPFSNode = LocalEmergenceServer.Instance.Environment().IPFSNode;
                 if (!string.IsNullOrEmpty(CustomIPFSNode))
                 {
-                    Debug.Log($"Found custom IPFS node in game config, replacing with \"{CustomIPFSNode}\""));
+                    Debug.Log($"Found custom IPFS node in game config, replacing with \"{CustomIPFSNode}\"");
                     IPFSNode = CustomIPFSNode;
                 }
                 string NewURL = IPFSURL.ToLowerInvariant().Replace("ipfs://", IPFSNode);
