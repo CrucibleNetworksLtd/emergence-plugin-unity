@@ -744,7 +744,7 @@ namespace EmergenceSDK
                 PrintRequestResult("Read Contract", request);
                 if (ProcessRequest<GetTransactionStatusResponse>(request, error, out var response))
                 {
-                    success?.Invoke(response);
+                    success?.Invoke(response); // Should we change this pattern?
                 }
             }
         }
