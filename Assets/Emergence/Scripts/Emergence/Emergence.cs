@@ -11,14 +11,10 @@ namespace EmergenceSDK
         //[SerializeField]
         //private string customEmergenceServerLocation;
 
-        [SerializeField]
-        public bool LaunchHidden = true;
 
         [SerializeField]
         private string nodeURL;
 
-        [SerializeField]
-        private string gameId;
 
         [SerializeField]
         private string tokenSymbol = "MATIC";
@@ -143,7 +139,7 @@ namespace EmergenceSDK
 
             if (launchEVMServerOnAwake)
             {
-                LocalEmergenceServer.Instance.LaunchLocalServerProcess(LaunchHidden);
+                LocalEmergenceServer.Instance.LaunchLocalServerProcess(EmergenceSingleton.Instance.LaunchHidden);
             }
         }
 
@@ -168,7 +164,7 @@ namespace EmergenceSDK
 
             if (launchEVMServerOnStart && !launchEVMServerOnAwake)
             {
-                LocalEmergenceServer.Instance.LaunchLocalServerProcess(LaunchHidden);
+                LocalEmergenceServer.Instance.LaunchLocalServerProcess(EmergenceSingleton.Instance.LaunchHidden);
             }
 
             ui = transform.GetChild(0).gameObject;

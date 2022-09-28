@@ -11,6 +11,8 @@ public class EmergenceSingleton : SingletonComponent<EmergenceSingleton>
     private string accessToken;
     private string address;
 
+    [SerializeField]
+    public bool LaunchHidden = true;
 
     [Header("Keyboard shortcut to open Emergence")]
     [SerializeField]

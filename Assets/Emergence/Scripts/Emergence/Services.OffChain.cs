@@ -15,14 +15,14 @@ namespace EmergenceSDK
         public delegate void SuccessPersonas(List<Persona> personas, Persona currentPersona);
         public void GetPersonas(SuccessPersonas success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (! LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineGetPersonas(success, error));
         }
 
         private IEnumerator CoroutineGetPersonas(SuccessPersonas success, GenericError error)
         {
             Debug.Log("GetPersonas request started");
-            string url = envValues.databaseAPIPrivate + "personas";
+            string url = LocalEmergenceServer.Instance.Environment().databaseAPIPrivate + "personas";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -74,14 +74,14 @@ namespace EmergenceSDK
         public delegate void SuccessGetCurrentPersona(Persona currentPersona);
         public void GetCurrentPersona(SuccessGetCurrentPersona success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineGetCurrentPersona(success, error));
         }
 
         private IEnumerator CoroutineGetCurrentPersona(SuccessGetCurrentPersona success, GenericError error)
         {
             Debug.Log("GetCurrentPersona request started");
-            string url = envValues.databaseAPIPrivate + "persona";
+            string url = LocalEmergenceServer.Instance.Environment().databaseAPIPrivate + "persona";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -109,7 +109,7 @@ namespace EmergenceSDK
         public delegate void SuccessCreatePersona();
         public void CreatePersona(Persona persona, SuccessCreatePersona success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineCreatePersona(persona, success, error));
         }
 
@@ -118,7 +118,7 @@ namespace EmergenceSDK
             Debug.Log("CreatePersona request started");
             string jsonPersona = SerializationHelper.Serialize(persona);
 
-            string url = envValues.databaseAPIPrivate + "persona";
+            string url = LocalEmergenceServer.Instance.Environment().databaseAPIPrivate + "persona";
 
             using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
@@ -148,7 +148,7 @@ namespace EmergenceSDK
         public delegate void SuccessEditPersona();
         public void EditPersona(Persona persona, SuccessEditPersona success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineEditPersona(persona, success, error));
         }
 
@@ -157,7 +157,7 @@ namespace EmergenceSDK
             Debug.Log("Edit Persona request started");
             string jsonPersona = SerializationHelper.Serialize(persona);
 
-            string url = envValues.databaseAPIPrivate + "persona";
+            string url = LocalEmergenceServer.Instance.Environment().databaseAPIPrivate + "persona";
 
             using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
@@ -188,14 +188,14 @@ namespace EmergenceSDK
         public delegate void SuccessDeletePersona();
         public void DeletePersona(Persona persona, SuccessDeletePersona success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineDeletePersona(persona, success, error));
         }
 
         private IEnumerator CoroutineDeletePersona(Persona persona, SuccessDeletePersona success, GenericError error)
         {
             Debug.Log("DeletePersona request started");
-            string url = envValues.databaseAPIPrivate + "persona/" + persona.id;
+            string url = LocalEmergenceServer.Instance.Environment().databaseAPIPrivate + "persona/" + persona.id;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -222,14 +222,14 @@ namespace EmergenceSDK
         public delegate void SuccessSetCurrentPersona();
         public void SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineSetCurrentPersona(persona, success, error));
         }
 
         private IEnumerator CoroutineSetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, GenericError error)
         {
             Debug.Log("Set Current Persona request started");
-            string url = envValues.databaseAPIPrivate + "setActivePersona/" + persona.id;
+            string url = LocalEmergenceServer.Instance.Environment().databaseAPIPrivate + "setActivePersona/" + persona.id;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -257,14 +257,14 @@ namespace EmergenceSDK
         public delegate void SuccessAvatars(List<Persona.Avatar> avatar);
         public void GetAvatars(SuccessAvatars success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineGetAvatars(success, error));
         }
 
         private IEnumerator CoroutineGetAvatars(SuccessAvatars success, GenericError error)
         {
             Debug.Log("Get Avatars request started");
-            string url = envValues.databaseAPIPrivate + "userUnlockedAvatars?id=" + gameId;
+            string url = LocalEmergenceServer.Instance.Environment().databaseAPIPrivate + "userUnlockedAvatars?id=" + gameId;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {

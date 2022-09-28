@@ -93,13 +93,13 @@ namespace EmergenceSDK
         }
 
         public delegate void GetTransactionStatusSuccess<T>(T response);
-        public static void GetTransactionStatus<T, U>(string transactionHash, string nodeURL, U body, GetTransactionStatusSuccess<T> success, GenericError error)
+        public static void GetTransactionStatus<T>(string transactionHash, string nodeURL,  GetTransactionStatusSuccess<T> success, GenericError error)
         {
             Services.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.GetTransactionStatus<T, U>(transactionHash, nodeURL, body, (response) =>
+                    Services.Instance.GetTransactionStatus<T>(transactionHash, nodeURL, (response) =>
                     {
                         success?.Invoke(response);
                     },

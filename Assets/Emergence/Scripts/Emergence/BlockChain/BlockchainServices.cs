@@ -30,8 +30,6 @@ namespace EmergenceSDK
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
-                request.method = "POST";
-                request.uploadHandler.contentType = "application/json";
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Get Block Number", request);
@@ -98,10 +96,16 @@ namespace EmergenceSDK
         public IEnumerator CoroutineReadContract<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
         {
             Debug.Log("ReadContract request started [" + contractAddress + "] / " + methodName);
-
             string url = LocalEmergenceServer.Instance.Environment().APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
-
+            url += LocalEmergenceServer.Instance.Environment().defaultNodeURL;
             string dataString = SerializationHelper.Serialize(body, false);
+            if (body is string bodystr)
+            {
+                if (string.IsNullOrWhiteSpace(bodystr))
+                {
+                    dataString = "[]";
+                }
+            }
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
