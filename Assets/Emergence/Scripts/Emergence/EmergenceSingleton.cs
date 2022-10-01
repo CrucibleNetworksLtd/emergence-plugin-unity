@@ -11,6 +11,8 @@ public class EmergenceSingleton : SingletonComponent<EmergenceSingleton>
     private string accessToken;
     private string address;
 
+    public EmergenceConfiguration Configuration;
+
     [SerializeField]
     public bool LaunchHidden = true;
 

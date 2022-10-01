@@ -466,6 +466,11 @@ PrefabInstance:
       propertyPath: LaunchHidden
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
+      propertyPath: Configuration
+      value: 
+      objectReference: {fileID: 11400000, guid: 59ea788f73e88824c8d4aa8afe83df38,
+        type: 2}
     - target: {fileID: 3122056887335212770, guid: d11676e3b1baadb4a84528313b89733e,
         type: 3}
       propertyPath: m_RootOrder

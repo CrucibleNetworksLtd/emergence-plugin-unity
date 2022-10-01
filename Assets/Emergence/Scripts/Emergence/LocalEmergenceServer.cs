@@ -16,6 +16,9 @@ namespace EmergenceSDK
         private const int DEFAULT_PORT = 57000;
 
         private bool started;
+
+        public string NodeURL { get; private set; }
+
         public bool IsStarted()
         {
             return started;
@@ -23,6 +26,8 @@ namespace EmergenceSDK
         #region Start and Stop
         public void LaunchLocalServerProcess(bool hidden = true)
         {
+            this.NodeURL = LocalEmergenceServer.Instance.Environment().defaultNodeURL;
+
             if (string.IsNullOrEmpty(Environment().CustomEmergenceServerURL))
             {
                 //nodeURL, gameId
@@ -158,7 +163,7 @@ namespace EmergenceSDK
 
         public bool CheckEnv()
         {
-            return envValues != null;
+            return EmergenceSingleton.Instance.Configuration != null;
         }
 
         public EnvValues Environment()
@@ -171,6 +176,7 @@ namespace EmergenceSDK
             }
             else
             {
+                return EnvValues.MapFrom(EmergenceSingleton.Instance.Configuration);
                 return envValues;
             }
         }

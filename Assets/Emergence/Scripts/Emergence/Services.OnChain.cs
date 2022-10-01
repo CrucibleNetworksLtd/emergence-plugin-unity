@@ -26,13 +26,6 @@ namespace EmergenceSDK
         {
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
 
-            this.nodeURL = LocalEmergenceServer.Instance.Environment().defaultNodeURL;
-
-            if (!string.IsNullOrEmpty(nodeURL.Trim()))
-            {
-                this.nodeURL = nodeURL;
-            }
-
             this.gameId = gameId;
 
             StartEVMServer(hidden);
@@ -151,6 +144,7 @@ namespace EmergenceSDK
 
         private bool LaunchEVMServerProcess(bool hidden)
         {
+
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return false; }
             bool started = false;
             try
@@ -362,7 +356,7 @@ namespace EmergenceSDK
         private IEnumerator CoroutineHandshake(HandshakeSuccess success, GenericError error)
         {
             Debug.Log("Handshake request started");
-            string url = LocalEmergenceServer.Instance.Environment().APIBase + "handshake" + "?nodeUrl=" + nodeURL;
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "handshake" + "?nodeUrl=" + LocalEmergenceServer.Instance.NodeURL;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -506,7 +500,7 @@ namespace EmergenceSDK
         {
             Debug.Log("Get Balance request started");
 
-            string url = LocalEmergenceServer.Instance.Environment().APIBase + "getbalance" + "?nodeUrl=" + nodeURL + "&address=" + address;
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "getbalance" + "?nodeUrl=" + LocalEmergenceServer.Instance.NodeURL + "&address=" + address;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {

@@ -8,7 +8,7 @@ namespace EmergenceSDK
 {
     public partial class Services : MonoBehaviour
     {
-        private string nodeURL = string.Empty;
+//        private string nodeURL = string.Empty;
         private string gameId = string.Empty;
         private string currentAccessToken = string.Empty;
 
