@@ -97,7 +97,7 @@ namespace EmergenceSDK
         {
             Debug.Log("ReadContract request started [" + contractAddress + "] / " + methodName);
             string url = LocalEmergenceServer.Instance.Environment().APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
-            url += LocalEmergenceServer.Instance.Environment().defaultNodeURL;
+            url += "&nodeUrl=" + LocalEmergenceServer.Instance.Environment().defaultNodeURL;
             string dataString = SerializationHelper.Serialize(body, false);
             if (body is string bodystr)
             {
@@ -148,6 +148,13 @@ namespace EmergenceSDK
             string url = LocalEmergenceServer.Instance.Environment().APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName + localAccountNameString + gasPriceString;
 
             string dataString = SerializationHelper.Serialize(body, false);
+            if (body is string bodystr)
+            {
+                if (string.IsNullOrWhiteSpace(bodystr))
+                {
+                    dataString = "[]";
+                }
+            }
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -194,7 +201,7 @@ namespace EmergenceSDK
         public void RequestToSign(string message, RequestToSignSuccess success, GenericError error)
         {
             Services.Instance.RequestToSignWalletConnect(message, success, error);
-            
+
         }
 
 

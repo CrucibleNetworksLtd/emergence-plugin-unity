@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace EmergenceSDK
 {
-    public class ReadContractResponse : BaseResponse<string>
+    public class WriteContractResponse : BaseResponse<string>
     {
-        public string response;
+        public string transactionHash { get; set; }
     }
 }

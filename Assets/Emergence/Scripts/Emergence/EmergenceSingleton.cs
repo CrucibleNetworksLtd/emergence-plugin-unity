@@ -13,6 +13,8 @@ public class EmergenceSingleton : SingletonComponent<EmergenceSingleton>
 
     public EmergenceConfiguration Configuration;
 
+    public bool UseNewInputSystem;
+
     [SerializeField]
     public bool LaunchHidden = true;
 
@@ -84,22 +86,29 @@ public class EmergenceSingleton : SingletonComponent<EmergenceSingleton>
 
     private void Update()
     {
-        bool shortcutPressed = Input.GetKeyDown(key)
-                       && (shift && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) || !shift)
-                       && (ctrl && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) || !ctrl);
-
-        if (shortcutPressed)
+        if (UseNewInputSystem)
         {
-            OpenEmergenceUI();
         }
-
-        if (Input.GetKeyDown(KeyCode.Escape))
+        else
         {
-            if (ScreenManager.Instance != null)
+
+            bool shortcutPressed = Input.GetKeyDown(key)
+                   && (shift && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) || !shift)
+                   && (ctrl && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) || !ctrl);
+
+            if (shortcutPressed)
             {
-                if (ScreenManager.Instance.IsVisible)
+                OpenEmergenceUI();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (ScreenManager.Instance != null)
                 {
-                    Emergence.Instance.CloseOverlay();
+                    if (ScreenManager.Instance.IsVisible)
+                    {
+                        Emergence.Instance.CloseOverlay();
+                    }
                 }
             }
         }

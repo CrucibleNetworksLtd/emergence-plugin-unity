@@ -367,9 +367,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf5e56923886cf145b8fd0a4509cd821, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LaunchHidden: 0
   nodeURL: 
-  gameId: e8daf2e1-b556-42fb-a531-2610e142db13
   tokenSymbol: MATIC
   launchEVMServerOnAwake: 0
   launchEVMServerOnStart: 1
@@ -397,6 +395,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3621d27f4d229c646aae8cea4aa420de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Configuration: {fileID: 0}
+  LaunchHidden: 0
   key: 9
   shift: 1
   ctrl: 0

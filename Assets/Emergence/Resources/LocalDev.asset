@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LocalDev
   m_EditorClassIdentifier: 
   APIBase: http://localhost/
-  DefaultNodeURL: https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134
+  Chain: {fileID: 11400000, guid: 5ec44fd547f00654caa10dac904ab3b7, type: 2}
   databaseAPIPrivate: https://57l0bi6g53.execute-api.us-east-1.amazonaws.com/staging/
   CustomEmergenceServerLocation: C:\Dev\emergence-evm-server\bin\Debug\net5.0\EmergenceEVMLocalServer.exe
-  CustomEmergenceServerURL: 
+  CustomEmergenceServerURL: http://localhost:50733/

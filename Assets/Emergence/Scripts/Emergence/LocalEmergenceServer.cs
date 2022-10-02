@@ -110,6 +110,24 @@ namespace EmergenceSDK
 
         #endregion Finish
 
+        private void Awake()
+        {
+            if (EmergenceSingleton.Instance.Configuration == null)
+            {
+                Debug.LogError("Missing configuration. Check the emergence prefab and assign a configuration object.");
+                throw new ArgumentNullException("Missing configuration. Check the emergence prefab and assign a configuration object.");
+            }
+            envValues = new EnvValues
+            {
+                APIBase = EmergenceSingleton.Instance.Configuration.APIBase,
+                CustomEmergenceServerLocation = EmergenceSingleton.Instance.Configuration.CustomEmergenceServerLocation,
+                CustomEmergenceServerURL = EmergenceSingleton.Instance.Configuration.CustomEmergenceServerURL,
+                databaseAPIPrivate = EmergenceSingleton.Instance.Configuration.databaseAPIPrivate,
+                defaultNodeURL = EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL,
+            };
+
+        }
+
         private void StopEVMServerProcess()
         {
             if (!CheckEnv()) { return; }
@@ -125,45 +143,9 @@ namespace EmergenceSDK
             }
         }
 
-        private void Awake()
-        {
-            TextAsset envFile;
-
-            try
-            {
-                envFile = Resources.Load<TextAsset>("emergence.env.dev");
-
-                if (envFile == null)
-                {
-                    envFile = Resources.Load<TextAsset>("emergence.env.staging");
-                }
-
-                if (envFile == null)
-                {
-                    envFile = Resources.Load<TextAsset>("emergence.env");
-                }
-
-                if (envFile == null)
-                {
-                    Debug.LogError("emergence.env file missing from Resources folder");
-                    return;
-                }
-
-                envValues = SerializationHelper.Deserialize<EnvValues>(envFile.text);
-                if (envValues == null)
-                {
-                    Debug.LogError("emergence.env file is corrupted or missing");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e.Message);
-            }
-        }
-
         public bool CheckEnv()
         {
-            return EmergenceSingleton.Instance.Configuration != null;
+            return envValues != null;
         }
 
         public EnvValues Environment()
@@ -176,7 +158,6 @@ namespace EmergenceSDK
             }
             else
             {
-                return EnvValues.MapFrom(EmergenceSingleton.Instance.Configuration);
                 return envValues;
             }
         }
