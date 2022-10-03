@@ -26,7 +26,7 @@ namespace EmergenceSDK
         #region Start and Stop
         public void LaunchLocalServerProcess(bool hidden = true)
         {
-            this.NodeURL = LocalEmergenceServer.Instance.Environment().defaultNodeURL;
+            this.NodeURL = LocalEmergenceServer.Instance.Environment().DefaultNodeURL;
 
             if (string.IsNullOrEmpty(Environment().CustomEmergenceServerURL))
             {
@@ -122,8 +122,9 @@ namespace EmergenceSDK
                 APIBase = EmergenceSingleton.Instance.Configuration.APIBase,
                 CustomEmergenceServerLocation = EmergenceSingleton.Instance.Configuration.CustomEmergenceServerLocation,
                 CustomEmergenceServerURL = EmergenceSingleton.Instance.Configuration.CustomEmergenceServerURL,
-                databaseAPIPrivate = EmergenceSingleton.Instance.Configuration.databaseAPIPrivate,
-                defaultNodeURL = EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL,
+                PersonaURL = EmergenceSingleton.Instance.Configuration.PersonaURL,
+                AvatarURL = EmergenceSingleton.Instance.Configuration.AvatarURL,
+                DefaultNodeURL = EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL,
             };
 
         }

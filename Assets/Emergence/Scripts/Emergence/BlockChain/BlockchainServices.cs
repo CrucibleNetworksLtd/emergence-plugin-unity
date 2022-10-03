@@ -97,7 +97,7 @@ namespace EmergenceSDK
         {
             Debug.Log("ReadContract request started [" + contractAddress + "] / " + methodName);
             string url = LocalEmergenceServer.Instance.Environment().APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
-            url += "&nodeUrl=" + LocalEmergenceServer.Instance.Environment().defaultNodeURL;
+            url += "&nodeUrl=" + LocalEmergenceServer.Instance.Environment().DefaultNodeURL;
             string dataString = SerializationHelper.Serialize(body, false);
             if (body is string bodystr)
             {

@@ -8,7 +8,7 @@ public class Tests : MonoBehaviour
 {
     private static void Test()
     {
-        BlockchainService.Instance.GetBlockNumber(LocalEmergenceServer.Instance.Environment().defaultNodeURL, (GetBlockNumberResponse blockNumber) =>
+        BlockchainService.Instance.GetBlockNumber(LocalEmergenceServer.Instance.Environment().DefaultNodeURL, (GetBlockNumberResponse blockNumber) =>
         {
             Debug.Log(blockNumber.blockNumber);
         }, (err, code) => { });
