@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace EmergenceSDK
+{
+    public class WriteContractResponse : BaseResponse<string>
+    {
+        public string transactionHash { get; set; }
+    }
+}
