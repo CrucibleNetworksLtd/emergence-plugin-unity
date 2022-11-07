@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
 
 namespace EmergenceSDK
@@ -27,15 +29,15 @@ namespace EmergenceSDK
         [SerializeField]
         private bool launchEVMServerOnStart = true;
 
-        [Header("Keyboard shortcut to open Emergence")]
-        [SerializeField]
-        private KeyCode key = KeyCode.Tab;
-
-        [SerializeField]
-        private bool shift = true;
-
-        [SerializeField]
-        private bool ctrl = false;
+        // [Header("Keyboard shortcut to open Emergence")]
+        // [SerializeField]
+        // private KeyCode key = KeyCode.Tab;
+        //
+        // [SerializeField] 
+        // private bool shift = true;
+        //
+        // [SerializeField]
+        // private bool ctrl = false;
 
         private GameObject ui;
 
@@ -173,16 +175,19 @@ namespace EmergenceSDK
 
         private void Update()
         {
-            bool shortcutPressed = Input.GetKeyDown(key)
-                           && (shift && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) || !shift)
-                           && (ctrl && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) || !ctrl);
+            // bool shortcutPressed = Input.GetKeyDown(key)
+            //                && (shift && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) || !shift)
+            //                && (ctrl && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) || !ctrl);
+
+            bool shortcutPressed = Keyboard.current.tabKey.wasPressedThisFrame;
 
             if (shortcutPressed)
             {
-                OpenOverlay();
+                OpenOverlay(); 
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            //if (Input.GetKeyDown(KeyCode.Escape))
+            if (Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 if (ScreenManager.Instance != null)
                 {
