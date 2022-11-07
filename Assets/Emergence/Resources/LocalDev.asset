@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d07fc96fcd841014799c96404c400a5e, type: 3}
+  m_Name: LocalDev
+  m_EditorClassIdentifier: 
+  APIBase: http://localhost/
+  Chain: {fileID: 11400000, guid: 5ec44fd547f00654caa10dac904ab3b7, type: 2}
+  databaseAPIPrivate: https://57l0bi6g53.execute-api.us-east-1.amazonaws.com/staging/
+  CustomEmergenceServerLocation: C:\Dev\emergence-evm-server\bin\Debug\net5.0\EmergenceEVMLocalServer.exe
+  CustomEmergenceServerURL: http://localhost:50733/

@@ -12,7 +12,7 @@ namespace EmergenceSDK
 {
     public class EmergenceEditor : Editor
     {
-        private const string basePath = "Emergence/";
+        public const string basePath = "Emergence/";
 
         // TODO Refactor current EVM server runtime methods to share parameters with this editor script
         /*
@@ -50,6 +50,7 @@ namespace EmergenceSDK
                 Debug.LogError(e.Message);
             }
         }
+
     }
 }
 #endif

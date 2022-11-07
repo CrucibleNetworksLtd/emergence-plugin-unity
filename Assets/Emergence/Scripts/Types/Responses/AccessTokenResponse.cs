@@ -2,13 +2,13 @@
 {
     public class AccessTokenResponse
     {
-        public class AccessToken
-        {
-            public string signedMessage;
-            public string message;
-            public string address;
-        }
 
-        public AccessToken accessToken;
+        public AccessToken AccessToken;
+    }
+    public class AccessToken
+    {
+        public string signedMessage;
+        public string message;
+        public string address;
     }
 }

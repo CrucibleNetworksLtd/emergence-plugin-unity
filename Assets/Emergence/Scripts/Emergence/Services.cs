@@ -8,7 +8,7 @@ namespace EmergenceSDK
 {
     public partial class Services : MonoBehaviour
     {
-        private string nodeURL = string.Empty;
+//        private string nodeURL = string.Empty;
         private string gameId = string.Empty;
         private string currentAccessToken = string.Empty;
 
@@ -16,7 +16,7 @@ namespace EmergenceSDK
 
         private bool skipWallet = false;
 
-        private EnvValues envValues = null;
+//        private EnvValues envValues = null;
 
         public delegate void GenericError(string message, long code);
 
@@ -25,40 +25,41 @@ namespace EmergenceSDK
         private void Awake()
         {
             Instance = this;
-            TextAsset envFile;
-
-            try
-            {
-                envFile = Resources.Load<TextAsset>("emergence.env.dev");
-
-                if (envFile == null)
-                {
-                    envFile = Resources.Load<TextAsset>("emergence.env.staging");
-                }
-
-                if (envFile == null)
-                {
-                    envFile = Resources.Load<TextAsset>("emergence.env");
-                }
-
-                if (envFile == null)
-                {
-                    Debug.LogError("emergence.env file missing from Resources folder");
-                    return;
-                }
-
-                envValues = SerializationHelper.Deserialize<EnvValues>(envFile.text);
-
-                if (envValues == null)
-                {
-                    Debug.LogError("emergence.env file is corrupted or missing");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e.Message);
-            }
         }
+        //    TextAsset envFile;
+
+            //    try
+            //    {
+            //        envFile = Resources.Load<TextAsset>("emergence.env.dev");
+
+            //        if (envFile == null)
+            //        {
+            //            envFile = Resources.Load<TextAsset>("emergence.env.staging");
+            //        }
+
+            //        if (envFile == null)
+            //        {
+            //            envFile = Resources.Load<TextAsset>("emergence.env");
+            //        }
+
+            //        if (envFile == null)
+            //        {
+            //            Debug.LogError("emergence.env file missing from Resources folder");
+            //            return;
+            //        }
+
+            //        envValues = SerializationHelper.Deserialize<EnvValues>(envFile.text);
+
+            //        if (envValues == null)
+            //        {
+            //            Debug.LogError("emergence.env file is corrupted or missing");
+            //        }
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        Debug.LogError(e.Message);
+            //    }
+            //}
 
         private bool refreshingToken = false;
         private void Update()
@@ -97,10 +98,10 @@ namespace EmergenceSDK
 
         #region Utilities
 
-        private bool CheckEnv()
-        {
-            return envValues != null;
-        }
+        //private bool CheckEnv()
+        //{
+        //    return envValues != null;
+        //}
 
         private class Expiration
         {
@@ -114,7 +115,7 @@ namespace EmergenceSDK
             expiration = SerializationHelper.Deserialize<Expiration>(expirationMessage);
         }
 
-        private bool RequestError(UnityWebRequest request)
+        internal static bool RequestError(UnityWebRequest request)
         {
             bool error = false;
 #if UNITY_2020_1_OR_NEWER
@@ -133,7 +134,7 @@ namespace EmergenceSDK
             return error;
         }
 
-        private void PrintRequestResult(string name, UnityWebRequest request)
+        internal static void PrintRequestResult(string name, UnityWebRequest request)
         {
             Debug.Log(name + " completed " + request.responseCode);
             if (RequestError(request))
@@ -146,7 +147,7 @@ namespace EmergenceSDK
             }
         }
 
-        private bool ProcessRequest<T>(UnityWebRequest request, GenericError error, out T response)
+        public bool ProcessRequest<T>(UnityWebRequest request, GenericError error, out T response)
         {
             bool isOk = false;
             response = default(T);
@@ -173,7 +174,7 @@ namespace EmergenceSDK
             return isOk;
         }
 
-        private bool ProcessResponse<T>(UnityWebRequest request, out BaseResponse<T> response, out BaseResponse<string> errorResponse)
+        public bool ProcessResponse<T>(UnityWebRequest request, out BaseResponse<T> response, out BaseResponse<string> errorResponse)
         {
             bool isOk = true;
             errorResponse = null;
@@ -201,8 +202,8 @@ namespace EmergenceSDK
             skipWallet = skip;
 
             BaseResponse<AccessTokenResponse> response = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(accessTokenJson);
-            currentAccessToken = SerializationHelper.Serialize(response.message.accessToken, false);
-            ProcessExpiration(response.message.accessToken.message);
+            currentAccessToken = SerializationHelper.Serialize(response.message.AccessToken, false);
+            ProcessExpiration(response.message.AccessToken.message);
         }
 
         #endregion No Wallet Cheat

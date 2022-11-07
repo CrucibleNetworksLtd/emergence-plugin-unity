@@ -17,25 +17,26 @@ namespace EmergenceSDK
 
         #region Start and Stop
 
+
+
+#if DEBUG
+        [Obsolete("Used updated API", true)]
+#endif        
         public void SetupAndStartEVMServer(string nodeURL, string gameId, bool hidden = true)
         {
-            if (!CheckEnv()) { return; }
-
-            this.nodeURL = envValues.defaultNodeURL;
-
-            if (!string.IsNullOrEmpty(nodeURL.Trim()))
-            {
-                this.nodeURL = nodeURL;
-            }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
 
             this.gameId = gameId;
 
             StartEVMServer(hidden);
         }
 
+#if DEBUG
+        [Obsolete("Used updated API", true)]
+#endif        
         public bool StartEVMServer(bool hidden = true)
         {
-            if (!CheckEnv()) { return false; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return false; }
 
             bool started = false;
             Process[] pname = Process.GetProcessesByName("EmergenceEVMLocalServer");
@@ -45,7 +46,7 @@ namespace EmergenceSDK
                 Debug.LogWarning("Existing process for EVM server found, trying connecting with the default port. This might fail if the EVM server was started with another port.");
 
                 string url = BuildLocalServerURL(DEFAULT_PORT);
-                envValues.APIBase = url + "api/";
+                LocalEmergenceServer.Instance.Environment().APIBase = url + "api/";
 
                 started = true;
             }
@@ -58,9 +59,12 @@ namespace EmergenceSDK
             return started;
         }
 
+#if DEBUG
+        [Obsolete("Used updated API", true)]
+#endif        
         public void StopEVMServer()
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             Debug.Log("Sending Finish command to EVM Server");
             Finish(() =>
             {
@@ -120,9 +124,9 @@ namespace EmergenceSDK
             // Look for free ports and update APIBase with it
             string serverURL = "http://localhost";
 
-            if (envValues.APIBase != null && envValues.APIBase.Trim().Length > 0)
+            if (LocalEmergenceServer.Instance.Environment().APIBase != null && LocalEmergenceServer.Instance.Environment().APIBase.Trim().Length > 0)
             {
-                serverURL = envValues.APIBase;
+                serverURL = LocalEmergenceServer.Instance.Environment().APIBase;
             }
 
             UriBuilder uriBuilder = new UriBuilder(serverURL);
@@ -140,12 +144,13 @@ namespace EmergenceSDK
 
         private bool LaunchEVMServerProcess(bool hidden)
         {
-            if (!CheckEnv()) { return false; }
+
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return false; }
             bool started = false;
             try
             {
                 string url = BuildLocalServerURL();
-                envValues.APIBase = url + "api/";
+                LocalEmergenceServer.Instance.Environment().APIBase = url + "api/";
 
                 string urls = " --urls=\"" + url + "\"";
                 string walletConnect = @" --walletconnect={""""""Name"""""":""""""Crucibletest"""""",""""""Description"""""":""""""UnityEngine+WalletConnect"""""",""""""Icons"""""":""""""https://crucible.network/wp-content/uploads/2020/10/cropped-crucible_favicon-32x32.png"""""",""""""URL"""""":""""""https://crucible.network""""""}";
@@ -179,7 +184,7 @@ namespace EmergenceSDK
 
         private void StopEVMServerProcess()
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             try
             {
                 // TODO avoid using a bat file
@@ -199,7 +204,7 @@ namespace EmergenceSDK
         public delegate void IsConnectedSuccess(bool connected);
         public void IsConnected(IsConnectedSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineIsConnected(success, error));
         }
 
@@ -207,7 +212,7 @@ namespace EmergenceSDK
         {
             Debug.Log("CoroutineIsConnected request started");
 
-            string url = envValues.APIBase + "isConnected";
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "isConnected";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -227,7 +232,7 @@ namespace EmergenceSDK
         public delegate void ReinitializeWalletConnectSuccess(bool disconnected);
         public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineReinitializeWalletConnect(success, error));
         }
 
@@ -235,7 +240,7 @@ namespace EmergenceSDK
         {
             Debug.Log("CoroutineReinitializeWalletConnect request started");
 
-            string url = envValues.APIBase + "reinitializewalletconnect";
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "reinitializewalletconnect";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -249,20 +254,50 @@ namespace EmergenceSDK
         }
 
         #endregion Reinitialize WalletConnect
+        #region Request to Sign WalletConnect
+        public delegate void RequestToSignSuccess(string signedMessage);
+        public void RequestToSignWalletConnect(string messageToSign, RequestToSignSuccess success, GenericError error)
+        {
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
+            StartCoroutine(CoroutineRequestToSignWalletConnect(messageToSign, success, error));
+        }
+
+        private IEnumerator CoroutineRequestToSignWalletConnect(string messageToSign, RequestToSignSuccess success, GenericError error)
+        {
+            Debug.Log("CoroutineRequestToSignWalletConnect request started");
+            var content = "{\"message\": \"" + messageToSign + "\"}";
+
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "request-to-sign";
+
+            using (UnityWebRequest request = UnityWebRequest.Post(url, content))
+            {
+                request.method = "POST";
+                request.uploadHandler.contentType = "application/json";
+                request.SetRequestHeader("accept", "application/json");
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("ReinitializeWalletConnect", request);
+                if (ProcessRequest<RequestToSignResponse>(request, error, out var response))
+                {
+                    success?.Invoke(response.SignedMessage);
+                }
+            }
+        }
+        #endregion
 
         #region QR Code
 
         public delegate void QRCodeSuccess(Texture2D qrCode);
         public void GetQRCode(QRCodeSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineGetQrCode(success, error));
         }
 
         private IEnumerator CoroutineGetQrCode(QRCodeSuccess success, GenericError error)
         {
             Debug.Log("GetQrCode request started");
-            string url = envValues.APIBase + "qrcode";
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "qrcode";
 
             using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
             {
@@ -314,14 +349,14 @@ namespace EmergenceSDK
         public delegate void HandshakeSuccess(string walletAddress);
         public void Handshake(HandshakeSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineHandshake(success, error));
         }
 
         private IEnumerator CoroutineHandshake(HandshakeSuccess success, GenericError error)
         {
             Debug.Log("Handshake request started");
-            string url = envValues.APIBase + "handshake" + "?nodeUrl=" + nodeURL;
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "handshake" + "?nodeUrl=" + LocalEmergenceServer.Instance.NodeURL;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -350,7 +385,7 @@ namespace EmergenceSDK
         {
             Debug.Log("CreateWallet request started");
 
-            string url = envValues.APIBase + "createWallet" + "?path=" + path + "&password=" + password;
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "createWallet" + "?path=" + path + "&password=" + password;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -381,7 +416,7 @@ namespace EmergenceSDK
 
             Debug.Log("Create KeyStore request started");
 
-            string url = envValues.APIBase + "createKeyStore" + "?privateKey=" + privateKey + "&password=" + password + "&publicKey=" + publicKey + "&path=" + path;
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "createKeyStore" + "?privateKey=" + privateKey + "&password=" + password + "&publicKey=" + publicKey + "&path=" + path;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -421,7 +456,7 @@ namespace EmergenceSDK
             };
 
             string dataString = SerializationHelper.Serialize(data, false);
-            string url = envValues.APIBase + "loadAccount";
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "loadAccount";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -431,7 +466,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Load Account", request);
-                if (ProcessRequest<LoadContractResponse>(request, error, out var response))
+                if (ProcessRequest<LoadAccountResponse>(request, error, out var response))
                 {
                     success?.Invoke();
                 }
@@ -445,7 +480,7 @@ namespace EmergenceSDK
         public delegate void BalanceSuccess(string balance);
         public void GetBalance(BalanceSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
 
             if (skipWallet)
             {
@@ -465,7 +500,7 @@ namespace EmergenceSDK
         {
             Debug.Log("Get Balance request started");
 
-            string url = envValues.APIBase + "getbalance" + "?nodeUrl=" + nodeURL + "&address=" + address;
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "getbalance" + "?nodeUrl=" + LocalEmergenceServer.Instance.NodeURL + "&address=" + address;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -499,7 +534,7 @@ namespace EmergenceSDK
             {
                 return currentAccessToken;
             }
-            private set
+            set
             {
                 currentAccessToken = value;
             }
@@ -510,14 +545,14 @@ namespace EmergenceSDK
         public delegate void AccessTokenSuccess(string accessToken);
         public void GetAccessToken(AccessTokenSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineGetAccessToken(success, error));
         }
 
         private IEnumerator CoroutineGetAccessToken(AccessTokenSuccess success, GenericError error)
         {
             Debug.Log("GetAccessToken request started");
-            string url = envValues.APIBase + "get-access-token";
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "get-access-token";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -525,8 +560,8 @@ namespace EmergenceSDK
                 PrintRequestResult("GetAccessToken", request);
                 if (ProcessRequest<AccessTokenResponse>(request, error, out var response))
                 {
-                    currentAccessToken = SerializationHelper.Serialize(response.accessToken, false);
-                    ProcessExpiration(response.accessToken.message);
+                    currentAccessToken = SerializationHelper.Serialize(response.AccessToken, false);
+                    ProcessExpiration(response.AccessToken.message);
                     success?.Invoke(currentAccessToken);
                 }
             }
@@ -539,7 +574,7 @@ namespace EmergenceSDK
         public delegate void ValidateAccessTokenSuccess(bool valid);
         public void ValidateAccessToken(ValidateAccessTokenSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineValidateAccessToken(success, error));
         }
 
@@ -547,7 +582,7 @@ namespace EmergenceSDK
         {
             Debug.Log("ValidateAccessToken request started");
 
-            string url = envValues.APIBase + "validate-access-token" + "?accessToken=" + currentAccessToken;
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "validate-access-token" + "?accessToken=" + currentAccessToken;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -562,13 +597,53 @@ namespace EmergenceSDK
 
         #endregion Validate Access Token
 
+        #region Validate Signed Message
+
+        public delegate void ValidateSignedMessageSuccess(bool valid);
+        public void ValidateSignedMessage(string message, string signedMessage, string address, ValidateSignedMessageSuccess success, GenericError error)
+        {
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
+            StartCoroutine(CoroutineValidateSignedMessage(message, signedMessage, address, success, error));
+        }
+
+        private IEnumerator CoroutineValidateSignedMessage(string message, string signedMessage, string address, ValidateSignedMessageSuccess success, GenericError error)
+        {
+            Debug.Log("ValidateSignedMessage request started");
+
+            ValidateSignedMessageRequest data = new ValidateSignedMessageRequest()
+            {
+                message = message,
+                signedMessage=signedMessage,
+                address=address
+            };
+
+            string dataString = SerializationHelper.Serialize(data, false);
+
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "validate-signed-message" + "?request=" + currentAccessToken;
+            
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+                yield return request.SendWebRequest();
+                PrintRequestResult("ValidateSignedMessage", request);
+                if (ProcessRequest<ValidateSignedMessageResponse>(request, error, out var response))
+                {
+                    success?.Invoke(response.valid);
+                }
+            }
+        }
+
+        #endregion Validate Signed Message
+
         #region Disconnect Wallet
 
         private bool disconnectInProgress = false;
         public delegate void DisconnectSuccess();
         public void Disconnect(DisconnectSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
 
             if (skipWallet)
             {
@@ -583,7 +658,7 @@ namespace EmergenceSDK
         private IEnumerator CoroutineDisconnect(DisconnectSuccess success, GenericError error)
         {
             Debug.Log("Disconnect request started");
-            string url = envValues.APIBase + "killSession";
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "killSession";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -610,14 +685,14 @@ namespace EmergenceSDK
         public delegate void SuccessFinish();
         public void Finish(SuccessFinish success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineFinish(success, error));
         }
 
         private IEnumerator CoroutineFinish(SuccessFinish success, GenericError error)
         {
             Debug.Log("Finish request started");
-            string url = envValues.APIBase + "finish";
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "finish";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -644,7 +719,7 @@ namespace EmergenceSDK
         public delegate void LoadContractSuccess();
         public void LoadContract(string contractAddress, string ABI, LoadContractSuccess success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineLoadContract(contractAddress, ABI, success, error));
         }
 
@@ -659,7 +734,7 @@ namespace EmergenceSDK
             };
 
             string dataString = SerializationHelper.Serialize(data, false);
-            string url = envValues.APIBase + "loadContract";
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "loadContract";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -678,12 +753,72 @@ namespace EmergenceSDK
 
         #endregion Load Contract
 
+        #region GetTransactionStatus
+        public delegate void GetTransactionStatusSuccess<T>(T response);
+        internal void GetTransactionStatus<T>(string transactionHash, string nodeURL, GetTransactionStatusSuccess<T> success, GenericError error)
+        {
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
+            StartCoroutine(CoroutineGetTransactionStatus<T>(transactionHash, nodeURL, success, error));
+        }
+
+        private IEnumerator CoroutineGetTransactionStatus<T>(string transactionHash, string nodeURL, GetTransactionStatusSuccess<T> success, GenericError error)
+        {
+            Debug.Log("Get Transaction Status request started [" + transactionHash + "] / " + nodeURL);
+
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "GetTransactionStatus?transactionHash=" + transactionHash + "&nodeURL=" + nodeURL;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                yield return request.SendWebRequest();
+                PrintRequestResult("Get Transaction Status", request);
+                if (ProcessRequest<T>(request, error, out var response))
+                {
+                    success?.Invoke(response); // Should we change this pattern?
+                }
+            }
+        }
+        #endregion
+
+        #region GetBlockNumber
+
+        public delegate void GetBlockNumberSuccess<T>(T response);
+        internal void GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body, GetBlockNumberSuccess<T> success, GenericError error)
+        {
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
+            StartCoroutine(CoroutineGetBlockNumber<T, U>(transactionHash, nodeURL, body, success, error));
+        }
+
+        private IEnumerator CoroutineGetBlockNumber<T, U>(string transactionHash, string nodeURL, U body, GetBlockNumberSuccess<T> success, GenericError error)
+        {
+            Debug.Log("Get Block Number request started [" + transactionHash + "] / " + nodeURL);
+
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "getBlockNumber?nodeURL=" + nodeURL;
+
+            string dataString = SerializationHelper.Serialize(body, false);
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                PrintRequestResult("Get Block Number", request);
+                if (ProcessRequest<T>(request, error, out var response))
+                {
+                    success?.Invoke(response);
+                }
+            }
+        }
+        #endregion
+
+
         #region Read Contract
 
         public delegate void ReadContractSuccess<T>(T response);
         public void ReadContract<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineReadContract<T, U>(contractAddress, methodName, body, success, error));
         }
 
@@ -691,7 +826,7 @@ namespace EmergenceSDK
         {
             Debug.Log("ReadContract request started [" + contractAddress + "] / " + methodName);
 
-            string url = envValues.APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
 
             string dataString = SerializationHelper.Serialize(body, false);
 
@@ -717,7 +852,7 @@ namespace EmergenceSDK
         public delegate void WriteContractSuccess<T>(T response);
         public void WriteContract<T, U>(string contractAddress, string methodName, string localAccountName, string gasPrice, U body, WriteContractSuccess<T> success, GenericError error)
         {
-            if (!CheckEnv()) { return; }
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, localAccountName, gasPrice, body, success, error));
         }
 
@@ -734,7 +869,7 @@ namespace EmergenceSDK
                 localAccountNameString = "&localAccountName=" + localAccountName;
             }
 
-            string url = envValues.APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName + localAccountNameString + gasPriceString;
+            string url = LocalEmergenceServer.Instance.Environment().APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName + localAccountNameString + gasPriceString;
 
             string dataString = SerializationHelper.Serialize(body, false);
 
