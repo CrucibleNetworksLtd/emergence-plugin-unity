@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07fc96fcd841014799c96404c400a5e, type: 3}
   m_Name: LocalDev
   m_EditorClassIdentifier: 
-  APIBase: http://localhost/
-  Chain: {fileID: 11400000, guid: 5ec44fd547f00654caa10dac904ab3b7, type: 2}
-  databaseAPIPrivate: https://57l0bi6g53.execute-api.us-east-1.amazonaws.com/staging/
-  CustomEmergenceServerLocation: C:\Dev\emergence-evm-server\bin\Debug\net5.0\EmergenceEVMLocalServer.exe
-  CustomEmergenceServerURL: http://localhost:50733/
+  APIBase: 
+  Chain: {fileID: 11400000, guid: 10b6e0bfbe1f33c4b83a0deeae9380aa, type: 2}
+  AvatarURL: https://dysaw5zhak.us-east-1.awsapprunner.com/AvatarSystem/
+  PersonaURL: https://x8iq9e5fq1.execute-api.us-east-1.amazonaws.com/staging/
+  CustomEmergenceServerLocation: 
+  CustomEmergenceServerURL: 

@@ -26,7 +26,7 @@ namespace EmergenceSDK
         {
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
 
-            this.gameId = gameId;
+            // this.gameId = gameId;
 
             StartEVMServer(hidden);
         }
@@ -365,6 +365,7 @@ namespace EmergenceSDK
                 if (ProcessRequest<HandshakeResponse>(request, error, out var response))
                 {
                     Address = response.address;
+                    EmergenceSingleton.Instance.SetCachedAddress(response.address);
                     success?.Invoke(Address);
                 }
             }
@@ -813,18 +814,18 @@ namespace EmergenceSDK
         #endregion
 
 
-        #region Read Contract
+        #region Read Method
 
-        public delegate void ReadContractSuccess<T>(T response);
-        public void ReadContract<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
+        public delegate void ReadMethodSuccess<T>(T response);
+        public void ReadContract<T, U>(string contractAddress, string methodName, U body, ReadMethodSuccess<T> success, GenericError error)
         {
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
-            StartCoroutine(CoroutineReadContract<T, U>(contractAddress, methodName, body, success, error));
+            StartCoroutine(CoroutineReadMethod<T, U>(contractAddress, methodName, body, success, error));
         }
 
-        public IEnumerator CoroutineReadContract<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
+        public IEnumerator CoroutineReadMethod<T, U>(string contractAddress, string methodName, U body, ReadMethodSuccess<T> success, GenericError error)
         {
-            Debug.Log("ReadContract request started [" + contractAddress + "] / " + methodName);
+            Debug.Log("ReadMethod request started [" + contractAddress + "] / " + methodName);
 
             string url = LocalEmergenceServer.Instance.Environment().APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
 
@@ -847,16 +848,16 @@ namespace EmergenceSDK
 
         #endregion Read Contract
 
-        #region Write Contract
+        #region Write Method
 
-        public delegate void WriteContractSuccess<T>(T response);
-        public void WriteContract<T, U>(string contractAddress, string methodName, string localAccountName, string gasPrice, U body, WriteContractSuccess<T> success, GenericError error)
+        public delegate void WriteMethodSuccess<T>(T response);
+        public void WriteContract<T, U>(string contractAddress, string methodName, string localAccountName, string gasPrice, U body, WriteMethodSuccess<T> success, GenericError error)
         {
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
-            StartCoroutine(CoroutineWriteContract<T, U>(contractAddress, methodName, localAccountName, gasPrice, body, success, error));
+            StartCoroutine(CoroutineWriteMethod<T, U>(contractAddress, methodName, localAccountName, gasPrice, body, success, error));
         }
 
-        public IEnumerator CoroutineWriteContract<T, U>(string contractAddress, string methodName, string localAccountName, string gasPrice, U body, WriteContractSuccess<T> success, GenericError error)
+        public IEnumerator CoroutineWriteMethod<T, U>(string contractAddress, string methodName, string localAccountName, string gasPrice, U body, WriteMethodSuccess<T> success, GenericError error)
         {
             Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
 

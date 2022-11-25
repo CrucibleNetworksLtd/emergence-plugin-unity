@@ -123,6 +123,7 @@ namespace EmergenceSDK
                 CustomEmergenceServerLocation = EmergenceSingleton.Instance.Configuration.CustomEmergenceServerLocation,
                 CustomEmergenceServerURL = EmergenceSingleton.Instance.Configuration.CustomEmergenceServerURL,
                 PersonaURL = EmergenceSingleton.Instance.Configuration.PersonaURL,
+                InventoryURL = EmergenceSingleton.Instance.Configuration.InventoryURL,
                 AvatarURL = EmergenceSingleton.Instance.Configuration.AvatarURL,
                 DefaultNodeURL = EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL,
             };

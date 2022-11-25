@@ -78,6 +78,12 @@ public class EmergenceSingleton : SingletonComponent<EmergenceSingleton>
     {
         return address;
     }
+    
+    public void SetCachedAddress(string _address)
+    {
+        Debug.Log("Setting cached address to: " + _address);
+        address = _address;
+    }
 
     public bool HasCachedAddress()
     {

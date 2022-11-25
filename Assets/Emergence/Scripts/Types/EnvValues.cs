@@ -8,6 +8,7 @@ namespace EmergenceSDK
         public string DefaultNodeURL;
         public string PersonaURL;
         public string AvatarURL;
+        public string InventoryURL;
         public string IPFSNode;
         public string CustomEmergenceServerLocation;
         public string CustomEmergenceServerURL;

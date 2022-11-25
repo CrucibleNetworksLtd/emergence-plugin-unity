@@ -1,6 +1,6 @@
 Using pre-set license
 Built from '2020.3/staging' branch; Version is '2020.3.8f1 (507919d4fff5) revision 5273881'; Using compiler version '192528614'; Build Type 'Release'
-OS: 'Windows 10 Pro; OS build 22000.1098; Version 2009; 64bit' Language: 'en' Physical Memory: 130980 MB
+OS: 'Windows 10 Pro; OS build 22000.1219; Version 2009; 64bit' Language: 'en' Physical Memory: 130980 MB
 BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
 
  COMMAND LINE ARGUMENTS:
@@ -15,11 +15,11 @@ D:/work/crucible/emergence-plugin-unity
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
-54892
+51410
 Successfully changed project path to: D:/work/crucible/emergence-plugin-unity
 D:/work/crucible/emergence-plugin-unity
 Using Asset Import Pipeline V2.
-Refreshing native plugins compatible for Editor in 24.46 ms, found 0 plugins.
+Refreshing native plugins compatible for Editor in 21.35 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 2020.3.8f1 (507919d4fff5)
 [Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.3.8f1/Editor/Data/Resources/UnitySubsystems
@@ -29,1003 +29,233 @@ Direct3D:
     Version:  Direct3D 11.0 [level 11.1]
     Renderer: NVIDIA GeForce RTX 3090 (ID=0x2204)
     Vendor:   
-    VRAM:     24348 MB
-    Driver:   31.0.15.1694
+    VRAM:     24340 MB
+    Driver:   31.0.15.2698
 Initialize mono
 Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2020.3.8f1/Editor/Data/Managed'
 Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2020.3.8f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
 Mono config path = 'C:/Program Files/Unity/Hub/Editor/2020.3.8f1/Editor/Data/MonoBleedingEdge/etc'
-Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56500
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56896
 Begin MonoManager ReloadAssembly
 Registering precompiled unity dll's ...
 Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.3.8f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
-Registered in 0.001461 seconds.
+Registered in 0.001223 seconds.
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 22.81 ms, found 0 plugins.
+Refreshing native plugins compatible for Editor in 21.77 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  0.766 seconds
+- Completed reload, in  0.731 seconds
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
-Registered in 0.001447 seconds.
+Registered in 0.001425 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 24.49 ms, found 0 plugins.
+Refreshing native plugins compatible for Editor in 21.16 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  0.679 seconds
+- Completed reload, in  0.578 seconds
 Platform modules already initialized, skipping
 ========================================================================
 Worker process is ready to serve import requests
 Launched and connected shader compiler UnityShaderCompiler.exe after 0.03 seconds
-Refreshing native plugins compatible for Editor in 0.45 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1538 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 75.5 MB.
-System memory in use after: 75.6 MB.
-
-Unloading 17 unused Assets to reduce memory usage. Loaded Objects now: 1980.
-Total: 1.859800 ms (FindLiveObjects: 0.189600 ms CreateObjectMapping: 0.066900 ms MarkObjects: 1.527900 ms  DeleteObjects: 0.074200 ms)
-
-========================================================================
-Received Import Request.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.023974 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.026026 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.071438 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000216 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002208 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.012107 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000212 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002280 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.109713 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000192 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002079 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.010373 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000365 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002418 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.112293 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000226 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002569 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.114510 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000287 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002543 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.012022 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000148 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001753 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.110274 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000181 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001997 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.011050 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000154 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001942 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.109422 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000187 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002015 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.011457 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000166 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002027 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.109918 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000183 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002052 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.010998 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000311 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002809 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.109157 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000198 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002144 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.010677 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000163 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002006 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.093268 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000168 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002019 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.011730 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000182 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002050 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.015787 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000168 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001952 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.109304 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000178 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001997 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.011888 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000210 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002070 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.019619 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000163 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002021 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.014917 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000157 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001975 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.014168 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000182 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002091 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.011768 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000162 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001973 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.010644 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000197 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002175 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.013468 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000157 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001919 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.008963 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000155 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001805 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.008987 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000158 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001851 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.008319 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000139 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001755 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.013445 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000174 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001874 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.018736 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000164 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001978 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.009378 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000148 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001818 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.110411 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000197 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002190 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.011541 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000176 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002161 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.040799 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000166 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002030 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.109201 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000188 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002121 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.009516 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000147 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001856 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.108730 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000183 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002229 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.010258 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000155 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001934 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.109895 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000177 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002044 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.011070 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000154 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001994 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.108888 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000179 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002016 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.013008 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000150 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001911 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.113990 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000172 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001997 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.011153 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000157 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001958 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.108596 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000183 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002036 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.010391 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000152 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001946 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.109949 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000206 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002132 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.010814 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000162 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001867 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.109246 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000187 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002063 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.010536 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000155 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001979 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.108524 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000178 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.002003 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.010339 seconds.
-  path: Assets/Emergence/Scripts/Emergence/Emergence.cs
-  artifactKey: Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Scripts/Emergence/Emergence.cs using Guid(bf5e56923886cf145b8fd0a4509cd821) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '00000000000000000000000000000000') in 0.000146 seconds
-  ERROR: Build asset version error: assets/emergence/scripts/emergence/emergence.cs in SourceAssetDB has modification time of '2022-11-06T19:55:34.1811303Z' while content on disk has modification time of '2022-11-06T19:58:35.1107572Z'
-  Import took 0.001908 seconds .
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.095003 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.584 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1513 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.7 MB.
-System memory in use after: 73.8 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 1983.
-Total: 1.696500 ms (FindLiveObjects: 0.188700 ms CreateObjectMapping: 0.069200 ms MarkObjects: 1.421200 ms  DeleteObjects: 0.016600 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001572 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.32 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.531 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.27 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1513 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.8 MB.
-System memory in use after: 73.9 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 1986.
-Total: 1.694800 ms (FindLiveObjects: 0.188100 ms CreateObjectMapping: 0.062200 ms MarkObjects: 1.426600 ms  DeleteObjects: 0.017300 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001311 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.579 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.36 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1513 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.8 MB.
-System memory in use after: 73.9 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 1989.
-Total: 1.719100 ms (FindLiveObjects: 0.177900 ms CreateObjectMapping: 0.058800 ms MarkObjects: 1.464900 ms  DeleteObjects: 0.016700 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001236 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.555 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1513 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.8 MB.
-System memory in use after: 73.9 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 1992.
-Total: 1.607100 ms (FindLiveObjects: 0.165000 ms CreateObjectMapping: 0.045400 ms MarkObjects: 1.379000 ms  DeleteObjects: 0.017100 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001186 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.35 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.592 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.39 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1513 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.8 MB.
-System memory in use after: 73.9 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 1995.
-Total: 1.669400 ms (FindLiveObjects: 0.167300 ms CreateObjectMapping: 0.052300 ms MarkObjects: 1.430800 ms  DeleteObjects: 0.017900 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001176 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.35 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.572 seconds
-Platform modules already initialized, skipping
 Refreshing native plugins compatible for Editor in 0.38 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1513 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.8 MB.
-System memory in use after: 73.9 MB.
+Unloading 1559 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 76.1 MB.
+System memory in use after: 76.2 MB.
 
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 1998.
-Total: 1.693300 ms (FindLiveObjects: 0.162900 ms CreateObjectMapping: 0.049700 ms MarkObjects: 1.462500 ms  DeleteObjects: 0.017700 ms)
+Unloading 17 unused Assets to reduce memory usage. Loaded Objects now: 2001.
+Total: 1.600700 ms (FindLiveObjects: 0.122700 ms CreateObjectMapping: 0.030300 ms MarkObjects: 1.386700 ms  DeleteObjects: 0.060300 ms)
+
+========================================================================
+Received Import Request.
+  path: Assets/Emergence/Scripts/Emergence/Services.cs
+  artifactKey: Guid(34110deff654ed347bf4111dfe78c54e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Emergence/Services.cs using Guid(34110deff654ed347bf4111dfe78c54e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8acc09fc68af058a960014c90bb17d3c') in 0.027769 seconds
+  Import took 0.033114 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 18.566122 seconds.
+  path: Assets/Emergence/Scripts/Emergence/Services.cs
+  artifactKey: Guid(34110deff654ed347bf4111dfe78c54e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Emergence/Services.cs using Guid(34110deff654ed347bf4111dfe78c54e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b837515fe0dff98c23df1923fa3b98f7') in 0.001424 seconds
+  Import took 0.007012 seconds .
 
 ========================================================================
 Received Prepare
 Registering precompiled user dll's ...
-Registered in 0.001244 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.577 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.37 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1513 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.8 MB.
-System memory in use after: 73.9 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2001.
-Total: 1.929900 ms (FindLiveObjects: 0.173800 ms CreateObjectMapping: 0.055800 ms MarkObjects: 1.681100 ms  DeleteObjects: 0.018500 ms)
-
-========================================================================
-Received Import Request.
-  Time since last request: 4716.598417 seconds.
-  path: Assets/Emergence/Demo/Scripts/CubeRotation.cs
-  artifactKey: Guid(2cc4bdb7bced0584d8335719cd78b70b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/CubeRotation.cs using Guid(2cc4bdb7bced0584d8335719cd78b70b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '4e008af40de129f514f638c5cb066fe3') in 0.007005 seconds
-  Import took 0.009271 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.363693 seconds.
-  path: Assets/Emergence/Demo/Scripts/GetNFTDemo.cs
-  artifactKey: Guid(845ba0ebeaa2a7e47ba89ad8b25c017c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/GetNFTDemo.cs using Guid(845ba0ebeaa2a7e47ba89ad8b25c017c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8391928811f21a255dcc7700f5c3d2c7') in 0.004235 seconds
-  Import took 0.006335 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.001337 seconds.
-  path: Assets/Emergence/Demo/Scripts/GetNFTDemo.cs
-  artifactKey: Guid(845ba0ebeaa2a7e47ba89ad8b25c017c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/GetNFTDemo.cs using Guid(845ba0ebeaa2a7e47ba89ad8b25c017c) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8391928811f21a255dcc7700f5c3d2c7') in 0.001180 seconds
-  Import took 0.003062 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 1.028690 seconds.
-  path: Assets/Emergence/Prefabs
-  artifactKey: Guid(65cdd3cec18f98245a3f7114b92bf420) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Prefabs using Guid(65cdd3cec18f98245a3f7114b92bf420) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1ae1df46cdc6e66c0ff7263bd634ae11') in 0.004249 seconds
-  Import took 0.006316 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 87.059954 seconds.
-  path: Assets/Emergence/Demo/Scripts
-  artifactKey: Guid(befb58208708356488ac5b5d162cb5a9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts using Guid(befb58208708356488ac5b5d162cb5a9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '51ab4af2aa16f9bc444abb54c921dd31') in 0.004240 seconds
-  Import took 0.006268 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 10.648003 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoPlayerController.cs
-  artifactKey: Guid(ae970bd2b0a72814684a8749007b69f0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoPlayerController.cs using Guid(ae970bd2b0a72814684a8749007b69f0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '40164dcc90c06ee7df96202422658f09') in 0.005021 seconds
-  Import took 0.007276 seconds .
-
-========================================================================
-Received Import Request.
-  Time since last request: 0.005930 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoPlayerController.cs
-  artifactKey: Guid(ae970bd2b0a72814684a8749007b69f0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoPlayerController.cs using Guid(ae970bd2b0a72814684a8749007b69f0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '40164dcc90c06ee7df96202422658f09') in 0.001475 seconds
-  Import took 0.003254 seconds .
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001109 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.32 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.541 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.32 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1514 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.9 MB.
-System memory in use after: 74.0 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2005.
-Total: 1.565000 ms (FindLiveObjects: 0.148000 ms CreateObjectMapping: 0.041900 ms MarkObjects: 1.360500 ms  DeleteObjects: 0.014100 ms)
-
-========================================================================
-Received Import Request.
-  Time since last request: 455.774629 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoPlayerController.cs
-  artifactKey: Guid(ae970bd2b0a72814684a8749007b69f0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoPlayerController.cs using Guid(ae970bd2b0a72814684a8749007b69f0) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8be5e248184ce07fb1bddbc6d28cecd2') in 0.004371 seconds
-  Import took 0.006828 seconds .
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001132 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.38 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.545 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1514 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.9 MB.
-System memory in use after: 74.0 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2008.
-Total: 1.638200 ms (FindLiveObjects: 0.161900 ms CreateObjectMapping: 0.051100 ms MarkObjects: 1.408800 ms  DeleteObjects: 0.015700 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001125 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.30 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.541 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.32 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1514 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.9 MB.
-System memory in use after: 74.0 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2011.
-Total: 1.755200 ms (FindLiveObjects: 0.167700 ms CreateObjectMapping: 0.053200 ms MarkObjects: 1.520800 ms  DeleteObjects: 0.012600 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001229 seconds.
+Registered in 0.001086 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for WindowsStandalone target not found
 Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.548 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.25 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1514 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.9 MB.
-System memory in use after: 74.0 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2014.
-Total: 1.701500 ms (FindLiveObjects: 0.195600 ms CreateObjectMapping: 0.054400 ms MarkObjects: 1.432100 ms  DeleteObjects: 0.017900 ms)
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001132 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.35 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.557 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1515 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.9 MB.
-System memory in use after: 74.0 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2018.
-Total: 1.737100 ms (FindLiveObjects: 0.184400 ms CreateObjectMapping: 0.069300 ms MarkObjects: 1.463800 ms  DeleteObjects: 0.018700 ms)
-
-========================================================================
-Received Import Request.
-  Time since last request: 1026.273590 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoStationController.cs
-  artifactKey: Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoStationController.cs using Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e96440372a9087b8b3ffc47a73094397') in 0.005922 seconds
-  Import took 0.008048 seconds .
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001391 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.35 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
 - Completed reload, in  0.563 seconds
 Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.36 ms, found 0 plugins.
+Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1515 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.9 MB.
-System memory in use after: 74.0 MB.
+Unloading 1535 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 74.4 MB.
+System memory in use after: 74.5 MB.
 
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2021.
-Total: 2.557000 ms (FindLiveObjects: 0.185500 ms CreateObjectMapping: 0.066800 ms MarkObjects: 2.273700 ms  DeleteObjects: 0.029800 ms)
-
-========================================================================
-Received Import Request.
-  Time since last request: 43.651945 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoStationController.cs
-  artifactKey: Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoStationController.cs using Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd7f91f0ed7165c7f0c14aef8d3ac67bb') in 0.003744 seconds
-  Import took 0.005890 seconds .
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2004.
+Total: 1.571000 ms (FindLiveObjects: 0.183200 ms CreateObjectMapping: 0.038700 ms MarkObjects: 1.331500 ms  DeleteObjects: 0.016400 ms)
 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.030910 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoStationController.cs
-  artifactKey: Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoStationController.cs using Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd7f91f0ed7165c7f0c14aef8d3ac67bb') in 0.001215 seconds
-  Import took 0.003361 seconds .
+  Time since last request: 5556.561760 seconds.
+  path: Assets/Emergence/Scripts/Emergence/Services.cs
+  artifactKey: Guid(34110deff654ed347bf4111dfe78c54e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Emergence/Services.cs using Guid(34110deff654ed347bf4111dfe78c54e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '827550fb48d4abbccd010f29a6d04707') in 0.004208 seconds
+  Import took 0.009689 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 13.191377 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoStationController.cs
-  artifactKey: Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoStationController.cs using Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b592e23eb6b2c3ec6b3ee8c8117adce3') in 0.001200 seconds
-  Import took 0.003216 seconds .
+  Time since last request: 3418.354651 seconds.
+  path: Assets/Emergence/Scripts/Emergence/Services.cs
+  artifactKey: Guid(34110deff654ed347bf4111dfe78c54e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Emergence/Services.cs using Guid(34110deff654ed347bf4111dfe78c54e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7cfc6f75fd34ed05d409bc3ba5dcaa99') in 0.001503 seconds
+  Import took 0.007108 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.017067 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoStationController.cs
-  artifactKey: Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoStationController.cs using Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b592e23eb6b2c3ec6b3ee8c8117adce3') in 0.001230 seconds
-  Import took 0.003399 seconds .
+  Time since last request: 0.001144 seconds.
+  path: Assets/Emergence/Scripts/Emergence/Services.cs
+  artifactKey: Guid(34110deff654ed347bf4111dfe78c54e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Emergence/Services.cs using Guid(34110deff654ed347bf4111dfe78c54e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '7cfc6f75fd34ed05d409bc3ba5dcaa99') in 0.001143 seconds
+  Import took 0.003003 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.571826 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/GetAvatarsResponse.cs
+  artifactKey: Guid(9d684546c4a2e5843bd61444a5f44bea) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/GetAvatarsResponse.cs using Guid(9d684546c4a2e5843bd61444a5f44bea) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '2c9b310133698a9b5c67d9418d307b73') in 0.003919 seconds
+  Import took 0.009532 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.920573 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/GetBalanceResponse.cs
+  artifactKey: Guid(29610b315eb980e4282a3c6bee8d7368) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/GetBalanceResponse.cs using Guid(29610b315eb980e4282a3c6bee8d7368) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0a471376f91891ad6c496efc2052b0aa') in 0.004087 seconds
+  Import took 0.009518 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.309870 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/GetBlockNumberResponse.cs
+  artifactKey: Guid(3548d1ebbbdf5cb49b7d812932de3359) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/GetBlockNumberResponse.cs using Guid(3548d1ebbbdf5cb49b7d812932de3359) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0eef8f2ab015f34531e21f435c6398d2') in 0.003976 seconds
+  Import took 0.009609 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 2.094668 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/BaseResponse.cs
+  artifactKey: Guid(880c1bc0db7f50b4da339df51be4b9cc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/BaseResponse.cs using Guid(880c1bc0db7f50b4da339df51be4b9cc) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'ea6f65062a372a705f8ddca5324a32c5') in 0.003794 seconds
+  Import took 0.005796 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 59.097539 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/GetTransactionStatusResponse.cs
+  artifactKey: Guid(a7f7fc3e5f5302d41b1b597d7d2e75dd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/GetTransactionStatusResponse.cs using Guid(a7f7fc3e5f5302d41b1b597d7d2e75dd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a85fda0d99728396afd6080dc97072b6') in 0.003970 seconds
+  Import took 0.006155 seconds .
 
 ========================================================================
 Received Prepare
 Registering precompiled user dll's ...
-Registered in 0.001169 seconds.
+Registered in 0.100383 seconds.
 Begin MonoManager ReloadAssembly
 Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
+Refreshing native plugins compatible for Editor in 0.35 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Mono: successfully reloaded assembly
-- Completed reload, in  0.555 seconds
+- Completed reload, in  0.564 seconds
 Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
+Refreshing native plugins compatible for Editor in 0.32 ms, found 0 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1515 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.9 MB.
-System memory in use after: 74.0 MB.
+Unloading 1535 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 74.5 MB.
+System memory in use after: 74.6 MB.
 
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2024.
-Total: 1.567400 ms (FindLiveObjects: 0.143600 ms CreateObjectMapping: 0.040400 ms MarkObjects: 1.368700 ms  DeleteObjects: 0.013900 ms)
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 2007.
+Total: 1.552900 ms (FindLiveObjects: 0.127200 ms CreateObjectMapping: 0.034700 ms MarkObjects: 1.375000 ms  DeleteObjects: 0.015300 ms)
 
 ========================================================================
 Received Import Request.
-  Time since last request: 23.682080 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoStationController.cs
-  artifactKey: Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoStationController.cs using Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd5381841b88637c2c85f76ef0fd7ec4f') in 0.003515 seconds
-  Import took 0.005555 seconds .
+  Time since last request: 362.074219 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/LoadAccountResponse.cs
+  artifactKey: Guid(239a3963a21d7fe4ea483c0176a3fa33) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/LoadAccountResponse.cs using Guid(239a3963a21d7fe4ea483c0176a3fa33) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '14b298347f9d6d9011e67a5b2d1e6044') in 0.007294 seconds
+  Import took 0.009653 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.036466 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoStationController.cs
-  artifactKey: Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoStationController.cs using Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd5381841b88637c2c85f76ef0fd7ec4f') in 0.001263 seconds
-  Import took 0.003455 seconds .
-
-========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001118 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.530 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1515 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.9 MB.
-System memory in use after: 74.0 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2027.
-Total: 1.885700 ms (FindLiveObjects: 0.203800 ms CreateObjectMapping: 0.216600 ms MarkObjects: 1.449000 ms  DeleteObjects: 0.015200 ms)
+  Time since last request: 1.159840 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/LoadContractResponse.cs
+  artifactKey: Guid(da4de85f5d50d024199c03c6253b67dd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/LoadContractResponse.cs using Guid(da4de85f5d50d024199c03c6253b67dd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '8cd679ae6604c449ec036576a2ab6b03') in 0.003813 seconds
+  Import took 0.009233 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 41.689194 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoStationController.cs
-  artifactKey: Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoStationController.cs using Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b6eddfcde5fafda55cdff3a1f558501a') in 0.003653 seconds
-  Import took 0.005730 seconds .
+  Time since last request: 0.870444 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/NFTMetadataResponse.cs
+  artifactKey: Guid(25eff3b0102cbef49af5e267b5d7803f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/NFTMetadataResponse.cs using Guid(25eff3b0102cbef49af5e267b5d7803f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '2759d28c898053507048979f292134ce') in 0.003867 seconds
+  Import took 0.009007 seconds .
 
 ========================================================================
 Received Import Request.
-  Time since last request: 0.032902 seconds.
-  path: Assets/Emergence/Demo/Scripts/DemoStationController.cs
-  artifactKey: Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
-Start importing Assets/Emergence/Demo/Scripts/DemoStationController.cs using Guid(4aeb43836d572704a9a4ed8a51dfcea3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'b6eddfcde5fafda55cdff3a1f558501a') in 0.001264 seconds
-  Import took 0.003678 seconds .
+  Time since last request: 4.571038 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/IsConnectedResponse.cs
+  artifactKey: Guid(c8ff4426395812446b488255faa78315) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/IsConnectedResponse.cs using Guid(c8ff4426395812446b488255faa78315) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'da195cb33fb0d01d68c8c05bfe44a37d') in 0.004215 seconds
+  Import took 0.010012 seconds .
 
 ========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001148 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.551 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1515 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 73.9 MB.
-System memory in use after: 74.1 MB.
-
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2030.
-Total: 1.735600 ms (FindLiveObjects: 0.172800 ms CreateObjectMapping: 0.060300 ms MarkObjects: 1.488300 ms  DeleteObjects: 0.013600 ms)
+Received Import Request.
+  Time since last request: 2.421115 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/HandshakeResponse.cs
+  artifactKey: Guid(275b6a52f11941e4ab68fede509562fa) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/HandshakeResponse.cs using Guid(275b6a52f11941e4ab68fede509562fa) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '9334016f1b7022de612c3c089b49c547') in 0.004155 seconds
+  Import took 0.006405 seconds .
 
 ========================================================================
-Received Prepare
-Registering precompiled user dll's ...
-Registered in 0.001110 seconds.
-Begin MonoManager ReloadAssembly
-Native extension for WindowsStandalone target not found
-Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Mono: successfully reloaded assembly
-- Completed reload, in  0.545 seconds
-Platform modules already initialized, skipping
-Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
-Preloading 0 native plugins for Editor in 0.00 ms.
-Unloading 1515 Unused Serialized files (Serialized files now loaded: 0)
-System memory in use before: 74.0 MB.
-System memory in use after: 74.1 MB.
+Received Import Request.
+  Time since last request: 2.724402 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/PersonasResponse.cs
+  artifactKey: Guid(d9f606d885d9dfd4b9d829a585cde77b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/PersonasResponse.cs using Guid(d9f606d885d9dfd4b9d829a585cde77b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0081c41aa70fa6d391bf8517a52b6f8b') in 0.003930 seconds
+  Import took 0.009167 seconds .
 
-Unloading 10 unused Assets to reduce memory usage. Loaded Objects now: 2033.
-Total: 1.606700 ms (FindLiveObjects: 0.153700 ms CreateObjectMapping: 0.046200 ms MarkObjects: 1.391600 ms  DeleteObjects: 0.014500 ms)
+========================================================================
+Received Import Request.
+  Time since last request: 1.432507 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/ReadContractResponse.cs
+  artifactKey: Guid(0d814df17e403cd459187caa09641d6e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/ReadContractResponse.cs using Guid(0d814df17e403cd459187caa09641d6e) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '9b17234fe730960687a80b16d600838e') in 0.004114 seconds
+  Import took 0.006166 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 96.928763 seconds.
+  path: Assets/Emergence/Scripts/Types/Responses/ReadContractTokenURIResponse.cs
+  artifactKey: Guid(f483b29773f63314c8fb593e6d04a67f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Responses/ReadContractTokenURIResponse.cs using Guid(f483b29773f63314c8fb593e6d04a67f) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5c3d271847ea763b5c74bba351b55fe6') in 0.004674 seconds
+  Import took 0.006813 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 0.413727 seconds.
+  path: Assets/Emergence/Scripts/Types/Account.cs
+  artifactKey: Guid(68821e52bf06f244a8ced6dc425dd14d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Emergence/Scripts/Types/Account.cs using Guid(68821e52bf06f244a8ced6dc425dd14d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '686a9cf2f89e646bb7b272c102f28463') in 0.003874 seconds
+  Import took 0.005905 seconds .
 
 AssetImportWorkerClient::OnTransportError - code=2 error=End of file

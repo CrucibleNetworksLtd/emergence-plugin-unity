@@ -3,13 +3,15 @@ using System;
 using UnityEngine;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
+using Cysharp.Threading.Tasks;
+using UnityEditor.PackageManager.Requests;
 
 namespace EmergenceSDK
 {
     public partial class Services : MonoBehaviour
     {
 //        private string nodeURL = string.Empty;
-        private string gameId = string.Empty;
+        // private string gameId = string.Empty;
         private string currentAccessToken = string.Empty;
 
         public static Services Instance;
@@ -149,6 +151,8 @@ namespace EmergenceSDK
 
         public bool ProcessRequest<T>(UnityWebRequest request, GenericError error, out T response)
         {
+            Debug.Log("Processing request: " + request);
+            
             bool isOk = false;
             response = default(T);
 
@@ -191,6 +195,23 @@ namespace EmergenceSDK
             }
 
             return isOk;
+        }
+
+        private async UniTask<string> PerformAsyncWebRequest(string url)
+        {
+            try
+            {
+                UnityWebRequest request = UnityWebRequest.Get(url);
+                Debug.Log("AccessToken: " + currentAccessToken);
+                request.SetRequestHeader("Authorization", currentAccessToken);
+                await request.SendWebRequest();
+                var response = request.downloadHandler.text;
+                return response;
+            }
+            catch (Exception ex) when (!(ex is OperationCanceledException))
+            {
+                return "Error with web request: " + ex.Message;
+            }
         }
 
         #endregion Utilities

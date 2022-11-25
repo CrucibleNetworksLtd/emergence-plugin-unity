@@ -1,5 +1,8 @@
 ﻿public class EmergenceAvatar
 {
-    public string ID { get; set; }
-    public string URL { get; set; }
+    public string AvatarId { get; set; }
+    public string ContractAddress { get; set; }
+    public string TokenId { get; set; }
+    public string TokenURI { get; set; }
+    
 }
