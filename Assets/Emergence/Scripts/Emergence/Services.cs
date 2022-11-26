@@ -204,9 +204,7 @@ namespace EmergenceSDK
                 UnityWebRequest request = UnityWebRequest.Get(url);
                 Debug.Log("AccessToken: " + currentAccessToken);
                 request.SetRequestHeader("Authorization", currentAccessToken);
-                await request.SendWebRequest();
-                var response = request.downloadHandler.text;
-                return response;
+                return (await request.SendWebRequest()).downloadHandler.text;
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
