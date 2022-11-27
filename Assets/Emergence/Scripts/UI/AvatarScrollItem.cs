@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace EmergenceSDK
@@ -15,9 +16,9 @@ namespace EmergenceSDK
         [SerializeField]
         private AspectRatioFitter ratioFitter;
 
-        private Persona.Avatar avatar;
+        private Avatar avatar;
 
-        public delegate void ImageCompleted(Persona.Avatar avatar, bool success);
+        public delegate void ImageCompleted(Avatar avatar, bool success);
         public static event ImageCompleted OnImageCompleted;
 
         private bool waitingForImageRequest = false;
@@ -36,14 +37,14 @@ namespace EmergenceSDK
             RequestImage.Instance.OnImageFailed -= Instance_OnImageFailed;
         }
 
-        public delegate void Selected(Persona.Avatar avatar);
+        public delegate void Selected(Avatar avatar);
         public static event Selected OnAvatarSelected;
         private void OnSelectClicked()
         {
             OnAvatarSelected?.Invoke(avatar);
         }
 
-        public void Refresh(Texture2D texture, Persona.Avatar avatar)
+        public void Refresh(Texture2D texture, Avatar avatar)
         {
             this.avatar = avatar;
             avatarRawImage.texture = texture;
@@ -52,10 +53,10 @@ namespace EmergenceSDK
 
             // If avatar is null then this avatar scroll item is the default image,
             // and will never call RequestImage
-            if (avatar != null && avatar.url != null)
+            if (avatar != null && avatar.meta.content.First().url != null)
             {
                 waitingForImageRequest = true;
-                if (!RequestImage.Instance.AskForImage(avatar.url))
+                if (!RequestImage.Instance.AskForImage(avatar.meta.content.First().url))
                 {
                     waitingForImageRequest = false;
                     OnImageCompleted?.Invoke(avatar, false);
@@ -69,7 +70,7 @@ namespace EmergenceSDK
 
         private void Instance_OnImageReady(string url, Texture2D texture)
         {
-            if (waitingForImageRequest && url.Equals(avatar.url))
+            if (waitingForImageRequest && url.Equals(avatar.meta.content.First().url))
             {
                 avatarRawImage.texture = texture;
                 waitingForImageRequest = false;
@@ -79,7 +80,7 @@ namespace EmergenceSDK
 
         private void Instance_OnImageFailed(string url, string error, long errorCode)
         {
-            if (waitingForImageRequest && url.Equals(avatar.url))
+            if (waitingForImageRequest && url.Equals(avatar.meta.content.First().url))
             {
                 waitingForImageRequest = false;
                 Debug.LogError("[" + url + "] " + error + " " + errorCode);

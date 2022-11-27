@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 
 namespace EmergenceSDK
@@ -135,11 +136,11 @@ namespace EmergenceSDK
                     Persona persona = personas[i];
                     if (persona.avatar != null)
                     {
-                        if (string.IsNullOrEmpty(persona.avatar.id))
+                        if (string.IsNullOrEmpty(persona.avatar.avatarId))
                         {
                             persona.avatar = null;
                         }
-                        else if (string.IsNullOrEmpty(persona.avatar.url))
+                        else if (string.IsNullOrEmpty(persona.avatar.meta.content.First().url))
                         {
                             persona.avatar = null;
                         }
@@ -210,10 +211,10 @@ namespace EmergenceSDK
                 id = string.Empty,
                 name = string.Empty,
                 bio = string.Empty,
-                avatar = new Persona.Avatar()
+                avatar = new Avatar()
                 {
-                    id = string.Empty,
-                    url = string.Empty,
+                    avatarId = string.Empty,
+                    // url = string.Empty,
                 },
                 settings = new Persona.PersonaSettings()
                 {
@@ -307,7 +308,7 @@ namespace EmergenceSDK
             }
             else if (imagesRefreshing.Count > 0)
             {
-                Debug.LogWarning("Image completed but not accounted for: [" + persona.id + "][" + persona.avatar.id + "][" + persona.avatar.url + "][" + success + "]");
+                Debug.LogWarning("Image completed but not accounted for: [" + persona.id + "][" + persona.avatar.meta.content.First().url + "][" + persona.avatar.meta.content.First().url + "][" + success + "]");
             }
         }
 

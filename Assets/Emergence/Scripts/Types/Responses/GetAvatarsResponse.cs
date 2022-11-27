@@ -4,6 +4,6 @@ namespace EmergenceSDK
 {
     public class GetAvatarsResponse
     {
-        public List<Persona.Avatar> avatars;
+        public List<Avatar> message;
     }
 }

@@ -255,18 +255,21 @@ namespace EmergenceSDK
 
         #region GetAvatars
 
-        public delegate void SuccessAvatars(List<Persona.Avatar> avatar);
+        public delegate void SuccessAvatars(List<Avatar> avatar);
         public async void GetAvatars(string address, SuccessAvatars success, GenericError error)
         {
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             Debug.Log("Getting avatars for address: " + address);
             
             Debug.Log("Get Avatars request started");
-            string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "byOwner?address=" + address;
+            string url = LocalEmergenceServer.Instance.Environment().AvatarURL + "byOwner?address=" + address;
             Debug.Log("Requesting avatars from URL: " + url);
             string response = await PerformAsyncWebRequest(url);
             
             Debug.Log("Avatar response: " + response.ToString());
+            GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response.ToString());
+            
+            success?.Invoke(avatarResponse.message);
             
             // StartCoroutine(CoroutineGetAvatars(address, success, error));
         }
@@ -293,7 +296,7 @@ namespace EmergenceSDK
                     Debug.Log("Avatar response: " + request.downloadHandler.text);
                     GetAvatarsResponse response = SerializationHelper.Deserialize<GetAvatarsResponse>(request.downloadHandler.text);
                     Debug.Log("Avatar response: " + response);
-                    success?.Invoke(response.avatars);
+                    success?.Invoke(response.message);
                 }
             }
         }

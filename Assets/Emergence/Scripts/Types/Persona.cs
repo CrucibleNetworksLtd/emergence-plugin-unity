@@ -12,11 +12,11 @@ namespace EmergenceSDK
             public bool showStatus;
         }
 
-        public class Avatar
-        {
-            public string id;
-            public string url;
-        }
+        // public class Avatar
+        // {
+        //     public string id;
+        //     public string url;
+        // }
 
         public string id;
         public string name;

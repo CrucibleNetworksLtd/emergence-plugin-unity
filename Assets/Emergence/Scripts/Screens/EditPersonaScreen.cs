@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -94,9 +95,9 @@ namespace EmergenceSDK
             }
         }
 
-        private Persona.Avatar currentAvatar = null;
-        private Persona.Avatar existingAvatar;
-        private void AvatarScrollItem_OnAvatarSelected(Persona.Avatar avatar)
+        private Avatar currentAvatar = null;
+        private Avatar existingAvatar;
+        private void AvatarScrollItem_OnAvatarSelected(Avatar avatar)
         {
             currentAvatar = avatar;
 
@@ -108,7 +109,8 @@ namespace EmergenceSDK
             }
 
             // Image at this point is already cached
-            RequestImage.Instance.AskForImage(avatar.url, (url, texture) =>
+            // Assuming image is the first in the list - TODO: need to check for MimeType
+            RequestImage.Instance.AskForImage(avatar.meta.content.First().url, (url, texture) =>
             {
                 personaAvatar.texture = texture;
                 personaAvatarBackground.texture = texture;
@@ -192,7 +194,7 @@ namespace EmergenceSDK
                     go.transform.SetParent(avatarScrollRoot);
                     go.transform.localScale = Vector3.one;
 
-                    imagesRefreshing.Add(avatars[i].id);
+                    imagesRefreshing.Add(avatars[i].avatarId);
                     go.GetComponent<AvatarScrollItem>().Refresh(defaultImage, avatars[i]);
                 }
                 requestingInProgress = false;
@@ -356,13 +358,13 @@ namespace EmergenceSDK
             currentAvatar = null;
         }
 
-        private void AvatarScrollItem_OnImageCompleted(Persona.Avatar avatar, bool success)
+        private void AvatarScrollItem_OnImageCompleted(Avatar avatar, bool success)
         {
             if (!success)
             {
-                if (avatar != null && imagesRefreshing.Contains(avatar.id))
+                if (avatar != null && imagesRefreshing.Contains(avatar.avatarId))
                 {
-                    imagesRefreshing.Remove(avatar.id);
+                    imagesRefreshing.Remove(avatar.avatarId);
                     if (imagesRefreshing.Count <= 1 && !requestingInProgress)
                     {
                         Modal.Instance.Hide();
@@ -371,9 +373,9 @@ namespace EmergenceSDK
             }
             else
             {
-                if (imagesRefreshing.Contains(avatar.id))
+                if (imagesRefreshing.Contains(avatar.avatarId))
                 {
-                    imagesRefreshing.Remove(avatar.id);
+                    imagesRefreshing.Remove(avatar.avatarId);
                     if (imagesRefreshing.Count <= 1 && !requestingInProgress)
                     {
                         Modal.Instance.Hide();
@@ -381,7 +383,7 @@ namespace EmergenceSDK
                 }
                 else if (imagesRefreshing.Count > 0)
                 {
-                    Debug.LogWarning("Image completed but not accounted for: [" + avatar.id + "][" + avatar.url + "][" + success + "]");
+                    Debug.LogWarning("Image completed but not accounted for: [" + avatar.avatarId + "][" + avatar.meta.content.First().url + "][" + success + "]");
                 }
             }
         }

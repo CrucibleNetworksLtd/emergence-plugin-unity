@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -104,10 +105,10 @@ namespace EmergenceSDK
             unselectedBorder.SetActive(!selected);
             selectedBorder.SetActive(selected);
 
-            if (persona.avatar != null && persona.avatar.url != null)
+            if (persona.avatar != null && persona.avatar.meta.content.First().url != null)
             {
                 waitingForImageRequest = true;
-                if (!RequestImage.Instance.AskForImage(persona.avatar.url))
+                if (!RequestImage.Instance.AskForImage(persona.avatar.meta.content.First().url))
                 {
                     waitingForImageRequest = false;
                     OnImageCompleted?.Invoke(persona, false);
@@ -131,7 +132,7 @@ namespace EmergenceSDK
 
         private void Instance_OnImageReady(string url, Texture2D texture)
         {
-            if (waitingForImageRequest && url == Persona.avatar.url)
+            if (waitingForImageRequest && url == Persona.avatar.meta.content.First().url)
             {
                 Persona.AvatarImage = texture;
                 photo.texture = Persona.AvatarImage;
@@ -142,7 +143,7 @@ namespace EmergenceSDK
 
         private void Instance_OnImageFailed(string url, string error, long errorCode)
         {
-            if (waitingForImageRequest && url == Persona.avatar.url)
+            if (waitingForImageRequest && url == Persona.avatar.meta.content.First().url)
             {
                 waitingForImageRequest = false;
                 Debug.LogError("[" + url + "] [" + errorCode + "] " + error);
