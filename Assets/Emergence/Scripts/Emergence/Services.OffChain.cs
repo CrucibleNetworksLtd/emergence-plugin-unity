@@ -274,77 +274,80 @@ namespace EmergenceSDK
             // StartCoroutine(CoroutineGetAvatars(address, success, error));
         }
 
-        private IEnumerator CoroutineGetAvatars(string address, SuccessAvatars success, GenericError error)
-        {
-            Debug.Log("Get Avatars request started");
-            string url = LocalEmergenceServer.Instance.Environment().AvatarURL + "byOwner?address=" + address;
-            Debug.Log("Requesting avatars from URL: " + url);
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                Debug.Log("AccessToken: " + currentAccessToken);
-                request.SetRequestHeader("Authorization", currentAccessToken);
-                yield return request.SendWebRequest();
-                PrintRequestResult("Get Avatars", request);
-
-                if (RequestError(request))
-                {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    Debug.Log("Avatar response: " + request.downloadHandler.text);
-                    GetAvatarsResponse response = SerializationHelper.Deserialize<GetAvatarsResponse>(request.downloadHandler.text);
-                    Debug.Log("Avatar response: " + response);
-                    success?.Invoke(response.message);
-                }
-            }
-        }
+        // private IEnumerator CoroutineGetAvatars(string address, SuccessAvatars success, GenericError error)
+        // {
+        //     Debug.Log("Get Avatars request started");
+        //     string url = LocalEmergenceServer.Instance.Environment().AvatarURL + "byOwner?address=" + address;
+        //     Debug.Log("Requesting avatars from URL: " + url);
+        //
+        //     using (UnityWebRequest request = UnityWebRequest.Get(url))
+        //     {
+        //         Debug.Log("AccessToken: " + currentAccessToken);
+        //         request.SetRequestHeader("Authorization", currentAccessToken);
+        //         yield return request.SendWebRequest();
+        //         PrintRequestResult("Get Avatars", request);
+        //
+        //         if (RequestError(request))
+        //         {
+        //             error?.Invoke(request.error, request.responseCode);
+        //         }
+        //         else
+        //         {
+        //             Debug.Log("Avatar response: " + request.downloadHandler.text);
+        //             GetAvatarsResponse response = SerializationHelper.Deserialize<GetAvatarsResponse>(request.downloadHandler.text);
+        //             Debug.Log("Avatar response: " + response);
+        //             success?.Invoke(response.message);
+        //         }
+        //     }
+        // }
 
         #endregion GetAvatars
         
         #region InventoryByOwner
 
-        public delegate void SuccessInventoryByOwner();
-        public void InventoryByOwner(string address, SuccessInventoryByOwner success, GenericError error)
+        public delegate void SuccessInventoryByOwner(List<InventoryItem> inventoryItems);
+        public async void InventoryByOwner(string address, SuccessInventoryByOwner success, GenericError error)
         {
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             Debug.Log("Getting inventory for address: " + address);
             Debug.Log("Inventory By Owner request started");
             string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "byOwner?address=" + address;
             Debug.Log("Requesting inventory from URL: " + url);
-            UniTask<string> response = PerformAsyncWebRequest(url);
+            string response = await PerformAsyncWebRequest(url);
             
             Debug.Log("Inventory response: " + response.ToString());
+            InventoryByOwnerResponse inventoryResponse = SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ToString());
+            
+            success?.Invoke(inventoryResponse.message.items);
             // StartCoroutine(CoroutineInventoryByOwner(address, success, error));
         }
 
-        private IEnumerator CoroutineInventoryByOwner(string address, SuccessInventoryByOwner success, GenericError error)
-        {
-            Debug.Log("Inventory By Owner request started");
-            string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "byOwner?address=" + address;
-            Debug.Log("Requesting inventory from URL: " + url);
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                Debug.Log("AccessToken: " + currentAccessToken);
-                request.SetRequestHeader("Authorization", currentAccessToken);
-                yield return request.SendWebRequest();
-                PrintRequestResult("Inventory By Owner", request);
-
-                if (RequestError(request))
-                {
-                    error?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    Debug.Log("Inventory response: " + request.downloadHandler.text);
-                    GetAvatarsResponse response = SerializationHelper.Deserialize<GetAvatarsResponse>(request.downloadHandler.text);
-                    Debug.Log("Inventory response: " + response);
-                    success?.Invoke();
-                }
-            }
-        }
+        // private IEnumerator CoroutineInventoryByOwner(string address, SuccessInventoryByOwner success, GenericError error)
+        // {
+        //     Debug.Log("Inventory By Owner request started");
+        //     string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "byOwner?address=" + address;
+        //     Debug.Log("Requesting inventory from URL: " + url);
+        //
+        //     using (UnityWebRequest request = UnityWebRequest.Get(url))
+        //     {
+        //         Debug.Log("AccessToken: " + currentAccessToken);
+        //         request.SetRequestHeader("Authorization", currentAccessToken);
+        //         yield return request.SendWebRequest();
+        //         PrintRequestResult("Inventory By Owner", request);
+        //
+        //         if (RequestError(request))
+        //         {
+        //             error?.Invoke(request.error, request.responseCode);
+        //         }
+        //         else
+        //         {
+        //             Debug.Log("Inventory response: " + request.downloadHandler.text);
+        //             GetAvatarsResponse response = SerializationHelper.Deserialize<GetAvatarsResponse>(request.downloadHandler.text);
+        //             Debug.Log("Inventory response: " + response);
+        //             success?.Invoke(new List<InventoryItem>());
+        //         }
+        //     }
+        // }
 
         #endregion InventoryByOwner
 

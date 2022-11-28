@@ -21,11 +21,16 @@ namespace EmergenceSDK
 
         [SerializeField]
         private GameObject editPersonaScreen;
+        
+        [SerializeField]
+        private GameObject myCollectionScreen;
 
         [Header("UI Reference")]
         public Button escButton;
         public Button escButtonOnboarding;
         public Button escButtonLogin;
+        public Button personasButton;
+        public Button collectionButton;
 
         [SerializeField]
         public GameObject disconnectModal;
@@ -37,6 +42,7 @@ namespace EmergenceSDK
             LogIn,
             Dashboard,
             EditPersona,
+            Collection,
         }
 
         private ScreenStates state = ScreenStates.WaitForServer;
@@ -59,6 +65,8 @@ namespace EmergenceSDK
             escButton.onClick.AddListener(OnEscButtonPressed);
             escButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
             escButtonLogin.onClick.AddListener(OnEscButtonPressed);
+            personasButton.onClick.AddListener(OnPersonaButtonPressed);
+            collectionButton.onClick.AddListener(OnCollectionButtonPressed);
 
             GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
 
@@ -80,6 +88,8 @@ namespace EmergenceSDK
             escButton.onClick.RemoveListener(OnEscButtonPressed);
             escButtonOnboarding.onClick.RemoveListener(OnEscButtonPressed);
             escButtonLogin.onClick.RemoveListener(OnEscButtonPressed);
+            personasButton.onClick.RemoveListener(OnPersonaButtonPressed);
+            collectionButton.onClick.RemoveListener(OnCollectionButtonPressed);
         }
 
         private void Start()
@@ -161,6 +171,26 @@ namespace EmergenceSDK
             OnButtonEsc?.Invoke();
         }
 
+        public delegate void ButtonPersona();
+
+        public static event ButtonPersona OnButtonPersona;
+
+        private void OnPersonaButtonPressed()
+        {
+            ShowDashboard();
+            OnButtonPersona?.Invoke();
+        }
+        
+        public delegate void ButtonCollection();
+
+        public static event ButtonCollection OnButtonCollection;
+
+        private void OnCollectionButtonPressed()
+        {
+            ShowCollection();
+            OnButtonCollection?.Invoke();
+        }
+
         private void ChangeState(ScreenStates state)
         {
             welcomeScreen.SetActive(false);
@@ -168,6 +198,7 @@ namespace EmergenceSDK
             dashboardScreen.SetActive(false);
             editPersonaScreen.SetActive(false);
             disconnectModal.SetActive(false);
+            myCollectionScreen.SetActive(false);
 
             this.state = state;
 
@@ -191,6 +222,10 @@ namespace EmergenceSDK
                     break;
                 case ScreenStates.EditPersona:
                     editPersonaScreen.SetActive(true);
+                    screensRoot.SetActive(true);
+                    break;
+                case ScreenStates.Collection:
+                    myCollectionScreen.SetActive(true);
                     screensRoot.SetActive(true);
                     break;
             }
@@ -222,6 +257,12 @@ namespace EmergenceSDK
         public void ShowEditPersona()
         {
             ChangeState(ScreenStates.EditPersona);
+        }
+
+        public void ShowCollection()
+        {
+            ChangeState(ScreenStates.Collection);
+            CollectionScreen.Instance.Refresh();
         }
 
         public void Restart()

@@ -7,8 +7,7 @@ using EmergenceSDK;
 public class DemoStationController : MonoBehaviour
 {
     [SerializeField] private GameObject instructions;
-    [SerializeField] private Emergence emergence;
-    
+
     public UnityEvent invokeMethod;
 
     void Start()
@@ -28,6 +27,6 @@ public class DemoStationController : MonoBehaviour
 
     public void OpenOverlay()
     {
-        emergence.OpenOverlay();
+        EmergenceSingleton.Instance.OpenEmergenceUI();
     }
 }

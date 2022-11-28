@@ -40,7 +40,7 @@ namespace EmergenceSDK
         
         public string avatarId;
         public string contractAddress;
-        public string tokneId;
+        public string tokenId;
         public string tokenURI;
         public string lastUpdated;
         public string chain;
