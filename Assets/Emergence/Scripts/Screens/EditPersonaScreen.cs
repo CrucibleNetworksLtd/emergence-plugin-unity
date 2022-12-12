@@ -1,8 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
+
+using UniGLTF;
+using UniVRM10;
 
 namespace EmergenceSDK
 {
@@ -300,6 +305,11 @@ namespace EmergenceSDK
                     });
                     break;
                 case States.EditAvatar:
+                    Debug.Log("Setting current avatar to: " + currentAvatar.meta.name);
+                    Debug.Log("Current avatar url: " + currentAvatar.meta.content[1].url);
+                    
+                    Services.Instance.SwapAvatars(currentAvatar.meta.content[1].url);
+                    
                     currentPersona.avatar = currentAvatar;
                     panelAvatar.SetActive(false);
                     panelInformation.SetActive(true);
@@ -310,7 +320,7 @@ namespace EmergenceSDK
                     break;
             }
         }
-
+        
         private void OnBackClicked()
         {
             switch (state)

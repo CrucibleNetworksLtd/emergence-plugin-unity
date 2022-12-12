@@ -12,7 +12,7 @@ namespace EmergenceSDK
         
         [SerializeField] private RawImage itemImage;
         public TextMeshProUGUI itemName;
-        public string url;
+        public string url { private get; set; }
         
         private void Awake()
         {
@@ -43,6 +43,8 @@ namespace EmergenceSDK
         {
             Debug.LogError("[" + url + "] " + error + " " + errorCode);
         }
+        
+        
 
     }
 }

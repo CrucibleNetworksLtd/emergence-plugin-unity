@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Networking;
+using UnityEngine;
+using UniGLTF;
+using UniVRM10;
 using Debug = UnityEngine.Debug;
 
 namespace EmergenceSDK
@@ -159,6 +162,7 @@ namespace EmergenceSDK
             string jsonPersona = SerializationHelper.Serialize(persona);
 
             string url = LocalEmergenceServer.Instance.Environment().PersonaURL + "persona";
+            Debug.Log("Edit persona url: " + url);
 
             using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
@@ -272,6 +276,21 @@ namespace EmergenceSDK
             success?.Invoke(avatarResponse.message);
             
             // StartCoroutine(CoroutineGetAvatars(address, success, error));
+        }
+        
+        public async void SwapAvatars(string vrmURL)
+        {
+            UnityWebRequest request = UnityWebRequest.Get(vrmURL);
+            byte[] response = (await request.SendWebRequest()).downloadHandler.data;
+
+            var vrm10 = await Vrm10.LoadBytesAsync(response, true);
+            GameObject playerArmature = GameObject.Find("PlayerArmature");
+            var originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
+            vrm10.transform.position = playerArmature.transform.position;
+            vrm10.transform.rotation = Quaternion.identity;
+            vrm10.transform.parent = playerArmature.transform;
+            vrm10.name = vrm10.name + "_Imported_v1_0";
+            originalMesh.enabled = false;
         }
 
         // private IEnumerator CoroutineGetAvatars(string address, SuccessAvatars success, GenericError error)

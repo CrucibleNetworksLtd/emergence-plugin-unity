@@ -37,13 +37,13 @@ namespace EmergenceSDK
         }
 
         public delegate void ReadContractSuccess<T>(T response);
-        public static void ReadContract<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
+        public static void ReadMethod<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
         {
             Services.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.ReadContract<T, U>(contractAddress, methodName, body, (response) =>
+                    Services.Instance.ReadMethod<T, U>(contractAddress, methodName, body, (response) =>
                     {
                         success?.Invoke(response);
                     },
@@ -54,7 +54,7 @@ namespace EmergenceSDK
                 }
                 else
                 {
-                    Debug.LogError("Read contract wallet not connected");
+                    Debug.LogError("Read Method wallet not connected");
                     error?.Invoke("Wallet not connected", 1);
                 }
             },
@@ -65,13 +65,13 @@ namespace EmergenceSDK
         }
 
         public delegate void WriteContractSuccess<T>(T response);
-        public static void WriteContract<T, U>(string contractAddress, string methodName, string localAccountName, string gasprice, U body, WriteContractSuccess<T> success, GenericError error)
+        public static void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName, string gasprice, U body, WriteContractSuccess<T> success, GenericError error)
         {
             Services.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.WriteContract<T, U>(contractAddress, methodName, localAccountName, gasprice, body, (response) =>
+                    Services.Instance.WriteMethod<T, U>(contractAddress, methodName, localAccountName, gasprice, body, (response) =>
                     {
                         success?.Invoke(response);
                     },
@@ -82,7 +82,7 @@ namespace EmergenceSDK
                 }
                 else
                 {
-                    Debug.LogError("Write contract wallet not connected");
+                    Debug.LogError("Write Method wallet not connected");
                     error?.Invoke("Wallet not connected", 1);
                 }
             },

@@ -1,4 +1,5 @@
 ﻿using System;
+using StarterAssets;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -100,6 +101,13 @@ namespace EmergenceSDK
                     OnEmergenceUIVisibilityChanged?.Invoke(true);
                 }
             }
+            
+            // Disable player controls if found
+            ThirdPersonController charController = FindObjectOfType<ThirdPersonController>();
+            if (charController != null)
+            {
+                charController.enabled = false;
+            }
         }
 
         public void CloseOverlay()
@@ -113,6 +121,13 @@ namespace EmergenceSDK
             RestoreCursor();
             OnEmergenceUIClosed.Invoke();
             OnEmergenceUIVisibilityChanged?.Invoke(false);
+            
+            // Enable player controls
+            ThirdPersonController charController = FindObjectOfType<ThirdPersonController>();
+            if (charController != null)
+            {
+                charController.enabled = true;
+            }
         }
 
         #endregion Overlay

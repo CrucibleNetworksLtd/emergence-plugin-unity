@@ -44,7 +44,7 @@ namespace EmergenceSDK
             ContractHelper.LoadContract(contractAddress, ABI, () =>
             {
                 Debug.Log("Contract loaded");
-                ContractHelper.ReadContract<ReadContractTokenURIResponse, string[]>(contractAddress, "tokenURI", data, (response) =>
+                ContractHelper.ReadMethod<ReadContractTokenURIResponse, string[]>(contractAddress, "tokenURI", data, (response) =>
                 {
                     Debug.Log("Contract Read");
                     StartCoroutine(GetMetadata(response.response));

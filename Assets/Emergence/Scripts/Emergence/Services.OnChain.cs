@@ -817,7 +817,7 @@ namespace EmergenceSDK
         #region Read Method
 
         public delegate void ReadMethodSuccess<T>(T response);
-        public void ReadContract<T, U>(string contractAddress, string methodName, U body, ReadMethodSuccess<T> success, GenericError error)
+        public void ReadMethod<T, U>(string contractAddress, string methodName, U body, ReadMethodSuccess<T> success, GenericError error)
         {
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineReadMethod<T, U>(contractAddress, methodName, body, success, error));
@@ -828,8 +828,12 @@ namespace EmergenceSDK
             Debug.Log("ReadMethod request started [" + contractAddress + "] / " + methodName);
 
             string url = LocalEmergenceServer.Instance.Environment().APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName;
+            
+            Debug.Log("ReadMethod url: " + url);
 
             string dataString = SerializationHelper.Serialize(body, false);
+            
+            Debug.Log("Data string: " + dataString);
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -851,7 +855,7 @@ namespace EmergenceSDK
         #region Write Method
 
         public delegate void WriteMethodSuccess<T>(T response);
-        public void WriteContract<T, U>(string contractAddress, string methodName, string localAccountName, string gasPrice, U body, WriteMethodSuccess<T> success, GenericError error)
+        public void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName, string gasPrice, U body, WriteMethodSuccess<T> success, GenericError error)
         {
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineWriteMethod<T, U>(contractAddress, methodName, localAccountName, gasPrice, body, success, error));
@@ -871,6 +875,8 @@ namespace EmergenceSDK
             }
 
             string url = LocalEmergenceServer.Instance.Environment().APIBase + "writeMethod?contractAddress=" + contractAddress + "&methodName=" + methodName + localAccountNameString + gasPriceString;
+            
+            Debug.Log("WriteMethod url: " + url);
 
             string dataString = SerializationHelper.Serialize(body, false);
 
