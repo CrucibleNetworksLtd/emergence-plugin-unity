@@ -60,6 +60,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -67,8 +68,7 @@ MonoBehaviour:
   m_text: Loading Emergence...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 031994eb5c175384ca2c4f429b24af78, type: 2}
-  m_sharedMaterial: {fileID: -2426909319969139822, guid: 031994eb5c175384ca2c4f429b24af78,
-    type: 2}
+  m_sharedMaterial: {fileID: -2426909319969139822, guid: 031994eb5c175384ca2c4f429b24af78, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -216,6 +216,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &2270906662828376546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,6 +295,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -330,7 +332,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3122056887335212770}
-  - component: {fileID: 4578423665131851711}
   - component: {fileID: 51037822}
   m_Layer: 0
   m_Name: Emergence
@@ -355,34 +356,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4578423665131851711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7199307401433611008}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf5e56923886cf145b8fd0a4509cd821, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  nodeURL: 
-  tokenSymbol: MATIC
-  launchEVMServerOnAwake: 0
-  launchEVMServerOnStart: 1
-  key: 9
-  shift: 1
-  ctrl: 0
-  OnEmergenceUIOpened:
-    m_PersistentCalls:
-      m_Calls: []
-  OnEmergenceUIClosed:
-    m_PersistentCalls:
-      m_Calls: []
-  OnEmergenceUIVisibilityChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &51037822
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -395,8 +368,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3621d27f4d229c646aae8cea4aa420de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Configuration: {fileID: 0}
-  LaunchHidden: 0
+  launchEVMServerOnAwake: 0
+  launchEVMServerOnStart: 1
+  Configuration: {fileID: 11400000, guid: 59ea788f73e88824c8d4aa8afe83df38, type: 2}
   key: 9
   shift: 1
   ctrl: 0
@@ -473,6 +447,7 @@ MonoBehaviour:
   m_Material: {fileID: 2100000, guid: 5b22f920c27128f47ba5880e046a5cb0, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -605,6 +580,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0.101960786, g: 0.06666667, b: 0.1882353, a: 1}
   m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:

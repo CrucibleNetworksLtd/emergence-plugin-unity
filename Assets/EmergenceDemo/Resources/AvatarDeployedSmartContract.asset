@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47186414874dd0d4f8021fc4966fa662, type: 3}
+  m_Name: AvatarDeployedSmartContract
+  m_EditorClassIdentifier: 
+  contractAddress: 0x074534df6174759a5ae3ad81e3bcdfc0f940f6a6
+  contract: {fileID: 11400000, guid: 9ad91216456a70046952060a37816f42, type: 2}
+  chain: {fileID: 11400000, guid: 10b6e0bfbe1f33c4b83a0deeae9380aa, type: 2}

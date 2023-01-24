@@ -269,14 +269,12 @@ namespace EmergenceSDK
             Debug.Log("Get Avatars request started");
             string url = LocalEmergenceServer.Instance.Environment().AvatarURL + "byOwner?address=" + address;
             Debug.Log("Requesting avatars from URL: " + url);
-            string response = await PerformAsyncWebRequest(url, error);
+            string response = await PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, error);
             
             Debug.Log("Avatar response: " + response.ToString());
             GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response.ToString());
             
             success?.Invoke(avatarResponse.message);
-            
-            // StartCoroutine(CoroutineGetAvatars(address, success, error));
         }
         
         public async void SwapAvatars(string vrmURL)
@@ -288,38 +286,19 @@ namespace EmergenceSDK
             GameObject playerArmature = GameObject.Find("PlayerArmature");
             var originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
             vrm10.transform.position = playerArmature.transform.position;
-            vrm10.transform.rotation = Quaternion.identity;
+            vrm10.transform.rotation = playerArmature.transform.rotation;
             vrm10.transform.parent = playerArmature.transform;
             vrm10.name = vrm10.name + "_Imported_v1_0";
-            originalMesh.enabled = false;
-        }
+            
+            await UniTask.DelayFrame(1); 
+            
+            UnityEngine.Avatar vrmAvatar = vrm10.GetComponent<Animator>().avatar;
+            playerArmature.GetComponent<Animator>().avatar = vrmAvatar;
 
-        // private IEnumerator CoroutineGetAvatars(string address, SuccessAvatars success, GenericError error)
-        // {
-        //     Debug.Log("Get Avatars request started");
-        //     string url = LocalEmergenceServer.Instance.Environment().AvatarURL + "byOwner?address=" + address;
-        //     Debug.Log("Requesting avatars from URL: " + url);
-        //
-        //     using (UnityWebRequest request = UnityWebRequest.Get(url))
-        //     {
-        //         Debug.Log("AccessToken: " + currentAccessToken);
-        //         request.SetRequestHeader("Authorization", currentAccessToken);
-        //         yield return request.SendWebRequest();
-        //         PrintRequestResult("Get Avatars", request);
-        //
-        //         if (RequestError(request))
-        //         {
-        //             error?.Invoke(request.error, request.responseCode);
-        //         }
-        //         else
-        //         {
-        //             Debug.Log("Avatar response: " + request.downloadHandler.text);
-        //             GetAvatarsResponse response = SerializationHelper.Deserialize<GetAvatarsResponse>(request.downloadHandler.text);
-        //             Debug.Log("Avatar response: " + response);
-        //             success?.Invoke(response.message);
-        //         }
-        //     }
-        // }
+            vrm10.gameObject.GetComponent<Animator>().enabled = false;
+
+                originalMesh.enabled = false;
+        }
 
         #endregion GetAvatars
         
@@ -338,7 +317,7 @@ namespace EmergenceSDK
                 Debug.Log("Inventory By Owner request started");
                 string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "byOwner?address=" + address;
                 Debug.Log("Requesting inventory from URL: " + url);
-                string response = await PerformAsyncWebRequest(url, error);
+                string response = await PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, error);
 
                 Debug.Log("Inventory response: " + response.ToString());
                 InventoryByOwnerResponse inventoryResponse =
@@ -350,6 +329,18 @@ namespace EmergenceSDK
             
         }
 
+        // public async void WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, BaseResponse<string> success, GenericError error)
+        // {
+        //     if (!LocalEmergenceServer.Instance.CheckEnv())
+        //     {
+        //         return;
+        //     }
+        //     
+        //     
+        //     string response = await PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPUT, error);
+        //     Debug.Log("WriteDynamicMetadata response: " + response.ToString());
+        // }
+        
         // private IEnumerator CoroutineInventoryByOwner(string address, SuccessInventoryByOwner success, GenericError error)
         // {
         //     Debug.Log("Inventory By Owner request started");
@@ -380,22 +371,35 @@ namespace EmergenceSDK
         #endregion InventoryByOwner
         
         #region WriteDynamicMetadata
-        public delegate void SuccessWriteDynamicMetadata(List<InventoryItem> inventoryItems);
-        public async void WriteDynamicMetadata(string network, string contract, string tokenId, SuccessWriteDynamicMetadata success, GenericError error)
+        public delegate void SuccessWriteDynamicMetadata(string response);
+        public async void WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, GenericError error)
         {
+            metadata = "{\"metadata\": \"" + metadata + "\"}";
+
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             Debug.Log("Writing dynamic metadata for contract: " + contract);
             Debug.Log("Write dynamic metadata request started");
-            string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "byOwner?address=" + address;
-            string response = await PerformAsyncWebRequest(url, error);
+            string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "updateMetadata?network=" + network + "&contract=" + contract + "&tokenId=" + tokenId;
             
-            Debug.Log("Inventory response: " + response.ToString());
+            Debug.Log("Dynamic metadata url: " + url);
+            Debug.Log("updated metadata: " + metadata);
+            
+            string response = await PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, error, metadata);
+            
+            Debug.Log("Write dynamic metadata response: " + response.ToString());
             InventoryByOwnerResponse inventoryResponse = SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ToString());
             
-            success?.Invoke(inventoryResponse.message.items);
-            // StartCoroutine(CoroutineInventoryByOwner(address, success, error));
+            success?.Invoke(response.ToString());
+           
         }
         #endregion WriteDynamicMetadata
+
+        public void OpenNFTPicker()
+        {
+            EmergenceSingleton.Instance.OpenEmergenceUI();
+            ScreenManager.Instance.ShowCollection(true);
+            
+        }
 
         #endregion AWS API
     }

@@ -197,13 +197,23 @@ namespace EmergenceSDK
             return isOk;
         }
 
-        private async UniTask<string> PerformAsyncWebRequest(string url, GenericError error)
+        private async UniTask<string> PerformAsyncWebRequest(string url, string method, GenericError error, string bodyData = "")
         {
-            UnityWebRequest request = UnityWebRequest.Get(url);
+            // UnityWebRequest request; = new UnityWebRequest(url, method); //UnityWebRequest.Get(url);
+            UnityWebRequest request;
+            if (method.Equals(UnityWebRequest.kHttpVerbGET))
+            {
+                request = UnityWebRequest.Get(url);
+            }
+            else
+            {
+                request = UnityWebRequest.Post(url, bodyData);
+                request.SetRequestHeader("Content-Type", "application/json");
+            }
             try
             {
                 Debug.Log("AccessToken: " + currentAccessToken);
-                request.SetRequestHeader("Authorization", currentAccessToken);
+                request.SetRequestHeader("Authorization-header", currentAccessToken);
                 return (await request.SendWebRequest()).downloadHandler.text;
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))

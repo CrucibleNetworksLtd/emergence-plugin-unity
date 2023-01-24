@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47186414874dd0d4f8021fc4966fa662, type: 3}
+  m_Name: DeployedCounterSmartContract
+  m_EditorClassIdentifier: 
+  contractAddress: 0xC9571AaF9EbCa8C08EC37D962310d0Ab9F8A5Dd2
+  contract: {fileID: 11400000, guid: 9c227bd1f290f4d47abfa18faca8bd78, type: 2}
+  chain: {fileID: 11400000, guid: f83c7faeb452eab4c83051e3d97f008c, type: 2}

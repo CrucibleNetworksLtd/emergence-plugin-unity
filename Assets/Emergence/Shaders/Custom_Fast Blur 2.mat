@@ -24,11 +24,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _BlurAmount: 10
+    - _BlurAmount: 26.5
     - _ColorMask: 15
-    - _Directions: 16
-    - _Quality: 4
-    - _Size: 2
+    - _Directions: 32
+    - _Quality: 32
+    - _Size: 3
     - _Stencil: 0
     - _StencilComp: 8
     - _StencilOp: 0
@@ -37,3 +37,4 @@ Material:
     - _UseUIAlphaClip: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
