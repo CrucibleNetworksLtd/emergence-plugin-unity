@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -260,7 +261,7 @@ namespace EmergenceSDK
         #region GetAvatars
 
         public delegate void SuccessAvatars(List<Avatar> avatar);
-        public async void GetAvatars(string address, SuccessAvatars success, GenericError error)
+        public async void AvatarByOwner(string address, SuccessAvatars success, GenericError error)
         {
             if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             Debug.Log("Getting avatars for address: " + address);
@@ -268,7 +269,7 @@ namespace EmergenceSDK
             Debug.Log("Get Avatars request started");
             string url = LocalEmergenceServer.Instance.Environment().AvatarURL + "byOwner?address=" + address;
             Debug.Log("Requesting avatars from URL: " + url);
-            string response = await PerformAsyncWebRequest(url);
+            string response = await PerformAsyncWebRequest(url, error);
             
             Debug.Log("Avatar response: " + response.ToString());
             GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response.ToString());
@@ -327,18 +328,26 @@ namespace EmergenceSDK
         public delegate void SuccessInventoryByOwner(List<InventoryItem> inventoryItems);
         public async void InventoryByOwner(string address, SuccessInventoryByOwner success, GenericError error)
         {
-            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
-            Debug.Log("Getting inventory for address: " + address);
-            Debug.Log("Inventory By Owner request started");
-            string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "byOwner?address=" + address;
-            Debug.Log("Requesting inventory from URL: " + url);
-            string response = await PerformAsyncWebRequest(url);
+          
+                if (!LocalEmergenceServer.Instance.CheckEnv())
+                {
+                    return;
+                }
+
+                Debug.Log("Getting inventory for address: " + address);
+                Debug.Log("Inventory By Owner request started");
+                string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "byOwner?address=" + address;
+                Debug.Log("Requesting inventory from URL: " + url);
+                string response = await PerformAsyncWebRequest(url, error);
+
+                Debug.Log("Inventory response: " + response.ToString());
+                InventoryByOwnerResponse inventoryResponse =
+                    SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ToString());
+
+                success?.Invoke(inventoryResponse.message.items);
+                // StartCoroutine(CoroutineInventoryByOwner(address, success, error));
             
-            Debug.Log("Inventory response: " + response.ToString());
-            InventoryByOwnerResponse inventoryResponse = SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ToString());
             
-            success?.Invoke(inventoryResponse.message.items);
-            // StartCoroutine(CoroutineInventoryByOwner(address, success, error));
         }
 
         // private IEnumerator CoroutineInventoryByOwner(string address, SuccessInventoryByOwner success, GenericError error)
@@ -369,6 +378,24 @@ namespace EmergenceSDK
         // }
 
         #endregion InventoryByOwner
+        
+        #region WriteDynamicMetadata
+        public delegate void SuccessWriteDynamicMetadata(List<InventoryItem> inventoryItems);
+        public async void WriteDynamicMetadata(string network, string contract, string tokenId, SuccessWriteDynamicMetadata success, GenericError error)
+        {
+            if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
+            Debug.Log("Writing dynamic metadata for contract: " + contract);
+            Debug.Log("Write dynamic metadata request started");
+            string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "byOwner?address=" + address;
+            string response = await PerformAsyncWebRequest(url, error);
+            
+            Debug.Log("Inventory response: " + response.ToString());
+            InventoryByOwnerResponse inventoryResponse = SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ToString());
+            
+            success?.Invoke(inventoryResponse.message.items);
+            // StartCoroutine(CoroutineInventoryByOwner(address, success, error));
+        }
+        #endregion WriteDynamicMetadata
 
         #endregion AWS API
     }

@@ -250,7 +250,7 @@ namespace EmergenceSDK
                 string processId = " --processid=" + System.Diagnostics.Process.GetCurrentProcess().Id;
 
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.FileName = "Server\\EmergenceEVMLocalServer.exe";
+                startInfo.FileName = "EmergenceEVMLocalServer.exe";
                 if (!string.IsNullOrEmpty(Environment().CustomEmergenceServerLocation) && File.Exists(Environment().CustomEmergenceServerLocation))
                 {
                     startInfo.FileName = Environment().CustomEmergenceServerLocation;

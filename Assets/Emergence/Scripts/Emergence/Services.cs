@@ -197,18 +197,19 @@ namespace EmergenceSDK
             return isOk;
         }
 
-        private async UniTask<string> PerformAsyncWebRequest(string url)
+        private async UniTask<string> PerformAsyncWebRequest(string url, GenericError error)
         {
+            UnityWebRequest request = UnityWebRequest.Get(url);
             try
             {
-                UnityWebRequest request = UnityWebRequest.Get(url);
                 Debug.Log("AccessToken: " + currentAccessToken);
                 request.SetRequestHeader("Authorization", currentAccessToken);
                 return (await request.SendWebRequest()).downloadHandler.text;
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                return "Error with web request: " + ex.Message;
+                error?.Invoke(request.error, request.responseCode);
+                return ex.Message;
             }
         }
 

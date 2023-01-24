@@ -16,18 +16,10 @@ namespace EmergenceSDK
         public GameObject itemEntryPrefab;
         public GameObject itemsListPanel;
         public GameObject detailsPanel;
+        public TextMeshProUGUI itemNameText;
+        public TextMeshProUGUI itemDescriptionText;
 
         private bool isItemSelected = false;
-
-        // private enum States
-        // {
-        //     CreateAvatar,
-        //     CreateInformation,
-        //     EditInformation,
-        //     EditAvatar,
-        // }
-        //
-        // private States state;
 
         private void Awake()
         {
@@ -48,7 +40,8 @@ namespace EmergenceSDK
                         GameObject entry = Instantiate(itemEntryPrefab);
 
                         Button entryButton = entry.GetComponent<Button>();
-                        entryButton.onClick.AddListener(OnInventoryItemPressed);
+                        InventoryItem item = inventoryItems[i];
+                        entryButton.onClick.AddListener(() => OnInventoryItemPressed(item));
                         
                         InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
                         itemEntry.itemName.text = inventoryItems[i]?.meta?.name;
@@ -68,8 +61,14 @@ namespace EmergenceSDK
                 });
         }
 
-        public void OnInventoryItemPressed()
+        public void OnInventoryItemPressed(InventoryItem item)
         {
+            
+            
+
+            itemNameText.text = item.meta.name;
+            itemDescriptionText.text = item.meta.description;
+            
             if (!isItemSelected)
             {
                 DOTween.To(() => detailsPanel.GetComponent<RectTransform>().anchoredPosition,
@@ -77,6 +76,8 @@ namespace EmergenceSDK
                 
                 DOTween.To(() => itemsListPanel.GetComponent<RectTransform>().offsetMax,
                     x=> itemsListPanel.GetComponent<RectTransform>().offsetMax = x, new Vector2(-443.5f, 0), 0.25f);
+
+                isItemSelected = true;
             }
         }
 

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LocalDev
   m_EditorClassIdentifier: 
   APIBase: 
-  Chain: {fileID: 11400000, guid: 10b6e0bfbe1f33c4b83a0deeae9380aa, type: 2}
+  Chain: {fileID: 11400000, guid: f83c7faeb452eab4c83051e3d97f008c, type: 2}
   AvatarURL: https://dysaw5zhak.us-east-1.awsapprunner.com/AvatarSystem/
   InventoryURL: https://dysaw5zhak.us-east-1.awsapprunner.com/InventoryService/
   PersonaURL: https://x8iq9e5fq1.execute-api.us-east-1.amazonaws.com/staging/

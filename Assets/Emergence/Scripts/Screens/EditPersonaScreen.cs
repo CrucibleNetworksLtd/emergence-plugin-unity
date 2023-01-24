@@ -188,7 +188,7 @@ namespace EmergenceSDK
 
             go.GetComponent<AvatarScrollItem>().Refresh(defaultImage, null);
 
-            Services.Instance.GetAvatars(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
+            Services.Instance.AvatarByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
             {
                 Modal.Instance.Show("Retrieving avatar images...");
                 requestingInProgress = true;
