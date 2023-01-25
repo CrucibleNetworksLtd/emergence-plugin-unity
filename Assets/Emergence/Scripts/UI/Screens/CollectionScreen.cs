@@ -1,20 +1,48 @@
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-using UniGLTF;
 using UniVRM10;
-using Cysharp.Threading.Tasks;
 
 namespace EmergenceSDK
 {
+    
     public class CollectionScreen : MonoBehaviour
     {
+        struct Item
+        {
+            public InventoryItem inventoryItem;
+            public GameObject entryGo;
+            public Item(InventoryItem inventoryItem, GameObject entryGo)
+            {
+                this.inventoryItem = inventoryItem;
+                this.entryGo = entryGo;
+            }
+        
+        }
+        
+        private class FilterParams
+        {
+            public string searchString ;
+            public bool avatars;
+            public bool props;
+            public bool clothing;
+            public bool weapons;
+            public int blockchain;
+            public FilterParams()
+            {
+                searchString = "";
+                avatars = true;
+                props = true;
+                clothing = true;
+                weapons = true;
+                blockchain = -1;
+            }
+        }
+        
         public static CollectionScreen Instance;
 
         public GameObject contentGO;
@@ -24,27 +52,54 @@ namespace EmergenceSDK
         public TextMeshProUGUI itemNameText;
         public TextMeshProUGUI itemDescriptionText;
         public TextMeshProUGUI dynamicMetadata;
+        public TMP_InputField searchInputField;
+        public Toggle avatarsToggle;
+        public Toggle propsToggle;
+        public Toggle clothingToggle;
+        public Toggle weaponsToggle;
+        public TMP_Dropdown blockchainDropdown;
 
         private bool isItemSelected = false;
         private InventoryItem selectedItem;
 
+        private List<Item> items = new List<Item>();
+
+        private FilterParams filterParams = new FilterParams();
+
         private void Awake()
         {
             Instance = this;
-
-            detailsPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(443.5f, 0, 0);
+            detailsPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(Screen.width, 0, 0);
+            
+            searchInputField.onValueChanged.AddListener(OnSearchFieldValueChanged);
+            avatarsToggle.onValueChanged.AddListener(onAvatarsToggleValueChanged);
+            propsToggle.onValueChanged.AddListener(onPropsToggleValueChanged);
+            clothingToggle.onValueChanged.AddListener(onClothingToggleValueChanged);
+            weaponsToggle.onValueChanged.AddListener(onWeaponsToggleValueChanged);
+            
+            blockchainDropdown.onValueChanged.AddListener(onBlockchainDropdownValueChanged);
         }
         
         public void Refresh(bool dynamicMetada = false)
         {
             Services.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
                 {
+
+                    foreach (var item in items)
+                    {
+                        Destroy(item.entryGo);
+                    }
+                    items.Clear();
+                    
+                    
                     Debug.Log("Received items: " + inventoryItems.Count);
                     Modal.Instance.Show("Retrieving inventory items...");
                     
                     for (int i = 0; i < inventoryItems.Count; i++)
                     {
                         GameObject entry = Instantiate(itemEntryPrefab);
+                        
+                        items.Add(new Item(inventoryItems[i], entry));
 
                         Button entryButton = entry.GetComponent<Button>();
                         InventoryItem item = inventoryItems[i];
@@ -60,12 +115,11 @@ namespace EmergenceSDK
                         
                         
                         InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
-                        itemEntry.itemName.text = inventoryItems[i]?.meta?.name;
-                        itemEntry.url = inventoryItems[i]?.meta?.content?.First().url;
-                        itemEntry.SetImageUrl(inventoryItems[i]?.meta?.content?.First().url);
-                        
+                        itemEntry.SetItem(inventoryItems[i]);
+
                         entry.transform.SetParent(contentGO.transform, false);
                     }
+                    
                     
                     Modal.Instance.Hide();
                     
@@ -75,6 +129,59 @@ namespace EmergenceSDK
                     Debug.LogError("[" + code + "] " + error);
                     Modal.Instance.Hide();
                 });
+        }
+
+        private void RefreshFilteredResults()
+        {
+            foreach (var item in items)
+            {
+                string name = item.inventoryItem.meta?.name;
+                if (string.IsNullOrEmpty(name) || name.ToLower().StartsWith(filterParams.searchString.ToLower()) || string.IsNullOrEmpty(filterParams.searchString))
+                {
+                    item.entryGo.SetActive(true);
+                }
+                else
+                {
+                    item.entryGo.SetActive(false);
+                }
+            }
+        }
+
+        private void OnSearchFieldValueChanged(string searchString)
+        {
+            filterParams.searchString = searchString;
+            RefreshFilteredResults();
+        }
+
+        private void onAvatarsToggleValueChanged(bool selected)
+        {
+            filterParams.avatars = selected;
+            RefreshFilteredResults();
+        }
+        
+        private void onPropsToggleValueChanged(bool selected)
+        {
+            filterParams.props = selected;
+            RefreshFilteredResults();
+        }
+        
+        private void onClothingToggleValueChanged(bool selected)
+        {
+            filterParams.clothing = selected;
+            RefreshFilteredResults();
+        }
+        
+        private void onWeaponsToggleValueChanged(bool selected)
+        {
+            filterParams.weapons = selected;
+            RefreshFilteredResults();
+        }
+
+        private void onBlockchainDropdownValueChanged(int selection)
+        {
+            Debug.Log("Dropdown");
+            filterParams.blockchain = selection;
+            RefreshFilteredResults();
         }
 
         public void OnInventoryItemPressed(InventoryItem item)

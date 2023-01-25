@@ -64,9 +64,10 @@ public class DemoInventoryService : MonoBehaviour
                     // entryButton.onClick.AddListener(OnInventoryItemPressed);
                         
                     InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
-                    itemEntry.itemName.text = inventoryItems[i]?.meta?.name;
-                    itemEntry.url = inventoryItems[i]?.meta?.content?.First().url;
-                    itemEntry.SetImageUrl(inventoryItems[i]?.meta?.content?.First().url);
+                    itemEntry.SetItem(inventoryItems[i]);
+                    // itemEntry.itemName.text = inventoryItems[i]?.meta?.name;
+                    // itemEntry.url = inventoryItems[i]?.meta?.content?.First().url;
+                    // itemEntry.SetImageUrl(inventoryItems[i]?.meta?.content?.First().url);
                         
                     entry.transform.SetParent(contentGO.transform, false);
                 }

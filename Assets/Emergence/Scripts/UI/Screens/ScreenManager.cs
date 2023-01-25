@@ -31,6 +31,8 @@ namespace EmergenceSDK
         public Button escButtonLogin;
         public Button personasButton;
         public Button collectionButton;
+        public Toggle personasToggle;
+        public Toggle collectionToggle;
 
         [SerializeField]
         public GameObject disconnectModal;
@@ -65,8 +67,11 @@ namespace EmergenceSDK
             escButton.onClick.AddListener(OnEscButtonPressed);
             escButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
             escButtonLogin.onClick.AddListener(OnEscButtonPressed);
-            personasButton.onClick.AddListener(OnPersonaButtonPressed);
-            collectionButton.onClick.AddListener(OnCollectionButtonPressed);
+            
+            // personasButton.onClick.AddListener(OnPersonaButtonPressed);
+            // collectionButton.onClick.AddListener(OnCollectionButtonPressed);
+            personasToggle.onValueChanged.AddListener(OnPersonaButtonPressed);
+            collectionToggle.onValueChanged.AddListener(OnCollectionButtonPressed);
 
             GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
 
@@ -88,8 +93,10 @@ namespace EmergenceSDK
             escButton.onClick.RemoveListener(OnEscButtonPressed);
             escButtonOnboarding.onClick.RemoveListener(OnEscButtonPressed);
             escButtonLogin.onClick.RemoveListener(OnEscButtonPressed);
-            personasButton.onClick.RemoveListener(OnPersonaButtonPressed);
-            collectionButton.onClick.RemoveListener(OnCollectionButtonPressed);
+            // personasButton.onClick.RemoveListener(OnPersonaButtonPressed);
+            // collectionButton.onClick.RemoveListener(OnCollectionButtonPressed);
+            personasToggle.onValueChanged.RemoveListener(OnPersonaButtonPressed);
+            collectionToggle.onValueChanged.RemoveListener(OnCollectionButtonPressed);
         }
 
         private void Start()
@@ -175,8 +182,9 @@ namespace EmergenceSDK
 
         public static event ButtonPersona OnButtonPersona;
 
-        private void OnPersonaButtonPressed()
+        private void OnPersonaButtonPressed(bool selected)
         {
+            if (!selected) return;
             ShowDashboard();
             OnButtonPersona?.Invoke();
         }
@@ -185,8 +193,9 @@ namespace EmergenceSDK
 
         public static event ButtonCollection OnButtonCollection;
 
-        private void OnCollectionButtonPressed()
+        private void OnCollectionButtonPressed(bool selected)
         {
+            if (!selected) return;
             ShowCollection();
             OnButtonCollection?.Invoke();
         }

@@ -5,9 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
-    path: Assets/Emergence/Demo/Emergence Demo Scene.unity
-    guid: 9ac0d0010bbf4204594572e7269655ab
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Emergence/Scenes/Emergence.unity
     guid: d046979703aa7324ebb8d872d06f6a59

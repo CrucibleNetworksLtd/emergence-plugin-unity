@@ -1,6 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,9 +9,11 @@ namespace EmergenceSDK
     {
         
         [SerializeField] private RawImage itemImage;
-        public TextMeshProUGUI itemName;
-        public string url { private get; set; }
-        
+        [SerializeField] private TextMeshProUGUI itemName;
+        private string url;
+
+        private InventoryItem item;
+
         private void Awake()
         {
             RequestImage.Instance.OnImageReady += Instance_OnImageReady;
@@ -26,6 +26,14 @@ namespace EmergenceSDK
             RequestImage.Instance.OnImageFailed -= Instance_OnImageFailed;
         }
 
+        public void SetItem(InventoryItem item)
+        {
+            this.item = item;
+            
+            itemName.text = item?.meta?.name;
+            SetImageUrl(item?.meta?.content?.First().url);
+        }
+
         public void SetImageUrl(string url)
         {
             RequestImage.Instance.AskForImage(url);
@@ -33,7 +41,7 @@ namespace EmergenceSDK
         
         private void Instance_OnImageReady(string _url, Texture2D texture)
         {
-            if (_url.Equals(url))
+            if (_url.Equals(item?.meta?.content?.First().url))
             {
                 itemImage.texture = texture;
             }
