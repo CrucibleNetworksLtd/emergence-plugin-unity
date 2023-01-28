@@ -3606,7 +3606,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 882507575}
   m_HandleRect: {fileID: 882507574}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -4133,9 +4133,6 @@ MonoBehaviour:
   avatarScrollItemsPool: {fileID: 974858287}
   nameIF: {fileID: 6424803331065271068}
   bioIF: {fileID: 2119715958}
-  availableOnSearchesToggle: {fileID: 0}
-  showingMyStatusToggle: {fileID: 0}
-  receiveContactRequestsToggle: {fileID: 0}
   deleteButton: {fileID: 4838606486741240241}
   editGOs:
   - {fileID: 7091028340078456422}
@@ -5126,7 +5123,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 483220476}
   m_HandleRect: {fileID: 483220475}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -6390,7 +6387,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2058410505}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -9391,8 +9388,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1576765858}
   - component: {fileID: 1576765861}
+  - component: {fileID: 1576765863}
   - component: {fileID: 1576765860}
   - component: {fileID: 1576765859}
+  - component: {fileID: 1576765862}
   m_Layer: 5
   m_Name: Template
   m_TagString: Untagged
@@ -9489,6 +9488,39 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1576765857}
   m_CullTransparentMesh: 1
+--- !u!223 &1576765862
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576765857}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 1
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!114 &1576765863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576765857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ef7d5072265b6f42a18009a51ca2d3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1578887741
 GameObject:
   m_ObjectHideFlags: 0

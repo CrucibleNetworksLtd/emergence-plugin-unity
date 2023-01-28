@@ -31,7 +31,7 @@ namespace EmergenceSDK
             public bool props;
             public bool clothing;
             public bool weapons;
-            public int blockchain;
+            public string blockchain;
             public FilterParams()
             {
                 searchString = "";
@@ -39,7 +39,7 @@ namespace EmergenceSDK
                 props = true;
                 clothing = true;
                 weapons = true;
-                blockchain = -1;
+                blockchain = "ANY";
             }
         }
         
@@ -135,8 +135,19 @@ namespace EmergenceSDK
         {
             foreach (var item in items)
             {
-                string name = item.inventoryItem.meta?.name;
-                if (string.IsNullOrEmpty(name) || name.ToLower().StartsWith(filterParams.searchString.ToLower()) || string.IsNullOrEmpty(filterParams.searchString))
+                // Search string
+                string itemName = item.inventoryItem.meta?.name.ToLower();
+                string itemBlockchain = item.inventoryItem.blockchain;
+
+                bool searchStringResult = string.IsNullOrEmpty(itemName) ||
+                                          itemName.StartsWith(filterParams.searchString.ToLower()) ||
+                                          string.IsNullOrEmpty(filterParams.searchString);
+
+                bool blockchainResult = filterParams.blockchain.Equals("ANY") ||
+                                        itemBlockchain.Equals(filterParams.blockchain);
+                
+                // if (string.IsNullOrEmpty(itemName) || itemName.StartsWith(filterParams.searchString.ToLower()) || string.IsNullOrEmpty(filterParams.searchString))
+                if (searchStringResult && blockchainResult)
                 {
                     item.entryGo.SetActive(true);
                 }
@@ -179,8 +190,8 @@ namespace EmergenceSDK
 
         private void onBlockchainDropdownValueChanged(int selection)
         {
-            Debug.Log("Dropdown");
-            filterParams.blockchain = selection;
+            Debug.Log(blockchainDropdown.options[selection].text);
+            filterParams.blockchain = blockchainDropdown.options[selection].text.ToUpper();
             RefreshFilteredResults();
         }
 

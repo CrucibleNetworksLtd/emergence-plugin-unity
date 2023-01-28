@@ -40,34 +40,57 @@ namespace EmergenceSDK
                     if (timeRemaining <= 0.0f)
                     {
                         timeRemaining += QRRefreshTimeOut;
-                        Services.Instance.ReinitializeWalletConnect((disconnected) =>
-                        {
-                            Services.Instance.Handshake((walletAddress) =>
-                            {
-                                state = States.RefreshAccessToken;
-                                HeaderScreen.Instance.Refresh(walletAddress);
-                            },
-                            (error, code) =>
-                            {
-                                Debug.LogError("[" + code + "] " + error);
-                                Reinitialize();
-                            });
 
-                            Services.Instance.GetQRCode((texture) =>
+                        Services.Instance.GetQRCode((texture, deviceId) =>
                             {
+                                EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
                                 rawQRImage.texture = texture;
+
+                                Services.Instance.Handshake((walletAddress) =>
+                                    {
+                                        state = States.RefreshAccessToken;
+                                        HeaderScreen.Instance.Refresh(walletAddress);
+                                    },
+                                    (error, code) =>
+                                    {
+                                        Debug.LogError("[" + code + "] " + error);
+                                        Reinitialize();
+                                    });
                             },
                             (error, code) =>
                             {
                                 Debug.LogError("[" + code + "] " + error);
                                 Reinitialize();
                             });
-                        },
-                        (error, code) =>
-                        {
-                            Debug.LogError("[" + code + "] " + error);
-                            Reinitialize();
-                        });
+                        //
+                        // Services.Instance.ReinitializeWalletConnect((disconnected) =>
+                        // {
+                        //     Services.Instance.Handshake((walletAddress) =>
+                        //     {
+                        //         state = States.RefreshAccessToken;
+                        //         HeaderScreen.Instance.Refresh(walletAddress);
+                        //     },
+                        //     (error, code) =>
+                        //     {
+                        //         Debug.LogError("[" + code + "] " + error);
+                        //         Reinitialize();
+                        //     });
+                        //
+                        //     Services.Instance.GetQRCode((texture) =>
+                        //     {
+                        //         rawQRImage.texture = texture;
+                        //     },
+                        //     (error, code) =>
+                        //     {
+                        //         Debug.LogError("[" + code + "] " + error);
+                        //         Reinitialize();
+                        //     });
+                        // },
+                        // (error, code) =>
+                        // {
+                        //     Debug.LogError("[" + code + "] " + error);
+                        //     Reinitialize();
+                        // });
                     }
 
                     refreshCounterText.text = timeRemaining.ToString("0");

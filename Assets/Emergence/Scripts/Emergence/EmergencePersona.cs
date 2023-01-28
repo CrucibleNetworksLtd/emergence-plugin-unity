@@ -14,25 +14,25 @@ public class EmergencePersona
     public EmergenceAvatar Avatar { get; }
     public string AvatarId { get; }
 
-    public EmergencePersona(string _json)
-    {
-        var serializedPersona = JsonConvert.DeserializeAnonymousType(_json, new { id = "", name = "", bio = "", settings = "", avatar = "", avatarid = "" });
-        Id = serializedPersona.id;
-        Name = serializedPersona.name;
-        Bio = serializedPersona.bio;
-        Settings = JsonConvert.DeserializeObject<EmergencePersonaSettings>(serializedPersona.settings);
-        Avatar = JsonConvert.DeserializeObject<EmergenceAvatar>(serializedPersona.avatar);
-        AvatarId = serializedPersona.avatarid;
-    }
-    public EmergencePersona(string _id, string _name, string _bio, EmergencePersonaSettings _settings, EmergenceAvatar _avatar, string _avatarId)
-    {
-        Id = _id;
-        Name = _name;
-        Bio = _bio;
-        Settings = _settings;
-        Avatar = _avatar;
-        AvatarId = _avatarId;
-    }
+    // public EmergencePersona(string _json)
+    // {
+    //     var serializedPersona = JsonConvert.DeserializeAnonymousType(_json, new { id = "", name = "", bio = "", settings = "", avatar = "", avatarid = "" });
+    //     Id = serializedPersona.id;
+    //     Name = serializedPersona.name;
+    //     Bio = serializedPersona.bio;
+    //     Settings = JsonConvert.DeserializeObject<EmergencePersonaSettings>(serializedPersona.settings);
+    //     Avatar = JsonConvert.DeserializeObject<EmergenceAvatar>(serializedPersona.avatar);
+    //     AvatarId = serializedPersona.avatarid;
+    // }
+    // public EmergencePersona(string _id, string _name, string _bio, EmergencePersonaSettings _settings, EmergenceAvatar _avatar, string _avatarId)
+    // {
+    //     Id = _id;
+    //     Name = _name;
+    //     Bio = _bio;
+    //     Settings = _settings;
+    //     Avatar = _avatar;
+    //     AvatarId = _avatarId;
+    // }
 
 }
 

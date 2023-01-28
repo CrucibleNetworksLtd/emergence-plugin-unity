@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07fc96fcd841014799c96404c400a5e, type: 3}
   m_Name: DefaultConfiguration
   m_EditorClassIdentifier: 
-  APIBase: 
+  APIBase: http://evm.openmeta.xyz/api/
   Chain: {fileID: 11400000, guid: f83c7faeb452eab4c83051e3d97f008c, type: 2}
   AvatarURL: https://dysaw5zhak.us-east-1.awsapprunner.com/AvatarSystem/
   InventoryURL: https://dysaw5zhak.us-east-1.awsapprunner.com/InventoryService/

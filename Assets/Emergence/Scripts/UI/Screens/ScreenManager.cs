@@ -48,8 +48,9 @@ namespace EmergenceSDK
         }
 
         private ScreenStates state = ScreenStates.WaitForServer;
+        // private ScreenStates state = ScreenStates.LogIn;
 
-        private bool checkingForServer = false;
+        // private bool checkingForServer = false;
 
         public static ScreenManager Instance { get; private set; }
 
@@ -118,46 +119,47 @@ namespace EmergenceSDK
             switch (state)
             {
                 case ScreenStates.WaitForServer:
-                    Modal.Instance.Show("Waiting for server...");
-                    if (!checkingForServer)
-                    {
-                        checkingForServer = true;
-                        Services.Instance.IsConnected((connected) =>
-                            {
-                                Modal.Instance.Hide();
-                                Debug.Log("EVM server found");
-                                checkingForServer = false;
-
-                                if (connected && Services.Instance.HasAccessToken)
-                                {
-                                    ShowDashboard();
-                                }
-                                else
-                                {
-                                    ShowWelcome();
-                                }
-                            },
-                            (error, code) =>
-                            {
-                                Modal.Instance.Show("Server not found, trying to launch");
-                                Debug.LogWarning("EVM code not running, trying to launch");
-
-                                LocalEmergenceServer.Instance.LaunchLocalServerProcess();
-                                Modal.Instance.Hide();
-                                checkingForServer = false;
-                                ShowWelcome();
-
-                                //if (LocalEmergenceServer.Instance.LaunchLocalServerProcess())
-                                //{
-                                //}
-                                //else
-                                //{
-                                //    Debug.LogWarning("Couldn't launch EVM Server");
-                                //    ModalPromptOK.Instance.Show("Error running server");
-                                //    checkingForServer = false;
-                                //}
-                            });
-                    }
+                    ShowWelcome();
+                    // Modal.Instance.Show("Waiting for server...");
+                    // if (!checkingForServer)
+                    // {
+                    //     checkingForServer = true;
+                    //     Services.Instance.IsConnected((connected) =>
+                    //         {
+                    //             Modal.Instance.Hide();
+                    //             Debug.Log("EVM server found");
+                    //             checkingForServer = false;
+                    //
+                    //             if (connected && Services.Instance.HasAccessToken)
+                    //             {
+                    //                 ShowDashboard();
+                    //             }
+                    //             else
+                    //             {
+                    //                 ShowWelcome();
+                    //             }
+                    //         },
+                    //         (error, code) =>
+                    //         {
+                    //             Modal.Instance.Show("Server not found, trying to launch");
+                    //             Debug.LogWarning("EVM code not running, trying to launch");
+                    //
+                    //             LocalEmergenceServer.Instance.LaunchLocalServerProcess();
+                    //             Modal.Instance.Hide();
+                    //             checkingForServer = false;
+                    //             ShowWelcome();
+                    //
+                    //             //if (LocalEmergenceServer.Instance.LaunchLocalServerProcess())
+                    //             //{
+                    //             //}
+                    //             //else
+                    //             //{
+                    //             //    Debug.LogWarning("Couldn't launch EVM Server");
+                    //             //    ModalPromptOK.Instance.Show("Error running server");
+                    //             //    checkingForServer = false;
+                    //             //}
+                    //         });
+                    // }
                     break;
             }
         }

@@ -65,10 +65,7 @@ public class DemoInventoryService : MonoBehaviour
                         
                     InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
                     itemEntry.SetItem(inventoryItems[i]);
-                    // itemEntry.itemName.text = inventoryItems[i]?.meta?.name;
-                    // itemEntry.url = inventoryItems[i]?.meta?.content?.First().url;
-                    // itemEntry.SetImageUrl(inventoryItems[i]?.meta?.content?.First().url);
-                        
+
                     entry.transform.SetParent(contentGO.transform, false);
                 }
             },

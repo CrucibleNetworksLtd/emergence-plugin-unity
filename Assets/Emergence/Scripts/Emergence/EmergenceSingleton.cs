@@ -16,14 +16,16 @@ namespace EmergenceSDK
 
         public static string HAS_LOGGED_IN_ONCE_KEY = "HasLoggedInOnce";
         
-        [Header("EVM Server")]
-        [SerializeField]
-        private bool launchEVMServerOnAwake = false;
-
-        [SerializeField]
-        private bool launchEVMServerOnStart = true;
+        // [Header("EVM Server")]
+        // [SerializeField]
+        // private bool launchEVMServerOnAwake = false;
+        //
+        // [SerializeField]
+        // private bool launchEVMServerOnStart = true;
 
         public EmergenceConfiguration Configuration;
+
+        public string CurrentDeviceId;
         
         [System.Serializable]
         public enum Environment
@@ -33,10 +35,10 @@ namespace EmergenceSDK
         }
     
 
-        private bool UseNewInputSystem = true;
+        // private bool UseNewInputSystem = true;
 
         // [SerializeField]
-        private bool LaunchHidden = true;
+        // private bool LaunchHidden = true;
 
         [Header("Keyboard shortcut to open Emergence")] [SerializeField]
         private KeyCode key = KeyCode.Tab;
@@ -75,16 +77,6 @@ namespace EmergenceSDK
         // parameter value would be overwritten by the value set in the inspector
         [HideInInspector] public EmergenceUIStateChanged OnEmergenceUIVisibilityChanged;
         public EmergencePersona CurrentCachedPersona { get; set; }
-
-        /// <summary>
-        /// Shortcut to .Instance. Use .Instance instead.
-        /// </summary>
-        /// <returns></returns>
-        // [Obsolete("Use .Instance instead.")]
-        // public static EmergenceSingleton GetEmergenceManager()
-        // {
-        //     return Instance;
-        // }
 
         public void OpenEmergenceUI()
         {
@@ -156,7 +148,7 @@ namespace EmergenceSDK
             
             #region Monobehaviour
             
-            private void Awake()
+            private new void Awake() 
             {
                 if (transform.childCount < 1)
                 {
@@ -164,22 +156,17 @@ namespace EmergenceSDK
                     return;
                 }
 
-                // if (Instance != null)
-                // {
-                //     Debug.LogError($"Emergence prefab instance already exists, removing this GameObject from the scene [{gameObject.name}]");
-                //     DestroyImmediate(gameObject);
-                //     return;
-                // }
-
                 // Instance = this;
                 SceneManager.sceneLoaded += SceneManager_sceneLoaded;
                 ScreenManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
                 DontDestroyOnLoad(gameObject);
 
-                if (launchEVMServerOnAwake)
-                {
-                    LocalEmergenceServer.Instance.LaunchLocalServerProcess(EmergenceSingleton.Instance.LaunchHidden);
-                }
+                // if (launchEVMServerOnAwake)
+                // {
+                //     LocalEmergenceServer.Instance.LaunchLocalServerProcess(EmergenceSingleton.Instance.LaunchHidden);
+                // }
+
+                // CloudEmergenceServer.Instance.InitializeEVMServer();
             }
             
             private void Start()
@@ -190,10 +177,10 @@ namespace EmergenceSDK
                     return;
                 }
 
-                if (launchEVMServerOnStart && !launchEVMServerOnAwake)
-                {
-                    LocalEmergenceServer.Instance.LaunchLocalServerProcess(EmergenceSingleton.Instance.LaunchHidden);
-                }
+                // if (launchEVMServerOnStart && !launchEVMServerOnAwake)
+                // {
+                //     LocalEmergenceServer.Instance.LaunchLocalServerProcess(EmergenceSingleton.Instance.LaunchHidden);
+                // }
 
                 ui = transform.GetChild(0).gameObject;
                 ui.SetActive(false);
@@ -243,7 +230,7 @@ namespace EmergenceSDK
 
             private void OnApplicationQuit()
             {
-                LocalEmergenceServer.Instance.KillLocalServerProcess();
+                // LocalEmergenceServer.Instance.KillLocalServerProcess();
             }
             
             #endregion Monobehaviour

@@ -151,7 +151,7 @@ namespace EmergenceSDK
 
         public bool ProcessRequest<T>(UnityWebRequest request, GenericError error, out T response)
         {
-            Debug.Log("Processing request: " + request);
+            Debug.Log("Processing request: " + request.url);
             
             bool isOk = false;
             response = default(T);
