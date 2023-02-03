@@ -7,13 +7,13 @@ namespace EmergenceSDK
         public delegate void GenericError(string message, long code);
 
         public delegate void LoadContractSuccess();
-        public static void LoadContract(string contractAddress, string ABI, LoadContractSuccess success, GenericError error)
+        public static void LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success, GenericError error)
         {
             Services.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.LoadContract(contractAddress, ABI, () =>
+                    Services.Instance.LoadContract(contractAddress, ABI, network,() =>
                         {
                             success?.Invoke();
                         },
@@ -37,13 +37,13 @@ namespace EmergenceSDK
         }
 
         public delegate void ReadContractSuccess<T>(T response);
-        public static void ReadMethod<T, U>(string contractAddress, string methodName, U body, ReadContractSuccess<T> success, GenericError error)
+        public static void ReadMethod<T, U>(string contractAddress, string methodName, string network, string nodeUrl, U body, ReadContractSuccess<T> success, GenericError error)
         {
             Services.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.ReadMethod<T, U>(contractAddress, methodName, body, (response) =>
+                    Services.Instance.ReadMethod<T, U>(contractAddress, methodName, network, nodeUrl, body, (response) =>
                     {
                         success?.Invoke(response);
                     },
@@ -65,13 +65,13 @@ namespace EmergenceSDK
         }
 
         public delegate void WriteContractSuccess<T>(T response);
-        public static void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName, string gasprice, U body, WriteContractSuccess<T> success, GenericError error)
+        public static void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName, string gasprice, string network, string nodeUrl, U body, WriteContractSuccess<T> success, GenericError error, string value = "0")
         {
             Services.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.WriteMethod<T, U>(contractAddress, methodName, localAccountName, gasprice, body, (response) =>
+                    Services.Instance.WriteMethod<T, U>(contractAddress, methodName, localAccountName, gasprice, network, nodeUrl, value, body, (response) =>
                     {
                         success?.Invoke(response);
                     },

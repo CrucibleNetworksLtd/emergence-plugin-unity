@@ -105,19 +105,35 @@ namespace EmergenceSDK
             unselectedBorder.SetActive(!selected);
             selectedBorder.SetActive(selected);
 
-            if (persona.avatar != null && persona.avatar.meta.content.First().url != null)
+            if (!string.IsNullOrEmpty(persona.avatarId))
             {
-                waitingForImageRequest = true;
-                if (!RequestImage.Instance.AskForImage(persona.avatar.meta.content.First().url))
+                Services.Instance.AvatarById(persona.avatarId, (avatar =>
                 {
-                    waitingForImageRequest = false;
-                    OnImageCompleted?.Invoke(persona, false);
-                }
+                    waitingForImageRequest = true;
+                    if (!RequestImage.Instance.AskForImage(avatar[0].meta.content.First().url))
+                    {
+                        waitingForImageRequest = false;
+                        OnImageCompleted?.Invoke(persona, false);
+                    }
+                }), (message, code) =>
+                {
+                    Debug.LogError("Error fetching Avatar by id: " + message);
+                });
             }
-            else
-            {
-                OnImageCompleted?.Invoke(persona, false);
-            }
+
+            // if (persona.avatar != null && persona.avatar.meta.content.First().url != null)
+            // {
+            //     waitingForImageRequest = true;
+            //     if (!RequestImage.Instance.AskForImage(persona.avatar.meta.content.First().url))
+            //     {
+            //         waitingForImageRequest = false;
+            //         OnImageCompleted?.Invoke(persona, false);
+            //     }
+            // }
+            // else
+            // {
+            //     OnImageCompleted?.Invoke(persona, false);
+            // }
         }
 
         public void OnPointerEnter(PointerEventData eventData)

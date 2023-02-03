@@ -25,14 +25,15 @@ namespace EmergenceSDK
 
         public EmergenceConfiguration Configuration;
 
-        public string CurrentDeviceId;
+        public string CurrentDeviceId { get; set; }
         
-        [System.Serializable]
         public enum Environment
         {
             Staging,
             Production
         }
+
+        public Environment _environment = new Environment();
     
 
         // private bool UseNewInputSystem = true;

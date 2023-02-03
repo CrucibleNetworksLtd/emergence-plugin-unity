@@ -7,72 +7,72 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class DemoInventoryService : MonoBehaviour
+namespace EmergenceDemo
 {
-    [SerializeField] private GameObject itemEntryPrefab;
-    [SerializeField] private GameObject contentGO;
-    [SerializeField] private GameObject scrollView;
-    public GameObject instructions;
-    
-    private bool isInventoryVisible = false;
-    
-    private void Start()
+    public class DemoInventoryService : MonoBehaviour
     {
-        instructions.SetActive(false);
-    }
+        [SerializeField] private GameObject itemEntryPrefab;
+        [SerializeField] private GameObject contentGO;
+        [SerializeField] private GameObject scrollView;
+        public GameObject instructions;
 
-    private void OnTriggerEnter(Collider other)
-    {
-        instructions.SetActive(true);
-    }
-    
-    private void OnTriggerExit(Collider other)
-    {
-        instructions.SetActive(false);
-    }
-    
-    private void Update()
-    {
-        if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+        private bool isInventoryVisible = false;
+
+        private void Start()
         {
-            ShowInventory();
+            instructions.SetActive(false);
         }
-    }
-    
-    public void ShowInventory()
-    {
-        if (!isInventoryVisible)
+
+        private void OnTriggerEnter(Collider other)
         {
-            DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
-                x=> scrollView.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, 0), 0.25f);
-            isInventoryVisible = true;
+            instructions.SetActive(true);
         }
-        else
+
+        private void OnTriggerExit(Collider other)
         {
-            DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
-                x=> scrollView.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, -200f), 0.25f);
-            isInventoryVisible = false;
+            instructions.SetActive(false);
         }
-        
-        Services.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
+
+        private void Update()
+        {
+            if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
             {
-                for (int i = 0; i < inventoryItems.Count; i++)
+                ShowInventory();
+            }
+        }
+
+        public void ShowInventory()
+        {
+            if (!isInventoryVisible)
+            {
+                DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
+                    x => scrollView.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, 0), 0.25f);
+                isInventoryVisible = true;
+            }
+            else
+            {
+                DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
+                    x => scrollView.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, -200f), 0.25f);
+                isInventoryVisible = false;
+            }
+
+            Services.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
                 {
-                    GameObject entry = Instantiate(itemEntryPrefab);
+                    for (int i = 0; i < inventoryItems.Count; i++)
+                    {
+                        GameObject entry = Instantiate(itemEntryPrefab);
 
-                    Button entryButton = entry.GetComponent<Button>();
-                    // entryButton.onClick.AddListener(OnInventoryItemPressed);
-                        
-                    InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
-                    itemEntry.SetItem(inventoryItems[i]);
+                        Button entryButton = entry.GetComponent<Button>();
+                        // entryButton.onClick.AddListener(OnInventoryItemPressed);
 
-                    entry.transform.SetParent(contentGO.transform, false);
-                }
-            },
-            (error, code) =>
-            {
-                Debug.LogError("[" + code + "] " + error);
-            });
+                        InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
+                        itemEntry.SetItem(inventoryItems[i]);
+
+                        entry.transform.SetParent(contentGO.transform, false);
+                    }
+                },
+                (error, code) => { Debug.LogError("[" + code + "] " + error); });
+        }
     }
-}
 
+}

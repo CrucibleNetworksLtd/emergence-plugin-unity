@@ -1,40 +1,40 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using EmergenceSDK;
 using UnityEngine.InputSystem;
 
-public class DemoOpenOverlay : MonoBehaviour
+namespace EmergenceDemo
 {
-    
-    [SerializeField] private GameObject instructions;
+    public class DemoOpenOverlay : MonoBehaviour
+    {
 
-    private void Start()
-    {
-        instructions.SetActive(false);
-    }
+        [SerializeField] private GameObject instructions;
 
-    private void OnTriggerEnter(Collider other)
-    {
-        instructions.SetActive(true);
-    }
-    
-    private void OnTriggerExit(Collider other)
-    {
-        instructions.SetActive(false);
-    }
-
-    private void Update()
-    {
-        if (Keyboard.current.eKey.wasPressedThisFrame  && instructions.activeSelf)
+        private void Start()
         {
-            OpenOverlay();
+            instructions.SetActive(false);
         }
-    }
 
-    private void OpenOverlay()
-    {
-        EmergenceSingleton.Instance.OpenEmergenceUI();
+        private void OnTriggerEnter(Collider other)
+        {
+            instructions.SetActive(true);
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            instructions.SetActive(false);
+        }
+
+        private void Update()
+        {
+            if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+            {
+                OpenOverlay();
+            }
+        }
+
+        private void OpenOverlay()
+        {
+            EmergenceSingleton.Instance.OpenEmergenceUI();
+        }
     }
 }

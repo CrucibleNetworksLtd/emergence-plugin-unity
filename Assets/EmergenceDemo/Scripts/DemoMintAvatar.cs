@@ -4,50 +4,47 @@ using EmergenceSDK;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class DemoMintAvatar : MonoBehaviour
+namespace EmergenceDemo
 {
+    public class DemoMintAvatar : MonoBehaviour
+    {
 
-    public GameObject instructions;
-    public DeployedSmartContract deployedContract;
-    
-    private void Start()
-    {
-        instructions.SetActive(false);
-    }
+        public GameObject instructions;
+        public DeployedSmartContract deployedContract;
 
-    private void OnTriggerEnter(Collider other)
-    {
-        instructions.SetActive(true);
-    }
-    
-    private void OnTriggerExit(Collider other)
-    {
-        instructions.SetActive(false);
-    }
-    
-    private void Update()
-    {
-        if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+        private void Start()
         {
-            MintAvatar();
+            instructions.SetActive(false);
         }
-    }
-    
-    private void MintAvatar()
-    {
-        ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, () =>
+
+        private void OnTriggerEnter(Collider other)
         {
-            ContractHelper.WriteMethod<BaseResponse<string>, string[]>(deployedContract.contractAddress, "mint", "", "", new string[] {  },
-                (response) =>
-                {
-                    Debug.Log("Mint response: " + response.message);
-                }, (message, id) =>
-                {
-                    Debug.LogError("Error while minting avatar: " + message);
-                });
-        }, (message, id) =>
+            instructions.SetActive(true);
+        }
+
+        private void OnTriggerExit(Collider other)
         {
-            Debug.LogError("Error while loading contract: " + message);
-        });
+            instructions.SetActive(false);
+        }
+
+        private void Update()
+        {
+            if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+            {
+                MintAvatar();
+            }
+        }
+
+        private void MintAvatar()
+        {
+            ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI,
+                deployedContract.contract.name, () =>
+                {
+                    ContractHelper.WriteMethod<BaseResponse<string>, string[]>(deployedContract.contractAddress, "mint",
+                        "", "", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL, new string[] { },
+                        (response) => { Debug.Log("Mint response: " + response.message); },
+                        (message, id) => { Debug.LogError("Error while minting avatar: " + message); });
+                }, (message, id) => { Debug.LogError("Error while loading contract: " + message); });
+        }
     }
 }

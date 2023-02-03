@@ -34,9 +34,6 @@ namespace EmergenceSDK
         [Header("UI References Information Panel")]
         public TMP_InputField nameIF;
         public TMP_InputField bioIF;
-        // public Toggle availableOnSearchesToggle;
-        // public Toggle showingMyStatusToggle;
-        // public Toggle receiveContactRequestsToggle;
         public Button deleteButton;
 
         [Header("UI References Edit / Create")]
@@ -157,11 +154,6 @@ namespace EmergenceSDK
             nameIF.text = persona.name;
             bioIF.text = persona.bio;
 
-
-            // availableOnSearchesToggle.SetIsOnWithoutNotify(persona.settings.availableOnSearch);
-            // showingMyStatusToggle.SetIsOnWithoutNotify(persona.settings.showStatus);
-            // receiveContactRequestsToggle.SetIsOnWithoutNotify(persona.settings.receiveContactRequest);
-
             if (persona.AvatarImage)
             {
                 personaAvatar.texture = persona.AvatarImage;
@@ -250,9 +242,6 @@ namespace EmergenceSDK
 
             currentPersona.name = nameIF.text;
             currentPersona.bio = bioIF.text;
-            // currentPersona.settings.availableOnSearch = availableOnSearchesToggle.isOn;
-            // currentPersona.settings.receiveContactRequest = receiveContactRequestsToggle.isOn;
-            // currentPersona.settings.showStatus = showingMyStatusToggle.isOn;
 
             switch (state)
             {

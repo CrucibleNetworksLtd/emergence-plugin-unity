@@ -4,49 +4,46 @@ using EmergenceSDK;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class DemoReadMethod : MonoBehaviour
+namespace EmergenceDemo
 {
-    public GameObject instructions;
-    public DeployedSmartContract deployedContract;
+    public class DemoReadMethod : MonoBehaviour
+    {
+        public GameObject instructions;
+        public DeployedSmartContract deployedContract;
 
-    private void Start()
-    {
-        instructions.SetActive(false);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        instructions.SetActive(true);
-    }
-    
-    private void OnTriggerExit(Collider other)
-    {
-        instructions.SetActive(false);
-    }
-    
-    private void Update()
-    {
-        if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+        private void Start()
         {
-            ReadCurrentCount();
+            instructions.SetActive(false);
         }
-    }
 
-    private void ReadCurrentCount()
-    {
-        ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, () =>
+        private void OnTriggerEnter(Collider other)
         {
-            ContractHelper.ReadMethod<ReadContractTokenURIResponse, string[]>(deployedContract.contractAddress, "GetCurrentCount", new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
-                (response) =>
-                {
-                    Debug.Log("Current count: " + response.response);
-                }, (message, id) =>
-                {
-                    Debug.LogError("Error while getting current count: " + message);
-                });
-        }, (message, id) =>
+            instructions.SetActive(true);
+        }
+
+        private void OnTriggerExit(Collider other)
         {
-            Debug.LogError("Error while loading contract: " + message);
-        });
+            instructions.SetActive(false);
+        }
+
+        private void Update()
+        {
+            if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+            {
+                ReadCurrentCount();
+            }
+        }
+
+        private void ReadCurrentCount()
+        {
+            ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI,
+                deployedContract.chain.networkName, () =>
+                {
+                    ContractHelper.ReadMethod<BaseResponse<string>, string[]>(deployedContract.contractAddress,
+                        "GetCurrentCount", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
+                        (response) => { Debug.Log("ReadContract finished"); },
+                        (message, id) => { Debug.LogError("Error while getting current count: " + message); });
+                }, (message, id) => { Debug.LogError("Error while loading contract: " + message); });
+        }
     }
 }

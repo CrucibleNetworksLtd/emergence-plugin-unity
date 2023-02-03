@@ -12,16 +12,24 @@ namespace EmergenceSDK
             public bool showStatus;
         }
 
-        // public class Avatar
-        // {
-        //     public string id;
-        //     public string url;
-        // }
+        public string avatarId;
+        // {Chain}:{Address}:{Token}:{GUID}
 
         public string id;
         public string name;
         public string bio;
-        public Avatar avatar;
+
+        private Avatar _avatar;
+        public Avatar avatar
+        {
+            get => _avatar;
+            set
+            {
+                _avatar = value;
+                // avatarId = value?.chain + ":" + value?.contractAddress + ":" + value?.tokenId + ":" + value?.GUID;
+            }
+        }
+
         public PersonaSettings settings;
 
         [JsonIgnore]

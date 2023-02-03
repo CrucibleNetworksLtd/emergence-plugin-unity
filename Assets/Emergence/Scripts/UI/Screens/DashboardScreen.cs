@@ -308,7 +308,7 @@ namespace EmergenceSDK
             }
             else if (imagesRefreshing.Count > 0)
             {
-                Debug.LogWarning("Image completed but not accounted for: [" + persona.id + "][" + persona.avatar.meta.content.First().url + "][" + persona.avatar.meta.content.First().url + "][" + success + "]");
+                // Debug.LogWarning("Image completed but not accounted for: [" + persona.id + "][" + persona.avatar.meta.content.First().url + "][" + persona.avatar.meta.content.First().url + "][" + success + "]");
             }
         }
 

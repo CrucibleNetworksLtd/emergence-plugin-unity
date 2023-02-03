@@ -4,21 +4,17 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
-using UnityEditor.PackageManager.Requests;
 
 namespace EmergenceSDK
 {
     public partial class Services : MonoBehaviour
     {
-//        private string nodeURL = string.Empty;
-        // private string gameId = string.Empty;
+
         private string currentAccessToken = string.Empty;
 
         public static Services Instance;
 
         private bool skipWallet = false;
-
-//        private EnvValues envValues = null;
 
         public delegate void GenericError(string message, long code);
 
@@ -28,40 +24,6 @@ namespace EmergenceSDK
         {
             Instance = this;
         }
-        //    TextAsset envFile;
-
-            //    try
-            //    {
-            //        envFile = Resources.Load<TextAsset>("emergence.env.dev");
-
-            //        if (envFile == null)
-            //        {
-            //            envFile = Resources.Load<TextAsset>("emergence.env.staging");
-            //        }
-
-            //        if (envFile == null)
-            //        {
-            //            envFile = Resources.Load<TextAsset>("emergence.env");
-            //        }
-
-            //        if (envFile == null)
-            //        {
-            //            Debug.LogError("emergence.env file missing from Resources folder");
-            //            return;
-            //        }
-
-            //        envValues = SerializationHelper.Deserialize<EnvValues>(envFile.text);
-
-            //        if (envValues == null)
-            //        {
-            //            Debug.LogError("emergence.env file is corrupted or missing");
-            //        }
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        Debug.LogError(e.Message);
-            //    }
-            //}
 
         private bool refreshingToken = false;
         private void Update()
@@ -99,11 +61,6 @@ namespace EmergenceSDK
         #endregion Monobehaviour
 
         #region Utilities
-
-        //private bool CheckEnv()
-        //{
-        //    return envValues != null;
-        //}
 
         private class Expiration
         {

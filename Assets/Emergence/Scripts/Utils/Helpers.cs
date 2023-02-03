@@ -14,15 +14,16 @@ namespace EmergenceSDK
             if (IPFSURL.Contains("ipfs://") || IPFSURL.Contains("IPFS://"))
             {
                 Debug.Log("Found IPFS URL, replacing with public node...");
-
+        
                 string IPFSNode = "http://ipfs.openmeta.xyz/ipfs/";
-                string CustomIPFSNode = LocalEmergenceServer.Instance.Environment().IPFSNode;
+                string CustomIPFSNode = EmergenceSingleton.Instance.Configuration.defaultIpfsGateway;
                 if (!string.IsNullOrEmpty(CustomIPFSNode))
                 {
                     Debug.Log($"Found custom IPFS node in game config, replacing with \"{CustomIPFSNode}\"");
                     IPFSNode = CustomIPFSNode;
                 }
-                string NewURL = IPFSURL.ToLowerInvariant().Replace("ipfs://", IPFSNode);
+                string NewURL = IPFSURL.Replace("ipfs://", IPFSNode);
+                NewURL = NewURL.Replace("IPFS://", IPFSNode);
                 Debug.Log($"New URL is \"{NewURL}\"");
                 return NewURL;
             }

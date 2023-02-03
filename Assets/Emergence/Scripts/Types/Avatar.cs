@@ -45,7 +45,7 @@ namespace EmergenceSDK
         public string lastUpdated;
         public string chain;
         public AvatarMeta meta;
-        // public string GUID;
+        public string GUID;
         // public string Name;
         // public string Creator;
         // public string Type;

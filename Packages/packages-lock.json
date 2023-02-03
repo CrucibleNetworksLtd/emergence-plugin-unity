@@ -7,6 +7,12 @@
       "dependencies": {},
       "hash": "c7eedf85c79e2ce06658c8060ca38a282f2ca7ab"
     },
+    "com.unity.asset-store-tools": {
+      "version": "file:com.unity.asset-store-tools",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.cinemachine": {
       "version": "2.6.17",
       "depth": 0,
