@@ -16,6 +16,8 @@ namespace EmergenceDemo
         [SerializeField] private GameObject scrollView;
         public GameObject instructions;
 
+        private List<GameObject> items = new List<GameObject>();
+
         private bool isInventoryVisible = false;
 
         private void Start()
@@ -48,16 +50,26 @@ namespace EmergenceDemo
                 DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
                     x => scrollView.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, 0), 0.25f);
                 isInventoryVisible = true;
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
             }
             else
             {
                 DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
                     x => scrollView.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, -200f), 0.25f);
                 isInventoryVisible = false;
+                Cursor.visible = false;
             }
 
             Services.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
                 {
+                    foreach (var item in items)
+                    {
+                        Destroy(item);
+                    }
+                    
+                    items.Clear();
+                    
                     for (int i = 0; i < inventoryItems.Count; i++)
                     {
                         GameObject entry = Instantiate(itemEntryPrefab);
@@ -69,6 +81,8 @@ namespace EmergenceDemo
                         itemEntry.SetItem(inventoryItems[i]);
 
                         entry.transform.SetParent(contentGO.transform, false);
+                        
+                        items.Add(entry);
                     }
                 },
                 (error, code) => { Debug.LogError("[" + code + "] " + error); });

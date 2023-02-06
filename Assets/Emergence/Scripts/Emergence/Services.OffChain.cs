@@ -335,7 +335,7 @@ namespace EmergenceSDK
             vrm10.transform.position = playerArmature.transform.position;
             vrm10.transform.rotation = playerArmature.transform.rotation;
             vrm10.transform.parent = playerArmature.transform;
-            vrm10.name = vrm10.name + "_Imported_v1_0";
+            vrm10.name = "VRMAvatar";
             
             await UniTask.DelayFrame(1); 
             
@@ -347,6 +347,18 @@ namespace EmergenceSDK
             originalMesh.enabled = false;
             
             success?.Invoke();
+        }
+
+        public void SetDefaultAvatar()
+        {
+            GameObject vrmAvatar = GameObject.Find("VRMAvatar");
+            GameObject playerArmature = GameObject.Find("PlayerArmature");
+            var originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
+
+            originalMesh.enabled = true;
+            playerArmature.GetComponent<Animator>().avatar = Resources.Load<UnityEngine.Avatar>("ArmatureAvatar");
+            
+            if (vrmAvatar != null) {Destroy(vrmAvatar);}
         }
 
         #endregion GetAvatars
@@ -385,7 +397,7 @@ namespace EmergenceSDK
         public delegate void SuccessWriteDynamicMetadata(string response);
         public async void WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, GenericError error)
         {
-            metadata = "{\"metadata\": \"" + metadata + "\"}";
+            metadata = "{\"metadata\": " + metadata + "}";
 
             // if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             Debug.Log("Writing dynamic metadata for contract: " + contract);

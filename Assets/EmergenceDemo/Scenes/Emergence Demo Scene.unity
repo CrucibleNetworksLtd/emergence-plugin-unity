@@ -227,7 +227,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemEntryPrefab: {fileID: 8976649131904049259, guid: a8964f0e5a9ef6846b6b788a05bcb9c5,
     type: 3}
-  contentGO: {fileID: 1902980415}
+  contentGO: {fileID: 1110410658}
   scrollView: {fileID: 243857090}
   instructions: {fileID: 900531492}
 --- !u!65 &51099252
@@ -4938,6 +4938,10 @@ PrefabInstance:
     - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
       propertyPath: LaunchHidden
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
+      propertyPath: _environment
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
       propertyPath: Configuration

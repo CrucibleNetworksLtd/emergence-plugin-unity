@@ -15,13 +15,6 @@ namespace EmergenceSDK
         private string address;
 
         public static string HAS_LOGGED_IN_ONCE_KEY = "HasLoggedInOnce";
-        
-        // [Header("EVM Server")]
-        // [SerializeField]
-        // private bool launchEVMServerOnAwake = false;
-        //
-        // [SerializeField]
-        // private bool launchEVMServerOnStart = true;
 
         public EmergenceConfiguration Configuration;
 
@@ -34,12 +27,7 @@ namespace EmergenceSDK
         }
 
         public Environment _environment = new Environment();
-    
-
-        // private bool UseNewInputSystem = true;
-
-        // [SerializeField]
-        // private bool LaunchHidden = true;
+        
 
         [Header("Keyboard shortcut to open Emergence")] [SerializeField]
         private KeyCode key = KeyCode.Tab;
@@ -47,8 +35,6 @@ namespace EmergenceSDK
         [SerializeField] private bool shift = true;
 
         [SerializeField] private bool ctrl = false;
-        
-        // public static EmergenceSingleton Instance;
 
         [Serializable]
         public class EmergenceUIStateChanged : UnityEvent<bool>
@@ -81,7 +67,6 @@ namespace EmergenceSDK
 
         public void OpenEmergenceUI()
         {
-            // Emergence.Instance.OpenOverlay();
             if (ScreenManager.Instance == null)
             {
                 ui.SetActive(true);
@@ -112,13 +97,6 @@ namespace EmergenceSDK
             RestoreCursor();
             OnEmergenceUIClosed.Invoke();
             OnEmergenceUIVisibilityChanged?.Invoke(false);
-            
-            // // Enable player controls -- TODO: let dev decide if they take care or we do this 
-            // ThirdPersonController charController = FindObjectOfType<ThirdPersonController>();
-            // if (charController != null)
-            // {
-            //     charController.enabled = true;
-            // }
         }
 
         public string GetCurrentAccessToken()
@@ -161,13 +139,6 @@ namespace EmergenceSDK
                 SceneManager.sceneLoaded += SceneManager_sceneLoaded;
                 ScreenManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
                 DontDestroyOnLoad(gameObject);
-
-                // if (launchEVMServerOnAwake)
-                // {
-                //     LocalEmergenceServer.Instance.LaunchLocalServerProcess(EmergenceSingleton.Instance.LaunchHidden);
-                // }
-
-                // CloudEmergenceServer.Instance.InitializeEVMServer();
             }
             
             private void Start()
@@ -178,22 +149,13 @@ namespace EmergenceSDK
                     return;
                 }
 
-                // if (launchEVMServerOnStart && !launchEVMServerOnAwake)
-                // {
-                //     LocalEmergenceServer.Instance.LaunchLocalServerProcess(EmergenceSingleton.Instance.LaunchHidden);
-                // }
-
                 ui = transform.GetChild(0).gameObject;
                 ui.SetActive(false);
             }
 
             private void Update()
             {
-                // if (UseNewInputSystem)
-                // {
-                // }
-                // else
-                // {
+
 
                     bool shortcutPressed = Input.GetKeyDown(key)
                                            && (shift && (Input.GetKey(KeyCode.LeftShift) ||
@@ -229,11 +191,6 @@ namespace EmergenceSDK
                 }
             }
 
-            private void OnApplicationQuit()
-            {
-                // LocalEmergenceServer.Instance.KillLocalServerProcess();
-            }
-            
             #endregion Monobehaviour
 
         #region Cursor Handling
