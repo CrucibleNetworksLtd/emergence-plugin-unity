@@ -298,7 +298,7 @@ namespace EmergenceSDK
                     Debug.Log("Setting current avatar to: " + currentAvatar.meta.name);
                     Debug.Log("Current avatar url: " + currentAvatar.meta.content[1].url);
                     
-                    Services.Instance.SwapAvatars(currentAvatar.meta.content[1].url);
+                    Services.Instance.SwapAvatars(currentAvatar.meta.content[1].url, () => { }, (message, code) => { });
                     
                     currentPersona.avatar = currentAvatar;
                     panelAvatar.SetActive(false);

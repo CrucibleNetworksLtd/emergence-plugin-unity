@@ -305,24 +305,26 @@ namespace EmergenceSDK
             success?.Invoke(avatarResponse.message);
         }
         
-        public async void AvatarById(string id, SuccessAvatars success, GenericError error)
+        public delegate void SuccessAvatar(Avatar avatar);
+        public async void AvatarById(string id, SuccessAvatar success, GenericError error)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             Debug.Log("Getting avatar with id: " + id);
             
             Debug.Log("Get Avatars by id request started");
-            string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "byId?id=" + id;
+            string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "id?id=" + id;
             Debug.Log("Requesting avatar by id from URL: " + url);
             
             string response = await PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, error);
             
             Debug.Log("Avatar by id response: " + response);
-            GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response.ToString());
+            GetAvatarResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarResponse>(response.ToString());
             
             success?.Invoke(avatarResponse.message);
         }
         
-        public async void SwapAvatars(string vrmURL)
+        public delegate void SuccessAvatarSwap();
+        public async void SwapAvatars(string vrmURL, SuccessAvatarSwap success, GenericError error)
         {
             UnityWebRequest request = UnityWebRequest.Get(vrmURL);
             byte[] response = (await request.SendWebRequest()).downloadHandler.data;
@@ -342,7 +344,9 @@ namespace EmergenceSDK
 
             vrm10.gameObject.GetComponent<Animator>().enabled = false;
 
-                originalMesh.enabled = false;
+            originalMesh.enabled = false;
+            
+            success?.Invoke();
         }
 
         #endregion GetAvatars

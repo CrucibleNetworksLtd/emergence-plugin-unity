@@ -115,7 +115,7 @@ namespace EmergenceSDK
 
             Services.Instance.GetPersonas((personas, currentPersona) =>
             {
-                Modal.Instance.Show("Retrieving avatar images...");
+                Modal.Instance.Show("Retrieving avatars...");
 
                 this.activePersona = currentPersona;
 
@@ -196,6 +196,7 @@ namespace EmergenceSDK
                 {
                     Modal.Instance.Hide();
                 }
+                
             },
             (error, code) =>
             {

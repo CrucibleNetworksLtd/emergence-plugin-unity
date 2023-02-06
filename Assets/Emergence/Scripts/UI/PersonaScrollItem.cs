@@ -109,16 +109,28 @@ namespace EmergenceSDK
             {
                 Services.Instance.AvatarById(persona.avatarId, (avatar =>
                 {
-                    waitingForImageRequest = true;
-                    if (!RequestImage.Instance.AskForImage(avatar[0].meta.content.First().url))
+                    // trigger swapping of the avatar
+                    Services.Instance.SwapAvatars(avatar.meta.content[1].url, () =>
                     {
-                        waitingForImageRequest = false;
-                        OnImageCompleted?.Invoke(persona, false);
-                    }
+                        // Add fetched avatar to persona
+                        Persona.avatar = avatar;
+                        waitingForImageRequest = true;
+
+                        if (!RequestImage.Instance.AskForImage(avatar.meta.content.First().url))
+                        {
+                            waitingForImageRequest = false;
+                            OnImageCompleted?.Invoke(persona, false);
+                        }
+                    }, (message, code) => {});
+                    
                 }), (message, code) =>
                 {
                     Debug.LogError("Error fetching Avatar by id: " + message);
                 });
+            }
+            else
+            {
+                OnImageCompleted?.Invoke(persona, false);
             }
 
             // if (persona.avatar != null && persona.avatar.meta.content.First().url != null)
