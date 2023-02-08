@@ -331,6 +331,13 @@ namespace EmergenceSDK
 
             var vrm10 = await Vrm10.LoadBytesAsync(response, true);
             GameObject playerArmature = GameObject.Find("PlayerArmature");
+            
+            if (playerArmature == null)
+            {
+                playerArmature = Instantiate(Resources.Load<GameObject>("PlayerArmature"));
+                playerArmature.name = "PlayerArmature";
+            }
+            
             var originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
             vrm10.transform.position = playerArmature.transform.position;
             vrm10.transform.rotation = playerArmature.transform.rotation;
@@ -353,6 +360,13 @@ namespace EmergenceSDK
         {
             GameObject vrmAvatar = GameObject.Find("VRMAvatar");
             GameObject playerArmature = GameObject.Find("PlayerArmature");
+            
+            if (playerArmature == null)
+            {
+                playerArmature = Instantiate(Resources.Load<GameObject>("PlayerArmature"));
+                playerArmature.name = "PlayerArmature";
+            }
+            
             var originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
 
             originalMesh.enabled = true;
