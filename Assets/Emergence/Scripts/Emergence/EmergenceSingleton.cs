@@ -70,7 +70,14 @@ namespace EmergenceSDK
             if (ScreenManager.Instance == null)
             {
                 ui.SetActive(true);
-                SceneManager.LoadSceneAsync("Emergence", LoadSceneMode.Additive);
+                Instantiate(Resources.Load<GameObject>("Emergence Root")).name = "Emergence UI Overlay";
+                ui?.SetActive(false);
+                ScreenManager.Instance.gameObject.SetActive(true);
+                SaveCursor();
+                UpdateCursor();
+                OnEmergenceUIOpened.Invoke();
+                OnEmergenceUIVisibilityChanged?.Invoke(true);
+                
             }
             else
             {
@@ -134,9 +141,7 @@ namespace EmergenceSDK
                     Debug.LogError("Missing children");
                     return;
                 }
-
-                // Instance = this;
-                SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+                
                 ScreenManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
                 DontDestroyOnLoad(gameObject);
             }
@@ -175,12 +180,10 @@ namespace EmergenceSDK
                         {
                             if (ScreenManager.Instance.IsVisible)
                             {
-                                // Emergence.Instance.CloseOverlay();
                                 CloseEmergeneUI();
                             }
                         }
                     }
-                // }
             }
             
             private void OnApplicationFocus(bool hasFocus)
@@ -217,21 +220,7 @@ namespace EmergenceSDK
         }
 
         #endregion Cursor Handling
-        
-        private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
-        {
-            if (arg0.name.Equals("Emergence"))
-            {
-                Debug.Log("Emergence overlay scene Loaded");
-                ui?.SetActive(false);
-                ScreenManager.Instance.gameObject.SetActive(true);
-                SaveCursor();
-                UpdateCursor();
-                OnEmergenceUIOpened.Invoke();
-                OnEmergenceUIVisibilityChanged?.Invoke(true);
-            }
-        }
-        
+
         private void EmergenceManager_OnButtonEsc()
         {
             CloseEmergeneUI();
