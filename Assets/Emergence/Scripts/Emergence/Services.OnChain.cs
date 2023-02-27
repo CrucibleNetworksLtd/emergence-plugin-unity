@@ -77,7 +77,7 @@ namespace EmergenceSDK
 
         public delegate void RequestToSignSuccess(string signedMessage);
 
-        public void RequestToSignWalletConnect(string messageToSign, RequestToSignSuccess success, GenericError error)
+        public void RequestToSign(string messageToSign, RequestToSignSuccess success, GenericError error)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv())
             // {
@@ -120,11 +120,6 @@ namespace EmergenceSDK
         public void GetQRCode(QRCodeSuccess success, GenericError error)
         {
             Debug.Log("Getting QR code");
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
-
             StartCoroutine(CoroutineGetQrCode(success, error));
         }
 
@@ -145,11 +140,6 @@ namespace EmergenceSDK
                 else
                 {
                     string deviceId = request.GetResponseHeader("deviceId");
-                    // EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
-
-                    //Debug.Log("Performing Handshake with deviceId: " + deviceId);
-                    // Handshake();
-
                     success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture, deviceId);
                 }
             }

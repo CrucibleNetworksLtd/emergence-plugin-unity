@@ -1452,6 +1452,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI_EventSystem
       objectReference: {fileID: 0}
+    - target: {fileID: 1992104595683069851, guid: f0271df749728104eac22c3d897fd8ce,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8063073397250431797, guid: f0271df749728104eac22c3d897fd8ce,
         type: 3}
       propertyPath: m_RootOrder
@@ -1521,6 +1526,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8279798545678494202, guid: f0271df749728104eac22c3d897fd8ce,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f0271df749728104eac22c3d897fd8ce, type: 3}
@@ -4969,6 +4979,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
+      propertyPath: CachedPersonaUpdated.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
       propertyPath: OnEmergenceUIClosed.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 6
       objectReference: {fileID: 0}
@@ -4985,6 +4999,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
+      propertyPath: CachedPersonaUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
       propertyPath: OnEmergenceUIClosed.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 642930279}
@@ -4992,6 +5010,10 @@ PrefabInstance:
       propertyPath: OnEmergenceUIOpened.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 642930279}
+    - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
+      propertyPath: CachedPersonaUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1692622641}
     - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
       propertyPath: OnEmergenceUIClosed.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -5009,6 +5031,10 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
+      propertyPath: CachedPersonaUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
       propertyPath: OnEmergenceUIClosed.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: set_enabled
       objectReference: {fileID: 0}
@@ -5017,12 +5043,20 @@ PrefabInstance:
       value: set_enabled
       objectReference: {fileID: 0}
     - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
+      propertyPath: CachedPersonaUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnPersonaUpdated
+      objectReference: {fileID: 0}
+    - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
       propertyPath: OnEmergenceUIClosed.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: UnityEngine.Behaviour, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
       propertyPath: OnEmergenceUIOpened.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: UnityEngine.Behaviour, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
+      propertyPath: CachedPersonaUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: EmergenceDemo.DemoOpenOverlay, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
       propertyPath: OnEmergenceUIClosed.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
@@ -5034,6 +5068,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
       propertyPath: OnEmergenceUIOpened.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 51037822, guid: d11676e3b1baadb4a84528313b89733e, type: 3}
+      propertyPath: CachedPersonaUpdated.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3122056887335212770, guid: d11676e3b1baadb4a84528313b89733e,

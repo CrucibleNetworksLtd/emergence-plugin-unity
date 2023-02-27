@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -80,7 +81,7 @@ namespace EmergenceSDK
             blockchainDropdown.onValueChanged.AddListener(onBlockchainDropdownValueChanged);
         }
         
-        public void Refresh(bool dynamicMetada = false)
+        public void Refresh(Action<InventoryItem> customOnClickHandler)
         {
             Services.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
                 {
@@ -104,9 +105,9 @@ namespace EmergenceSDK
                         Button entryButton = entry.GetComponent<Button>();
                         InventoryItem item = inventoryItems[i];
 
-                        if (dynamicMetada)
+                        if (customOnClickHandler != null)
                         {
-                            entryButton.onClick.AddListener(() => OnInventoryItemPressed_DynamicMetadata(item));
+                            entryButton.onClick.AddListener(() => customOnClickHandler(item));
                         }
                         else
                         {
@@ -213,44 +214,16 @@ namespace EmergenceSDK
                 selectedItem = item;
             }
         }
-        
-        public void OnInventoryItemPressed_DynamicMetadata(InventoryItem item)
-        {
-            Debug.Log("Updating Dynamic metadata");
-            if (string.IsNullOrEmpty(item.meta.dynamicMetadata)) return;
-            var curMetadata = int.Parse(item.meta.dynamicMetadata);
-            curMetadata++;
 
-            Services.Instance.WriteDynamicMetadata(item.blockchain, item.contract, item.tokenId, curMetadata.ToString(), (string response) => {}, (string error, long code) => {});
-            EmergenceSingleton.Instance.CloseEmergeneUI();
-        }
-
-        public async void LoadItem()
-        {
-            if (selectedItem == null) return;
-
-            if (selectedItem.meta.content[1].mimeType.Equals("model/gltf-binary"))
-            {
-                Debug.Log("Downloading from: " + selectedItem.meta.content[1].url);
+        public void OnCloseDetailsPanelButtonPressed() {
+            DOTween.To(() => detailsPanel.GetComponent<RectTransform>().anchoredPosition,
+                x=> detailsPanel.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(Screen.width / 2, 0), 0.25f);
                 
-                UnityWebRequest request = UnityWebRequest.Get(selectedItem.meta.content[1].url);
-                byte[] response = (await request.SendWebRequest()).downloadHandler.data;
-
-                var vrm10 = await Vrm10.LoadBytesAsync(response);
-
-                GameObject playerArmature = GameObject.Find("PlayerArmature");
-                
-                vrm10.transform.position = playerArmature.transform.position;
-                vrm10.transform.rotation = playerArmature.transform.rotation;
-                // vrm10.transform.parent = playerArmature.transform;
-                vrm10.transform.rotation = Quaternion.identity;
+            DOTween.To(() => itemsListPanel.GetComponent<RectTransform>().offsetMax,
+                x=> itemsListPanel.GetComponent<RectTransform>().offsetMax = x, new Vector2(0, 0), 0.25f);
             
-                // vrm10.name = vrm10.name + "_Imported_v1_0";
-            
-                await UniTask.DelayFrame(1);
-            }
+            isItemSelected = false;
         }
-
     }
 
 

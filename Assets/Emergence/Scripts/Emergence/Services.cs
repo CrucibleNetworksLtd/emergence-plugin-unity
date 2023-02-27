@@ -164,13 +164,16 @@ namespace EmergenceSDK
             }
             else
             {
-                request = UnityWebRequest.Post(url, bodyData);
-                request.SetRequestHeader("Content-Type", "application/json");
+                request = UnityWebRequest.Post(url, string.Empty);
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(bodyData));
+                request.uploadHandler.contentType = "application/json";
+                // request.SetRequestHeader("Content-Type", "application/json");
             }
             try
             {
                 Debug.Log("AccessToken: " + currentAccessToken);
-                request.SetRequestHeader("Authorization-header", currentAccessToken);
+                request.SetRequestHeader("Authorization", currentAccessToken);
+                request.SetRequestHeader("Authorization-header", "0iKoO1V2ZG98fPETreioOyEireDTYwby");
                 return (await request.SendWebRequest()).downloadHandler.text;
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))

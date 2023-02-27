@@ -2,11 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Networking;
 using UnityEngine;
-using UniGLTF;
 using UniVRM10;
 using Debug = UnityEngine.Debug;
 
@@ -65,8 +63,8 @@ namespace EmergenceSDK
                 return cachedPersona;
             }
 
-            private set
-            {
+            private set {
+                if (cachedPersona != null && cachedPersona.id.Equals(value.id)) return; // don't do anything if the new persona is the same as the cached one)
                 cachedPersona = value;
                 OnCurrentPersonaUpdated?.Invoke(cachedPersona);
             }
@@ -124,15 +122,24 @@ namespace EmergenceSDK
         private IEnumerator CoroutineCreatePersona(Persona persona, SuccessCreatePersona success, GenericError error)
         {
             Debug.Log("CreatePersona request started");
+            if (persona.avatarId == null) {
+                persona.avatarId = "";
+            }
             string jsonPersona = SerializationHelper.Serialize(persona);
 
+            Debug.Log("Persona json: " + jsonPersona);
+            
             // string url = LocalEmergenceServer.Instance.Environment().PersonaURL + "persona";
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
+            
+            Debug.Log("Persona url: " + url);
 
             using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
                 request.uploadHandler.contentType = "application/json";
+                
+                Debug.Log("Access token: " + currentAccessToken);
 
                 request.SetRequestHeader("Authorization", currentAccessToken);
 
@@ -252,7 +259,6 @@ namespace EmergenceSDK
         public delegate void SuccessSetCurrentPersona();
         public void SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, GenericError error)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineSetCurrentPersona(persona, success, error));
         }
 
@@ -289,11 +295,9 @@ namespace EmergenceSDK
         public delegate void SuccessAvatars(List<Avatar> avatar);
         public async void AvatarByOwner(string address, SuccessAvatars success, GenericError error)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             Debug.Log("Getting avatars for address: " + address);
             
             Debug.Log("Get Avatars request started");
-            // string url = LocalEmergenceServer.Instance.Environment().AvatarURL + "byOwner?address=" + address;
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "byOwner?address=" + address;
             
             Debug.Log("Requesting avatars from URL: " + url);
@@ -308,7 +312,6 @@ namespace EmergenceSDK
         public delegate void SuccessAvatar(Avatar avatar);
         public async void AvatarById(string id, SuccessAvatar success, GenericError error)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             Debug.Log("Getting avatar with id: " + id);
             
             Debug.Log("Get Avatars by id request started");
@@ -319,60 +322,8 @@ namespace EmergenceSDK
             
             Debug.Log("Avatar by id response: " + response);
             GetAvatarResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarResponse>(response.ToString());
-            
+
             success?.Invoke(avatarResponse.message);
-        }
-        
-        public delegate void SuccessAvatarSwap();
-        public async void SwapAvatars(string vrmURL, SuccessAvatarSwap success, GenericError error)
-        {
-            UnityWebRequest request = UnityWebRequest.Get(vrmURL);
-            byte[] response = (await request.SendWebRequest()).downloadHandler.data;
-
-            var vrm10 = await Vrm10.LoadBytesAsync(response, true);
-            GameObject playerArmature = GameObject.Find("PlayerArmature");
-            
-            if (playerArmature == null)
-            {
-                playerArmature = Instantiate(Resources.Load<GameObject>("PlayerArmature"));
-                playerArmature.name = "PlayerArmature";
-            }
-            
-            var originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
-            vrm10.transform.position = playerArmature.transform.position;
-            vrm10.transform.rotation = playerArmature.transform.rotation;
-            vrm10.transform.parent = playerArmature.transform;
-            vrm10.name = "VRMAvatar";
-            
-            await UniTask.DelayFrame(1); 
-            
-            UnityEngine.Avatar vrmAvatar = vrm10.GetComponent<Animator>().avatar;
-            playerArmature.GetComponent<Animator>().avatar = vrmAvatar;
-
-            vrm10.gameObject.GetComponent<Animator>().enabled = false;
-
-            originalMesh.enabled = false;
-            
-            success?.Invoke();
-        }
-
-        public void SetDefaultAvatar()
-        {
-            GameObject vrmAvatar = GameObject.Find("VRMAvatar");
-            GameObject playerArmature = GameObject.Find("PlayerArmature");
-            
-            if (playerArmature == null)
-            {
-                playerArmature = Instantiate(Resources.Load<GameObject>("PlayerArmature"));
-                playerArmature.name = "PlayerArmature";
-            }
-            
-            var originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
-
-            originalMesh.enabled = true;
-            playerArmature.GetComponent<Animator>().avatar = Resources.Load<UnityEngine.Avatar>("ArmatureAvatar");
-            
-            if (vrmAvatar != null) {Destroy(vrmAvatar);}
         }
 
         #endregion GetAvatars
@@ -382,13 +333,8 @@ namespace EmergenceSDK
         public delegate void SuccessInventoryByOwner(List<InventoryItem> inventoryItems);
         public async void InventoryByOwner(string address, SuccessInventoryByOwner success, GenericError error)
         {
-          
-                // if (!LocalEmergenceServer.Instance.CheckEnv())
-                // {
-                //     return;
-                // }
 
-                Debug.Log("Getting inventory for address: " + address);
+            Debug.Log("Getting inventory for address: " + address);
                 Debug.Log("Inventory By Owner request started");
                 // string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "byOwner?address=" + address;
                 string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address;
@@ -411,7 +357,7 @@ namespace EmergenceSDK
         public delegate void SuccessWriteDynamicMetadata(string response);
         public async void WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, GenericError error)
         {
-            metadata = "{\"metadata\": " + metadata + "}";
+            metadata = "{\"metadata\": \"" + metadata + "\"}";
 
             // if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             Debug.Log("Writing dynamic metadata for contract: " + contract);
@@ -432,11 +378,10 @@ namespace EmergenceSDK
         }
         #endregion WriteDynamicMetadata
 
-        public void OpenNFTPicker()
+        public void OpenNFTPicker(Action<InventoryItem> customOnClickHandler = null)
         {
             EmergenceSingleton.Instance.OpenEmergenceUI();
-            ScreenManager.Instance.ShowCollection(true);
-            
+            ScreenManager.Instance.ShowCollection(customOnClickHandler);
         }
 
         #endregion AWS API

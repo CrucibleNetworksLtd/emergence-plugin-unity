@@ -102,7 +102,7 @@ namespace EmergenceSDK
         private void AvatarScrollItem_OnAvatarSelected(Avatar avatar)
         {
             currentAvatar = avatar;
-            Debug.Log("Avatar selected: " + avatar.meta.name);
+            // Debug.Log("Avatar selected: " + avatar.meta.name);
 
             if (currentAvatar == null)
             {
@@ -290,15 +290,15 @@ namespace EmergenceSDK
                         {
                             Debug.LogError("[" + code + "] " + error);
                             Modal.Instance.Hide();
-                            ModalPromptOK.Instance.Show("Error creating persona");
+                            ModalPromptOK.Instance.Show("Error editing persona");
                         });
                     });
                     break;
                 case States.EditAvatar:
-                    Debug.Log("Setting current avatar to: " + currentAvatar.meta.name);
-                    Debug.Log("Current avatar url: " + currentAvatar.meta.content[1].url);
+                    // Debug.Log("Setting current avatar to: " + currentAvatar.meta.name);
+                    // Debug.Log("Current avatar url: " + currentAvatar.meta.content[1].url);
                     
-                    Services.Instance.SwapAvatars(currentAvatar.meta.content[1].url, () => { }, (message, code) => { });
+                    // Services.Instance.SwapAvatars(currentAvatar.meta.content[1].url, () => { }, (message, code) => { });
                     
                     currentPersona.avatar = currentAvatar;
                     panelAvatar.SetActive(false);

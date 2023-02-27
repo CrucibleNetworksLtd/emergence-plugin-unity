@@ -191,36 +191,12 @@ namespace EmergenceSDK
 
                 requestingInProgress = false;
                 
-                if (!string.IsNullOrEmpty(currentPersona.avatarId))
-                {
-                    Services.Instance.AvatarById(currentPersona.avatarId, (avatar =>
-                    {
-                        // trigger swapping of the avatar
-                        Services.Instance.SwapAvatars(avatar.meta.content[1].url, () =>
-                        {
-                            // In case images were already cached
-                            if (imagesRefreshing.Count <= 0)
-                            {
-                                Modal.Instance.Hide();
-                            }
-                        }, (message, code) => {});
-                    
-                    }), (message, code) =>
-                    {
-                        Debug.LogError("Error fetching Avatar by id: " + message);
-                    });
-                }
-                else
-                {
-                    Services.Instance.SetDefaultAvatar();
-                }
-
-                // // In case images were already cached
-                // if (imagesRefreshing.Count <= 0)
-                // {
-                //     Modal.Instance.Hide();
-                // }
                 
+                
+                if (imagesRefreshing.Count <= 0)
+                {
+                    Modal.Instance.Hide();
+                }
             },
             (error, code) =>
             {

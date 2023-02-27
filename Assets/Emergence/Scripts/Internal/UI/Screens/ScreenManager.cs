@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -76,17 +77,17 @@ namespace EmergenceSDK
 
             GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
 
-            for (int i = 0; i < roots.Length; i++)
-            {
-                EventSystem[] ess = roots[i].GetComponentsInChildren<EventSystem>();
-
-                if (ess.Length > 0)
-                {
-                    EventSystem es = gameObject.GetComponentInChildren<EventSystem>();
-                    es.gameObject.SetActive(false);
-                    break;
-                }
-            }
+            // for (int i = 0; i < roots.Length; i++)
+            // {
+            //     EventSystem[] ess = roots[i].GetComponentsInChildren<EventSystem>();
+            //
+            //     if (ess.Length > 0)
+            //     {
+            //         EventSystem es = gameObject.GetComponentInChildren<EventSystem>();
+            //         es.gameObject.SetActive(false);
+            //         break;
+            //     }
+            // }
         }
 
         private void OnDestroy()
@@ -270,10 +271,10 @@ namespace EmergenceSDK
             ChangeState(ScreenStates.EditPersona);
         }
 
-        public void ShowCollection(bool dynamicMetadata = false)
+        public void ShowCollection(Action<InventoryItem> customOnClickHandler = null)
         {
             ChangeState(ScreenStates.Collection);
-            CollectionScreen.Instance.Refresh(dynamicMetadata);
+            CollectionScreen.Instance.Refresh(customOnClickHandler);
         }
 
         public void Restart()

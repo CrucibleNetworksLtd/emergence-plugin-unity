@@ -37,12 +37,20 @@ namespace EmergenceDemo
 
         private void ShowNFTPicker()
         {
-            Services.Instance.OpenNFTPicker();
+            Services.Instance.OpenNFTPicker(UpdateDynamicMetadata);
         }
 
-        private void UpdateDynamicMetadata()
+        private void UpdateDynamicMetadata(InventoryItem item)
         {
+            Debug.Log("Updating Dynamic metadata");
+            if (string.IsNullOrEmpty(item.meta.dynamicMetadata)) return;
+            var curMetadata = int.Parse(item.meta.dynamicMetadata);
+            curMetadata++;
 
+            Services.Instance.WriteDynamicMetadata(item.blockchain, item.contract, item.tokenId, curMetadata.ToString(), (string response) => {}, (string error, long code) => {});
+            EmergenceSingleton.Instance.CloseEmergeneUI();
         }
     }
 }
+
+

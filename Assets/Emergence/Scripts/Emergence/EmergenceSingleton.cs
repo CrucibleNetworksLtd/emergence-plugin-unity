@@ -1,10 +1,7 @@
-﻿using EmergenceSDK;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 namespace EmergenceSDK
 {
@@ -70,7 +67,9 @@ namespace EmergenceSDK
             if (ScreenManager.Instance == null)
             {
                 ui.SetActive(true);
-                Instantiate(Resources.Load<GameObject>("Emergence Root")).name = "Emergence UI Overlay";
+                GameObject UIRoot = Instantiate(Resources.Load<GameObject>("Emergence Root"));
+                UIRoot.name = "Emergence UI Overlay";
+                UIRoot.GetComponentInChildren<EventSystem>().enabled = true;
                 ui?.SetActive(false);
                 ScreenManager.Instance.gameObject.SetActive(true);
                 SaveCursor();
