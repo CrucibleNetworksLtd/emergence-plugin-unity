@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b788b53a5f437c0489c8bd8b4b4a8fc6, type: 3}
   m_Name: EthereumGoerli
   m_EditorClassIdentifier: 
-  DefaultNodeURL: https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161
+  DefaultNodeURL: https://goerli.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134
   ChainID: 5
   networkName: Goerli
