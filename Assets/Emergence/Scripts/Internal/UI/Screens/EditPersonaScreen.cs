@@ -295,17 +295,12 @@ namespace EmergenceSDK
                     });
                     break;
                 case States.EditAvatar:
-                    // Debug.Log("Setting current avatar to: " + currentAvatar.meta.name);
-                    // Debug.Log("Current avatar url: " + currentAvatar.meta.content[1].url);
-                    
-                    // Services.Instance.SwapAvatars(currentAvatar.meta.content[1].url, () => { }, (message, code) => { });
-                    
                     currentPersona.avatar = currentAvatar;
                     panelAvatar.SetActive(false);
                     panelInformation.SetActive(true);
                     replaceAvatarButton.gameObject.SetActive(true);
                     backButtonText.text = "Back";
-                    nextButtonText.text = "Confirm Avatar";
+                    nextButtonText.text = "Save Changes";
                     state = States.EditInformation;
                     break;
             }

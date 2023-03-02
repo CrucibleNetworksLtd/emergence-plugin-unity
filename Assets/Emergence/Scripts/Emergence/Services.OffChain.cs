@@ -358,20 +358,20 @@ namespace EmergenceSDK
         public async void WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, GenericError error)
         {
             metadata = "{\"metadata\": \"" + metadata + "\"}";
-
-            // if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
+            
             Debug.Log("Writing dynamic metadata for contract: " + contract);
             Debug.Log("Write dynamic metadata request started");
-            // string url = LocalEmergenceServer.Instance.Environment().InventoryURL + "updateMetadata?network=" + network + "&contract=" + contract + "&tokenId=" + tokenId;
             string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "updateMetadata?network=" + network + "&contract=" + contract + "&tokenId=" + tokenId;
             
             Debug.Log("Dynamic metadata url: " + url);
             Debug.Log("updated metadata: " + metadata);
-            
-            string response = await PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, error, metadata);
+
+            Dictionary<string, string> headers = new Dictionary<string, string>();
+            headers.Add("Authorization-header", "0iKoO1V2ZG98fPETreioOyEireDTYwby");
+            string response = await PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, error, metadata, headers);
             
             Debug.Log("Write dynamic metadata response: " + response.ToString());
-            InventoryByOwnerResponse inventoryResponse = SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ToString());
+            BaseResponse<string> dynamicMetadataResponse = SerializationHelper.Deserialize<BaseResponse<string>>(response.ToString());
             
             success?.Invoke(response.ToString());
            

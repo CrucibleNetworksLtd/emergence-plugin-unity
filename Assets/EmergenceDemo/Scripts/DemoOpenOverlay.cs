@@ -45,6 +45,7 @@ namespace EmergenceDemo
         }
 
         public void OnPersonaUpdated(Persona persona) {
+            Debug.Log("Changing avatar");
             if (persona != null && !string.IsNullOrEmpty(persona.avatarId))
             {
                 Services.Instance.AvatarById(persona.avatarId, (avatar =>

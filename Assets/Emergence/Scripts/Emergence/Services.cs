@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
@@ -154,9 +155,8 @@ namespace EmergenceSDK
             return isOk;
         }
 
-        private async UniTask<string> PerformAsyncWebRequest(string url, string method, GenericError error, string bodyData = "")
+        private async UniTask<string> PerformAsyncWebRequest(string url, string method, GenericError error, string bodyData = "", Dictionary<string, string> headers = null)
         {
-            // UnityWebRequest request; = new UnityWebRequest(url, method); //UnityWebRequest.Get(url);
             UnityWebRequest request;
             if (method.Equals(UnityWebRequest.kHttpVerbGET))
             {
@@ -167,13 +167,17 @@ namespace EmergenceSDK
                 request = UnityWebRequest.Post(url, string.Empty);
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(bodyData));
                 request.uploadHandler.contentType = "application/json";
-                // request.SetRequestHeader("Content-Type", "application/json");
             }
             try
             {
                 Debug.Log("AccessToken: " + currentAccessToken);
                 request.SetRequestHeader("Authorization", currentAccessToken);
-                request.SetRequestHeader("Authorization-header", "0iKoO1V2ZG98fPETreioOyEireDTYwby");
+
+                if (headers != null) {
+                    foreach (var key in headers.Keys) {
+                        request.SetRequestHeader(key, headers[key]);
+                    }
+                }
                 return (await request.SendWebRequest()).downloadHandler.text;
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))

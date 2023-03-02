@@ -79,10 +79,6 @@ namespace EmergenceSDK
 
         public void RequestToSign(string messageToSign, RequestToSignSuccess success, GenericError error)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
 
             StartCoroutine(CoroutineRequestToSignWalletConnect(messageToSign, success, error));
         }
@@ -92,21 +88,28 @@ namespace EmergenceSDK
         {
             Debug.Log("CoroutineRequestToSignWalletConnect request started");
             var content = "{\"message\": \"" + messageToSign + "\"}";
+            
+            Debug.Log("content: " + content);
 
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "request-to-sign";
+            
+            Debug.Log("url: " + url);
+            
+            Debug.Log("deviceId: " + EmergenceSingleton.Instance.CurrentDeviceId);
 
-            using (UnityWebRequest request = UnityWebRequest.Post(url, content))
+            using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
                 request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(content));
                 request.uploadHandler.contentType = "application/json";
                 request.SetRequestHeader("accept", "application/json");
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("ReinitializeWalletConnect", request);
-                if (ProcessRequest<RequestToSignResponse>(request, error, out var response))
+                if (ProcessRequest<BaseResponse<string>>(request, error, out var response))
                 {
-                    success?.Invoke(response.SignedMessage);
+                    success?.Invoke(response.message);
                 }
             }
         }
@@ -170,10 +173,6 @@ namespace EmergenceSDK
 
         public void Handshake(HandshakeSuccess success, GenericError error)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
 
             StartCoroutine(CoroutineHandshake(success, error));
         }
@@ -316,10 +315,6 @@ namespace EmergenceSDK
 
         public void GetBalance(BalanceSuccess success, GenericError error)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
 
             if (skipWallet)
             {
@@ -638,13 +633,9 @@ namespace EmergenceSDK
 
         public delegate void GetTransactionStatusSuccess<T>(T response);
 
-        internal void GetTransactionStatus<T>(string transactionHash, string nodeURL,
+        public void GetTransactionStatus<T>(string transactionHash, string nodeURL,
             GetTransactionStatusSuccess<T> success, GenericError error)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
 
             StartCoroutine(CoroutineGetTransactionStatus<T>(transactionHash, nodeURL, success, error));
         }
@@ -674,14 +665,9 @@ namespace EmergenceSDK
 
         public delegate void GetBlockNumberSuccess<T>(T response);
 
-        internal void GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
+        public void GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
             GetBlockNumberSuccess<T> success, GenericError error)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
-
             StartCoroutine(CoroutineGetBlockNumber<T, U>(transactionHash, nodeURL, body, success, error));
         }
 
