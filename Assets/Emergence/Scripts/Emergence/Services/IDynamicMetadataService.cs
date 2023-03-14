@@ -1,6 +1,9 @@
 using Cysharp.Threading.Tasks;
 using EmergenceSDK;
 
+/// <summary>
+/// Gives access to dynamic metadata. This service is off chain.
+/// </summary>
 public interface IDynamicMetadataService
 {
     /// <summary>
