@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using EmergenceSDK;
@@ -37,7 +38,8 @@ namespace EmergenceDemo
 
         private void ShowNFTPicker()
         {
-            Services.Instance.OpenNFTPicker(UpdateDynamicMetadata);
+            EmergenceSingleton.Instance.OpenEmergenceUI();
+            ScreenManager.Instance.ShowCollection(UpdateDynamicMetadata);
         }
 
         private void UpdateDynamicMetadata(InventoryItem item)

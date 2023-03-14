@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Emergence.Scripts.Emergence.Services;
 
 namespace EmergenceSDK
 {
@@ -21,6 +22,11 @@ namespace EmergenceSDK
 
         public IPersonaService PersonaService { get; private set; }
 
+        public IAvatarService AvatarService { get; private set; }
+        
+        public IInventoryService InventoryService { get; private set; }
+        
+        public IDynamicMetadataService DynamicMetadataService { get; private set; }
 
         private bool skipWallet = false;
 
@@ -30,6 +36,9 @@ namespace EmergenceSDK
         {
             Instance = this;
             PersonaService = gameObject.AddComponent<PersonaService>();
+            AvatarService = new AvatarService();
+            InventoryService = new InventoryService();
+            DynamicMetadataService = new DynamicMetadataService();
         }
 
         private bool refreshingToken = false;
@@ -162,7 +171,8 @@ namespace EmergenceSDK
             return isOk;
         }
 
-        private async UniTask<string> PerformAsyncWebRequest(string url, string method, ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null)
+        //TODO: move this to a utility class
+        public static async UniTask<string> PerformAsyncWebRequest(string url, string method, ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null)
         {
             UnityWebRequest request;
             if (method.Equals(UnityWebRequest.kHttpVerbGET))
@@ -177,8 +187,8 @@ namespace EmergenceSDK
             }
             try
             {
-                Debug.Log("AccessToken: " + currentAccessToken);
-                request.SetRequestHeader("Authorization", currentAccessToken);
+                Debug.Log("AccessToken: " + Services.Instance.CurrentAccessToken);
+                request.SetRequestHeader("Authorization", Services.Instance.CurrentAccessToken);
 
                 if (headers != null) {
                     foreach (var key in headers.Keys) {
