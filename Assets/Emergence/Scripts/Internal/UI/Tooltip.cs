@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using TMPro;
+﻿using TMPro;
+using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI
 {
     public class Tooltip : MonoBehaviour
     {

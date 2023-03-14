@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text;
+using EmergenceSDK.StarterAssets.InputSystem;
+using EmergenceSDK.StarterAssets.ThirdPersonController.Scripts;
 using UnityEditor;
 using UnityEngine;
 

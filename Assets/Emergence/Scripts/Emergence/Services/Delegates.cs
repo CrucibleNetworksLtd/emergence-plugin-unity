@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using EmergenceSDK.Types;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Services
 {
     public delegate void SuccessPersonas(List<Persona> personas, Persona currentPersona);
     public delegate void ErrorCallback(string message, long code);

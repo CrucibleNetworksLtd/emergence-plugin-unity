@@ -1,41 +1,44 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
-public class UIVirtualButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
+namespace EmergenceSDK.StarterAssets.Mobile.Scripts.VirtualInputs
 {
-    [System.Serializable]
-    public class BoolEvent : UnityEvent<bool> { }
-    [System.Serializable]
-    public class Event : UnityEvent { }
-
-    [Header("Output")]
-    public BoolEvent buttonStateOutputEvent;
-    public Event buttonClickOutputEvent;
-
-    public void OnPointerDown(PointerEventData eventData)
+    public class UIVirtualButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
     {
-        OutputButtonStateValue(true);
-    }
+        [System.Serializable]
+        public class BoolEvent : UnityEvent<bool> { }
+        [System.Serializable]
+        public class Event : UnityEvent { }
 
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        OutputButtonStateValue(false);
-    }
+        [Header("Output")]
+        public BoolEvent buttonStateOutputEvent;
+        public Event buttonClickOutputEvent;
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            OutputButtonStateValue(true);
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            OutputButtonStateValue(false);
+        }
     
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        OutputButtonClickEvent();
-    }
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            OutputButtonClickEvent();
+        }
 
-    void OutputButtonStateValue(bool buttonState)
-    {
-        buttonStateOutputEvent.Invoke(buttonState);
-    }
+        void OutputButtonStateValue(bool buttonState)
+        {
+            buttonStateOutputEvent.Invoke(buttonState);
+        }
 
-    void OutputButtonClickEvent()
-    {
-        buttonClickOutputEvent.Invoke();
-    }
+        void OutputButtonClickEvent()
+        {
+            buttonClickOutputEvent.Invoke();
+        }
 
+    }
 }

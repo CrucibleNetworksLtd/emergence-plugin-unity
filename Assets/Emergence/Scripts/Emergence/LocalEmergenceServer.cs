@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using UnityEngine;
-using UnityEngine.Networking;
-using static EmergenceSDK.EmergenceServices;
+﻿using EmergenceSDK.Internal.Utils;
 
 namespace EmergenceSDK
 {

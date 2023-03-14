@@ -1,11 +1,8 @@
-using System;
+using EmergenceSDK.Services;
 using UnityEngine;
-using EmergenceSDK;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
-using Avatar = EmergenceSDK.Avatar;
 
-namespace EmergenceDemo
+namespace EmergenceSDK.EmergenceDemo.Scripts
 {
     public class DemoSignMessage : MonoBehaviour
     {

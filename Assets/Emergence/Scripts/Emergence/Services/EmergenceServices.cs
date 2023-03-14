@@ -1,13 +1,17 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Services;
+using EmergenceSDK.Internal.UI;
+using EmergenceSDK.Internal.UI.Screens;
+using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Types.Responses;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
-using Cysharp.Threading.Tasks;
-using EmergenceSDK.Emergence.Scripts.Emergence.Services;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Services
 {
     /// <summary>
     /// The services singleton provides you with all the methods you need to get going with Emergence.

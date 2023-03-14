@@ -1,9 +1,9 @@
 ﻿using System;
+using EmergenceSDK.Types;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI.Screens
 {
     public class ScreenManager : MonoBehaviour
     {

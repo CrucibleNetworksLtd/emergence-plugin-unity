@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.Utils
 {
     public static class UnitConverter
     {

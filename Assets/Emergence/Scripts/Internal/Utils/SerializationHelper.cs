@@ -1,7 +1,6 @@
-using UnityEngine;
 using Newtonsoft.Json;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.Utils
 {
     public static class SerializationHelper
     {

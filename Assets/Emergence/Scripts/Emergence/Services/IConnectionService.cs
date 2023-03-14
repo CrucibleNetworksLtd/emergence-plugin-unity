@@ -1,6 +1,7 @@
-using EmergenceSDK;
-
-public interface IConnectionService
+namespace EmergenceSDK.Services
 {
-    void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback);
+    public interface IConnectionService
+    {
+        void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback);
+    }
 }

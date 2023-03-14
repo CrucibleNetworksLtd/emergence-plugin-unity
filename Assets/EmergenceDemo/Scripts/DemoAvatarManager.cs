@@ -1,9 +1,10 @@
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
 using UniVRM10;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.EmergenceDemo.Scripts
 {
     public class DemoAvatarManager : SingletonComponent<DemoAvatarManager>
     {

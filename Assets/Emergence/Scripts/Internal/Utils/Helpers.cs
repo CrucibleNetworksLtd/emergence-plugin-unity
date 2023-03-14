@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using EmergenceSDK.Types;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.Utils
 {
     public static class Helpers
     {

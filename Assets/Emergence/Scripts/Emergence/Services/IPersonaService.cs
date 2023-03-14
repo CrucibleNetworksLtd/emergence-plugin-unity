@@ -1,4 +1,6 @@
-namespace EmergenceSDK
+using EmergenceSDK.Types;
+
+namespace EmergenceSDK.Services
 {
     public interface IPersonaService
     {

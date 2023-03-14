@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI
 {
     public class InventoryItemEntry : MonoBehaviour
     {

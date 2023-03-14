@@ -1,9 +1,7 @@
-﻿using EmergenceSDK;
-using System.Collections;
-using System.Collections.Generic;
+﻿using EmergenceSDK.Types;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "Configuration", menuName = "EmergenceConfiguration", order = 1)]
     public class EmergenceConfiguration : ScriptableObject

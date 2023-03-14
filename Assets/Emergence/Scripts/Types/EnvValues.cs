@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace EmergenceSDK
+﻿namespace EmergenceSDK.Types
 {
     public class EnvValues
     {

@@ -1,10 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using EmergenceSDK;
+using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.ScriptableObjects;
+using EmergenceSDK.Types;
+using EmergenceSDK.Types.Responses;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace EmergenceDemo
+namespace EmergenceSDK.EmergenceDemo.Scripts
 {
     public class DemoReadMethod : MonoBehaviour
     {

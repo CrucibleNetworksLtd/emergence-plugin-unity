@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using DG.Tweening;
+using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
-using UniVRM10;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI.Screens
 {
     
     public class CollectionScreen : MonoBehaviour
@@ -204,10 +202,10 @@ namespace EmergenceSDK
             
             if (!isItemSelected)
             {
-                DOTween.To(() => detailsPanel.GetComponent<RectTransform>().anchoredPosition,
+                DG.Tweening.DOTween.To(() => detailsPanel.GetComponent<RectTransform>().anchoredPosition,
                     x=> detailsPanel.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, 0), 0.25f);
                 
-                DOTween.To(() => itemsListPanel.GetComponent<RectTransform>().offsetMax,
+                DG.Tweening.DOTween.To(() => itemsListPanel.GetComponent<RectTransform>().offsetMax,
                     x=> itemsListPanel.GetComponent<RectTransform>().offsetMax = x, new Vector2(-443.5f, 0), 0.25f);
 
                 isItemSelected = true;
@@ -216,10 +214,10 @@ namespace EmergenceSDK
         }
 
         public void OnCloseDetailsPanelButtonPressed() {
-            DOTween.To(() => detailsPanel.GetComponent<RectTransform>().anchoredPosition,
+            DG.Tweening.DOTween.To(() => detailsPanel.GetComponent<RectTransform>().anchoredPosition,
                 x=> detailsPanel.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(Screen.width / 2, 0), 0.25f);
                 
-            DOTween.To(() => itemsListPanel.GetComponent<RectTransform>().offsetMax,
+            DG.Tweening.DOTween.To(() => itemsListPanel.GetComponent<RectTransform>().offsetMax,
                 x=> itemsListPanel.GetComponent<RectTransform>().offsetMax = x, new Vector2(0, 0), 0.25f);
             
             isItemSelected = false;

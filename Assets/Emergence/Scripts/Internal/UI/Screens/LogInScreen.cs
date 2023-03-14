@@ -1,8 +1,10 @@
-﻿using TMPro;
+﻿using EmergenceSDK.Services;
+using EmergenceSDK.Types;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI.Screens
 {
     public class LogInScreen : MonoBehaviour
     {

@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using EmergenceSDK.Services;
+using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.Utils
 {
     public static class ContractHelper
     {

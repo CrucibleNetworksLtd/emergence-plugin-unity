@@ -1,15 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
+using Avatar = EmergenceSDK.Types.Avatar;
 
-using UniGLTF;
-using UniVRM10;
-
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI.Screens
 {
     public class EditPersonaScreen : MonoBehaviour
     {

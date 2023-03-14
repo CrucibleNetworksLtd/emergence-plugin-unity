@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.ScriptableObjects
 {
     [CreateAssetMenu(fileName = "DeployedSmartContract", menuName = "Deployed Smart Contract", order = 2)]
     public class DeployedSmartContract : ScriptableObject

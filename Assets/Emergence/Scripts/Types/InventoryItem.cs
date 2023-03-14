@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Types
 {
     public class InventoryItem
     {

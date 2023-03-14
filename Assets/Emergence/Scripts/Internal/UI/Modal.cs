@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI
 {
     public class Modal : MonoBehaviour
     {

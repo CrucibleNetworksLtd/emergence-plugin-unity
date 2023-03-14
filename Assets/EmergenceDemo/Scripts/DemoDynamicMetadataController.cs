@@ -1,11 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using EmergenceSDK;
+using EmergenceSDK.Internal.UI.Screens;
+using EmergenceSDK.ScriptableObjects;
+using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace EmergenceDemo
+namespace EmergenceSDK.EmergenceDemo.Scripts
 {
     public class DemoDynamicMetadataController : MonoBehaviour
     {

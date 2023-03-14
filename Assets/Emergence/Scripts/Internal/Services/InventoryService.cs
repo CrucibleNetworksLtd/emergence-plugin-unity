@@ -1,21 +1,27 @@
 using Cysharp.Threading.Tasks;
-using EmergenceSDK;
+using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
+using EmergenceSDK.Types;
+using EmergenceSDK.Types.Responses;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class InventoryService : IInventoryService
+namespace EmergenceSDK.Internal.Services
 {
-    public async UniTask InventoryByOwner(string address, SuccessInventoryByOwner success, ErrorCallback errorCallback)
+    public class InventoryService : IInventoryService
     {
-        Debug.Log("Getting inventory for address: " + address);
-        string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address;
-        Debug.Log("Requesting inventory from URL: " + url);
-        string response = await EmergenceServices.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
+        public async UniTask InventoryByOwner(string address, SuccessInventoryByOwner success, ErrorCallback errorCallback)
+        {
+            Debug.Log("Getting inventory for address: " + address);
+            string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address;
+            Debug.Log("Requesting inventory from URL: " + url);
+            string response = await EmergenceServices.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
 
-        Debug.Log("Inventory response: " + response.ToString());
-        InventoryByOwnerResponse inventoryResponse =
-            SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ToString());
+            Debug.Log("Inventory response: " + response.ToString());
+            InventoryByOwnerResponse inventoryResponse =
+                SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ToString());
 
-        success?.Invoke(inventoryResponse.message.items);
+            success?.Invoke(inventoryResponse.message.items);
+        }
     }
 }

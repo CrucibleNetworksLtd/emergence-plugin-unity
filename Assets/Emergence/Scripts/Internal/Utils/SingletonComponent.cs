@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.Utils
 {
     public abstract class SingletonComponent<T> : MonoBehaviour where T : SingletonComponent<T>
     {

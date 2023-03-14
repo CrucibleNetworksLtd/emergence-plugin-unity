@@ -1,4 +1,4 @@
-﻿namespace EmergenceSDK
+﻿namespace EmergenceSDK.Types
 {
     public class Account
     {

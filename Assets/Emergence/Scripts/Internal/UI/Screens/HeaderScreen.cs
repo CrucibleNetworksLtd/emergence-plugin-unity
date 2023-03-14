@@ -1,8 +1,10 @@
-﻿using TMPro;
+﻿using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI.Screens
 {
     public class HeaderScreen : MonoBehaviour
     {

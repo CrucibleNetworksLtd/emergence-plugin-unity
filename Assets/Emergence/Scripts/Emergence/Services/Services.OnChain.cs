@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
+using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Types;
+using EmergenceSDK.Types.Responses;
 using UnityEngine;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Services
 {
     public partial class EmergenceServices
     {

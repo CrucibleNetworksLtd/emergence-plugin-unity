@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Types
 {
     public class Avatar
     {

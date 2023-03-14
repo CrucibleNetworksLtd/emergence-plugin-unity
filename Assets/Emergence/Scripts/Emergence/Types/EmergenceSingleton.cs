@@ -1,9 +1,12 @@
 ﻿using System;
+using EmergenceSDK.Internal.UI.Screens;
+using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Types
 {
     public class EmergenceSingleton : SingletonComponent<EmergenceSingleton>
     {

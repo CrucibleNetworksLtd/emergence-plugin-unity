@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI
 {
     public class DropdownFix : MonoBehaviour
     {

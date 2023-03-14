@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
+using UnityEngine;
 using UnityEngine.UI;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI.Screens
 {
     public class WelcomeScreen : MonoBehaviour
     {

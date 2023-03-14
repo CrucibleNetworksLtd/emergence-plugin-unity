@@ -1,10 +1,13 @@
 ﻿using System.Linq;
+using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI
 {
     public class PersonaScrollItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {

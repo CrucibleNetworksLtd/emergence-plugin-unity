@@ -1,8 +1,10 @@
 ﻿using System.Linq;
+using EmergenceSDK.Internal.Utils;
 using UnityEngine;
 using UnityEngine.UI;
+using Avatar = EmergenceSDK.Types.Avatar;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Internal.UI
 {
     public class AvatarScrollItem : MonoBehaviour
     {

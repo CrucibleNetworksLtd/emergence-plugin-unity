@@ -1,113 +1,116 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
-public class UIVirtualJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+namespace EmergenceSDK.StarterAssets.Mobile.Scripts.VirtualInputs
 {
-    [System.Serializable]
-    public class Event : UnityEvent<Vector2> { }
+    public class UIVirtualJoystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+    {
+        [System.Serializable]
+        public class Event : UnityEvent<Vector2> { }
     
-    [Header("Rect References")]
-    public RectTransform containerRect;
-    public RectTransform handleRect;
+        [Header("Rect References")]
+        public RectTransform containerRect;
+        public RectTransform handleRect;
 
-    [Header("Settings")]
-    public float joystickRange = 50f;
-    public float magnitudeMultiplier = 1f;
-    public bool invertXOutputValue;
-    public bool invertYOutputValue;
+        [Header("Settings")]
+        public float joystickRange = 50f;
+        public float magnitudeMultiplier = 1f;
+        public bool invertXOutputValue;
+        public bool invertYOutputValue;
 
-    [Header("Output")]
-    public Event joystickOutputEvent;
+        [Header("Output")]
+        public Event joystickOutputEvent;
 
-    void Start()
-    {
-        SetupHandle();
-    }
-
-    private void SetupHandle()
-    {
-        if(handleRect)
+        void Start()
         {
-            UpdateHandleRectPosition(Vector2.zero);
+            SetupHandle();
         }
-    }
 
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        OnDrag(eventData);
-    }
+        private void SetupHandle()
+        {
+            if(handleRect)
+            {
+                UpdateHandleRectPosition(Vector2.zero);
+            }
+        }
 
-    public void OnDrag(PointerEventData eventData)
-    {
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            OnDrag(eventData);
+        }
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(containerRect, eventData.position, eventData.pressEventCamera, out Vector2 position);
+        public void OnDrag(PointerEventData eventData)
+        {
+
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(containerRect, eventData.position, eventData.pressEventCamera, out Vector2 position);
         
-        position = ApplySizeDelta(position);
+            position = ApplySizeDelta(position);
         
-        Vector2 clampedPosition = ClampValuesToMagnitude(position);
+            Vector2 clampedPosition = ClampValuesToMagnitude(position);
 
-        Vector2 outputPosition = ApplyInversionFilter(position);
+            Vector2 outputPosition = ApplyInversionFilter(position);
 
-        OutputPointerEventValue(outputPosition * magnitudeMultiplier);
+            OutputPointerEventValue(outputPosition * magnitudeMultiplier);
 
-        if(handleRect)
-        {
-            UpdateHandleRectPosition(clampedPosition * joystickRange);
-        }
+            if(handleRect)
+            {
+                UpdateHandleRectPosition(clampedPosition * joystickRange);
+            }
         
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        OutputPointerEventValue(Vector2.zero);
-
-        if(handleRect)
-        {
-             UpdateHandleRectPosition(Vector2.zero);
-        }
-    }
-
-    private void OutputPointerEventValue(Vector2 pointerPosition)
-    {
-        joystickOutputEvent.Invoke(pointerPosition);
-    }
-
-    private void UpdateHandleRectPosition(Vector2 newPosition)
-    {
-        handleRect.anchoredPosition = newPosition;
-    }
-
-    Vector2 ApplySizeDelta(Vector2 position)
-    {
-        float x = (position.x/containerRect.sizeDelta.x) * 2.5f;
-        float y = (position.y/containerRect.sizeDelta.y) * 2.5f;
-        return new Vector2(x, y);
-    }
-
-    Vector2 ClampValuesToMagnitude(Vector2 position)
-    {
-        return Vector2.ClampMagnitude(position, 1);
-    }
-
-    Vector2 ApplyInversionFilter(Vector2 position)
-    {
-        if(invertXOutputValue)
-        {
-            position.x = InvertValue(position.x);
         }
 
-        if(invertYOutputValue)
+        public void OnPointerUp(PointerEventData eventData)
         {
-            position.y = InvertValue(position.y);
+            OutputPointerEventValue(Vector2.zero);
+
+            if(handleRect)
+            {
+                UpdateHandleRectPosition(Vector2.zero);
+            }
         }
 
-        return position;
-    }
+        private void OutputPointerEventValue(Vector2 pointerPosition)
+        {
+            joystickOutputEvent.Invoke(pointerPosition);
+        }
 
-    float InvertValue(float value)
-    {
-        return -value;
-    }
+        private void UpdateHandleRectPosition(Vector2 newPosition)
+        {
+            handleRect.anchoredPosition = newPosition;
+        }
+
+        Vector2 ApplySizeDelta(Vector2 position)
+        {
+            float x = (position.x/containerRect.sizeDelta.x) * 2.5f;
+            float y = (position.y/containerRect.sizeDelta.y) * 2.5f;
+            return new Vector2(x, y);
+        }
+
+        Vector2 ClampValuesToMagnitude(Vector2 position)
+        {
+            return Vector2.ClampMagnitude(position, 1);
+        }
+
+        Vector2 ApplyInversionFilter(Vector2 position)
+        {
+            if(invertXOutputValue)
+            {
+                position.x = InvertValue(position.x);
+            }
+
+            if(invertYOutputValue)
+            {
+                position.y = InvertValue(position.y);
+            }
+
+            return position;
+        }
+
+        float InvertValue(float value)
+        {
+            return -value;
+        }
     
+    }
 }

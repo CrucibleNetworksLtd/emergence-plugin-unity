@@ -1,4 +1,4 @@
-﻿namespace EmergenceSDK
+﻿namespace EmergenceSDK.Types
 {
     public enum StatusCode
     {

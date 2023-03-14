@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 
-namespace EmergenceSDK.Emergence.Scripts.Emergence.Services
+namespace EmergenceSDK.Services
 {
     /// <summary>
     /// Provides access to the avatar API. This service is off chain.

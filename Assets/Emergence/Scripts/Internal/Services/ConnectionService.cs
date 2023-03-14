@@ -1,32 +1,36 @@
 using System.Collections;
-using EmergenceSDK;
-using EmergenceSDK.Emergence.Scripts.Emergence.Services;
+using EmergenceSDK.Services;
+using EmergenceSDK.Types;
+using EmergenceSDK.Types.Responses;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class ConnectionService : MonoBehaviour, IConnectionService
+namespace EmergenceSDK.Internal.Services
 {
-    public void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
+    public class ConnectionService : MonoBehaviour, IConnectionService
     {
-        StartCoroutine(CoroutineIsConnected(success, errorCallback));
-    }
-
-    private IEnumerator CoroutineIsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
-    {
-        Debug.Log("CoroutineIsConnected request started");
-
-        // string url = EmergenceSingleton.Instance.Configuration.APIBase + "isConnected";
-        string url = EmergenceSingleton.Instance.Configuration.APIBase + "isConnected";
-        Debug.Log("url: " + url);
-
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        public void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
         {
-            request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-            yield return request.SendWebRequest();
-            EmergenceServices.PrintRequestResult("IsConnected", request);
-            if (EmergenceServices.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
+            StartCoroutine(CoroutineIsConnected(success, errorCallback));
+        }
+
+        private IEnumerator CoroutineIsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
+        {
+            Debug.Log("CoroutineIsConnected request started");
+
+            // string url = EmergenceSingleton.Instance.Configuration.APIBase + "isConnected";
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "isConnected";
+            Debug.Log("url: " + url);
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
-                success?.Invoke(response.isConnected);
+                request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
+                yield return request.SendWebRequest();
+                EmergenceServices.PrintRequestResult("IsConnected", request);
+                if (EmergenceServices.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
+                {
+                    success?.Invoke(response.isConnected);
+                }
             }
         }
     }

@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Cysharp.Threading.Tasks;
-using EmergenceSDK.Emergence.Scripts.Emergence.Services;
-using UnityEngine.Networking;
-using Debug = UnityEngine.Debug;
+﻿using EmergenceSDK.Types;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Services
 {
     public partial class EmergenceServices
     {

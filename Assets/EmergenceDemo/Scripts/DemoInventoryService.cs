@@ -1,13 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using DG.Tweening;
-using EmergenceSDK;
+using EmergenceSDK.Internal.UI;
+using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace EmergenceDemo
+namespace EmergenceSDK.EmergenceDemo.Scripts
 {
     public class DemoInventoryService : MonoBehaviour
     {
@@ -47,7 +46,7 @@ namespace EmergenceDemo
         {
             if (!isInventoryVisible)
             {
-                DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
+                DG.Tweening.DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
                     x => scrollView.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, 0), 0.25f);
                 isInventoryVisible = true;
                 Cursor.visible = true;
@@ -55,7 +54,7 @@ namespace EmergenceDemo
             }
             else
             {
-                DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
+                DG.Tweening.DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
                     x => scrollView.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, -200f), 0.25f);
                 isInventoryVisible = false;
                 Cursor.visible = false;
