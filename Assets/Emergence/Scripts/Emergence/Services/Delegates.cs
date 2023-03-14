@@ -17,4 +17,6 @@ namespace EmergenceSDK
     public delegate void SuccessInventoryByOwner(List<InventoryItem> inventoryItems);
     
     public delegate void SuccessWriteDynamicMetadata(string response);
+    
+    public delegate void IsConnectedSuccess(bool connected);
 }

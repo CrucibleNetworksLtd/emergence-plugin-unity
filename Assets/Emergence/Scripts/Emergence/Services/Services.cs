@@ -27,6 +27,8 @@ namespace EmergenceSDK
         public IInventoryService InventoryService { get; private set; }
         
         public IDynamicMetadataService DynamicMetadataService { get; private set; }
+        
+        public IConnectionService ConnectionService { get; private set; }
 
         private bool skipWallet = false;
 
@@ -39,6 +41,7 @@ namespace EmergenceSDK
             AvatarService = new AvatarService();
             InventoryService = new InventoryService();
             DynamicMetadataService = new DynamicMetadataService();
+            ConnectionService = gameObject.AddComponent<ConnectionService>();
         }
 
         private bool refreshingToken = false;
@@ -123,7 +126,8 @@ namespace EmergenceSDK
             }
         }
 
-        public bool ProcessRequest<T>(UnityWebRequest request, ErrorCallback errorCallback, out T response)
+        //TODO: move this to a utility class
+        public static bool ProcessRequest<T>(UnityWebRequest request, ErrorCallback errorCallback, out T response)
         {
             Debug.Log("Processing request: " + request.url);
             
@@ -152,7 +156,8 @@ namespace EmergenceSDK
             return isOk;
         }
 
-        public bool ProcessResponse<T>(UnityWebRequest request, out BaseResponse<T> response, out BaseResponse<string> errorResponse)
+        //TODO: move this to a utility class
+        public static bool ProcessResponse<T>(UnityWebRequest request, out BaseResponse<T> response, out BaseResponse<string> errorResponse)
         {
             bool isOk = true;
             errorResponse = null;
