@@ -8,22 +8,28 @@ using Cysharp.Threading.Tasks;
 
 namespace EmergenceSDK
 {
+    /// <summary>
+    /// The services singleton provides you with all the methods you need to get going with Emergence.
+    /// </summary>
+    /// <remarks>See our prefabs for examples of how to use it!</remarks>
     public partial class Services : MonoBehaviour
     {
-
+        public string CurrentAccessToken => currentAccessToken;
         private string currentAccessToken = string.Empty;
 
         public static Services Instance;
 
-        private bool skipWallet = false;
+        public IPersonaService PersonaService { get; private set; }
 
-        public delegate void GenericError(string message, long code);
+
+        private bool skipWallet = false;
 
         #region Monobehaviour
 
         private void Awake()
         {
             Instance = this;
+            PersonaService = gameObject.AddComponent<PersonaService>();
         }
 
         private bool refreshingToken = false;
@@ -70,12 +76,13 @@ namespace EmergenceSDK
         }
 
         private Expiration expiration;
+
         private void ProcessExpiration(string expirationMessage)
         {
             expiration = SerializationHelper.Deserialize<Expiration>(expirationMessage);
         }
 
-        internal static bool RequestError(UnityWebRequest request)
+        public static bool RequestError(UnityWebRequest request)
         {
             bool error = false;
 #if UNITY_2020_1_OR_NEWER
@@ -94,7 +101,7 @@ namespace EmergenceSDK
             return error;
         }
 
-        internal static void PrintRequestResult(string name, UnityWebRequest request)
+        public static void PrintRequestResult(string name, UnityWebRequest request)
         {
             Debug.Log(name + " completed " + request.responseCode);
             if (RequestError(request))
@@ -107,7 +114,7 @@ namespace EmergenceSDK
             }
         }
 
-        public bool ProcessRequest<T>(UnityWebRequest request, GenericError error, out T response)
+        public bool ProcessRequest<T>(UnityWebRequest request, ErrorCallback errorCallback, out T response)
         {
             Debug.Log("Processing request: " + request.url);
             
@@ -116,7 +123,7 @@ namespace EmergenceSDK
 
             if (RequestError(request))
             {
-                error?.Invoke(request.error, request.responseCode);
+                errorCallback?.Invoke(request.error, request.responseCode);
             }
             else
             {
@@ -124,7 +131,7 @@ namespace EmergenceSDK
                 BaseResponse<string> errorResponse;
                 if (!ProcessResponse(request, out okresponse, out errorResponse))
                 {
-                    error?.Invoke(errorResponse.message, (long)errorResponse.statusCode);
+                    errorCallback?.Invoke(errorResponse.message, (long)errorResponse.statusCode);
                 }
                 else
                 {
@@ -155,7 +162,7 @@ namespace EmergenceSDK
             return isOk;
         }
 
-        private async UniTask<string> PerformAsyncWebRequest(string url, string method, GenericError error, string bodyData = "", Dictionary<string, string> headers = null)
+        private async UniTask<string> PerformAsyncWebRequest(string url, string method, ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null)
         {
             UnityWebRequest request;
             if (method.Equals(UnityWebRequest.kHttpVerbGET))
@@ -182,7 +189,7 @@ namespace EmergenceSDK
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
-                error?.Invoke(request.error, request.responseCode);
+                errorCallback?.Invoke(request.error, request.responseCode);
                 return ex.Message;
             }
         }

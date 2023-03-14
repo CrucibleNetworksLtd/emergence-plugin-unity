@@ -12,12 +12,12 @@ namespace EmergenceSDK
 
         public delegate void IsConnectedSuccess(bool connected);
 
-        public void IsConnected(IsConnectedSuccess success, GenericError error)
+        public void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
         {
-            StartCoroutine(CoroutineIsConnected(success, error));
+            StartCoroutine(CoroutineIsConnected(success, errorCallback));
         }
 
-        private IEnumerator CoroutineIsConnected(IsConnectedSuccess success, GenericError error)
+        private IEnumerator CoroutineIsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("CoroutineIsConnected request started");
 
@@ -30,7 +30,7 @@ namespace EmergenceSDK
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
                 yield return request.SendWebRequest();
                 PrintRequestResult("IsConnected", request);
-                if (ProcessRequest<IsConnectedResponse>(request, error, out var response))
+                if (ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.isConnected);
                 }
@@ -43,18 +43,18 @@ namespace EmergenceSDK
 
         public delegate void ReinitializeWalletConnectSuccess(bool disconnected);
 
-        public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, GenericError error)
+        public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, ErrorCallback errorCallback)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv())
             // {
             //     return;
             // }
 
-            StartCoroutine(CoroutineReinitializeWalletConnect(success, error));
+            StartCoroutine(CoroutineReinitializeWalletConnect(success, errorCallback));
         }
 
         private IEnumerator CoroutineReinitializeWalletConnect(ReinitializeWalletConnectSuccess success,
-            GenericError error)
+            ErrorCallback errorCallback)
         {
             Debug.Log("CoroutineReinitializeWalletConnect request started");
 
@@ -64,7 +64,7 @@ namespace EmergenceSDK
             {
                 yield return request.SendWebRequest();
                 PrintRequestResult("ReinitializeWalletConnect", request);
-                if (ProcessRequest<ReinitializeWalletConnectResponse>(request, error, out var response))
+                if (ProcessRequest<ReinitializeWalletConnectResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.disconnected);
                 }
@@ -77,14 +77,14 @@ namespace EmergenceSDK
 
         public delegate void RequestToSignSuccess(string signedMessage);
 
-        public void RequestToSign(string messageToSign, RequestToSignSuccess success, GenericError error)
+        public void RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback)
         {
 
-            StartCoroutine(CoroutineRequestToSignWalletConnect(messageToSign, success, error));
+            StartCoroutine(CoroutineRequestToSignWalletConnect(messageToSign, success, errorCallback));
         }
 
         private IEnumerator CoroutineRequestToSignWalletConnect(string messageToSign, RequestToSignSuccess success,
-            GenericError error)
+            ErrorCallback errorCallback)
         {
             Debug.Log("CoroutineRequestToSignWalletConnect request started");
             var content = "{\"message\": \"" + messageToSign + "\"}";
@@ -107,7 +107,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("ReinitializeWalletConnect", request);
-                if (ProcessRequest<BaseResponse<string>>(request, error, out var response))
+                if (ProcessRequest<BaseResponse<string>>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.message);
                 }
@@ -120,13 +120,13 @@ namespace EmergenceSDK
 
         public delegate void QRCodeSuccess(Texture2D qrCode, string deviceId);
 
-        public void GetQRCode(QRCodeSuccess success, GenericError error)
+        public void GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("Getting QR code");
-            StartCoroutine(CoroutineGetQrCode(success, error));
+            StartCoroutine(CoroutineGetQrCode(success, errorCallback));
         }
 
-        private IEnumerator CoroutineGetQrCode(QRCodeSuccess success, GenericError error)
+        private IEnumerator CoroutineGetQrCode(QRCodeSuccess success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "qrcode";
 
@@ -138,7 +138,7 @@ namespace EmergenceSDK
 
                 if (RequestError(request))
                 {
-                    error?.Invoke(request.error, request.responseCode);
+                    errorCallback?.Invoke(request.error, request.responseCode);
                 }
                 else
                 {
@@ -171,13 +171,13 @@ namespace EmergenceSDK
 
         public delegate void HandshakeSuccess(string walletAddress);
 
-        public void Handshake(HandshakeSuccess success, GenericError error)
+        public void Handshake(HandshakeSuccess success, ErrorCallback errorCallback)
         {
 
-            StartCoroutine(CoroutineHandshake(success, error));
+            StartCoroutine(CoroutineHandshake(success, errorCallback));
         }
 
-        private IEnumerator CoroutineHandshake(HandshakeSuccess success, GenericError error)
+        private IEnumerator CoroutineHandshake(HandshakeSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("Handshake request started");
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "handshake" + "?nodeUrl=" +
@@ -189,7 +189,7 @@ namespace EmergenceSDK
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
                 yield return request.SendWebRequest();
                 PrintRequestResult("Handshake", request);
-                if (ProcessRequest<HandshakeResponse>(request, error, out var response))
+                if (ProcessRequest<HandshakeResponse>(request, errorCallback, out var response))
                 {
                     Address = response.address;
                     EmergenceSingleton.Instance.SetCachedAddress(response.address);
@@ -204,13 +204,13 @@ namespace EmergenceSDK
 
         public delegate void CreateWalletSuccess();
 
-        public void CreateWallet(string path, string password, CreateWalletSuccess success, GenericError error)
+        public void CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback)
         {
-            StartCoroutine(CoroutineCreateWallet(path, password, success, error));
+            StartCoroutine(CoroutineCreateWallet(path, password, success, errorCallback));
         }
 
         private IEnumerator CoroutineCreateWallet(string path, string password, CreateWalletSuccess success,
-            GenericError error)
+            ErrorCallback errorCallback)
         {
             Debug.Log("CreateWallet request started");
 
@@ -223,7 +223,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Create Wallet", request);
-                if (ProcessRequest<string>(request, error, out var response))
+                if (ProcessRequest<string>(request, errorCallback, out var response))
                 {
                     success?.Invoke();
                 }
@@ -237,13 +237,13 @@ namespace EmergenceSDK
         public delegate void CreateKeyStoreSuccess();
 
         public void CreateKeyStore(string privateKey, string password, string publicKey, string path,
-            CreateKeyStoreSuccess success, GenericError error)
+            CreateKeyStoreSuccess success, ErrorCallback errorCallback)
         {
-            StartCoroutine(CoroutineKeyStore(privateKey, password, publicKey, path, success, error));
+            StartCoroutine(CoroutineKeyStore(privateKey, password, publicKey, path, success, errorCallback));
         }
 
         private IEnumerator CoroutineKeyStore(string privateKey, string password, string publicKey, string path,
-            CreateKeyStoreSuccess success, GenericError error)
+            CreateKeyStoreSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("Create KeyStore request started");
 
@@ -256,7 +256,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Key Store", request);
-                if (ProcessRequest<string>(request, error, out var response))
+                if (ProcessRequest<string>(request, errorCallback, out var response))
                 {
                     success?.Invoke();
                 }
@@ -270,13 +270,13 @@ namespace EmergenceSDK
         public delegate void LoadAccountSuccess();
 
         public void LoadAccount(string name, string password, string path, string nodeURL, string chainId,
-            LoadAccountSuccess success, GenericError error)
+            LoadAccountSuccess success, ErrorCallback errorCallback)
         {
-            StartCoroutine(CoroutineLoadAccount(name, password, path, nodeURL, chainId, success, error));
+            StartCoroutine(CoroutineLoadAccount(name, password, path, nodeURL, chainId, success, errorCallback));
         }
 
         private IEnumerator CoroutineLoadAccount(string name, string password, string path, string nodeURL,
-            string chainId, LoadAccountSuccess success, GenericError error)
+            string chainId, LoadAccountSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("Load Account request started");
 
@@ -300,7 +300,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Load Account", request);
-                if (ProcessRequest<LoadAccountResponse>(request, error, out var response))
+                if (ProcessRequest<LoadAccountResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke();
                 }
@@ -313,7 +313,7 @@ namespace EmergenceSDK
 
         public delegate void BalanceSuccess(string balance);
 
-        public void GetBalance(BalanceSuccess success, GenericError error)
+        public void GetBalance(BalanceSuccess success, ErrorCallback errorCallback)
         {
 
             if (skipWallet)
@@ -327,10 +327,10 @@ namespace EmergenceSDK
                 return;
             }
 
-            StartCoroutine(CoroutineGetBalance(Address, success, error));
+            StartCoroutine(CoroutineGetBalance(Address, success, errorCallback));
         }
 
-        private IEnumerator CoroutineGetBalance(string address, BalanceSuccess success, GenericError error)
+        private IEnumerator CoroutineGetBalance(string address, BalanceSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("Get Balance request started");
 
@@ -342,7 +342,7 @@ namespace EmergenceSDK
                 yield return request.SendWebRequest();
 
                 PrintRequestResult("Get Balance", request);
-                if (ProcessRequest<GetBalanceResponse>(request, error, out var response))
+                if (ProcessRequest<GetBalanceResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.balance);
                 }
@@ -370,17 +370,17 @@ namespace EmergenceSDK
 
         public delegate void AccessTokenSuccess(string accessToken);
 
-        public void GetAccessToken(AccessTokenSuccess success, GenericError error)
+        public void GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv())
             // {
             //     return;
             // }
 
-            StartCoroutine(CoroutineGetAccessToken(success, error));
+            StartCoroutine(CoroutineGetAccessToken(success, errorCallback));
         }
 
-        private IEnumerator CoroutineGetAccessToken(AccessTokenSuccess success, GenericError error)
+        private IEnumerator CoroutineGetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("GetAccessToken request started");
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "get-access-token";
@@ -390,7 +390,7 @@ namespace EmergenceSDK
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
                 yield return request.SendWebRequest();
                 PrintRequestResult("GetAccessToken", request);
-                if (ProcessRequest<AccessTokenResponse>(request, error, out var response))
+                if (ProcessRequest<AccessTokenResponse>(request, errorCallback, out var response))
                 {
                     currentAccessToken = SerializationHelper.Serialize(response.AccessToken, false);
                     ProcessExpiration(response.AccessToken.message);
@@ -405,17 +405,17 @@ namespace EmergenceSDK
 
         public delegate void ValidateAccessTokenSuccess(bool valid);
 
-        public void ValidateAccessToken(ValidateAccessTokenSuccess success, GenericError error)
+        public void ValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv())
             // {
             //     return;
             // }
 
-            StartCoroutine(CoroutineValidateAccessToken(success, error));
+            StartCoroutine(CoroutineValidateAccessToken(success, errorCallback));
         }
 
-        private IEnumerator CoroutineValidateAccessToken(ValidateAccessTokenSuccess success, GenericError error)
+        private IEnumerator CoroutineValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("ValidateAccessToken request started");
 
@@ -426,7 +426,7 @@ namespace EmergenceSDK
             {
                 yield return request.SendWebRequest();
                 PrintRequestResult("ValidateAccessToken", request);
-                if (ProcessRequest<ValidateAccessTokenResponse>(request, error, out var response))
+                if (ProcessRequest<ValidateAccessTokenResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.valid);
                 }
@@ -440,18 +440,18 @@ namespace EmergenceSDK
         public delegate void ValidateSignedMessageSuccess(bool valid);
 
         public void ValidateSignedMessage(string message, string signedMessage, string address,
-            ValidateSignedMessageSuccess success, GenericError error)
+            ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv())
             // {
             //     return;
             // }
 
-            StartCoroutine(CoroutineValidateSignedMessage(message, signedMessage, address, success, error));
+            StartCoroutine(CoroutineValidateSignedMessage(message, signedMessage, address, success, errorCallback));
         }
 
         private IEnumerator CoroutineValidateSignedMessage(string message, string signedMessage, string address,
-            ValidateSignedMessageSuccess success, GenericError error)
+            ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("ValidateSignedMessage request started");
 
@@ -474,7 +474,7 @@ namespace EmergenceSDK
                 request.uploadHandler.contentType = "application/json";
                 yield return request.SendWebRequest();
                 PrintRequestResult("ValidateSignedMessage", request);
-                if (ProcessRequest<ValidateSignedMessageResponse>(request, error, out var response))
+                if (ProcessRequest<ValidateSignedMessageResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.valid);
                 }
@@ -489,7 +489,7 @@ namespace EmergenceSDK
 
         public delegate void DisconnectSuccess();
 
-        public void Disconnect(DisconnectSuccess success, GenericError error)
+        public void Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv())
             // {
@@ -503,10 +503,10 @@ namespace EmergenceSDK
             }
 
             disconnectInProgress = true;
-            StartCoroutine(CoroutineDisconnect(success, error));
+            StartCoroutine(CoroutineDisconnect(success, errorCallback));
         }
 
-        private IEnumerator CoroutineDisconnect(DisconnectSuccess success, GenericError error)
+        private IEnumerator CoroutineDisconnect(DisconnectSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("Disconnect request started");
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "killSession";
@@ -519,7 +519,7 @@ namespace EmergenceSDK
                 if (RequestError(request))
                 {
                     disconnectInProgress = false;
-                    error?.Invoke(request.error, request.responseCode);
+                    errorCallback?.Invoke(request.error, request.responseCode);
                 }
                 else
                 {
@@ -535,17 +535,17 @@ namespace EmergenceSDK
 
         public delegate void SuccessFinish();
 
-        public void Finish(SuccessFinish success, GenericError error)
+        public void Finish(SuccessFinish success, ErrorCallback errorCallback)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv())
             // {
             //     return;
             // }
 
-            StartCoroutine(CoroutineFinish(success, error));
+            StartCoroutine(CoroutineFinish(success, errorCallback));
         }
 
-        private IEnumerator CoroutineFinish(SuccessFinish success, GenericError error)
+        private IEnumerator CoroutineFinish(SuccessFinish success, ErrorCallback errorCallback)
         {
             Debug.Log("Finish request started");
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "finish";
@@ -557,7 +557,7 @@ namespace EmergenceSDK
 
                 if (RequestError(request))
                 {
-                    error?.Invoke(request.error, request.responseCode);
+                    errorCallback?.Invoke(request.error, request.responseCode);
                 }
                 else
                 {
@@ -575,18 +575,18 @@ namespace EmergenceSDK
         public delegate void LoadContractSuccess();
 
         public void LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success,
-            GenericError error)
+            ErrorCallback errorCallback)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv())
             // {
             //     return;
             // }
 
-            StartCoroutine(CoroutineLoadContract(contractAddress, ABI, network, success, error));
+            StartCoroutine(CoroutineLoadContract(contractAddress, ABI, network, success, errorCallback));
         }
 
         public IEnumerator CoroutineLoadContract(string contractAddress, string ABI, string network,
-            LoadContractSuccess success, GenericError error)
+            LoadContractSuccess success, ErrorCallback errorCallback)
         {
             Debug.Log("LoadContract request started");
 
@@ -620,7 +620,7 @@ namespace EmergenceSDK
                 request.downloadHandler = new DownloadHandlerBuffer();
                 yield return request.SendWebRequest();
                 PrintRequestResult("Load Contract", request);
-                if (ProcessRequest<LoadContractResponse>(request, error, out var response))
+                if (ProcessRequest<LoadContractResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke();
                 }
@@ -634,14 +634,14 @@ namespace EmergenceSDK
         public delegate void GetTransactionStatusSuccess<T>(T response);
 
         public void GetTransactionStatus<T>(string transactionHash, string nodeURL,
-            GetTransactionStatusSuccess<T> success, GenericError error)
+            GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback)
         {
 
-            StartCoroutine(CoroutineGetTransactionStatus<T>(transactionHash, nodeURL, success, error));
+            StartCoroutine(CoroutineGetTransactionStatus<T>(transactionHash, nodeURL, success, errorCallback));
         }
 
         private IEnumerator CoroutineGetTransactionStatus<T>(string transactionHash, string nodeURL,
-            GetTransactionStatusSuccess<T> success, GenericError error)
+            GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback)
         {
             Debug.Log("Get Transaction Status request started [" + transactionHash + "] / " + nodeURL);
 
@@ -652,7 +652,7 @@ namespace EmergenceSDK
             {
                 yield return request.SendWebRequest();
                 PrintRequestResult("Get Transaction Status", request);
-                if (ProcessRequest<T>(request, error, out var response))
+                if (ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response); // Should we change this pattern?
                 }
@@ -666,13 +666,13 @@ namespace EmergenceSDK
         public delegate void GetBlockNumberSuccess<T>(T response);
 
         public void GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
-            GetBlockNumberSuccess<T> success, GenericError error)
+            GetBlockNumberSuccess<T> success, ErrorCallback errorCallback)
         {
-            StartCoroutine(CoroutineGetBlockNumber<T, U>(transactionHash, nodeURL, body, success, error));
+            StartCoroutine(CoroutineGetBlockNumber<T, U>(transactionHash, nodeURL, body, success, errorCallback));
         }
 
         private IEnumerator CoroutineGetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
-            GetBlockNumberSuccess<T> success, GenericError error)
+            GetBlockNumberSuccess<T> success, ErrorCallback errorCallback)
         {
             Debug.Log("Get Block Number request started [" + transactionHash + "] / " + nodeURL);
 
@@ -688,7 +688,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Get Block Number", request);
-                if (ProcessRequest<T>(request, error, out var response))
+                if (ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response);
                 }
@@ -703,18 +703,18 @@ namespace EmergenceSDK
         public delegate void ReadMethodSuccess<T>(T response);
 
         public void ReadMethod<T, U>(string contractAddress, string methodName, string network, string nodeUrl, U body, ReadMethodSuccess<T> success,
-            GenericError error)
+            ErrorCallback errorCallback)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv())
             // {
             //     return;
             // }
 
-            StartCoroutine(CoroutineReadMethod<T, U>(contractAddress, methodName,  network, nodeUrl, body, success, error));
+            StartCoroutine(CoroutineReadMethod<T, U>(contractAddress, methodName,  network, nodeUrl, body, success, errorCallback));
         }
 
         public IEnumerator CoroutineReadMethod<T, U>(string contractAddress, string methodName, string network, string nodeUrl, U body,
-            ReadMethodSuccess<T> success, GenericError error)
+            ReadMethodSuccess<T> success, ErrorCallback errorCallback)
         {
             Debug.Log("ReadMethod request started [" + contractAddress + "] / " + methodName);
 
@@ -734,7 +734,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Read Contract", request);
-                if (ProcessRequest<T>(request, error, out var response))
+                if (ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response);
                 }
@@ -748,7 +748,7 @@ namespace EmergenceSDK
         public delegate void WriteMethodSuccess<T>(T response);
 
         public void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName,
-            string gasPrice, string network, string nodeUrl, string value, U body, WriteMethodSuccess<T> success, GenericError error)
+            string gasPrice, string network, string nodeUrl, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
         {
             // if (!LocalEmergenceServer.Instance.CheckEnv())
             // {
@@ -756,11 +756,11 @@ namespace EmergenceSDK
             // }
 
             StartCoroutine(CoroutineWriteMethod<T, U>(contractAddress, methodName, localAccountName, gasPrice, network, nodeUrl, value, body,
-                success, error));
+                success, errorCallback));
         }
 
         public IEnumerator CoroutineWriteMethod<T, U>(string contractAddress, string methodName,
-            string localAccountName, string gasPrice, string network, string nodeUrl, string value, U body, WriteMethodSuccess<T> success, GenericError error)
+            string localAccountName, string gasPrice, string network, string nodeUrl, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
         {
             Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
 
@@ -790,7 +790,7 @@ namespace EmergenceSDK
 
                 yield return request.SendWebRequest();
                 PrintRequestResult("Write Contract", request);
-                if (ProcessRequest<T>(request, error, out var response))
+                if (ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response);
                 }

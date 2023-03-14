@@ -14,7 +14,7 @@ namespace EmergenceDemo
 
         private void OnEnable() {
             // EventManager.StartListening(EmergenceEvents.AVATAR_LOADED, SwapAvatar);
-            Services.OnCurrentPersonaUpdated += OnPersonaUpdated;
+            Services.Instance.PersonaService.OnCurrentPersonaUpdated += OnPersonaUpdated;
         }
         //
         // private void OnDisable() {
