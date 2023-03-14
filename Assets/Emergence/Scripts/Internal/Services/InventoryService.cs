@@ -10,7 +10,7 @@ public class InventoryService : IInventoryService
         Debug.Log("Getting inventory for address: " + address);
         string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address;
         Debug.Log("Requesting inventory from URL: " + url);
-        string response = await Services.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
+        string response = await EmergenceServices.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
 
         Debug.Log("Inventory response: " + response.ToString());
         InventoryByOwnerResponse inventoryResponse =

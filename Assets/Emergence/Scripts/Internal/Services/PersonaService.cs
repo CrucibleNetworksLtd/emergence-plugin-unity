@@ -46,11 +46,11 @@ public class PersonaService : MonoBehaviour, IPersonaService
 
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
-            request.SetRequestHeader("Authorization", Services.Instance.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
             yield return request.SendWebRequest();
-            Services.PrintRequestResult("GetPersonas", request);
+            EmergenceServices.PrintRequestResult("GetPersonas", request);
 
-            if (Services.RequestError(request))
+            if (EmergenceServices.RequestError(request))
             {
                 errorCallback?.Invoke(request.error, request.responseCode);
             }
@@ -76,12 +76,12 @@ public class PersonaService : MonoBehaviour, IPersonaService
 
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
-            request.SetRequestHeader("Authorization", Services.Instance.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
 
             yield return request.SendWebRequest();
-            Services.PrintRequestResult("Get Current Persona", request);
+            EmergenceServices.PrintRequestResult("Get Current Persona", request);
 
-            if (Services.RequestError(request))
+            if (EmergenceServices.RequestError(request))
             {
                 errorCallback?.Invoke(request.error, request.responseCode);
             }
@@ -119,14 +119,14 @@ public class PersonaService : MonoBehaviour, IPersonaService
             request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
             request.uploadHandler.contentType = "application/json";
             
-            Debug.Log("Access token: " + Services.Instance.CurrentAccessToken);
+            Debug.Log("Access token: " + EmergenceServices.Instance.CurrentAccessToken);
 
-            request.SetRequestHeader("Authorization", Services.Instance.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
 
             yield return request.SendWebRequest();
-            Services.PrintRequestResult("Save Persona", request);
+            EmergenceServices.PrintRequestResult("Save Persona", request);
 
-            if (Services.RequestError(request))
+            if (EmergenceServices.RequestError(request))
             {
                 errorCallback?.Invoke(request.error, request.responseCode);
             }
@@ -153,7 +153,7 @@ public class PersonaService : MonoBehaviour, IPersonaService
             using (UnityWebRequest tokenURIRequest = UnityWebRequest.Get(personaAvatarTokenURI))
             {
                 yield return tokenURIRequest.SendWebRequest();
-                Services.PrintRequestResult("Avatar tokenURI", tokenURIRequest);
+                EmergenceServices.PrintRequestResult("Avatar tokenURI", tokenURIRequest);
                 TokenURIResponse res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenURIRequest.downloadHandler.text)[0];
                 // Debug.Log("GUID: " + res.GUID);
                 // rebuild the avatarId field with the GUID
@@ -176,12 +176,12 @@ public class PersonaService : MonoBehaviour, IPersonaService
             request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
             request.uploadHandler.contentType = "application/json";
 
-            request.SetRequestHeader("Authorization", Services.Instance.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
 
             yield return request.SendWebRequest();
-            Services.PrintRequestResult("Save Persona", request);
+            EmergenceServices.PrintRequestResult("Save Persona", request);
 
-            if (Services.RequestError(request))
+            if (EmergenceServices.RequestError(request))
             {
                 errorCallback?.Invoke(request.error, request.responseCode);
             }
@@ -207,11 +207,11 @@ public class PersonaService : MonoBehaviour, IPersonaService
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             request.method = "DELETE";
-            request.SetRequestHeader("Authorization", Services.Instance.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
             yield return request.SendWebRequest();
-            Services.PrintRequestResult("Delete Persona Persona", request);
+            EmergenceServices.PrintRequestResult("Delete Persona Persona", request);
 
-            if (Services.RequestError(request))
+            if (EmergenceServices.RequestError(request))
             {
                 errorCallback?.Invoke(request.error, request.responseCode);
             }
@@ -237,11 +237,11 @@ public class PersonaService : MonoBehaviour, IPersonaService
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             request.method = "PATCH";
-            request.SetRequestHeader("Authorization", Services.Instance.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
             yield return request.SendWebRequest();
-            Services.PrintRequestResult("Set Current Persona", request);
+            EmergenceServices.PrintRequestResult("Set Current Persona", request);
 
-            if (Services.RequestError(request))
+            if (EmergenceServices.RequestError(request))
             {
                 errorCallback?.Invoke(request.error, request.responseCode);
             }

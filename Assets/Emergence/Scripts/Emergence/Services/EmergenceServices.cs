@@ -13,12 +13,12 @@ namespace EmergenceSDK
     /// The services singleton provides you with all the methods you need to get going with Emergence.
     /// </summary>
     /// <remarks>See our prefabs for examples of how to use it!</remarks>
-    public partial class Services : MonoBehaviour
+    public partial class EmergenceServices : MonoBehaviour
     {
         public string CurrentAccessToken => currentAccessToken;
         private string currentAccessToken = string.Empty;
 
-        public static Services Instance;
+        public static EmergenceServices Instance;
 
         public IPersonaService PersonaService { get; private set; }
 
@@ -192,8 +192,8 @@ namespace EmergenceSDK
             }
             try
             {
-                Debug.Log("AccessToken: " + Services.Instance.CurrentAccessToken);
-                request.SetRequestHeader("Authorization", Services.Instance.CurrentAccessToken);
+                Debug.Log("AccessToken: " + EmergenceServices.Instance.CurrentAccessToken);
+                request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
 
                 if (headers != null) {
                     foreach (var key in headers.Keys) {

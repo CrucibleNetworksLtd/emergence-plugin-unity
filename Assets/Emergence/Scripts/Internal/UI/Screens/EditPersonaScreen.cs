@@ -181,7 +181,7 @@ namespace EmergenceSDK
 
             go.GetComponent<AvatarScrollItem>().Refresh(defaultImage, null);
 
-            Services.Instance.AvatarByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
+            EmergenceServices.Instance.AvatarByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
             {
                 Modal.Instance.Show("Retrieving avatar images...");
                 requestingInProgress = true;
@@ -213,7 +213,7 @@ namespace EmergenceSDK
             ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () =>
             {
                 Modal.Instance.Show("Deleting Persona...");
-                Services.Instance.DeletePersona(currentPersona, () =>
+                EmergenceServices.Instance.DeletePersona(currentPersona, () =>
                 {
                     Debug.Log("Deleting Persona");
                     Modal.Instance.Hide();
@@ -258,7 +258,7 @@ namespace EmergenceSDK
                     {
                         Modal.Instance.Show("Saving Changes...");
 
-                        Services.Instance.CreatePersona(currentPersona, () =>
+                        EmergenceServices.Instance.CreatePersona(currentPersona, () =>
                         {
                             Debug.Log("New Persona saved");
                             Modal.Instance.Hide();
@@ -279,7 +279,7 @@ namespace EmergenceSDK
                     {
                         Modal.Instance.Show("Saving Changes...");
 
-                        Services.Instance.EditPersona(currentPersona, () =>
+                        EmergenceServices.Instance.EditPersona(currentPersona, () =>
                         {
                             Debug.Log("Changes to Persona saved");
                             Modal.Instance.Hide();

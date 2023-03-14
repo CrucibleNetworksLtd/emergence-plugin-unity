@@ -141,7 +141,7 @@ namespace EmergenceSDK
 
                         string accessTokenJson = System.IO.File.ReadAllText("accessToken.json");
 
-                        Services.Instance.SkipWallet(cheatActive, accessTokenJson);
+                        EmergenceServices.Instance.SkipWallet(cheatActive, accessTokenJson);
                         ScreenManager.Instance.ShowDashboard();
                     }
                 }

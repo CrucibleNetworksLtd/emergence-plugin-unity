@@ -6,7 +6,7 @@ using Debug = UnityEngine.Debug;
 
 namespace EmergenceSDK
 {
-    public partial class Services
+    public partial class EmergenceServices
     {
         #region Is Connected
 

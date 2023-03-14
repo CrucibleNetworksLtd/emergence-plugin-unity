@@ -113,7 +113,7 @@ namespace EmergenceSDK
 
             Modal.Instance.Show("Loading Personas...");
 
-            Services.Instance.GetPersonas((personas, currentPersona) =>
+            EmergenceServices.Instance.GetPersonas((personas, currentPersona) =>
             {
                 Modal.Instance.Show("Retrieving avatars...");
 
@@ -253,7 +253,7 @@ namespace EmergenceSDK
         private void OnUsePersonaAsCurrent()
         {
             Modal.Instance.Show("Loading Personas...");
-            Services.Instance.SetCurrentPersona(selectedPersona, () =>
+            EmergenceServices.Instance.SetCurrentPersona(selectedPersona, () =>
             {
                 Refresh();
             },
@@ -275,7 +275,7 @@ namespace EmergenceSDK
             ModalPromptYESNO.Instance.Show("Delete " + selectedPersona.name, "are you sure?", () =>
             {
                 Modal.Instance.Show("Deleting Persona...");
-                Services.Instance.DeletePersona(selectedPersona, () =>
+                EmergenceServices.Instance.DeletePersona(selectedPersona, () =>
                 {
                     Debug.Log("Deleting Persona");
                     Modal.Instance.Hide();

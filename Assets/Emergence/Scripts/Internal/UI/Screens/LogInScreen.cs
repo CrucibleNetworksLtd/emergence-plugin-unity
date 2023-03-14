@@ -41,12 +41,12 @@ namespace EmergenceSDK
                     {
                         timeRemaining += QRRefreshTimeOut;
 
-                        Services.Instance.GetQRCode((texture, deviceId) =>
+                        EmergenceServices.Instance.GetQRCode((texture, deviceId) =>
                             {
                                 EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
                                 rawQRImage.texture = texture;
 
-                                Services.Instance.Handshake((walletAddress) =>
+                                EmergenceServices.Instance.Handshake((walletAddress) =>
                                     {
                                         state = States.RefreshAccessToken;
                                         HeaderScreen.Instance.Refresh(walletAddress);
@@ -97,7 +97,7 @@ namespace EmergenceSDK
                     break;
                 case States.RefreshAccessToken:
                     state = States.RefreshingAccessToken;
-                    Services.Instance.GetAccessToken((token) =>
+                    EmergenceServices.Instance.GetAccessToken((token) =>
                     {
                         state = States.LoginFinished;
                         PlayerPrefs.SetInt(EmergenceSingleton.HAS_LOGGED_IN_ONCE_KEY, 1);

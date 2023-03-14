@@ -49,7 +49,7 @@ namespace EmergenceDemo
             var curMetadata = int.Parse(item.meta.dynamicMetadata);
             curMetadata++;
 
-            Services.Instance.WriteDynamicMetadata(item.blockchain, item.contract, item.tokenId, curMetadata.ToString(), (string response) => {}, (string error, long code) => {});
+            EmergenceServices.Instance.WriteDynamicMetadata(item.blockchain, item.contract, item.tokenId, curMetadata.ToString(), (string response) => {}, (string error, long code) => {});
             EmergenceSingleton.Instance.CloseEmergeneUI();
         }
     }

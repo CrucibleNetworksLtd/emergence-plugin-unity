@@ -61,7 +61,7 @@ namespace EmergenceDemo
                 Cursor.visible = false;
             }
 
-            Services.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
+            EmergenceServices.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
                 {
                     foreach (var item in items)
                     {

@@ -9,7 +9,7 @@ using Debug = UnityEngine.Debug;
 
 namespace EmergenceSDK
 {
-    public partial class Services
+    public partial class EmergenceServices
     {
         /// <inheritdoc cref="IPersonaService.GetPersonas"/>
         public void GetPersonas(SuccessPersonas success, ErrorCallback errorCallback) => PersonaService.GetPersonas(success, errorCallback);

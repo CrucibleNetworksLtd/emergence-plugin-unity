@@ -14,7 +14,7 @@ namespace EmergenceDemo
 
         private void OnEnable() {
             // EventManager.StartListening(EmergenceEvents.AVATAR_LOADED, SwapAvatar);
-            Services.Instance.PersonaService.OnCurrentPersonaUpdated += OnPersonaUpdated;
+            EmergenceServices.Instance.PersonaService.OnCurrentPersonaUpdated += OnPersonaUpdated;
         }
         //
         // private void OnDisable() {
@@ -48,7 +48,7 @@ namespace EmergenceDemo
             Debug.Log("Changing avatar");
             if (persona != null && !string.IsNullOrEmpty(persona.avatarId))
             {
-                Services.Instance.AvatarById(persona.avatarId, (avatar =>
+                EmergenceServices.Instance.AvatarById(persona.avatarId, (avatar =>
                 {
                     DemoAvatarManager.Instance.SwapAvatars(avatar.meta.content[1].url);
                 

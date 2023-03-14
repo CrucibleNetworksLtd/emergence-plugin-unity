@@ -107,7 +107,7 @@ namespace EmergenceSDK
 
             if (!string.IsNullOrEmpty(persona.avatarId))
             {
-                Services.Instance.AvatarById(persona.avatarId, (avatar =>
+                EmergenceServices.Instance.AvatarById(persona.avatarId, (avatar =>
                 {
                     
                     // Add fetched avatar to persona

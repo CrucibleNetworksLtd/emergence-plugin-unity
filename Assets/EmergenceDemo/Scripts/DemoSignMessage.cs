@@ -36,7 +36,7 @@ namespace EmergenceDemo
         }
 
         private void SignMessage() {
-            Services.Instance.RequestToSign("Test message", message => {
+            EmergenceServices.Instance.RequestToSign("Test message", message => {
                 Debug.Log("Message signed succesfully: " + message);
             }, (message, code) => {
                 Debug.LogError("Error signing message: " + message);

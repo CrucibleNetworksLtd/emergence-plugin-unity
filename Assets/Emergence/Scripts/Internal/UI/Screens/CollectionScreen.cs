@@ -83,7 +83,7 @@ namespace EmergenceSDK
         
         public void Refresh(Action<InventoryItem> customOnClickHandler)
         {
-            Services.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
+            EmergenceServices.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
                 {
 
                     foreach (var item in items)

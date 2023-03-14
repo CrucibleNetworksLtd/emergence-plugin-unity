@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
-using static EmergenceSDK.Services;
+using static EmergenceSDK.EmergenceServices;
 
 namespace EmergenceSDK
 {

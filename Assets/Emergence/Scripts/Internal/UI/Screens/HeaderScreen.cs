@@ -46,7 +46,7 @@ namespace EmergenceSDK
             {
                 remainingTime += refreshTimeOut;
 
-                Services.Instance.GetBalance((balance) =>
+                EmergenceServices.Instance.GetBalance((balance) =>
                 {
                     string converted = UnitConverter.Convert(balance, UnitConverter.EtherUnitType.WEI, UnitConverter.EtherUnitType.ETHER, ",");
                     string[] splitted = converted.Split(new string[] { "," }, System.StringSplitOptions.None);
@@ -102,7 +102,7 @@ namespace EmergenceSDK
         private void OnDisconnectClick()
         {
             Modal.Instance.Show("Disconnecting wallet...");
-            Services.Instance.Disconnect(() =>
+            EmergenceServices.Instance.Disconnect(() =>
             {
                 Modal.Instance.Hide();
                 Hide();

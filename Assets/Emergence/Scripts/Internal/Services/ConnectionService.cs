@@ -23,8 +23,8 @@ public class ConnectionService : MonoBehaviour, IConnectionService
         {
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             yield return request.SendWebRequest();
-            Services.PrintRequestResult("IsConnected", request);
-            if (Services.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
+            EmergenceServices.PrintRequestResult("IsConnected", request);
+            if (EmergenceServices.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
             {
                 success?.Invoke(response.isConnected);
             }

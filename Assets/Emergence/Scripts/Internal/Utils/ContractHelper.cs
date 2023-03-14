@@ -9,11 +9,11 @@ namespace EmergenceSDK
         public delegate void LoadContractSuccess();
         public static void LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success, GenericError error)
         {
-            Services.Instance.IsConnected((connected) =>
+            EmergenceServices.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.LoadContract(contractAddress, ABI, network,() =>
+                    EmergenceServices.Instance.LoadContract(contractAddress, ABI, network,() =>
                         {
                             success?.Invoke();
                         },
@@ -39,11 +39,11 @@ namespace EmergenceSDK
         public delegate void ReadContractSuccess<T>(T response);
         public static void ReadMethod<T, U>(string contractAddress, string methodName, string network, string nodeUrl, U body, ReadContractSuccess<T> success, GenericError error)
         {
-            Services.Instance.IsConnected((connected) =>
+            EmergenceServices.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.ReadMethod<T, U>(contractAddress, methodName, network, nodeUrl, body, (response) =>
+                    EmergenceServices.Instance.ReadMethod<T, U>(contractAddress, methodName, network, nodeUrl, body, (response) =>
                     {
                         success?.Invoke(response);
                     },
@@ -67,11 +67,11 @@ namespace EmergenceSDK
         public delegate void WriteContractSuccess<T>(T response);
         public static void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName, string gasprice, string network, string nodeUrl, U body, WriteContractSuccess<T> success, GenericError error, string value = "0")
         {
-            Services.Instance.IsConnected((connected) =>
+            EmergenceServices.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.WriteMethod<T, U>(contractAddress, methodName, localAccountName, gasprice, network, nodeUrl, value, body, (response) =>
+                    EmergenceServices.Instance.WriteMethod<T, U>(contractAddress, methodName, localAccountName, gasprice, network, nodeUrl, value, body, (response) =>
                     {
                         success?.Invoke(response);
                     },
@@ -95,11 +95,11 @@ namespace EmergenceSDK
         public delegate void GetTransactionStatusSuccess<T>(T response);
         public static void GetTransactionStatus<T>(string transactionHash, string nodeURL,  GetTransactionStatusSuccess<T> success, GenericError error)
         {
-            Services.Instance.IsConnected((connected) =>
+            EmergenceServices.Instance.IsConnected((connected) =>
             {
                 if (connected)
                 {
-                    Services.Instance.GetTransactionStatus<T>(transactionHash, nodeURL, (response) =>
+                    EmergenceServices.Instance.GetTransactionStatus<T>(transactionHash, nodeURL, (response) =>
                     {
                         success?.Invoke(response);
                     },
