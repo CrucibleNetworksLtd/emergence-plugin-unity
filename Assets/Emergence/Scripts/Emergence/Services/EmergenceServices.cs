@@ -103,7 +103,7 @@ namespace EmergenceSDK.Services
             EmergenceUtils.ProcessExpiration(response.message.AccessToken.message);
         }
         
-                /// <inheritdoc cref="IPersonaService.GetPersonas"/>
+        /// <inheritdoc cref="IPersonaService.GetPersonas"/>
         public void GetPersonas(SuccessPersonas success, ErrorCallback errorCallback) => PersonaService.GetPersonas(success, errorCallback);
         
         /// <inheritdoc cref="IPersonaService.GetCurrentPersona(SuccessGetCurrentPersona, ErrorCallback)"/>
@@ -133,26 +133,35 @@ namespace EmergenceSDK.Services
         /// <inheritdoc cref="IDynamicMetadataService.WriteDynamicMetadata"/>
         public async void WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, ErrorCallback errorCallback) => await DynamicMetadataService.WriteDynamicMetadata(network, contract, tokenId, metadata, success, errorCallback);
         
+        /// <inheritdoc cref="IAccountService.IsConnected"/>
         public void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback) => AccountService.IsConnected(success, errorCallback);
         
+        /// <inheritdoc cref="IWalletService.ReinitializeWalletConnect"/>
         public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, ErrorCallback errorCallback) => WalletService.ReinitializeWalletConnect(success, errorCallback);
 
+        /// <inheritdoc cref="IWalletService.RequestToSign"/>
         public void RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback) => WalletService.RequestToSign(messageToSign, success, errorCallback);
 
+        /// <inheritdoc cref="IQRCodeService.GetQRCode"/>
         public void GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback) => QRCodeService.GetQRCode(success, errorCallback);
 
+        /// <inheritdoc cref="IWalletService.Handshake"/>
         public void Handshake(HandshakeSuccess success, ErrorCallback errorCallback) => WalletService.Handshake(success, errorCallback);
 
+        /// <inheritdoc cref="IWalletService.CreateWallet"/>
         public void CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback) => WalletService.CreateWallet(path, password, success, errorCallback);
 
+        /// <inheritdoc cref="IAccountService.CreateKeyStore"/>
         public void CreateKeyStore(string privateKey, string password, string publicKey, string path,
             CreateKeyStoreSuccess success, ErrorCallback errorCallback) 
             => AccountService.CreateKeyStore(privateKey, password, publicKey, path, success, errorCallback);
 
+        /// <inheritdoc cref="IAccountService.LoadAccount"/>
         public void LoadAccount(string name, string password, string path, string nodeURL, string chainId,
             LoadAccountSuccess success, ErrorCallback errorCallback) 
             => AccountService.LoadAccount(name, password, path, nodeURL, chainId, success, errorCallback);
 
+        /// <inheritdoc cref="IWalletService.GetBalance"/>
         public void GetBalance(BalanceSuccess success, ErrorCallback errorCallback)
         {
             if (skipWallet)
@@ -163,14 +172,18 @@ namespace EmergenceSDK.Services
             WalletService.GetBalance(success, errorCallback);
         }
 
+        /// <inheritdoc cref="IAccountService.GetAccessToken"/>
         public void GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback) => AccountService.GetAccessToken(success, errorCallback);
 
+        /// <inheritdoc cref="IAccountService.ValidateAccessToken"/>
         public void ValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback) => AccountService.ValidateAccessToken(success, errorCallback);
 
+        /// <inheritdoc cref="IAccountService.ValidateSignedMessage"/>
         public void ValidateSignedMessage(string message, string signedMessage, string address,
             ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
             => AccountService.ValidateSignedMessage(message, signedMessage, address, success, errorCallback);
 
+        /// <inheritdoc cref="IAccountService.Disconnect"/>
         public void Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
         {
             if (skipWallet)
@@ -181,23 +194,29 @@ namespace EmergenceSDK.Services
             AccountService.Disconnect(success, errorCallback);
         }
 
+        /// <inheritdoc cref="IAccountService.Finish"/>
         public void Finish(SuccessFinish success, ErrorCallback errorCallback) => AccountService.Finish(success, errorCallback);
 
+        /// <inheritdoc cref="IContractService"/>
         public void LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success,
             ErrorCallback errorCallback) 
             => ContractService.LoadContract(contractAddress, ABI, network, success, errorCallback);
 
+        /// <inheritdoc cref="IContractService.GetTransactionStatus{T}"/>
         public void GetTransactionStatus<T>(string transactionHash, string nodeURL,
             GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback) 
             => ContractService.GetTransactionStatus(transactionHash, nodeURL, success, errorCallback);
 
+        /// <inheritdoc cref="IContractService.GetBlockNumber{T,U}"/>
         public void GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
             GetBlockNumberSuccess<T> success, ErrorCallback errorCallback) 
             => ContractService.GetBlockNumber(transactionHash, nodeURL, body, success, errorCallback);
         
+        /// <inheritdoc cref="IContractService.ReadMethod{T,U}"/>
         public void ReadMethod<T, U>(string contractAddress, string methodName, string network, string nodeUrl, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback) 
             => ContractService.ReadMethod(contractAddress, methodName, network, nodeUrl, body, success, errorCallback);
 
+        /// <inheritdoc cref="IContractService.WriteMethod{T,U}"/>
         public void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName,
             string gasPrice, string network, string nodeUrl, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback) 
             => ContractService.WriteMethod(contractAddress, methodName, localAccountName, gasPrice, network, nodeUrl, value, body, success, errorCallback);

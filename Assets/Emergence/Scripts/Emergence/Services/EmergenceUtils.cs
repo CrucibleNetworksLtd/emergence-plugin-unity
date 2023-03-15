@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types.Responses;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -11,8 +10,6 @@ namespace EmergenceSDK.Services
 {
     public static class EmergenceUtils
     {
-        
-
         public static void ProcessExpiration(string expirationMessage)
         {
             EmergenceServices.Instance.expiration = SerializationHelper.Deserialize<EmergenceServices.Expiration>(expirationMessage);
