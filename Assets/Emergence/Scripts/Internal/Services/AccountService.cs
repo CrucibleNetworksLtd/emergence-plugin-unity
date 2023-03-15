@@ -1,0 +1,253 @@
+using System.Collections;
+using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
+using EmergenceSDK.Types;
+using EmergenceSDK.Types.Responses;
+using UnityEngine;
+using UnityEngine.Networking;
+
+namespace EmergenceSDK.Internal.Services
+{
+    public class AccountService : MonoBehaviour, IAccountService
+    {
+        public string CurrentAccessToken
+        {
+            get => currentAccessToken;
+            set => currentAccessToken = value;
+        }
+        private string currentAccessToken = string.Empty;
+        public bool HasAccessToken => currentAccessToken.Length > 0;
+        
+        public bool DisconnectInProgress => disconnectInProgress;
+        private bool disconnectInProgress = false;
+
+        public void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
+        {
+            StartCoroutine(CoroutineIsConnected(success, errorCallback));
+        }
+
+        private IEnumerator CoroutineIsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
+        {
+            Debug.Log("CoroutineIsConnected request started");
+
+            // string url = EmergenceSingleton.Instance.Configuration.APIBase + "isConnected";
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "isConnected";
+            Debug.Log("url: " + url);
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
+                yield return request.SendWebRequest();
+                EmergenceServices.PrintRequestResult("IsConnected", request);
+                if (EmergenceServices.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
+                {
+                    success?.Invoke(response.isConnected);
+                }
+            }
+        }
+        
+        public void CreateKeyStore(string privateKey, string password, string publicKey, string path,
+            CreateKeyStoreSuccess success, ErrorCallback errorCallback)
+        {
+            StartCoroutine(CoroutineKeyStore(privateKey, password, publicKey, path, success, errorCallback));
+        }
+
+        private IEnumerator CoroutineKeyStore(string privateKey, string password, string publicKey, string path,
+            CreateKeyStoreSuccess success, ErrorCallback errorCallback)
+        {
+            Debug.Log("Create KeyStore request started");
+
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "createKeyStore" + "?privateKey=" +
+                         privateKey + "&password=" + password + "&publicKey=" + publicKey + "&path=" + path;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+
+                yield return request.SendWebRequest();
+                EmergenceServices.PrintRequestResult("Key Store", request);
+                if (EmergenceServices.ProcessRequest<string>(request, errorCallback, out var response))
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+        
+        public void LoadAccount(string name, string password, string path, string nodeURL, string chainId,
+            LoadAccountSuccess success, ErrorCallback errorCallback)
+        {
+            StartCoroutine(CoroutineLoadAccount(name, password, path, nodeURL, chainId, success, errorCallback));
+        }
+
+        private IEnumerator CoroutineLoadAccount(string name, string password, string path, string nodeURL,
+            string chainId, LoadAccountSuccess success, ErrorCallback errorCallback)
+        {
+            Debug.Log("Load Account request started");
+
+            Account data = new Account()
+            {
+                name = name,
+                password = password,
+                path = path,
+                nodeURL = nodeURL,
+                chainId = chainId
+            };
+
+            string dataString = SerializationHelper.Serialize(data, false);
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "loadAccount";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+
+                yield return request.SendWebRequest();
+                EmergenceServices.PrintRequestResult("Load Account", request);
+                if (EmergenceServices.ProcessRequest<LoadAccountResponse>(request, errorCallback, out var response))
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+        
+        public void GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
+        {
+            StartCoroutine(CoroutineGetAccessToken(success, errorCallback));
+        }
+
+        private IEnumerator CoroutineGetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
+        {
+            Debug.Log("GetAccessToken request started");
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "get-access-token";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
+                yield return request.SendWebRequest();
+                EmergenceServices.PrintRequestResult("GetAccessToken", request);
+                if (EmergenceServices.ProcessRequest<AccessTokenResponse>(request, errorCallback, out var response))
+                {
+                    currentAccessToken = SerializationHelper.Serialize(response.AccessToken, false);
+                    EmergenceServices.Instance.ProcessExpiration(response.AccessToken.message);
+                    success?.Invoke(currentAccessToken);
+                }
+            }
+        }
+        
+        public void ValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback)
+        {
+            StartCoroutine(CoroutineValidateAccessToken(success, errorCallback));
+        }
+
+        private IEnumerator CoroutineValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback)
+        {
+            Debug.Log("ValidateAccessToken request started");
+
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "validate-access-token" +
+                         "?accessToken=" + currentAccessToken;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                yield return request.SendWebRequest();
+                EmergenceServices.PrintRequestResult("ValidateAccessToken", request);
+                if (EmergenceServices.ProcessRequest<ValidateAccessTokenResponse>(request, errorCallback, out var response))
+                {
+                    success?.Invoke(response.valid);
+                }
+            }
+        }
+        
+        public void ValidateSignedMessage(string message, string signedMessage, string address,
+            ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
+        {
+            StartCoroutine(CoroutineValidateSignedMessage(message, signedMessage, address, success, errorCallback));
+        }
+
+        private IEnumerator CoroutineValidateSignedMessage(string message, string signedMessage, string address,
+            ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
+        {
+            Debug.Log("ValidateSignedMessage request started");
+
+            ValidateSignedMessageRequest data = new ValidateSignedMessageRequest()
+            {
+                message = message,
+                signedMessage = signedMessage,
+                address = address
+            };
+
+            string dataString = SerializationHelper.Serialize(data, false);
+
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "validate-signed-message" + "?request=" +
+                         currentAccessToken;
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                request.method = "POST";
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler.contentType = "application/json";
+                yield return request.SendWebRequest();
+                EmergenceServices.PrintRequestResult("ValidateSignedMessage", request);
+                if (EmergenceServices.ProcessRequest<ValidateSignedMessageResponse>(request, errorCallback, out var response))
+                {
+                    success?.Invoke(response.valid);
+                }
+            }
+        }
+        
+        public void Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
+        {
+            disconnectInProgress = true;
+            StartCoroutine(CoroutineDisconnect(success, errorCallback));
+        }
+
+        private IEnumerator CoroutineDisconnect(DisconnectSuccess success, ErrorCallback errorCallback)
+        {
+            Debug.Log("Disconnect request started");
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "killSession";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                yield return request.SendWebRequest();
+                EmergenceServices.PrintRequestResult("Disconnect request completed", request);
+
+                if (EmergenceServices.RequestError(request))
+                {
+                    disconnectInProgress = false;
+                    errorCallback?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    disconnectInProgress = false;
+                    success?.Invoke();
+                }
+            }
+        }
+        
+        public void Finish(SuccessFinish success, ErrorCallback errorCallback)
+        {
+            StartCoroutine(CoroutineFinish(success, errorCallback));
+        }
+
+        private IEnumerator CoroutineFinish(SuccessFinish success, ErrorCallback errorCallback)
+        {
+            Debug.Log("Finish request started");
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "finish";
+
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                yield return request.SendWebRequest();
+                EmergenceServices.PrintRequestResult("Finish request completed", request);
+
+                if (EmergenceServices.RequestError(request))
+                {
+                    errorCallback?.Invoke(request.error, request.responseCode);
+                }
+                else
+                {
+                    success?.Invoke();
+                }
+            }
+        }
+    }
+}

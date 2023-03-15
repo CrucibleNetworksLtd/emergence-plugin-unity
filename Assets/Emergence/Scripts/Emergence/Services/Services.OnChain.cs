@@ -11,545 +11,57 @@ namespace EmergenceSDK.Services
 {
     public partial class EmergenceServices
     {
-        #region Is Connected
-
+        public void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback) => AccountService.IsConnected(success, errorCallback);
         
+        public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, ErrorCallback errorCallback) => WalletService.ReinitializeWalletConnect(success, errorCallback);
 
-        public void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
-        {
-            
-        }
+        public void RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback) => WalletService.RequestToSign(messageToSign, success, errorCallback);
 
-        #endregion Is Connected
+        public void GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback) => QRCodeService.GetQRCode(success, errorCallback);
 
-        #region Reinitialize WalletConnect
+        public void Handshake(HandshakeSuccess success, ErrorCallback errorCallback) => WalletService.Handshake(success, errorCallback);
 
-        public delegate void ReinitializeWalletConnectSuccess(bool disconnected);
-
-        public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, ErrorCallback errorCallback)
-        {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
-
-            StartCoroutine(CoroutineReinitializeWalletConnect(success, errorCallback));
-        }
-
-        private IEnumerator CoroutineReinitializeWalletConnect(ReinitializeWalletConnectSuccess success,
-            ErrorCallback errorCallback)
-        {
-            Debug.Log("CoroutineReinitializeWalletConnect request started");
-
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "reinitializewalletconnect";
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                yield return request.SendWebRequest();
-                PrintRequestResult("ReinitializeWalletConnect", request);
-                if (ProcessRequest<ReinitializeWalletConnectResponse>(request, errorCallback, out var response))
-                {
-                    success?.Invoke(response.disconnected);
-                }
-            }
-        }
-
-        #endregion Reinitialize WalletConnect
-
-        #region Request to Sign WalletConnect
-
-        public delegate void RequestToSignSuccess(string signedMessage);
-
-        public void RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback)
-        {
-
-            StartCoroutine(CoroutineRequestToSignWalletConnect(messageToSign, success, errorCallback));
-        }
-
-        private IEnumerator CoroutineRequestToSignWalletConnect(string messageToSign, RequestToSignSuccess success,
-            ErrorCallback errorCallback)
-        {
-            Debug.Log("CoroutineRequestToSignWalletConnect request started");
-            var content = "{\"message\": \"" + messageToSign + "\"}";
-            
-            Debug.Log("content: " + content);
-
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "request-to-sign";
-            
-            Debug.Log("url: " + url);
-            
-            Debug.Log("deviceId: " + EmergenceSingleton.Instance.CurrentDeviceId);
-
-            using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
-            {
-                request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-                request.method = "POST";
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(content));
-                request.uploadHandler.contentType = "application/json";
-                request.SetRequestHeader("accept", "application/json");
-
-                yield return request.SendWebRequest();
-                PrintRequestResult("ReinitializeWalletConnect", request);
-                if (ProcessRequest<BaseResponse<string>>(request, errorCallback, out var response))
-                {
-                    success?.Invoke(response.message);
-                }
-            }
-        }
-
-        #endregion
-
-        #region QR Code
-
-        public delegate void QRCodeSuccess(Texture2D qrCode, string deviceId);
-
-        public void GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback)
-        {
-            Debug.Log("Getting QR code");
-            StartCoroutine(CoroutineGetQrCode(success, errorCallback));
-        }
-
-        private IEnumerator CoroutineGetQrCode(QRCodeSuccess success, ErrorCallback errorCallback)
-        {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "qrcode";
-
-            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
-            {
-                yield return request.SendWebRequest();
-
-                PrintRequestResult("GetQrCode", request);
-
-                if (RequestError(request))
-                {
-                    errorCallback?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    string deviceId = request.GetResponseHeader("deviceId");
-                    success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture, deviceId);
-                }
-            }
-        }
-
-        #endregion QR Code
-
-        #region Handshake
-
-        #region Handshake Address Properties
-
-        private string address = string.Empty;
-
-        public bool HasAddress
-        {
-            get { return address != null && address.Trim() != string.Empty; }
-        }
-
-        public string Address
-        {
-            get { return address; }
-            private set { address = value; }
-        }
-
-        #endregion Handshake Address Properties
-
-        public delegate void HandshakeSuccess(string walletAddress);
-
-        public void Handshake(HandshakeSuccess success, ErrorCallback errorCallback)
-        {
-
-            StartCoroutine(CoroutineHandshake(success, errorCallback));
-        }
-
-        private IEnumerator CoroutineHandshake(HandshakeSuccess success, ErrorCallback errorCallback)
-        {
-            Debug.Log("Handshake request started");
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "handshake" + "?nodeUrl=" +
-                         EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL;
-            Debug.Log("Handshake: " + url);
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-                yield return request.SendWebRequest();
-                PrintRequestResult("Handshake", request);
-                if (ProcessRequest<HandshakeResponse>(request, errorCallback, out var response))
-                {
-                    Address = response.address;
-                    EmergenceSingleton.Instance.SetCachedAddress(response.address);
-                    success?.Invoke(Address);
-                }
-            }
-        }
-
-        #endregion Handshake
-
-        #region Create Wallet
-
-        public delegate void CreateWalletSuccess();
-
-        public void CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback)
-        {
-            StartCoroutine(CoroutineCreateWallet(path, password, success, errorCallback));
-        }
-
-        private IEnumerator CoroutineCreateWallet(string path, string password, CreateWalletSuccess success,
-            ErrorCallback errorCallback)
-        {
-            Debug.Log("CreateWallet request started");
-
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "createWallet" + "?path=" + path +
-                         "&password=" + password;
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                request.method = "POST";
-
-                yield return request.SendWebRequest();
-                PrintRequestResult("Create Wallet", request);
-                if (ProcessRequest<string>(request, errorCallback, out var response))
-                {
-                    success?.Invoke();
-                }
-            }
-        }
-
-        #endregion Create Wallet
-
-        #region Create Key Store
-
-        public delegate void CreateKeyStoreSuccess();
+        public void CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback) => WalletService.CreateWallet(path, password, success, errorCallback);
 
         public void CreateKeyStore(string privateKey, string password, string publicKey, string path,
-            CreateKeyStoreSuccess success, ErrorCallback errorCallback)
-        {
-            StartCoroutine(CoroutineKeyStore(privateKey, password, publicKey, path, success, errorCallback));
-        }
-
-        private IEnumerator CoroutineKeyStore(string privateKey, string password, string publicKey, string path,
-            CreateKeyStoreSuccess success, ErrorCallback errorCallback)
-        {
-            Debug.Log("Create KeyStore request started");
-
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "createKeyStore" + "?privateKey=" +
-                         privateKey + "&password=" + password + "&publicKey=" + publicKey + "&path=" + path;
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                request.method = "POST";
-
-                yield return request.SendWebRequest();
-                PrintRequestResult("Key Store", request);
-                if (ProcessRequest<string>(request, errorCallback, out var response))
-                {
-                    success?.Invoke();
-                }
-            }
-        }
-
-        #endregion Create Key Store
-
-        #region Load Account
-
-        public delegate void LoadAccountSuccess();
+            CreateKeyStoreSuccess success, ErrorCallback errorCallback) 
+            => AccountService.CreateKeyStore(privateKey, password, publicKey, path, success, errorCallback);
 
         public void LoadAccount(string name, string password, string path, string nodeURL, string chainId,
             LoadAccountSuccess success, ErrorCallback errorCallback)
         {
-            StartCoroutine(CoroutineLoadAccount(name, password, path, nodeURL, chainId, success, errorCallback));
+            AccountService.LoadAccount(name, password, path, nodeURL, chainId, success, errorCallback);
         }
-
-        private IEnumerator CoroutineLoadAccount(string name, string password, string path, string nodeURL,
-            string chainId, LoadAccountSuccess success, ErrorCallback errorCallback)
-        {
-            Debug.Log("Load Account request started");
-
-            Account data = new Account()
-            {
-                name = name,
-                password = password,
-                path = path,
-                nodeURL = nodeURL,
-                chainId = chainId
-            };
-
-            string dataString = SerializationHelper.Serialize(data, false);
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "loadAccount";
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                request.method = "POST";
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
-                request.uploadHandler.contentType = "application/json";
-
-                yield return request.SendWebRequest();
-                PrintRequestResult("Load Account", request);
-                if (ProcessRequest<LoadAccountResponse>(request, errorCallback, out var response))
-                {
-                    success?.Invoke();
-                }
-            }
-        }
-
-        #endregion Load Account
-
-        #region Get Balance
-
-        public delegate void BalanceSuccess(string balance);
 
         public void GetBalance(BalanceSuccess success, ErrorCallback errorCallback)
         {
-
             if (skipWallet)
             {
                 success?.Invoke("No wallet");
                 return;
             }
-
-            if (disconnectInProgress)
-            {
-                return;
-            }
-
-            StartCoroutine(CoroutineGetBalance(Address, success, errorCallback));
+            WalletService.GetBalance(success, errorCallback);
         }
 
-        private IEnumerator CoroutineGetBalance(string address, BalanceSuccess success, ErrorCallback errorCallback)
-        {
-            Debug.Log("Get Balance request started");
+        public void GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback) => AccountService.GetAccessToken(success, errorCallback);
 
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "getbalance" + "?nodeUrl=" +
-                         EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL + "&address=" + address;
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                yield return request.SendWebRequest();
-
-                PrintRequestResult("Get Balance", request);
-                if (ProcessRequest<GetBalanceResponse>(request, errorCallback, out var response))
-                {
-                    success?.Invoke(response.balance);
-                }
-            }
-        }
-
-        #endregion Get Balance
-
-        #region Get Access Token
-
-        #region Properties
-
-        public bool HasAccessToken
-        {
-            get { return currentAccessToken.Length > 0; }
-        }
-
-        public string AccessToken
-        {
-            get { return currentAccessToken; }
-            set { currentAccessToken = value; }
-        }
-
-        #endregion Properties
-
-        public delegate void AccessTokenSuccess(string accessToken);
-
-        public void GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
-        {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
-
-            StartCoroutine(CoroutineGetAccessToken(success, errorCallback));
-        }
-
-        private IEnumerator CoroutineGetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
-        {
-            Debug.Log("GetAccessToken request started");
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "get-access-token";
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-                yield return request.SendWebRequest();
-                PrintRequestResult("GetAccessToken", request);
-                if (ProcessRequest<AccessTokenResponse>(request, errorCallback, out var response))
-                {
-                    currentAccessToken = SerializationHelper.Serialize(response.AccessToken, false);
-                    ProcessExpiration(response.AccessToken.message);
-                    success?.Invoke(currentAccessToken);
-                }
-            }
-        }
-
-        #endregion Get Access Token
-
-        #region Validate Access Token
-
-        public delegate void ValidateAccessTokenSuccess(bool valid);
-
-        public void ValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback)
-        {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
-
-            StartCoroutine(CoroutineValidateAccessToken(success, errorCallback));
-        }
-
-        private IEnumerator CoroutineValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback)
-        {
-            Debug.Log("ValidateAccessToken request started");
-
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "validate-access-token" +
-                         "?accessToken=" + currentAccessToken;
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                yield return request.SendWebRequest();
-                PrintRequestResult("ValidateAccessToken", request);
-                if (ProcessRequest<ValidateAccessTokenResponse>(request, errorCallback, out var response))
-                {
-                    success?.Invoke(response.valid);
-                }
-            }
-        }
-
-        #endregion Validate Access Token
-
-        #region Validate Signed Message
-
-        public delegate void ValidateSignedMessageSuccess(bool valid);
+        public void ValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback) => AccountService.ValidateAccessToken(success, errorCallback);
 
         public void ValidateSignedMessage(string message, string signedMessage, string address,
             ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
-        {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
-
-            StartCoroutine(CoroutineValidateSignedMessage(message, signedMessage, address, success, errorCallback));
-        }
-
-        private IEnumerator CoroutineValidateSignedMessage(string message, string signedMessage, string address,
-            ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
-        {
-            Debug.Log("ValidateSignedMessage request started");
-
-            ValidateSignedMessageRequest data = new ValidateSignedMessageRequest()
-            {
-                message = message,
-                signedMessage = signedMessage,
-                address = address
-            };
-
-            string dataString = SerializationHelper.Serialize(data, false);
-
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "validate-signed-message" + "?request=" +
-                         currentAccessToken;
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                request.method = "POST";
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
-                request.uploadHandler.contentType = "application/json";
-                yield return request.SendWebRequest();
-                PrintRequestResult("ValidateSignedMessage", request);
-                if (ProcessRequest<ValidateSignedMessageResponse>(request, errorCallback, out var response))
-                {
-                    success?.Invoke(response.valid);
-                }
-            }
-        }
-
-        #endregion Validate Signed Message
-
-        #region Disconnect Wallet
-
-        private bool disconnectInProgress = false;
-
-        public delegate void DisconnectSuccess();
+            => AccountService.ValidateSignedMessage(message, signedMessage, address, success, errorCallback);
 
         public void Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
-
             if (skipWallet)
             {
                 success?.Invoke();
                 return;
             }
-
-            disconnectInProgress = true;
-            StartCoroutine(CoroutineDisconnect(success, errorCallback));
+            AccountService.Disconnect(success, errorCallback);
         }
 
-        private IEnumerator CoroutineDisconnect(DisconnectSuccess success, ErrorCallback errorCallback)
-        {
-            Debug.Log("Disconnect request started");
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "killSession";
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                yield return request.SendWebRequest();
-                PrintRequestResult("Disconnect request completed", request);
-
-                if (RequestError(request))
-                {
-                    disconnectInProgress = false;
-                    errorCallback?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    disconnectInProgress = false;
-                    success?.Invoke();
-                }
-            }
-        }
-
-        #endregion Disconnect Wallet
-
-        #region Finish
-
-        public delegate void SuccessFinish();
-
-        public void Finish(SuccessFinish success, ErrorCallback errorCallback)
-        {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
-
-            StartCoroutine(CoroutineFinish(success, errorCallback));
-        }
-
-        private IEnumerator CoroutineFinish(SuccessFinish success, ErrorCallback errorCallback)
-        {
-            Debug.Log("Finish request started");
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "finish";
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                yield return request.SendWebRequest();
-                PrintRequestResult("Finish request completed", request);
-
-                if (RequestError(request))
-                {
-                    errorCallback?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    success?.Invoke();
-                }
-            }
-        }
-
-        #endregion Finish
+        public void Finish(SuccessFinish success, ErrorCallback errorCallback) => AccountService.Finish(success, errorCallback);
 
         #region Contracts
 
@@ -560,11 +72,6 @@ namespace EmergenceSDK.Services
         public void LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success,
             ErrorCallback errorCallback)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
-
             StartCoroutine(CoroutineLoadContract(contractAddress, ABI, network, success, errorCallback));
         }
 

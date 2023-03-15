@@ -19,8 +19,9 @@ namespace EmergenceSDK.Services
     /// <remarks>See our prefabs for examples of how to use it!</remarks>
     public partial class EmergenceServices : MonoBehaviour
     {
-        public string CurrentAccessToken => currentAccessToken;
-        private string currentAccessToken = string.Empty;
+        public string CurrentAccessToken => AccountService.CurrentAccessToken;
+        
+        public bool DisconnectInProgress => AccountService.DisconnectInProgress;
 
         public static EmergenceServices Instance;
 
@@ -32,8 +33,12 @@ namespace EmergenceSDK.Services
         
         public IDynamicMetadataService DynamicMetadataService { get; private set; }
         
-        public IConnectionService ConnectionService { get; private set; }
-
+        public IAccountService AccountService { get; private set; }
+        
+        public IWalletService WalletService { get; private set; }
+        
+        public IQRCodeService QRCodeService { get; private set; }
+ 
         private bool skipWallet = false;
 
         #region Monobehaviour
@@ -45,7 +50,9 @@ namespace EmergenceSDK.Services
             AvatarService = new AvatarService();
             InventoryService = new InventoryService();
             DynamicMetadataService = new DynamicMetadataService();
-            ConnectionService = gameObject.AddComponent<ConnectionService>();
+            AccountService = gameObject.AddComponent<AccountService>();
+            WalletService = gameObject.AddComponent<WalletService>();
+            QRCodeService = gameObject.AddComponent<QRCodeService>();
         }
 
         private bool refreshingToken = false;
@@ -58,7 +65,7 @@ namespace EmergenceSDK.Services
 
             bool uiIsVisible = ScreenManager.Instance.gameObject.activeSelf;
 
-            if (!skipWallet && uiIsVisible && !refreshingToken && HasAccessToken)
+            if (!skipWallet && uiIsVisible && !refreshingToken && AccountService.HasAccessToken)
             {
                 long now = DateTimeOffset.Now.ToUnixTimeSeconds();
 
@@ -93,7 +100,7 @@ namespace EmergenceSDK.Services
 
         private Expiration expiration;
 
-        private void ProcessExpiration(string expirationMessage)
+        public void ProcessExpiration(string expirationMessage)
         {
             expiration = SerializationHelper.Deserialize<Expiration>(expirationMessage);
         }
@@ -222,7 +229,7 @@ namespace EmergenceSDK.Services
             skipWallet = skip;
 
             BaseResponse<AccessTokenResponse> response = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(accessTokenJson);
-            currentAccessToken = SerializationHelper.Serialize(response.message.AccessToken, false);
+            AccountService.CurrentAccessToken = SerializationHelper.Serialize(response.message.AccessToken, false);
             ProcessExpiration(response.message.AccessToken.message);
         }
 
