@@ -22,9 +22,9 @@ namespace EmergenceSDK.Internal.Services
             {
                 yield return request.SendWebRequest();
 
-                EmergenceServices.PrintRequestResult("GetQrCode", request);
+                EmergenceUtils.PrintRequestResult("GetQrCode", request);
 
-                if (EmergenceServices.RequestError(request))
+                if (EmergenceUtils.RequestError(request))
                 {
                     errorCallback?.Invoke(request.error, request.responseCode);
                 }

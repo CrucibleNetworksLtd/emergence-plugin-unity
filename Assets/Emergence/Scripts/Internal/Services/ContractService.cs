@@ -49,8 +49,8 @@ namespace EmergenceSDK.Internal.Services
                 request.uploadHandler.contentType = "application/json";
                 request.downloadHandler = new DownloadHandlerBuffer();
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Load Contract", request);
-                if (EmergenceServices.ProcessRequest<LoadContractResponse>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("Load Contract", request);
+                if (EmergenceUtils.ProcessRequest<LoadContractResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke();
                 }
@@ -75,8 +75,8 @@ namespace EmergenceSDK.Internal.Services
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Get Transaction Status", request);
-                if (EmergenceServices.ProcessRequest<T>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("Get Transaction Status", request);
+                if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response); // Should we change this pattern?
                 }
@@ -105,8 +105,8 @@ namespace EmergenceSDK.Internal.Services
                 request.uploadHandler.contentType = "application/json";
 
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Get Block Number", request);
-                if (EmergenceServices.ProcessRequest<T>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("Get Block Number", request);
+                if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response);
                 }
@@ -144,8 +144,8 @@ namespace EmergenceSDK.Internal.Services
                 request.uploadHandler.contentType = "application/json";
 
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Read Contract", request);
-                if (EmergenceServices.ProcessRequest<T>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("Read Contract", request);
+                if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response);
                 }
@@ -189,8 +189,8 @@ namespace EmergenceSDK.Internal.Services
                 request.uploadHandler.contentType = "application/json";
 
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Write Contract", request);
-                if (EmergenceServices.ProcessRequest<T>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("Write Contract", request);
+                if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response);
                 }

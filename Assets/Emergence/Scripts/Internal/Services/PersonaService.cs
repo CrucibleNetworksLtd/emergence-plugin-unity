@@ -53,9 +53,9 @@ namespace EmergenceSDK.Internal.Services
             {
                 request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("GetPersonas", request);
+                EmergenceUtils.PrintRequestResult("GetPersonas", request);
 
-                if (EmergenceServices.RequestError(request))
+                if (EmergenceUtils.RequestError(request))
                 {
                     errorCallback?.Invoke(request.error, request.responseCode);
                 }
@@ -84,9 +84,9 @@ namespace EmergenceSDK.Internal.Services
                 request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
 
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Get Current Persona", request);
+                EmergenceUtils.PrintRequestResult("Get Current Persona", request);
 
-                if (EmergenceServices.RequestError(request))
+                if (EmergenceUtils.RequestError(request))
                 {
                     errorCallback?.Invoke(request.error, request.responseCode);
                 }
@@ -129,9 +129,9 @@ namespace EmergenceSDK.Internal.Services
                 request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
 
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Save Persona", request);
+                EmergenceUtils.PrintRequestResult("Save Persona", request);
 
-                if (EmergenceServices.RequestError(request))
+                if (EmergenceUtils.RequestError(request))
                 {
                     errorCallback?.Invoke(request.error, request.responseCode);
                 }
@@ -158,7 +158,7 @@ namespace EmergenceSDK.Internal.Services
                 using (UnityWebRequest tokenURIRequest = UnityWebRequest.Get(personaAvatarTokenURI))
                 {
                     yield return tokenURIRequest.SendWebRequest();
-                    EmergenceServices.PrintRequestResult("Avatar tokenURI", tokenURIRequest);
+                    EmergenceUtils.PrintRequestResult("Avatar tokenURI", tokenURIRequest);
                     TokenURIResponse res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenURIRequest.downloadHandler.text)[0];
                     // Debug.Log("GUID: " + res.GUID);
                     // rebuild the avatarId field with the GUID
@@ -184,9 +184,9 @@ namespace EmergenceSDK.Internal.Services
                 request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
 
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Save Persona", request);
+                EmergenceUtils.PrintRequestResult("Save Persona", request);
 
-                if (EmergenceServices.RequestError(request))
+                if (EmergenceUtils.RequestError(request))
                 {
                     errorCallback?.Invoke(request.error, request.responseCode);
                 }
@@ -214,9 +214,9 @@ namespace EmergenceSDK.Internal.Services
                 request.method = "DELETE";
                 request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Delete Persona Persona", request);
+                EmergenceUtils.PrintRequestResult("Delete Persona Persona", request);
 
-                if (EmergenceServices.RequestError(request))
+                if (EmergenceUtils.RequestError(request))
                 {
                     errorCallback?.Invoke(request.error, request.responseCode);
                 }
@@ -244,9 +244,9 @@ namespace EmergenceSDK.Internal.Services
                 request.method = "PATCH";
                 request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Set Current Persona", request);
+                EmergenceUtils.PrintRequestResult("Set Current Persona", request);
 
-                if (EmergenceServices.RequestError(request))
+                if (EmergenceUtils.RequestError(request))
                 {
                     errorCallback?.Invoke(request.error, request.responseCode);
                 }

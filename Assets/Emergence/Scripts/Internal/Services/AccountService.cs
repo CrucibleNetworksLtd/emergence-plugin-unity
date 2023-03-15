@@ -38,8 +38,8 @@ namespace EmergenceSDK.Internal.Services
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("IsConnected", request);
-                if (EmergenceServices.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("IsConnected", request);
+                if (EmergenceUtils.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.isConnected);
                 }
@@ -65,8 +65,8 @@ namespace EmergenceSDK.Internal.Services
                 request.method = "POST";
 
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Key Store", request);
-                if (EmergenceServices.ProcessRequest<string>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("Key Store", request);
+                if (EmergenceUtils.ProcessRequest<string>(request, errorCallback, out var response))
                 {
                     success?.Invoke();
                 }
@@ -103,8 +103,8 @@ namespace EmergenceSDK.Internal.Services
                 request.uploadHandler.contentType = "application/json";
 
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Load Account", request);
-                if (EmergenceServices.ProcessRequest<LoadAccountResponse>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("Load Account", request);
+                if (EmergenceUtils.ProcessRequest<LoadAccountResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke();
                 }
@@ -125,11 +125,11 @@ namespace EmergenceSDK.Internal.Services
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("GetAccessToken", request);
-                if (EmergenceServices.ProcessRequest<AccessTokenResponse>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("GetAccessToken", request);
+                if (EmergenceUtils.ProcessRequest<AccessTokenResponse>(request, errorCallback, out var response))
                 {
                     currentAccessToken = SerializationHelper.Serialize(response.AccessToken, false);
-                    EmergenceServices.Instance.ProcessExpiration(response.AccessToken.message);
+                    EmergenceUtils.ProcessExpiration(response.AccessToken.message);
                     success?.Invoke(currentAccessToken);
                 }
             }
@@ -150,8 +150,8 @@ namespace EmergenceSDK.Internal.Services
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("ValidateAccessToken", request);
-                if (EmergenceServices.ProcessRequest<ValidateAccessTokenResponse>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("ValidateAccessToken", request);
+                if (EmergenceUtils.ProcessRequest<ValidateAccessTokenResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.valid);
                 }
@@ -187,8 +187,8 @@ namespace EmergenceSDK.Internal.Services
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
                 request.uploadHandler.contentType = "application/json";
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("ValidateSignedMessage", request);
-                if (EmergenceServices.ProcessRequest<ValidateSignedMessageResponse>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("ValidateSignedMessage", request);
+                if (EmergenceUtils.ProcessRequest<ValidateSignedMessageResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.valid);
                 }
@@ -209,9 +209,9 @@ namespace EmergenceSDK.Internal.Services
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Disconnect request completed", request);
+                EmergenceUtils.PrintRequestResult("Disconnect request completed", request);
 
-                if (EmergenceServices.RequestError(request))
+                if (EmergenceUtils.RequestError(request))
                 {
                     disconnectInProgress = false;
                     errorCallback?.Invoke(request.error, request.responseCode);
@@ -237,9 +237,9 @@ namespace EmergenceSDK.Internal.Services
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Finish request completed", request);
+                EmergenceUtils.PrintRequestResult("Finish request completed", request);
 
-                if (EmergenceServices.RequestError(request))
+                if (EmergenceUtils.RequestError(request))
                 {
                     errorCallback?.Invoke(request.error, request.responseCode);
                 }

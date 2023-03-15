@@ -25,7 +25,7 @@ namespace EmergenceSDK.Internal.Services
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("Authorization-header", "0iKoO1V2ZG98fPETreioOyEireDTYwby");
-            string response = await EmergenceServices.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, errorCallback, metadata, headers);
+            string response = await EmergenceUtils.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, errorCallback, metadata, headers);
             
             Debug.Log("Write dynamic metadata response: " + response);
             BaseResponse<string> dynamicMetadataResponse = SerializationHelper.Deserialize<BaseResponse<string>>(response);

@@ -37,8 +37,8 @@ namespace EmergenceSDK.Internal.Services
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("ReinitializeWalletConnect", request);
-                if (EmergenceServices.ProcessRequest<ReinitializeWalletConnectResponse>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("ReinitializeWalletConnect", request);
+                if (EmergenceUtils.ProcessRequest<ReinitializeWalletConnectResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.disconnected);
                 }
@@ -74,8 +74,8 @@ namespace EmergenceSDK.Internal.Services
                 request.SetRequestHeader("accept", "application/json");
 
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("RequestToSignWalletConnect", request);
-                if (EmergenceServices.ProcessRequest<BaseResponse<string>>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("RequestToSignWalletConnect", request);
+                if (EmergenceUtils.ProcessRequest<BaseResponse<string>>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.message);
                 }
@@ -99,8 +99,8 @@ namespace EmergenceSDK.Internal.Services
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Handshake", request);
-                if (EmergenceServices.ProcessRequest<HandshakeResponse>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("Handshake", request);
+                if (EmergenceUtils.ProcessRequest<HandshakeResponse>(request, errorCallback, out var response))
                 {
                     WalletAddress = response.address;
                     EmergenceSingleton.Instance.SetCachedAddress(response.address);
@@ -127,8 +127,8 @@ namespace EmergenceSDK.Internal.Services
                 request.method = "POST";
 
                 yield return request.SendWebRequest();
-                EmergenceServices.PrintRequestResult("Create Wallet", request);
-                if (EmergenceServices.ProcessRequest<string>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("Create Wallet", request);
+                if (EmergenceUtils.ProcessRequest<string>(request, errorCallback, out var response))
                 {
                     success?.Invoke();
                 }
@@ -153,8 +153,8 @@ namespace EmergenceSDK.Internal.Services
             {
                 yield return request.SendWebRequest();
 
-                EmergenceServices.PrintRequestResult("Get Balance", request);
-                if (EmergenceServices.ProcessRequest<GetBalanceResponse>(request, errorCallback, out var response))
+                EmergenceUtils.PrintRequestResult("Get Balance", request);
+                if (EmergenceUtils.ProcessRequest<GetBalanceResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response.balance);
                 }
