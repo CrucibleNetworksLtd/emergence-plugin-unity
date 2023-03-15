@@ -38,6 +38,8 @@ namespace EmergenceSDK.Services
         public IWalletService WalletService { get; private set; }
         
         public IQRCodeService QRCodeService { get; private set; }
+        
+        public IContractService ContractService { get; private set; }
  
         private bool skipWallet = false;
 

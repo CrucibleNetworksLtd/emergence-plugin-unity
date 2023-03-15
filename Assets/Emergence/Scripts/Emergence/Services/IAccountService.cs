@@ -39,7 +39,8 @@ namespace EmergenceSDK.Services
         /// <summary>
         /// Attempts to validate a signed message, the success callback will fire with the validation result if the call is successful
         /// </summary>
-        void ValidateSignedMessage(string message, string signedMessage, string address, ValidateSignedMessageSuccess success, ErrorCallback errorCallback);
+        void ValidateSignedMessage(string message, string signedMessage, string address,
+            ValidateSignedMessageSuccess success, ErrorCallback errorCallback);
 
         /// <summary>
         /// Attempts to disconnect the user from Emergence, the success callback will fire if successful

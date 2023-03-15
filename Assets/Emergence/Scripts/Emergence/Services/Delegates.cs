@@ -56,4 +56,14 @@ namespace EmergenceSDK.Services
     public delegate void DisconnectSuccess();
     
     public delegate void SuccessFinish();
+    
+    public delegate void LoadContractSuccess();
+    
+    public delegate void GetTransactionStatusSuccess<T>(T response);
+    
+    public delegate void GetBlockNumberSuccess<T>(T response);
+    
+    public delegate void ReadMethodSuccess<T>(T response);
+    
+    public delegate void WriteMethodSuccess<T>(T response);
 }
