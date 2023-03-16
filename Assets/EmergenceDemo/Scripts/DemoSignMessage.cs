@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 
 namespace EmergenceSDK.EmergenceDemo.Scripts
 {
-    public class DemoSignMessage : MonoBehaviour
+    public class DemoSignMessage : DemoStation<DemoSignMessage>, IDemoStation
     {
 
         [SerializeField] private GameObject instructions;
@@ -39,5 +39,7 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
                 Debug.LogError("Error signing message: " + message);
             });
         }
+
+        public bool IsReady { get; set; }
     }
 }

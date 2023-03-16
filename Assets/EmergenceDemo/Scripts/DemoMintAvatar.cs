@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace EmergenceSDK.EmergenceDemo.Scripts
 {
-    public class DemoMintAvatar : MonoBehaviour
+    public class DemoMintAvatar : DemoStation<DemoMintAvatar>, IDemoStation
     {
 
         public GameObject instructions;
@@ -56,5 +56,7 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
         {
             Debug.LogError("Error while minting avatar: " + message);
         }
+
+        public bool IsReady { get; set; }
     }
 }

@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 namespace EmergenceSDK.EmergenceDemo.Scripts
 {
-    public class DemoDynamicMetadataController : MonoBehaviour
+    public class DemoDynamicMetadataController : DemoStation<DemoDynamicMetadataController>, IDemoStation
     {
 
         public GameObject instructions;
@@ -52,6 +52,8 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
             EmergenceServices.Instance.WriteDynamicMetadata(item.blockchain, item.contract, item.tokenId, curMetadata.ToString(), (string response) => {}, (string error, long code) => {});
             EmergenceSingleton.Instance.CloseEmergeneUI();
         }
+
+        public bool IsReady { get; set; }
     }
 }
 

@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace EmergenceSDK.EmergenceDemo.Scripts
 {
-    public class DemoInventoryService : MonoBehaviour
+    public class DemoInventoryService : DemoStation<DemoInventoryService>, IDemoStation
     {
         [SerializeField] private GameObject itemEntryPrefab;
         [SerializeField] private GameObject contentGO;
@@ -86,6 +86,8 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
                 },
                 (error, code) => { Debug.LogError("[" + code + "] " + error); });
         }
+
+        public bool IsReady { get; set; }
     }
 
 }

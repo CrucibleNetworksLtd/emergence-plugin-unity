@@ -5,19 +5,15 @@ using UnityEngine.InputSystem;
 
 namespace EmergenceSDK.EmergenceDemo.Scripts
 {
-    public class DemoOpenOverlay : MonoBehaviour
+    public class DemoOpenOverlay : DemoStation<DemoOpenOverlay>, IDemoStation
     {
 
         [SerializeField] private GameObject instructions;
 
-        private void OnEnable() {
-            // EventManager.StartListening(EmergenceEvents.AVATAR_LOADED, SwapAvatar);
+        private void OnEnable() 
+        {
             EmergenceServices.Instance.PersonaService.OnCurrentPersonaUpdated += OnPersonaUpdated;
         }
-        //
-        // private void OnDisable() {
-        //     throw new NotImplementedException();
-        // }
 
         private void Start()
         {
@@ -42,7 +38,8 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
             }
         }
 
-        public void OnPersonaUpdated(Persona persona) {
+        public void OnPersonaUpdated(Persona persona) 
+        {
             Debug.Log("Changing avatar");
             if (persona != null && !string.IsNullOrEmpty(persona.avatarId))
             {
@@ -61,8 +58,11 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
             }
         }
 
-        private void OpenOverlay() {
+        private void OpenOverlay() 
+        {
             EmergenceSingleton.Instance.OpenEmergenceUI();
         }
+
+        public bool IsReady { get; set; }
     }
 }

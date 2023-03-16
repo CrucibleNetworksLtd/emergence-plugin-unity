@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace EmergenceSDK.EmergenceDemo.Scripts
 {
-    public class DemoWriteMethod : MonoBehaviour
+    public class DemoWriteMethod : DemoStation<DemoWriteMethod>, IDemoStation
     {
         public GameObject instructions;
         public DeployedSmartContract deployedContract;
@@ -46,5 +46,7 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
             ContractHelper.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", new string[] { },
                 (response) => Debug.Log("WriteMethod finished"), (message, id) => Debug.LogError("Error while incrementing current count: " + message));
         }
+
+        public bool IsReady { get; set; }
     }
 }

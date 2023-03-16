@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 
 namespace EmergenceSDK.EmergenceDemo.Scripts
 {
-    public class DemoReadMethod : MonoBehaviour
+    public class DemoReadMethod : DemoStation<DemoReadMethod>, IDemoStation
     {
         public GameObject instructions;
         public DeployedSmartContract deployedContract;
@@ -47,5 +47,7 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
             ContractHelper.ReadMethod<BaseResponse<string>, string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
                 (response) => Debug.Log($"ReadContract finished: {response.message}"), (message, id) => Debug.LogError("Error while getting current count: " + message));
         }
+
+        public bool IsReady { get; set; }
     }
 }

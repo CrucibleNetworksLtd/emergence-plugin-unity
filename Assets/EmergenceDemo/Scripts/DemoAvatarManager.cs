@@ -6,7 +6,7 @@ using UniVRM10;
 
 namespace EmergenceSDK.EmergenceDemo.Scripts
 {
-    public class DemoAvatarManager : SingletonComponent<DemoAvatarManager>
+    public class DemoAvatarManager : DemoStation<DemoAvatarManager>, IDemoStation
     {
         public async void SwapAvatars(string vrmURL)
         {
@@ -56,6 +56,8 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
             
             if (vrmAvatar != null) {Destroy(vrmAvatar);}
         }
+
+        public bool IsReady { get; set; }
     }
     
     
