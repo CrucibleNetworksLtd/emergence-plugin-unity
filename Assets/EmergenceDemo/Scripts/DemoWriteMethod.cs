@@ -36,15 +36,15 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
 
         private void IncrementCurrentCount()
         {
-            ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI,
-                deployedContract.chain.networkName, () =>
-                {
-                    var contractInfo = new ContractInfo(deployedContract.contractAddress, "IncrementCount",
-                        deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL);
-                    ContractHelper.WriteMethod<BaseResponse<string>, string[]>(contractInfo,  "", "",   new string[] { },
-                        (response) => Debug.Log("WriteMethod finished"),
-                        (message, id) => Debug.LogError("Error while incrementing current count: " + message));
-                }, (message, id) => Debug.LogError("Error while loading contract: " + message));
+            ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.chain.networkName, 
+                OnLoadContractSuccess, (message, id) => Debug.LogError("Error while loading contract: " + message));
+        }
+
+        private void OnLoadContractSuccess()
+        {
+            var contractInfo = new ContractInfo(deployedContract.contractAddress, "IncrementCount", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL);
+            ContractHelper.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", new string[] { },
+                (response) => Debug.Log("WriteMethod finished"), (message, id) => Debug.LogError("Error while incrementing current count: " + message));
         }
     }
 }
