@@ -45,7 +45,7 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
         {
             ContractInfo contractInfo = new ContractInfo(deployedContract.contractAddress, "GetCurrentCount", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL);
             ContractHelper.ReadMethod<BaseResponse<string>, string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
-                (response) => Debug.Log("ReadContract finished"), (message, id) => Debug.LogError("Error while getting current count: " + message));
+                (response) => Debug.Log($"ReadContract finished: {response.message}"), (message, id) => Debug.LogError("Error while getting current count: " + message));
         }
     }
 }
