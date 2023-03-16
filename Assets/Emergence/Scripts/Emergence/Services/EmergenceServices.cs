@@ -213,13 +213,13 @@ namespace EmergenceSDK.Services
             => ContractService.GetBlockNumber(transactionHash, nodeURL, body, success, errorCallback);
         
         /// <inheritdoc cref="IContractService.ReadMethod{T,U}"/>
-        public void ReadMethod<T, U>(string contractAddress, string methodName, string network, string nodeUrl, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback) 
-            => ContractService.ReadMethod(contractAddress, methodName, network, nodeUrl, body, success, errorCallback);
+        public void ReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback) 
+            => ContractService.ReadMethod(contractInfo, body, success, errorCallback);
 
         /// <inheritdoc cref="IContractService.WriteMethod{T,U}"/>
-        public void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName,
-            string gasPrice, string network, string nodeUrl, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback) 
-            => ContractService.WriteMethod(contractAddress, methodName, localAccountName, gasPrice, network, nodeUrl, value, body, success, errorCallback);
+        public void WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value,
+            U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback) 
+            => ContractService.WriteMethod(contractInfo, localAccountName, gasPrice, value, body, success, errorCallback);
 
     }
 }

@@ -38,9 +38,8 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
         
         private void OnMintSuccess()
         {
-            ContractHelper.WriteMethod<BaseResponse<string>, string[]>(deployedContract.contractAddress, "mint",
-                "", "", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL,
-                new string[] { }, OnWriteSuccess, OnWriteError);
+            var contractInfo = new ContractInfo(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.contract.name, deployedContract.chain.DefaultNodeURL);
+            ContractHelper.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", new string[] { }, OnWriteSuccess, OnWriteError);
         }
 
         private void OnMintError(string message, long id)

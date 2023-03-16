@@ -1,3 +1,5 @@
+using EmergenceSDK.Internal.Utils;
+
 namespace EmergenceSDK.Services
 {
     public interface IContractService
@@ -11,11 +13,10 @@ namespace EmergenceSDK.Services
         void GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
             GetBlockNumberSuccess<T> success, ErrorCallback errorCallback);
 
-        void ReadMethod<T, U>(string contractAddress, string methodName, string network, string nodeUrl, U body,
+        void ReadMethod<T, U>(ContractInfo contractInfo, U body,
             ReadMethodSuccess<T> success, ErrorCallback errorCallback);
 
-        public void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName,
-            string gasPrice, string network, string nodeUrl, string value, U body, WriteMethodSuccess<T> success,
-            ErrorCallback errorCallback);
+        public void WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value,
+            U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback);
     }
 }

@@ -27,7 +27,7 @@ namespace EmergenceSDK.Internal.Utils
         }
 
         public delegate void ReadContractSuccess<T>(T response);
-        public static void ReadMethod<T, U>(string contractAddress, string methodName, string network, string nodeUrl, U body, ReadContractSuccess<T> success, GenericError error)
+        public static void ReadMethod<T, U>(ContractInfo contractInfo, U body, ReadContractSuccess<T> success, GenericError error)
         {
             EmergenceServices.Instance.IsConnected(IsConnectedSuccess,(errorMessage, code) => error?.Invoke(errorMessage, code));
             
@@ -35,8 +35,9 @@ namespace EmergenceSDK.Internal.Utils
             {
                 if (connected)
                 {
-                    EmergenceServices.Instance.ReadMethod<T, U>(contractAddress, methodName, network, nodeUrl, body, 
-                        (response) => success?.Invoke(response), (errorMessage, code) => error?.Invoke(errorMessage, code));
+                    EmergenceServices.Instance.ReadMethod<T, U>(contractInfo, body, 
+                        (response) => success?.Invoke(response),
+                        (errorMessage, code) => error?.Invoke(errorMessage, code));
                 }
                 else
                 {
@@ -46,7 +47,7 @@ namespace EmergenceSDK.Internal.Utils
         }
 
         public delegate void WriteContractSuccess<T>(T response);
-        public static void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName, string gasprice, string network, string nodeUrl, U body, WriteContractSuccess<T> success, GenericError error, string value = "0")
+        public static void WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasprice,  U body, WriteContractSuccess<T> success, GenericError error, string value = "0")
         {
             EmergenceServices.Instance.IsConnected(IsConnectedSuccess, (errorMessage, code) => error?.Invoke(errorMessage, code));
             
@@ -54,7 +55,7 @@ namespace EmergenceSDK.Internal.Utils
             {
                 if (connected)
                 {
-                    EmergenceServices.Instance.WriteMethod<T, U>(contractAddress, methodName, localAccountName, gasprice, network, nodeUrl, value, body,
+                    EmergenceServices.Instance.WriteMethod<T, U>(contractInfo, localAccountName, gasprice, value, body,
                         (response) => success?.Invoke(response), (errorMessage, code) => error?.Invoke(errorMessage, code));
                 }
                 else

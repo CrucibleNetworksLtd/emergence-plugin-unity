@@ -113,23 +113,16 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
-        public void ReadMethod<T, U>(string contractAddress, string methodName, string network, string nodeUrl, U body, ReadMethodSuccess<T> success,
-            ErrorCallback errorCallback)
+        public void ReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv())
-            // {
-            //     return;
-            // }
-
-            StartCoroutine(CoroutineReadMethod<T, U>(contractAddress, methodName,  network, nodeUrl, body, success, errorCallback));
+            StartCoroutine(CoroutineReadMethod<T, U>(contractInfo, body, success, errorCallback));
         }
 
-        public IEnumerator CoroutineReadMethod<T, U>(string contractAddress, string methodName, string network, string nodeUrl, U body,
-            ReadMethodSuccess<T> success, ErrorCallback errorCallback)
+        public IEnumerator CoroutineReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback)
         {
-            Debug.Log("ReadMethod request started [" + contractAddress + "] / " + methodName);
+            Debug.Log("ReadMethod request started [" + contractInfo.ContractAddress + "] / " + contractInfo.MethodName);
 
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "readMethod?contractAddress=" + contractAddress + "&methodName=" + methodName + "&nodeUrl=" + nodeUrl + "&network=" + network;
+            string url = contractInfo.ToReadUrl();
 
             Debug.Log("ReadMethod url: " + url);
 
@@ -152,17 +145,15 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
-        public void WriteMethod<T, U>(string contractAddress, string methodName, string localAccountName,
-            string gasPrice, string network, string nodeUrl, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
+        public void WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
         {
-            StartCoroutine(CoroutineWriteMethod<T, U>(contractAddress, methodName, localAccountName, gasPrice, network, nodeUrl, value, body,
-                success, errorCallback));
+            StartCoroutine(CoroutineWriteMethod<T, U>(contractInfo, localAccountName, gasPrice, value, body, success, errorCallback));
         }
 
-        public IEnumerator CoroutineWriteMethod<T, U>(string contractAddress, string methodName,
-            string localAccountName, string gasPrice, string network, string nodeUrl, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
+        public IEnumerator CoroutineWriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value, 
+            U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
         {
-            Debug.Log("WriteContract request started [" + contractAddress + "] / " + methodName);
+            Debug.Log("WriteContract request started [" + contractInfo.ContractAddress + "] / " + contractInfo.MethodName);
 
             string gasPriceString = String.Empty;
             string localAccountNameString = String.Empty;
@@ -173,9 +164,7 @@ namespace EmergenceSDK.Internal.Services
                 localAccountNameString = "&localAccountName=" + localAccountName;
             }
 
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "writeMethod?contractAddress=" +
-                         contractAddress + "&methodName=" + methodName + localAccountNameString + gasPriceString +
-                         "&network=" + network + "&nodeUrl=" + nodeUrl + "&value=" + value;
+            string url = contractInfo.ToWriteUrl(localAccountNameString, gasPriceString, value);
 
             Debug.Log("WriteMethod url: " + url);
 
