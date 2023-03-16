@@ -31,20 +31,31 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
         {
             if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
             {
-                MintAvatar();
+                ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI,
+                                             deployedContract.contract.name, OnMintSuccess, OnMintError);
             }
         }
-
-        private void MintAvatar()
+        
+        private void OnMintSuccess()
         {
-            ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI,
-                deployedContract.contract.name, () =>
-                {
-                    ContractHelper.WriteMethod<BaseResponse<string>, string[]>(deployedContract.contractAddress, "mint",
-                        "", "", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL, new string[] { },
-                        (response) => { Debug.Log("Mint response: " + response.message); },
-                        (message, id) => { Debug.LogError("Error while minting avatar: " + message); });
-                }, (message, id) => { Debug.LogError("Error while loading contract: " + message); });
+            ContractHelper.WriteMethod<BaseResponse<string>, string[]>(deployedContract.contractAddress, "mint",
+                "", "", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL,
+                new string[] { }, OnWriteSuccess, OnWriteError);
+        }
+
+        private void OnMintError(string message, long id)
+        {
+            Debug.LogError("Error while loading contract: " + message);
+        }
+
+        private void OnWriteSuccess(BaseResponse<string> response)
+        {
+            Debug.Log("Mint response: " + response.message);
+        }
+
+        private void OnWriteError(string message, long id)
+        {
+            Debug.LogError("Error while minting avatar: " + message);
         }
     }
 }
