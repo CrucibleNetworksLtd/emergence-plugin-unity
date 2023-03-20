@@ -20,10 +20,6 @@ namespace EmergenceSDK.Internal.Services
         public IEnumerator CoroutineLoadContract(string contractAddress, string ABI, string network,
             LoadContractSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("LoadContract request started");
-
-            Debug.Log("ABI: " + ABI);
-
             Contract data = new Contract()
             {
                 contractAddress = contractAddress,
@@ -38,9 +34,6 @@ namespace EmergenceSDK.Internal.Services
 
             string dataString = SerializationHelper.Serialize(data, false);
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "loadContract";
-
-            Debug.Log("payload: " + System.Text.RegularExpressions.Regex.Unescape(dataString));
-            Debug.Log("Load contract url: " + url);
 
             using (UnityWebRequest request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST))
             {
@@ -67,8 +60,6 @@ namespace EmergenceSDK.Internal.Services
         private IEnumerator CoroutineGetTransactionStatus<T>(string transactionHash, string nodeURL,
             GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback)
         {
-            Debug.Log("Get Transaction Status request started [" + transactionHash + "] / " + nodeURL);
-
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "GetTransactionStatus?transactionHash=" +
                          transactionHash + "&nodeURL=" + nodeURL;
 
@@ -92,8 +83,6 @@ namespace EmergenceSDK.Internal.Services
         private IEnumerator CoroutineGetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
             GetBlockNumberSuccess<T> success, ErrorCallback errorCallback)
         {
-            Debug.Log("Get Block Number request started [" + transactionHash + "] / " + nodeURL);
-
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
 
             string dataString = SerializationHelper.Serialize(body, false);
@@ -120,15 +109,9 @@ namespace EmergenceSDK.Internal.Services
 
         public IEnumerator CoroutineReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback)
         {
-            Debug.Log("ReadMethod request started [" + contractInfo.ContractAddress + "] / " + contractInfo.MethodName);
-
             string url = contractInfo.ToReadUrl();
 
-            Debug.Log("ReadMethod url: " + url);
-
             string dataString = SerializationHelper.Serialize(body, false);
-
-            Debug.Log("Data string: " + dataString);
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -153,8 +136,6 @@ namespace EmergenceSDK.Internal.Services
         public IEnumerator CoroutineWriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value, 
             U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
         {
-            Debug.Log("WriteContract request started [" + contractInfo.ContractAddress + "] / " + contractInfo.MethodName);
-
             string gasPriceString = String.Empty;
             string localAccountNameString = String.Empty;
 
@@ -165,8 +146,6 @@ namespace EmergenceSDK.Internal.Services
             }
 
             string url = contractInfo.ToWriteUrl(localAccountNameString, gasPriceString, value);
-
-            Debug.Log("WriteMethod url: " + url);
 
             string dataString = SerializationHelper.Serialize(body, false);
 

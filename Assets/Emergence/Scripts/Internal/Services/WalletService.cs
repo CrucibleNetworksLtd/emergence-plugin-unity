@@ -11,15 +11,12 @@ namespace EmergenceSDK.Internal.Services
     {
         private string walletAddress = string.Empty;
 
-        public bool HasAddress
-        {
-            get { return walletAddress != null && walletAddress.Trim() != string.Empty; }
-        }
+        public bool HasAddress => walletAddress != null && walletAddress.Trim() != string.Empty;
 
         public string WalletAddress
         {
-            get { return walletAddress; }
-            set { walletAddress = value; }
+            get => walletAddress;
+            set => walletAddress = value;
         }
         
         public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, ErrorCallback errorCallback)
@@ -30,8 +27,6 @@ namespace EmergenceSDK.Internal.Services
         private IEnumerator CoroutineReinitializeWalletConnect(ReinitializeWalletConnectSuccess success,
             ErrorCallback errorCallback)
         {
-            Debug.Log("CoroutineReinitializeWalletConnect request started");
-
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "reinitializewalletconnect";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
@@ -47,23 +42,15 @@ namespace EmergenceSDK.Internal.Services
 
         public void RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback)
         {
-
             StartCoroutine(CoroutineRequestToSignWalletConnect(messageToSign, success, errorCallback));
         }
 
         private IEnumerator CoroutineRequestToSignWalletConnect(string messageToSign, RequestToSignSuccess success,
             ErrorCallback errorCallback)
         {
-            Debug.Log("CoroutineRequestToSignWalletConnect request started");
             var content = "{\"message\": \"" + messageToSign + "\"}";
-            
-            Debug.Log("content: " + content);
 
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "request-to-sign";
-            
-            Debug.Log("url: " + url);
-            
-            Debug.Log("deviceId: " + EmergenceSingleton.Instance.CurrentDeviceId);
 
             using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
             {
@@ -84,16 +71,13 @@ namespace EmergenceSDK.Internal.Services
         
         public void Handshake(HandshakeSuccess success, ErrorCallback errorCallback)
         {
-
             StartCoroutine(CoroutineHandshake(success, errorCallback));
         }
 
         private IEnumerator CoroutineHandshake(HandshakeSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("Handshake request started");
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "handshake" + "?nodeUrl=" +
                          EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL;
-            Debug.Log("Handshake: " + url);
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -117,8 +101,6 @@ namespace EmergenceSDK.Internal.Services
         private IEnumerator CoroutineCreateWallet(string path, string password, CreateWalletSuccess success,
             ErrorCallback errorCallback)
         {
-            Debug.Log("CreateWallet request started");
-
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "createWallet" + "?path=" + path +
                          "&password=" + password;
 
@@ -144,8 +126,6 @@ namespace EmergenceSDK.Internal.Services
 
         private IEnumerator CoroutineGetBalance(string address, BalanceSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("Get Balance request started");
-
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "getbalance" + "?nodeUrl=" +
                          EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL + "&address=" + address;
 

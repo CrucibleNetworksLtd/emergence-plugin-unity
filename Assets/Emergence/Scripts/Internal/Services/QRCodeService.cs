@@ -10,7 +10,6 @@ namespace EmergenceSDK.Internal.Services
     {
         public void GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("Getting QR code");
             StartCoroutine(CoroutineGetQrCode(success, errorCallback));
         }
 

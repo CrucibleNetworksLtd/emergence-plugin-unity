@@ -45,8 +45,6 @@ namespace EmergenceSDK.Internal.Services
     
         private IEnumerator CoroutineGetPersonas(SuccessPersonas success, ErrorCallback errorCallback)
         {
-            Debug.Log("GetPersonas request started");
-            // string url = LocalEmergenceServer.Instance.Environment().PersonaURL + "personas";
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "personas";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
@@ -75,8 +73,6 @@ namespace EmergenceSDK.Internal.Services
 
         private IEnumerator CoroutineGetCurrentPersona(SuccessGetCurrentPersona success, ErrorCallback errorCallback)
         {
-            Debug.Log("GetCurrentPersona request started");
-            // string url = LocalEmergenceServer.Instance.Environment().PersonaURL + "persona";
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
@@ -100,31 +96,22 @@ namespace EmergenceSDK.Internal.Services
     
         public void CreatePersona(Persona persona, SuccessCreatePersona success, ErrorCallback errorCallback)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineCreatePersona(persona, success, errorCallback));
         }
 
         private IEnumerator CoroutineCreatePersona(Persona persona, SuccessCreatePersona success, ErrorCallback errorCallback)
         {
-            Debug.Log("CreatePersona request started");
             if (persona.avatarId == null) {
                 persona.avatarId = "";
             }
             string jsonPersona = SerializationHelper.Serialize(persona);
 
-            Debug.Log("Persona json: " + jsonPersona);
-        
-            // string url = LocalEmergenceServer.Instance.Environment().PersonaURL + "persona";
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
         
-            Debug.Log("Persona url: " + url);
-
             using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
                 request.uploadHandler.contentType = "application/json";
-            
-                Debug.Log("Access token: " + EmergenceServices.Instance.CurrentAccessToken);
 
                 request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
 
@@ -144,14 +131,11 @@ namespace EmergenceSDK.Internal.Services
     
         public void EditPersona(Persona persona, SuccessEditPersona success, ErrorCallback errorCallback)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineEditPersona(persona, success, errorCallback));
         }
 
         private IEnumerator CoroutineEditPersona(Persona persona, SuccessEditPersona success, ErrorCallback errorCallback)
         {
-            Debug.Log("Edit Persona request started");
-        
             // Fetch the current avatar GUID and add it to the avatarId field of the persona
             if (persona.avatar != null) {
                 string personaAvatarTokenURI = Helpers.InternalIPFSURLToHTTP(persona.avatar.tokenURI);
@@ -168,12 +152,7 @@ namespace EmergenceSDK.Internal.Services
             }
 
             string jsonPersona = SerializationHelper.Serialize(persona);
-        
-            Debug.Log("persona json: " + jsonPersona);
-
-            // string url = LocalEmergenceServer.Instance.Environment().PersonaURL + "persona";
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
-            Debug.Log("Edit persona url: " + url);
 
             using (UnityWebRequest request = UnityWebRequest.Post(url, string.Empty))
             {
@@ -199,14 +178,11 @@ namespace EmergenceSDK.Internal.Services
     
         public void DeletePersona(Persona persona, SuccessDeletePersona success, ErrorCallback errorCallback)
         {
-            // if (!LocalEmergenceServer.Instance.CheckEnv()) { return; }
             StartCoroutine(CoroutineDeletePersona(persona, success, errorCallback));
         }
 
         private IEnumerator CoroutineDeletePersona(Persona persona, SuccessDeletePersona success, ErrorCallback errorCallback)
         {
-            Debug.Log("DeletePersona request started");
-            // string url = LocalEmergenceServer.Instance.Environment().PersonaURL + "persona/" + persona.id;
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona/" + persona.id;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
@@ -234,10 +210,7 @@ namespace EmergenceSDK.Internal.Services
 
         private IEnumerator CoroutineSetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, ErrorCallback errorCallback)
         {
-            Debug.Log("Set Current Persona request started");
-            // string url = LocalEmergenceServer.Instance.Environment().PersonaURL + "setActivePersona/" + persona.id;
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "setActivePersona/" + persona.id;
-        
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {

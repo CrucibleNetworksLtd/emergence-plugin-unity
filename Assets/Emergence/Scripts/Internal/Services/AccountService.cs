@@ -28,9 +28,6 @@ namespace EmergenceSDK.Internal.Services
 
         private IEnumerator CoroutineIsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("CoroutineIsConnected request started");
-
-            // string url = EmergenceSingleton.Instance.Configuration.APIBase + "isConnected";
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "isConnected";
             Debug.Log("url: " + url);
 
@@ -55,8 +52,6 @@ namespace EmergenceSDK.Internal.Services
         private IEnumerator CoroutineKeyStore(string privateKey, string password, string publicKey, string path,
             CreateKeyStoreSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("Create KeyStore request started");
-
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "createKeyStore" + "?privateKey=" +
                          privateKey + "&password=" + password + "&publicKey=" + publicKey + "&path=" + path;
 
@@ -82,8 +77,6 @@ namespace EmergenceSDK.Internal.Services
         private IEnumerator CoroutineLoadAccount(string name, string password, string path, string nodeURL,
             string chainId, LoadAccountSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("Load Account request started");
-
             Account data = new Account()
             {
                 name = name,
@@ -118,7 +111,6 @@ namespace EmergenceSDK.Internal.Services
 
         private IEnumerator CoroutineGetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("GetAccessToken request started");
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "get-access-token";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
@@ -142,8 +134,6 @@ namespace EmergenceSDK.Internal.Services
 
         private IEnumerator CoroutineValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("ValidateAccessToken request started");
-
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "validate-access-token" +
                          "?accessToken=" + currentAccessToken;
 
@@ -167,8 +157,6 @@ namespace EmergenceSDK.Internal.Services
         private IEnumerator CoroutineValidateSignedMessage(string message, string signedMessage, string address,
             ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("ValidateSignedMessage request started");
-
             ValidateSignedMessageRequest data = new ValidateSignedMessageRequest()
             {
                 message = message,
@@ -203,7 +191,6 @@ namespace EmergenceSDK.Internal.Services
 
         private IEnumerator CoroutineDisconnect(DisconnectSuccess success, ErrorCallback errorCallback)
         {
-            Debug.Log("Disconnect request started");
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "killSession";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
@@ -231,7 +218,6 @@ namespace EmergenceSDK.Internal.Services
 
         private IEnumerator CoroutineFinish(SuccessFinish success, ErrorCallback errorCallback)
         {
-            Debug.Log("Finish request started");
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "finish";
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
