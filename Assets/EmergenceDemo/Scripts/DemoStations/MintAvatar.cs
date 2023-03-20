@@ -2,14 +2,11 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-namespace EmergenceSDK.EmergenceDemo.Scripts
+namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class DemoMintAvatar : DemoStation<DemoMintAvatar>, IDemoStation
+    public class MintAvatar : DemoStation<MintAvatar>, IDemoStation
     {
-
-        public GameObject instructions;
         public DeployedSmartContract deployedContract;
 
         private void Start()
@@ -29,7 +26,7 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
 
         private void Update()
         {
-            if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+            if (HasBeenActivated() && IsReady)
             {
                 ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI,
                                              deployedContract.contract.name, OnMintSuccess, OnMintError);

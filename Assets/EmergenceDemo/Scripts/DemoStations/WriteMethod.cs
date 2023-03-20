@@ -2,13 +2,11 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-namespace EmergenceSDK.EmergenceDemo.Scripts
+namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class DemoWriteMethod : DemoStation<DemoWriteMethod>, IDemoStation
+    public class WriteMethod : DemoStation<WriteMethod>, IDemoStation
     {
-        public GameObject instructions;
         public DeployedSmartContract deployedContract;
 
         private void Start()
@@ -28,7 +26,7 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
 
         private void Update()
         {
-            if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+            if (HasBeenActivated() && IsReady)
             {
                 IncrementCurrentCount();
             }

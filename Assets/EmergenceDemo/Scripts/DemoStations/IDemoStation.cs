@@ -1,4 +1,4 @@
-namespace EmergenceSDK.EmergenceDemo.Scripts
+namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public interface IDemoStation
     {

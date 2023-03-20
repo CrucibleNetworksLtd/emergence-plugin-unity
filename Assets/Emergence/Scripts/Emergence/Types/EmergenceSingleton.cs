@@ -177,7 +177,6 @@ namespace EmergenceSDK.Types
 
                     if (Input.GetKeyDown(KeyCode.Escape))
                     {
-                        Debug.Log("Esc");
                         if (ScreenManager.Instance != null)
                         {
                             if (ScreenManager.Instance.IsVisible)

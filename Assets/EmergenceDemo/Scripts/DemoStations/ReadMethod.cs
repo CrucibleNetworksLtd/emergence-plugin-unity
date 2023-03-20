@@ -3,13 +3,11 @@ using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-namespace EmergenceSDK.EmergenceDemo.Scripts
+namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class DemoReadMethod : DemoStation<DemoReadMethod>, IDemoStation
+    public class ReadMethod : DemoStation<ReadMethod>, IDemoStation
     {
-        public GameObject instructions;
         public DeployedSmartContract deployedContract;
 
         private void Start()
@@ -29,7 +27,7 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
 
         private void Update()
         {
-            if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+            if (HasBeenActivated() && IsReady)
             {
                 ReadCurrentCount();
             }

@@ -3,17 +3,15 @@ using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace EmergenceSDK.EmergenceDemo.Scripts
+namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class DemoInventoryService : DemoStation<DemoInventoryService>, IDemoStation
+    public class InventoryService : DemoStation<InventoryService>, IDemoStation
     {
         [SerializeField] private GameObject itemEntryPrefab;
         [SerializeField] private GameObject contentGO;
         [SerializeField] private GameObject scrollView;
-        public GameObject instructions;
 
         private List<GameObject> items = new List<GameObject>();
 
@@ -36,7 +34,7 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
 
         private void Update()
         {
-            if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+            if (HasBeenActivated() && IsReady)
             {
                 ShowInventory();
             }

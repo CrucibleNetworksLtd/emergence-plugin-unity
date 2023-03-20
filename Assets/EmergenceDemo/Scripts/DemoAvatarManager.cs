@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UniVRM10;
 
-namespace EmergenceSDK.EmergenceDemo.Scripts
+namespace EmergenceSDK.EmergenceDemo
 {
-    public class DemoAvatarManager : DemoStation<DemoAvatarManager>, IDemoStation
+    public class DemoAvatarManager : SingletonComponent<DemoAvatarManager>
     {
         public async void SwapAvatars(string vrmURL)
         {
@@ -53,11 +53,12 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
 
             originalMesh.enabled = true;
             playerArmature.GetComponent<Animator>().avatar = Resources.Load<UnityEngine.Avatar>("ArmatureAvatar");
-            
-            if (vrmAvatar != null) {Destroy(vrmAvatar);}
-        }
 
-        public bool IsReady { get; set; }
+            if (vrmAvatar != null)
+            {
+                Destroy(vrmAvatar);
+            }
+        }
     }
     
     

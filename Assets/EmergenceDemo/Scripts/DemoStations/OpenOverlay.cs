@@ -1,15 +1,11 @@
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-namespace EmergenceSDK.EmergenceDemo.Scripts
+namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class DemoOpenOverlay : DemoStation<DemoOpenOverlay>, IDemoStation
+    public class OpenOverlay : DemoStation<OpenOverlay>, IDemoStation
     {
-
-        [SerializeField] private GameObject instructions;
-
         private void OnEnable() 
         {
             EmergenceServices.Instance.PersonaService.OnCurrentPersonaUpdated += OnPersonaUpdated;
@@ -32,9 +28,9 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
 
         private void Update()
         {
-            if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+            if (HasBeenActivated() && IsReady)
             {
-                OpenOverlay();
+                EmergenceSingleton.Instance.OpenEmergenceUI();
             }
         }
 
@@ -56,11 +52,6 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
             {
                 DemoAvatarManager.Instance.SetDefaultAvatar();
             }
-        }
-
-        private void OpenOverlay() 
-        {
-            EmergenceSingleton.Instance.OpenEmergenceUI();
         }
 
         public bool IsReady { get; set; }

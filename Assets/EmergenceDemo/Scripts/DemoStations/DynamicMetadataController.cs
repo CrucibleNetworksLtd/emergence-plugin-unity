@@ -3,14 +3,11 @@ using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-namespace EmergenceSDK.EmergenceDemo.Scripts
+namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class DemoDynamicMetadataController : DemoStation<DemoDynamicMetadataController>, IDemoStation
+    public class DynamicMetadataController : DemoStation<DynamicMetadataController>, IDemoStation
     {
-
-        public GameObject instructions;
         public DeployedSmartContract deployedContract;
 
         private void Start()
@@ -30,7 +27,7 @@ namespace EmergenceSDK.EmergenceDemo.Scripts
 
         private void Update()
         {
-            if (Keyboard.current.eKey.wasPressedThisFrame && instructions.activeSelf)
+            if (HasBeenActivated() && IsReady)
             {
                 ShowNFTPicker();
             }
