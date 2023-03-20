@@ -5,6 +5,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace EmergenceSDK.Internal.UI
@@ -142,14 +143,12 @@ namespace EmergenceSDK.Internal.UI
         }
         nowState = GifState.Loading;
         
-        // Load file
-        using (WWW www = new WWW(imageUrl))
+        using (UnityWebRequest request = UnityWebRequest.Get(imageUrl))
         {
-            yield return www;
-
-            if (string.IsNullOrEmpty(www.error) == false)
+            yield return request.SendWebRequest();
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("File load error.\n" + www.error);
+                Debug.LogError("File load error.\n" + request.error);
                 nowState = GifState.None;
                 yield break;
             }
@@ -158,35 +157,35 @@ namespace EmergenceSDK.Internal.UI
             nowState = GifState.Loading;
 
             // Get GIF textures
-            yield return StartCoroutine(UniGif.GetTextureListCoroutine(www.bytes, (gifTexList, loopCount, width, height) =>
-            {
-                if (gifTexList != null)
+            yield return StartCoroutine(UniGif.GetTextureListCoroutine(request.downloadHandler.data, (gifTexList, loopCount, width, height) =>
                 {
-                    m_gifTextureList = gifTexList;
-                    this.loopCount = loopCount;
-                    this.width = width;
-                    this.height = height;
-                    nowState = GifState.Ready;
-
-                    // m_imgAspectCtrl.FixAspectRatio(width, height);
-
-                    if (m_rotateOnLoading)
+                    if (gifTexList != null)
                     {
-                        transform.localEulerAngles = Vector3.zero;
-                    }
+                        m_gifTextureList = gifTexList;
+                        this.loopCount = loopCount;
+                        this.width = width;
+                        this.height = height;
+                        nowState = GifState.Ready;
 
-                    if (autoPlay)
-                    {
-                        Play();
+                        // m_imgAspectCtrl.FixAspectRatio(width, height);
+
+                        if (m_rotateOnLoading)
+                        {
+                            transform.localEulerAngles = Vector3.zero;
+                        }
+
+                        if (autoPlay)
+                        {
+                            Play();
+                        }
                     }
-                }
-                else
-                {
-                    Debug.LogError("Gif texture get error.");
-                    nowState = GifState.None;
-                }
-            },
-            m_filterMode, m_wrapMode, m_outputDebugLog));
+                    else
+                    {
+                        Debug.LogError("Gif texture get error.");
+                        nowState = GifState.None;
+                    }
+                },
+                m_filterMode, m_wrapMode, m_outputDebugLog));
         }
     }
         
