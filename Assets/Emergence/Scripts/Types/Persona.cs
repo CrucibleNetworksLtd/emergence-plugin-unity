@@ -5,21 +5,17 @@ namespace EmergenceSDK.Types
 {
     public class Persona
     {
-        public class PersonaSettings
-        {
-            public bool availableOnSearch;
-            public bool receiveContactRequest;
-            public bool showStatus;
-        }
-
         public string avatarId;
         // {Chain}:{Address}:{Token}:{GUID}
 
         public string id;
         public string name;
         public string bio;
-
+        
+        [JsonIgnore]
         private Avatar _avatar;
+        //TODO: Remove
+        [JsonIgnore]
         public Avatar avatar
         {
             get => _avatar;
@@ -29,8 +25,6 @@ namespace EmergenceSDK.Types
                 // avatarId = value?.chain + ":" + value?.contractAddress + ":" + value?.tokenId + ":" + value?.GUID;
             }
         }
-
-        public PersonaSettings settings;
 
         [JsonIgnore]
         public Texture2D AvatarImage

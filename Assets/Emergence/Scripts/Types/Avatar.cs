@@ -6,7 +6,6 @@ namespace EmergenceSDK.Types
 {
     public class Avatar
     {
-
         public class AvatarMeta
         {
             public class AvatarMetaAttributes

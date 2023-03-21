@@ -137,7 +137,8 @@ namespace EmergenceSDK.Internal.Services
         private IEnumerator CoroutineEditPersona(Persona persona, SuccessEditPersona success, ErrorCallback errorCallback)
         {
             // Fetch the current avatar GUID and add it to the avatarId field of the persona
-            if (persona.avatar != null) {
+            if (persona.avatar != null) 
+            {
                 string personaAvatarTokenURI = Helpers.InternalIPFSURLToHTTP(persona.avatar.tokenURI);
                 using (UnityWebRequest tokenURIRequest = UnityWebRequest.Get(personaAvatarTokenURI))
                 {
@@ -171,6 +172,7 @@ namespace EmergenceSDK.Internal.Services
                 }
                 else
                 {
+                    CurrentPersona = persona;
                     success?.Invoke();
                 }
             }

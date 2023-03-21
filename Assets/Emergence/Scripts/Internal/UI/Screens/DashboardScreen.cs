@@ -221,12 +221,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                     avatarId = string.Empty,
                     // url = string.Empty,
                 },
-                settings = new Persona.PersonaSettings()
-                {
-                    availableOnSearch = true,
-                    receiveContactRequest = true,
-                    showStatus = true,
-                },
                 AvatarImage = null,
             };
 
