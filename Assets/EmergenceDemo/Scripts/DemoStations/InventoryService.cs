@@ -59,30 +59,30 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             }
 
             EmergenceServices.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
+            {
+                foreach (var item in items)
                 {
-                    foreach (var item in items)
-                    {
-                        Destroy(item);
-                    }
+                    Destroy(item);
+                }
+                
+                items.Clear();
+                
+                for (int i = 0; i < inventoryItems.Count; i++)
+                {
+                    GameObject entry = Instantiate(itemEntryPrefab);
+
+                    Button entryButton = entry.GetComponent<Button>();
+                    // entryButton.onClick.AddListener(OnInventoryItemPressed);
+
+                    InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
+                    itemEntry.SetItem(inventoryItems[i]);
+
+                    entry.transform.SetParent(contentGO.transform, false);
                     
-                    items.Clear();
-                    
-                    for (int i = 0; i < inventoryItems.Count; i++)
-                    {
-                        GameObject entry = Instantiate(itemEntryPrefab);
-
-                        Button entryButton = entry.GetComponent<Button>();
-                        // entryButton.onClick.AddListener(OnInventoryItemPressed);
-
-                        InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
-                        itemEntry.SetItem(inventoryItems[i]);
-
-                        entry.transform.SetParent(contentGO.transform, false);
-                        
-                        items.Add(entry);
-                    }
-                },
-                (error, code) => { Debug.LogError("[" + code + "] " + error); });
+                    items.Add(entry);
+                }
+            },
+            (error, code) => { Debug.LogError("[" + code + "] " + error); });
         }
 
         public bool IsReady { get; set; }
