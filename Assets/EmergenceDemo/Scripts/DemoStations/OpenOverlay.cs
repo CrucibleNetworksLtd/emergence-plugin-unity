@@ -6,6 +6,12 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public class OpenOverlay : DemoStation<OpenOverlay>, IDemoStation
     {
+        public bool IsReady
+        {
+            get => isReady;
+            set => InstructionsText.text = value ? ActiveInstructions : InactiveInstructions;
+        }
+        
         private void OnEnable() 
         {
             EmergenceServices.Instance.PersonaService.OnCurrentPersonaUpdated += OnPersonaUpdated;
@@ -13,17 +19,18 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Start()
         {
-            instructions.SetActive(false);
+            instructionsGO.SetActive(false);
+            IsReady = true;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            instructions.SetActive(true);
+            instructionsGO.SetActive(true);
         }
 
         private void OnTriggerExit(Collider other)
         {
-            instructions.SetActive(false);
+            instructionsGO.SetActive(false);
         }
 
         private void Update()
@@ -53,7 +60,5 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 DemoAvatarManager.Instance.SetDefaultAvatar();
             }
         }
-
-        public bool IsReady { get; set; }
     }
 }

@@ -10,19 +10,26 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
     {
         public DeployedSmartContract deployedContract;
 
+        public bool IsReady
+        {
+            get => isReady;
+            set => InstructionsText.text = value ? ActiveInstructions : InactiveInstructions;
+        }
+        
         private void Start()
         {
-            instructions.SetActive(false);
+            instructionsGO.SetActive(false);
+            IsReady = false;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            instructions.SetActive(true);
+            instructionsGO.SetActive(true);
         }
 
         private void OnTriggerExit(Collider other)
         {
-            instructions.SetActive(false);
+            instructionsGO.SetActive(false);
         }
 
         private void Update()
@@ -45,7 +52,5 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             ContractHelper.ReadMethod<BaseResponse<string>, string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
                 (response) => Debug.Log($"ReadContract finished: {response.message}"), (message, id) => Debug.LogError("Error while getting current count: " + message));
         }
-
-        public bool IsReady { get; set; }
     }
 }

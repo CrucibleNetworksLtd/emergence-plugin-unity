@@ -9,21 +9,27 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
     public class DynamicMetadataController : DemoStation<DynamicMetadataController>, IDemoStation
     {
         public DeployedSmartContract deployedContract;
-        public bool IsReady { get; set; }
+
+        public bool IsReady
+        {
+            get => isReady;
+            set => InstructionsText.text = value ? ActiveInstructions : InactiveInstructions;
+        }
 
         private void Start()
         {
-            instructions.SetActive(false);
+            instructionsGO.SetActive(false);
+            IsReady = false;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            instructions.SetActive(true);
+            instructionsGO.SetActive(true);
         }
 
         private void OnTriggerExit(Collider other)
         {
-            instructions.SetActive(false);
+            instructionsGO.SetActive(false);
         }
 
         private void Update()

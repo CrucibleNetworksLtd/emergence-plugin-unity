@@ -5,19 +5,26 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public class SignMessage : DemoStation<SignMessage>, IDemoStation
     {
+        public bool IsReady
+        {
+            get => isReady;
+            set => InstructionsText.text = value ? ActiveInstructions : InactiveInstructions;
+        }
+        
         private void Start()
         {
-            instructions.SetActive(false);
+            instructionsGO.SetActive(false);
+            IsReady = false;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            instructions.SetActive(true);
+            instructionsGO.SetActive(true);
         }
 
         private void OnTriggerExit(Collider other)
         {
-            instructions.SetActive(false);
+            instructionsGO.SetActive(false);
         }
 
         private void Update()
@@ -37,7 +44,5 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             Debug.Log("Message signed succesfully: " + message);
         }
-
-        public bool IsReady { get; set; }
     }
 }

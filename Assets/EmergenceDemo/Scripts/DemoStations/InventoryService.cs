@@ -16,20 +16,27 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private List<GameObject> items = new List<GameObject>();
 
         private bool isInventoryVisible = false;
+        
+        public bool IsReady
+        {
+            get => isReady;
+            set => InstructionsText.text = value ? ActiveInstructions : InactiveInstructions;
+        }
 
         private void Start()
         {
-            instructions.SetActive(false);
+            instructionsGO.SetActive(false);
+            IsReady = false;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            instructions.SetActive(true);
+            instructionsGO.SetActive(true);
         }
 
         private void OnTriggerExit(Collider other)
         {
-            instructions.SetActive(false);
+            instructionsGO.SetActive(false);
         }
 
         private void Update()
@@ -88,8 +95,6 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 items.Add(entry);
             }
         }
-
-        public bool IsReady { get; set; }
     }
 
 }
