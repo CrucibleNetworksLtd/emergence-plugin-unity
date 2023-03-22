@@ -9,6 +9,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
     public class DynamicMetadataController : DemoStation<DynamicMetadataController>, IDemoStation
     {
         public DeployedSmartContract deployedContract;
+        public bool IsReady { get; set; }
 
         private void Start()
         {
@@ -39,18 +40,35 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             ScreenManager.Instance.ShowCollection(UpdateDynamicMetadata);
         }
 
+        private class DynamicMetaData
+        {
+            public int statusCode;
+            public string message;
+        }
+        
         private void UpdateDynamicMetadata(InventoryItem item)
         {
             Debug.Log("Updating Dynamic metadata");
-            if (string.IsNullOrEmpty(item.meta.dynamicMetadata)) return;
+            if (string.IsNullOrEmpty(item.meta.dynamicMetadata)) 
+                return;
+            
             var curMetadata = int.Parse(item.meta.dynamicMetadata);
             curMetadata++;
 
-            EmergenceServices.Instance.WriteDynamicMetadata(item.blockchain, item.contract, item.tokenId, curMetadata.ToString(), (string response) => {}, (string error, long code) => {});
-            EmergenceSingleton.Instance.CloseEmergeneUI();
+            EmergenceServices.Instance.WriteDynamicMetadata(item.blockchain, item.contract, item.tokenId,
+                curMetadata.ToString(), UpdateDynamicMetadataSuccess, (string error, long code) => {});
+            
+            void UpdateDynamicMetadataSuccess(string response)
+            {
+                var dynamicMetaData = JsonUtility.FromJson<DynamicMetaData>(response);
+                if (dynamicMetaData.statusCode == 0)
+                {
+                    CollectionScreen.Instance.OpenSidebar(item);
+                    CollectionScreen.Instance.Refresh(null);
+                }
+            
+            }
         }
-
-        public bool IsReady { get; set; }
     }
 }
 

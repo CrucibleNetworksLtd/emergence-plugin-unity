@@ -95,7 +95,7 @@ namespace EmergenceSDK.Types
             }
         }
         
-        public void CloseEmergeneUI()
+        public void CloseEmergenceUI()
         {
             if (ScreenManager.Instance == null)
             {
@@ -109,93 +109,91 @@ namespace EmergenceSDK.Types
         }
 
         public string GetCurrentAccessToken()
-            {
-                return accessToken;
-            }
+        {
+            return accessToken;
+        }
 
-            public bool HasAccessToken()
-            {
-                return !string.IsNullOrEmpty(accessToken);
-            }
+        public bool HasAccessToken()
+        {
+            return !string.IsNullOrEmpty(accessToken);
+        }
 
-            public string GetCachedAddress()
-            {
-                return address;
-            }
+        public string GetCachedAddress()
+        {
+            return address;
+        }
 
-            public void SetCachedAddress(string _address)
-            {
-                Debug.Log("Setting cached address to: " + _address);
-                address = _address;
-            }
+        public void SetCachedAddress(string _address)
+        {
+            Debug.Log("Setting cached address to: " + _address);
+            address = _address;
+        }
 
-            public bool HasCachedAddress()
+        public bool HasCachedAddress()
+        {
+            return !string.IsNullOrEmpty(address);
+        }
+        
+        #region Monobehaviour
+        
+        private new void Awake() 
+        {
+            if (transform.childCount < 1)
             {
-                return !string.IsNullOrEmpty(address);
+                Debug.LogError("Missing children");
+                return;
             }
             
-            #region Monobehaviour
-            
-            private new void Awake() 
+            ScreenManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
+            DontDestroyOnLoad(gameObject);
+        }
+        
+        private void Start()
+        {
+            if (transform.childCount < 1)
             {
-                if (transform.childCount < 1)
+                Debug.LogError("Missing children");
+                return;
+            }
+
+            ui = transform.GetChild(0).gameObject;
+            ui.SetActive(false);
+        }
+
+        private void Update()
+        {
+            bool shortcutPressed = Input.GetKeyDown(key)
+                                   && (shift && (Input.GetKey(KeyCode.LeftShift) ||
+                                                 Input.GetKey(KeyCode.RightShift)) || !shift)
+                                   && (ctrl && (Input.GetKey(KeyCode.LeftControl) ||
+                                                Input.GetKey(KeyCode.RightControl)) || !ctrl);
+
+            if (shortcutPressed)
+            {
+                OpenEmergenceUI();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (ScreenManager.Instance != null)
                 {
-                    Debug.LogError("Missing children");
-                    return;
-                }
-                
-                ScreenManager.OnButtonEsc += EmergenceManager_OnButtonEsc;
-                DontDestroyOnLoad(gameObject);
-            }
-            
-            private void Start()
-            {
-                if (transform.childCount < 1)
-                {
-                    Debug.LogError("Missing children");
-                    return;
-                }
-
-                ui = transform.GetChild(0).gameObject;
-                ui.SetActive(false);
-            }
-
-            private void Update()
-            {
-
-
-                    bool shortcutPressed = Input.GetKeyDown(key)
-                                           && (shift && (Input.GetKey(KeyCode.LeftShift) ||
-                                                         Input.GetKey(KeyCode.RightShift)) || !shift)
-                                           && (ctrl && (Input.GetKey(KeyCode.LeftControl) ||
-                                                        Input.GetKey(KeyCode.RightControl)) || !ctrl);
-
-                    if (shortcutPressed)
+                    if (ScreenManager.Instance.IsVisible)
                     {
-                        OpenEmergenceUI();
+                        CloseEmergenceUI();
                     }
-
-                    if (Input.GetKeyDown(KeyCode.Escape))
-                    {
-                        if (ScreenManager.Instance != null)
-                        {
-                            if (ScreenManager.Instance.IsVisible)
-                            {
-                                CloseEmergeneUI();
-                            }
-                        }
-                    }
-            }
-            
-            private void OnApplicationFocus(bool hasFocus)
-            {
-                if (hasFocus && ScreenManager.Instance != null && ScreenManager.Instance.IsVisible)
-                {
-                    UpdateCursor();
                 }
             }
+        }
+        
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (hasFocus && ScreenManager.Instance != null && ScreenManager.Instance.IsVisible)
+            {
+                UpdateCursor();
+            }
+        }
 
-            #endregion Monobehaviour
+        #endregion Monobehaviour
 
         #region Cursor Handling
 
@@ -224,7 +222,7 @@ namespace EmergenceSDK.Types
 
         private void EmergenceManager_OnButtonEsc()
         {
-            CloseEmergeneUI();
+            CloseEmergenceUI();
         }
 
     }

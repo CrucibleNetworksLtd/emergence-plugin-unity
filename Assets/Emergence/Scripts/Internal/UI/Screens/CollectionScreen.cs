@@ -81,53 +81,48 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         public void Refresh(Action<InventoryItem> customOnClickHandler)
         {
-            EmergenceServices.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
+            EmergenceServices.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryByOwnerSuccess, InventoryRefreshErrorCallback);
+            void InventoryByOwnerSuccess(List<InventoryItem> inventoryItems)
+            {
+                foreach (var item in items)
                 {
+                    Destroy(item.entryGo);
+                }
 
-                    foreach (var item in items)
-                    {
-                        Destroy(item.entryGo);
-                    }
-                    items.Clear();
-                    
-                    
-                    Debug.Log("Received items: " + inventoryItems.Count);
-                    Modal.Instance.Show("Retrieving inventory items...");
-                    
-                    for (int i = 0; i < inventoryItems.Count; i++)
-                    {
-                        GameObject entry = Instantiate(itemEntryPrefab);
-                        
-                        items.Add(new Item(inventoryItems[i], entry));
+                items.Clear();
 
-                        Button entryButton = entry.GetComponent<Button>();
-                        InventoryItem item = inventoryItems[i];
+                Debug.Log("Received items: " + inventoryItems.Count);
+                Modal.Instance.Show("Retrieving inventory items...");
 
-                        if (customOnClickHandler != null)
-                        {
-                            entryButton.onClick.AddListener(() => customOnClickHandler(item));
-                        }
-                        else
-                        {
-                            entryButton.onClick.AddListener(() => OnInventoryItemPressed(item));
-                        }
-                        
-                        
-                        InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
-                        itemEntry.SetItem(inventoryItems[i]);
-
-                        entry.transform.SetParent(contentGO.transform, false);
-                    }
-                    
-                    
-                    Modal.Instance.Hide();
-                    
-                },
-                (error, code) =>
+                for (int i = 0; i < inventoryItems.Count; i++)
                 {
-                    Debug.LogError("[" + code + "] " + error);
-                    Modal.Instance.Hide();
-                });
+                    GameObject entry = Instantiate(itemEntryPrefab, contentGO.transform, false);
+
+                    items.Add(new Item(inventoryItems[i], entry));
+
+                    Button entryButton = entry.GetComponent<Button>();
+                    InventoryItem item = inventoryItems[i];
+
+                    if (customOnClickHandler != null)
+                    {
+                        entryButton.onClick.AddListener(() => customOnClickHandler(item));
+                    }
+                    else
+                    {
+                        entryButton.onClick.AddListener(() => OnInventoryItemPressed(item));
+                    }
+
+                    InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
+                    itemEntry.SetItem(inventoryItems[i]);
+                }
+                Modal.Instance.Hide();
+            }
+        }
+
+        private void InventoryRefreshErrorCallback(string error, long code)
+        {
+            Debug.LogError("[" + code + "] " + error);
+            Modal.Instance.Hide();
         }
 
         private void RefreshFilteredResults()
@@ -196,24 +191,30 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public void OnInventoryItemPressed(InventoryItem item)
         {
+            OpenSidebar(item);
+        }
+
+        public void OpenSidebar(InventoryItem item)
+        {
             itemNameText.text = item.meta.name;
             itemDescriptionText.text = item.meta.description;
             dynamicMetadata.text = "Dynamic metadata: " + item.meta.dynamicMetadata;
-            
+
             if (!isItemSelected)
             {
                 DG.Tweening.DOTween.To(() => detailsPanel.GetComponent<RectTransform>().anchoredPosition,
-                    x=> detailsPanel.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, 0), 0.25f);
-                
+                    x => detailsPanel.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, 0), 0.25f);
+
                 DG.Tweening.DOTween.To(() => itemsListPanel.GetComponent<RectTransform>().offsetMax,
-                    x=> itemsListPanel.GetComponent<RectTransform>().offsetMax = x, new Vector2(-443.5f, 0), 0.25f);
+                    x => itemsListPanel.GetComponent<RectTransform>().offsetMax = x, new Vector2(-443.5f, 0), 0.25f);
 
                 isItemSelected = true;
                 selectedItem = item;
             }
         }
 
-        public void OnCloseDetailsPanelButtonPressed() {
+        public void OnCloseDetailsPanelButtonPressed() 
+        {
             DG.Tweening.DOTween.To(() => detailsPanel.GetComponent<RectTransform>().anchoredPosition,
                 x=> detailsPanel.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(Screen.width / 2, 0), 0.25f);
                 

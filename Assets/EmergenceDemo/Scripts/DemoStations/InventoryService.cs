@@ -58,31 +58,35 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 Cursor.visible = false;
             }
 
-            EmergenceServices.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (inventoryItems) =>
+            EmergenceServices.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), SuccessInventoryByOwner, ErrorCallback);
+        }
+
+        private void ErrorCallback(string error, long code)
+        {
+            Debug.LogError("[" + code + "] " + error);
+        }
+
+        private void SuccessInventoryByOwner(List<InventoryItem> inventoryItems)
+        {
+            foreach (var item in items)
             {
-                foreach (var item in items)
-                {
-                    Destroy(item);
-                }
-                
-                items.Clear();
-                
-                for (int i = 0; i < inventoryItems.Count; i++)
-                {
-                    GameObject entry = Instantiate(itemEntryPrefab);
+                Destroy(item);
+            }
 
-                    Button entryButton = entry.GetComponent<Button>();
-                    // entryButton.onClick.AddListener(OnInventoryItemPressed);
+            items.Clear();
 
-                    InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
-                    itemEntry.SetItem(inventoryItems[i]);
+            for (int i = 0; i < inventoryItems.Count; i++)
+            {
+                GameObject entry = Instantiate(itemEntryPrefab, contentGO.transform, false);
 
-                    entry.transform.SetParent(contentGO.transform, false);
-                    
-                    items.Add(entry);
-                }
-            },
-            (error, code) => { Debug.LogError("[" + code + "] " + error); });
+                Button entryButton = entry.GetComponent<Button>();
+                // entryButton.onClick.AddListener(OnInventoryItemPressed);
+
+                InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
+                itemEntry.SetItem(inventoryItems[i]);
+
+                items.Add(entry);
+            }
         }
 
         public bool IsReady { get; set; }
