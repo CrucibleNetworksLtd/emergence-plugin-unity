@@ -20,7 +20,11 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         public bool IsReady
         {
             get => isReady;
-            set => InstructionsText.text = value ? ActiveInstructions : InactiveInstructions;
+            set
+            {
+                InstructionsText.text = value ? ActiveInstructions : InactiveInstructions;
+                isReady = value;
+            }
         }
 
         private void Start()

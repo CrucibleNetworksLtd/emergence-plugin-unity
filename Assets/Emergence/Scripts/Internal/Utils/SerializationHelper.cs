@@ -1,4 +1,7 @@
+using System;
+using System.Linq;
 using Newtonsoft.Json;
+using UnityEngine;
 
 namespace EmergenceSDK.Internal.Utils
 {
@@ -6,20 +9,28 @@ namespace EmergenceSDK.Internal.Utils
     {
         public static string Serialize<T>(T value, bool pretty = true)
         {
-            // UnityEngine
-            //return JsonUtility.ToJson(value, pretty);
-
-            // Newtonsoft Json.NET
-            return JsonConvert.SerializeObject(value, pretty ? Formatting.Indented : Formatting.None);
+            try
+            {
+                return JsonConvert.SerializeObject(value, pretty ? Formatting.Indented : Formatting.None);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error serializing {typeof(T).Name}: {e.Message}");
+                throw;
+            }
         }
 
         public static T Deserialize<T>(string serializedState)
         {
-            // UnityEngine
-            //return JsonUtility.FromJson<T>(serializedState);
-
-            // Newtonsoft Json.NET
-            return JsonConvert.DeserializeObject<T>(serializedState);
+            try
+            {  
+                return JsonConvert.DeserializeObject<T>(serializedState);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error serializing {typeof(T).Name}: {e.Message}");
+                throw;
+            }
         }
     }
 }

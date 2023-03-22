@@ -9,7 +9,11 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         public bool IsReady
         {
             get => isReady;
-            set => InstructionsText.text = value ? ActiveInstructions : InactiveInstructions;
+            set
+            {
+                InstructionsText.text = value ? ActiveInstructions : InactiveInstructions;
+                isReady = value;
+            }
         }
         
         private void OnEnable() 
@@ -20,7 +24,6 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void Start()
         {
             instructionsGO.SetActive(false);
-            IsReady = true;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -35,7 +38,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Update()
         {
-            if (HasBeenActivated() && IsReady)
+            if (HasBeenActivated())
             {
                 EmergenceSingleton.Instance.OpenEmergenceUI();
             }

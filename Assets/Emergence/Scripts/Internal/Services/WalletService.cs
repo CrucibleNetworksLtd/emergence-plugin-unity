@@ -45,6 +45,11 @@ namespace EmergenceSDK.Internal.Services
             StartCoroutine(CoroutineRequestToSignWalletConnect(messageToSign, success, errorCallback));
         }
 
+        public class WalletSignMessage
+        {
+            public string signedMessage { get; set; }
+        }
+        
         private IEnumerator CoroutineRequestToSignWalletConnect(string messageToSign, RequestToSignSuccess success,
             ErrorCallback errorCallback)
         {
@@ -58,13 +63,12 @@ namespace EmergenceSDK.Internal.Services
                 request.method = "POST";
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(content));
                 request.uploadHandler.contentType = "application/json";
-                request.SetRequestHeader("accept", "application/json");
 
                 yield return request.SendWebRequest();
                 EmergenceUtils.PrintRequestResult("RequestToSignWalletConnect", request);
-                if (EmergenceUtils.ProcessRequest<BaseResponse<string>>(request, errorCallback, out var response))
+                if (EmergenceUtils.ProcessRequest<WalletSignMessage>(request, errorCallback, out var response))
                 {
-                    success?.Invoke(response.message);
+                    success?.Invoke(response.signedMessage);
                 }
             }
         }
