@@ -1,5 +1,6 @@
 ﻿using System;
 using EmergenceSDK.Types;
+using EmergenceSDK.Types.Inventory;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -15,8 +15,7 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address;
             string response = await EmergenceUtils.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
 
-            InventoryByOwnerResponse inventoryResponse =
-                SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ToString());
+            InventoryByOwnerResponse inventoryResponse = SerializationHelper.Deserialize<InventoryByOwnerResponse>(response);
 
             success?.Invoke(inventoryResponse.message.items);
         }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using EmergenceSDK.Types;
+using EmergenceSDK.Types.Inventory;
 using UnityEngine;
 using Avatar = EmergenceSDK.Types.Avatar;
 

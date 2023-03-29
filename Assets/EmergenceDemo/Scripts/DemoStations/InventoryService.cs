@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
+using EmergenceSDK.Types.Inventory;
 using UnityEngine;
 using UnityEngine.UI;
 

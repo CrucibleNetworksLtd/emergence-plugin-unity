@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
+using EmergenceSDK.Types.Inventory;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,11 +12,11 @@ namespace EmergenceSDK.Internal.UI.Screens
     
     public class CollectionScreen : MonoBehaviour
     {
-        struct Item
+        struct InventoryUIItem
         {
             public InventoryItem inventoryItem;
             public GameObject entryGo;
-            public Item(InventoryItem inventoryItem, GameObject entryGo)
+            public InventoryUIItem(InventoryItem inventoryItem, GameObject entryGo)
             {
                 this.inventoryItem = inventoryItem;
                 this.entryGo = entryGo;
@@ -61,7 +62,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private bool isItemSelected = false;
         private InventoryItem selectedItem;
 
-        private List<Item> items = new List<Item>();
+        private List<InventoryUIItem> items = new List<InventoryUIItem>();
 
         private FilterParams filterParams = new FilterParams();
 
@@ -71,12 +72,12 @@ namespace EmergenceSDK.Internal.UI.Screens
             detailsPanel.GetComponent<RectTransform>().anchoredPosition = new Vector3(Screen.width, 0, 0);
             
             searchInputField.onValueChanged.AddListener(OnSearchFieldValueChanged);
-            avatarsToggle.onValueChanged.AddListener(onAvatarsToggleValueChanged);
-            propsToggle.onValueChanged.AddListener(onPropsToggleValueChanged);
-            clothingToggle.onValueChanged.AddListener(onClothingToggleValueChanged);
-            weaponsToggle.onValueChanged.AddListener(onWeaponsToggleValueChanged);
+            avatarsToggle.onValueChanged.AddListener(OnAvatarsToggleValueChanged);
+            propsToggle.onValueChanged.AddListener(OnPropsToggleValueChanged);
+            clothingToggle.onValueChanged.AddListener(OnClothingToggleValueChanged);
+            weaponsToggle.onValueChanged.AddListener(OnWeaponsToggleValueChanged);
             
-            blockchainDropdown.onValueChanged.AddListener(onBlockchainDropdownValueChanged);
+            blockchainDropdown.onValueChanged.AddListener(OnBlockchainDropdownValueChanged);
         }
         
         public void Refresh(Action<InventoryItem> customOnClickHandler)
@@ -98,7 +99,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 {
                     GameObject entry = Instantiate(itemEntryPrefab, contentGO.transform, false);
 
-                    items.Add(new Item(inventoryItems[i], entry));
+                    items.Add(new InventoryUIItem(inventoryItems[i], entry));
 
                     Button entryButton = entry.GetComponent<Button>();
                     InventoryItem item = inventoryItems[i];
@@ -130,12 +131,10 @@ namespace EmergenceSDK.Internal.UI.Screens
             foreach (var item in items)
             {
                 // Search string
-                string itemName = item.inventoryItem.meta?.name.ToLower();
-                string itemBlockchain = item.inventoryItem.blockchain;
+                string itemName = item.inventoryItem.Meta?.Name.ToLower();
+                string itemBlockchain = item.inventoryItem.Blockchain;
 
-                bool searchStringResult = string.IsNullOrEmpty(itemName) ||
-                                          itemName.StartsWith(filterParams.searchString.ToLower()) ||
-                                          string.IsNullOrEmpty(filterParams.searchString);
+                bool searchStringResult = string.IsNullOrEmpty(itemName) || itemName.StartsWith(filterParams.searchString.ToLower()) || string.IsNullOrEmpty(filterParams.searchString);
 
                 bool blockchainResult = filterParams.blockchain.Equals("ANY") || itemBlockchain.Equals(filterParams.blockchain);
                 
@@ -156,31 +155,31 @@ namespace EmergenceSDK.Internal.UI.Screens
             RefreshFilteredResults();
         }
 
-        private void onAvatarsToggleValueChanged(bool selected)
+        private void OnAvatarsToggleValueChanged(bool selected)
         {
             filterParams.avatars = selected;
             RefreshFilteredResults();
         }
         
-        private void onPropsToggleValueChanged(bool selected)
+        private void OnPropsToggleValueChanged(bool selected)
         {
             filterParams.props = selected;
             RefreshFilteredResults();
         }
         
-        private void onClothingToggleValueChanged(bool selected)
+        private void OnClothingToggleValueChanged(bool selected)
         {
             filterParams.clothing = selected;
             RefreshFilteredResults();
         }
         
-        private void onWeaponsToggleValueChanged(bool selected)
+        private void OnWeaponsToggleValueChanged(bool selected)
         {
             filterParams.weapons = selected;
             RefreshFilteredResults();
         }
 
-        private void onBlockchainDropdownValueChanged(int selection)
+        private void OnBlockchainDropdownValueChanged(int selection)
         {
             Debug.Log(blockchainDropdown.options[selection].text);
             filterParams.blockchain = blockchainDropdown.options[selection].text.ToUpper();
@@ -194,9 +193,9 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public void OpenSidebar(InventoryItem item)
         {
-            itemNameText.text = item.meta.name;
-            itemDescriptionText.text = item.meta.description;
-            dynamicMetadata.text = "Dynamic metadata: " + item.meta.dynamicMetadata;
+            itemNameText.text = item.Meta.Name;
+            itemDescriptionText.text = item.Meta.Description;
+            dynamicMetadata.text = "Dynamic metadata: " + item.Meta.DynamicMetadata;
 
             if (!isItemSelected)
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
+using EmergenceSDK.Types.Inventory;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -41,8 +42,8 @@ namespace EmergenceSDK.Internal.UI
         {
             this.item = item;
             
-            itemName.text = item?.meta?.name;
-            SetImageUrl(item?.meta?.content?.First().url);
+            itemName.text = item?.Meta?.Name;
+            SetImageUrl(item?.Meta?.Content?.First().URL);
         }
 
         public void SetImageUrl(string imageUrl)
@@ -60,7 +61,7 @@ namespace EmergenceSDK.Internal.UI
         
         private void Instance_OnImageReady(string _url, Texture2D texture)
         {
-            if (_url.Equals(item?.meta?.content?.First().url))
+            if (_url.Equals(item?.Meta?.Content?.First().URL))
             {
                 itemThumbnail.LoadStaticImage(texture);
             }

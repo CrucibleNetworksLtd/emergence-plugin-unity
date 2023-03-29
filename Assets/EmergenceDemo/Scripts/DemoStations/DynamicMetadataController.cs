@@ -2,6 +2,7 @@ using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
+using EmergenceSDK.Types.Inventory;
 using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
@@ -59,13 +60,13 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void UpdateDynamicMetadata(InventoryItem item)
         {
             Debug.Log("Updating Dynamic metadata");
-            if (string.IsNullOrEmpty(item.meta.dynamicMetadata)) 
+            if (string.IsNullOrEmpty(item.Meta.DynamicMetadata)) 
                 return;
             
-            var curMetadata = int.Parse(item.meta.dynamicMetadata);
+            var curMetadata = int.Parse(item.Meta.DynamicMetadata);
             curMetadata++;
 
-            EmergenceServices.Instance.WriteDynamicMetadata(item.blockchain, item.contract, item.tokenId,
+            EmergenceServices.Instance.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
                 curMetadata.ToString(), UpdateDynamicMetadataSuccess, (string error, long code) => {});
             
             void UpdateDynamicMetadataSuccess(string response)
