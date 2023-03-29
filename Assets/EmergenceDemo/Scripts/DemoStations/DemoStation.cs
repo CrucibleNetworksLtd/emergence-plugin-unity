@@ -1,6 +1,7 @@
 using EmergenceSDK.Internal.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
@@ -18,6 +19,6 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         protected bool isReady;
         
-        protected bool HasBeenActivated() => Input.GetKeyDown(KeyCode.E) && instructionsGO.activeSelf;
+        protected bool HasBeenActivated() => Keyboard.current.eKey.wasPressedThisFrame && instructionsGO.activeSelf;
     }
 }
