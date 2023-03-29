@@ -49,9 +49,6 @@ namespace EmergenceSDK.Internal.UI.Screens
         }
 
         private ScreenStates state = ScreenStates.WaitForServer;
-        // private ScreenStates state = ScreenStates.LogIn;
-
-        // private bool checkingForServer = false;
 
         public static ScreenManager Instance { get; private set; }
 
@@ -69,25 +66,10 @@ namespace EmergenceSDK.Internal.UI.Screens
             escButton.onClick.AddListener(OnEscButtonPressed);
             escButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
             escButtonLogin.onClick.AddListener(OnEscButtonPressed);
-            
-            // personasButton.onClick.AddListener(OnPersonaButtonPressed);
-            // collectionButton.onClick.AddListener(OnCollectionButtonPressed);
             personasToggle.onValueChanged.AddListener(OnPersonaButtonPressed);
             collectionToggle.onValueChanged.AddListener(OnCollectionButtonPressed);
 
             GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
-
-            // for (int i = 0; i < roots.Length; i++)
-            // {
-            //     EventSystem[] ess = roots[i].GetComponentsInChildren<EventSystem>();
-            //
-            //     if (ess.Length > 0)
-            //     {
-            //         EventSystem es = gameObject.GetComponentInChildren<EventSystem>();
-            //         es.gameObject.SetActive(false);
-            //         break;
-            //     }
-            // }
         }
 
         private void OnDestroy()
@@ -95,8 +77,6 @@ namespace EmergenceSDK.Internal.UI.Screens
             escButton.onClick.RemoveListener(OnEscButtonPressed);
             escButtonOnboarding.onClick.RemoveListener(OnEscButtonPressed);
             escButtonLogin.onClick.RemoveListener(OnEscButtonPressed);
-            // personasButton.onClick.RemoveListener(OnPersonaButtonPressed);
-            // collectionButton.onClick.RemoveListener(OnCollectionButtonPressed);
             personasToggle.onValueChanged.RemoveListener(OnPersonaButtonPressed);
             collectionToggle.onValueChanged.RemoveListener(OnCollectionButtonPressed);
         }
@@ -121,46 +101,6 @@ namespace EmergenceSDK.Internal.UI.Screens
             {
                 case ScreenStates.WaitForServer:
                     ShowWelcome();
-                    // Modal.Instance.Show("Waiting for server...");
-                    // if (!checkingForServer)
-                    // {
-                    //     checkingForServer = true;
-                    //     Services.Instance.IsConnected((connected) =>
-                    //         {
-                    //             Modal.Instance.Hide();
-                    //             Debug.Log("EVM server found");
-                    //             checkingForServer = false;
-                    //
-                    //             if (connected && Services.Instance.HasAccessToken)
-                    //             {
-                    //                 ShowDashboard();
-                    //             }
-                    //             else
-                    //             {
-                    //                 ShowWelcome();
-                    //             }
-                    //         },
-                    //         (error, code) =>
-                    //         {
-                    //             Modal.Instance.Show("Server not found, trying to launch");
-                    //             Debug.LogWarning("EVM code not running, trying to launch");
-                    //
-                    //             LocalEmergenceServer.Instance.LaunchLocalServerProcess();
-                    //             Modal.Instance.Hide();
-                    //             checkingForServer = false;
-                    //             ShowWelcome();
-                    //
-                    //             //if (LocalEmergenceServer.Instance.LaunchLocalServerProcess())
-                    //             //{
-                    //             //}
-                    //             //else
-                    //             //{
-                    //             //    Debug.LogWarning("Couldn't launch EVM Server");
-                    //             //    ModalPromptOK.Instance.Show("Error running server");
-                    //             //    checkingForServer = false;
-                    //             //}
-                    //         });
-                    // }
                     break;
             }
         }

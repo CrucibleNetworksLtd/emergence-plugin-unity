@@ -131,20 +131,6 @@ namespace EmergenceSDK.Internal.UI
             {
                 OnImageCompleted?.Invoke(persona, false);
             }
-
-            // if (persona.avatar != null && persona.avatar.meta.content.First().url != null)
-            // {
-            //     waitingForImageRequest = true;
-            //     if (!RequestImage.Instance.AskForImage(persona.avatar.meta.content.First().url))
-            //     {
-            //         waitingForImageRequest = false;
-            //         OnImageCompleted?.Invoke(persona, false);
-            //     }
-            // }
-            // else
-            // {
-            //     OnImageCompleted?.Invoke(persona, false);
-            // }
         }
 
         public void OnPointerEnter(PointerEventData eventData)

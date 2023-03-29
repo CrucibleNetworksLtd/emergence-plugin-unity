@@ -45,12 +45,6 @@ namespace EmergenceSDK.Types
         public string chain;
         public AvatarMeta meta;
         public string GUID;
-        // public string Name;
-        // public string Creator;
-        // public string Type;
-        // public string UriBase;
-        // public int MaxTotalSize;
-        // public int MaxTotalVertices;
 
         [JsonIgnore]
         public Texture2D AvatarImage

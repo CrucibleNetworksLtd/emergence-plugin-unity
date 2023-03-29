@@ -90,9 +90,6 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             {
                 GameObject entry = Instantiate(itemEntryPrefab, contentGO.transform, false);
 
-                Button entryButton = entry.GetComponent<Button>();
-                // entryButton.onClick.AddListener(OnInventoryItemPressed);
-
                 InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
                 itemEntry.SetItem(inventoryItems[i]);
 

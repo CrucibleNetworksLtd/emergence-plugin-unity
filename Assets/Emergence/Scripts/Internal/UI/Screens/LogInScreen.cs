@@ -64,35 +64,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                                 Debug.LogError("[" + code + "] " + error);
                                 Reinitialize();
                             });
-                        //
-                        // Services.Instance.ReinitializeWalletConnect((disconnected) =>
-                        // {
-                        //     Services.Instance.Handshake((walletAddress) =>
-                        //     {
-                        //         state = States.RefreshAccessToken;
-                        //         HeaderScreen.Instance.Refresh(walletAddress);
-                        //     },
-                        //     (error, code) =>
-                        //     {
-                        //         Debug.LogError("[" + code + "] " + error);
-                        //         Reinitialize();
-                        //     });
-                        //
-                        //     Services.Instance.GetQRCode((texture) =>
-                        //     {
-                        //         rawQRImage.texture = texture;
-                        //     },
-                        //     (error, code) =>
-                        //     {
-                        //         Debug.LogError("[" + code + "] " + error);
-                        //         Reinitialize();
-                        //     });
-                        // },
-                        // (error, code) =>
-                        // {
-                        //     Debug.LogError("[" + code + "] " + error);
-                        //     Reinitialize();
-                        // });
                     }
 
                     refreshCounterText.text = timeRemaining.ToString("0");
@@ -112,19 +83,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                     });
                     break;
             }
-
-            #region Test
-            /*
-            if (Input.GetKeyDown(KeyCode.B))
-            {
-                Debug.Log("CHEAT ACTIVATED!");
-
-                string accessTokenJson = System.IO.File.ReadAllText("accessToken.json");
-
-                Services.Instance.SkipWallet(true, accessTokenJson);
-                ScreenManager.Instance.ShowDashboard();
-            }*/
-            #endregion Test
         }
 
         public void Restart()

@@ -219,7 +219,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                 avatar = new Avatar()
                 {
                     avatarId = string.Empty,
-                    // url = string.Empty,
                 },
                 AvatarImage = null,
             };
@@ -304,10 +303,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                 {
                     Modal.Instance.Hide();
                 }
-            }
-            else if (imagesRefreshing.Count > 0)
-            {
-                // Debug.LogWarning("Image completed but not accounted for: [" + persona.id + "][" + persona.avatar.meta.content.First().url + "][" + persona.avatar.meta.content.First().url + "][" + success + "]");
             }
         }
 

@@ -30,7 +30,6 @@ namespace EmergenceSDK.Internal.Utils
             bool result = true;
             if (url == null)
             {
-                // Debug.LogWarning("RequestImage: URL cannot be null");
                 result = false;
             }
             else if (cachedTextures.ContainsKey(url) && cachedTextures[url] != null)

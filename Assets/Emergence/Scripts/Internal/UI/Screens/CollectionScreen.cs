@@ -137,10 +137,8 @@ namespace EmergenceSDK.Internal.UI.Screens
                                           itemName.StartsWith(filterParams.searchString.ToLower()) ||
                                           string.IsNullOrEmpty(filterParams.searchString);
 
-                bool blockchainResult = filterParams.blockchain.Equals("ANY") ||
-                                        itemBlockchain.Equals(filterParams.blockchain);
+                bool blockchainResult = filterParams.blockchain.Equals("ANY") || itemBlockchain.Equals(filterParams.blockchain);
                 
-                // if (string.IsNullOrEmpty(itemName) || itemName.StartsWith(filterParams.searchString.ToLower()) || string.IsNullOrEmpty(filterParams.searchString))
                 if (searchStringResult && blockchainResult)
                 {
                     item.entryGo.SetActive(true);

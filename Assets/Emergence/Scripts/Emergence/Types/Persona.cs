@@ -5,8 +5,8 @@ namespace EmergenceSDK.Types
 {
     public class Persona
     {
-        public string avatarId;
         // {Chain}:{Address}:{Token}:{GUID}
+        public string avatarId;
 
         public string id;
         public string name;
@@ -22,7 +22,6 @@ namespace EmergenceSDK.Types
             set
             {
                 _avatar = value;
-                // avatarId = value?.chain + ":" + value?.contractAddress + ":" + value?.tokenId + ":" + value?.GUID;
             }
         }
 

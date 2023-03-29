@@ -16,7 +16,6 @@ namespace EmergenceSDK.Types
 
             public class InventoryItemMetaContent
             {
-                // public string type;
                 public string url;
                 public string representation;
                 public string mimeType;
@@ -54,8 +53,6 @@ namespace EmergenceSDK.Types
         public string contract;
         public string tokenId;
         public List<InventoryItemCreators> creators;
-        // public string owners;
-        // public string royalties;
         public string lazySupply;
         public List<InventoryItemPending> pending;
         public string mintedAt;
