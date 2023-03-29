@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
@@ -79,7 +80,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             
             blockchainDropdown.onValueChanged.AddListener(OnBlockchainDropdownValueChanged);
         }
-        
+
         public void Refresh(Action<InventoryItem> customOnClickHandler)
         {
             EmergenceServices.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryByOwnerSuccess, InventoryRefreshErrorCallback);
@@ -130,15 +131,21 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             foreach (var item in items)
             {
-                // Search string
+                //TODO: implement MVC based long term code here
+                
+                // Search string filter
                 string itemName = item.inventoryItem.Meta?.Name.ToLower();
-                string itemBlockchain = item.inventoryItem.Blockchain;
-
                 bool searchStringResult = string.IsNullOrEmpty(itemName) || itemName.StartsWith(filterParams.searchString.ToLower()) || string.IsNullOrEmpty(filterParams.searchString);
 
+                // Blockchain filter
+                string itemBlockchain = item.inventoryItem.Blockchain;
                 bool blockchainResult = filterParams.blockchain.Equals("ANY") || itemBlockchain.Equals(filterParams.blockchain);
                 
-                if (searchStringResult && blockchainResult)
+                //Avatar filter
+                bool isAvatar = !item.inventoryItem.Meta?.Content?.Any(o => o.MimeType.Equals("model/gltf-binary")) ?? true;
+                bool avatarResult = filterParams.avatars || isAvatar;
+                
+                if (searchStringResult && blockchainResult && avatarResult)
                 {
                     item.entryGo.SetActive(true);
                 }
@@ -163,18 +170,21 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         private void OnPropsToggleValueChanged(bool selected)
         {
+            Debug.LogWarning("Prop filtering is currently not implemented");
             filterParams.props = selected;
             RefreshFilteredResults();
         }
         
         private void OnClothingToggleValueChanged(bool selected)
         {
+            Debug.LogWarning("Clothing filtering is currently not implemented");
             filterParams.clothing = selected;
             RefreshFilteredResults();
         }
         
         private void OnWeaponsToggleValueChanged(bool selected)
         {
+            Debug.LogWarning("Weapon filtering is currently not implemented");
             filterParams.weapons = selected;
             RefreshFilteredResults();
         }
