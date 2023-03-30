@@ -53,13 +53,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public static ScreenManager Instance { get; private set; }
 
-        public bool IsVisible
-        {
-            get
-            {
-                return gameObject.activeSelf;
-            }
-        }
+        public bool IsVisible => gameObject.activeSelf;
 
         private void Awake()
         {
@@ -69,8 +63,6 @@ namespace EmergenceSDK.Internal.UI.Screens
             escButtonLogin.onClick.AddListener(OnEscButtonPressed);
             personasToggle.onValueChanged.AddListener(OnPersonaButtonPressed);
             collectionToggle.onValueChanged.AddListener(OnCollectionButtonPressed);
-
-            GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
         }
 
         private void OnDestroy()

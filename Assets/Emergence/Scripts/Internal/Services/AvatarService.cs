@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    public class AvatarService : IAvatarService
+    internal class AvatarService : IAvatarService
     {
         public async UniTask AvatarByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback)
         {

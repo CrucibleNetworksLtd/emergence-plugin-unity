@@ -9,7 +9,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    public class DynamicMetadataService : IDynamicMetadataService
+    internal class DynamicMetadataService : IDynamicMetadataService
     {
         public async UniTask WriteDynamicMetadata(string network, string contract, string tokenId, string metadata,
             SuccessWriteDynamicMetadata success, ErrorCallback errorCallback)

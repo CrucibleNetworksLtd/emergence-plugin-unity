@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    public partial class WalletService : IWalletService
+    internal class WalletService : IWalletService
     {
         private readonly IAccountService accountService;
         private string walletAddress = string.Empty;

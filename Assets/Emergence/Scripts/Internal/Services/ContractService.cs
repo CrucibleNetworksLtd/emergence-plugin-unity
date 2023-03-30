@@ -10,7 +10,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    public class ContractService : IContractService
+    internal class ContractService : IContractService
     {
         public async UniTask LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success, ErrorCallback errorCallback)
         {

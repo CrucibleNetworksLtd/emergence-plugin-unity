@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    public class QRCodeService : IQRCodeService
+    internal class QRCodeService : IQRCodeService
     {
         public async UniTask GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback)
         {

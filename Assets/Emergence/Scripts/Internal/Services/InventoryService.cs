@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    public class InventoryService : IInventoryService
+    internal class InventoryService : IInventoryService
     {
         public async UniTask InventoryByOwner(string address, SuccessInventoryByOwner success, ErrorCallback errorCallback)
         {
