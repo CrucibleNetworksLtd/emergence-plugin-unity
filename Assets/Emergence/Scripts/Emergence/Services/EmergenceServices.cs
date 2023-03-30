@@ -57,9 +57,9 @@ namespace EmergenceSDK.Services
             InventoryService = new InventoryService();
             DynamicMetadataService = new DynamicMetadataService();
             AccountService = new AccountService();
-            WalletService = gameObject.AddComponent<WalletService>();
+            WalletService = new WalletService();
             QRCodeService = new QRCodeService();
-            ContractService = gameObject.AddComponent<ContractService>();
+            ContractService = new ContractService();
         }
 
         private bool refreshingToken = false;
@@ -129,34 +129,44 @@ namespace EmergenceSDK.Services
             => await PersonaService.SetCurrentPersona(persona, success, errorCallback);
         
         /// <inheritdoc cref="IAvatarService.AvatarByOwner"/>
-        public async void AvatarByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback) => await AvatarService.AvatarByOwner(address, success, errorCallback);
+        public async void AvatarByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback) 
+            => await AvatarService.AvatarByOwner(address, success, errorCallback);
 
         /// <inheritdoc cref="IAvatarService.AvatarById"/>
-        public async void AvatarById(string id, SuccessAvatar success, ErrorCallback errorCallback) => await AvatarService.AvatarById(id, success, errorCallback);
+        public async void AvatarById(string id, SuccessAvatar success, ErrorCallback errorCallback) 
+            => await AvatarService.AvatarById(id, success, errorCallback);
 
         /// <inheritdoc cref="IInventoryService.InventoryByOwner"/>
-        public async void InventoryByOwner(string address, SuccessInventoryByOwner success, ErrorCallback errorCallback) => await InventoryService.InventoryByOwner(address, success, errorCallback);
+        public async void InventoryByOwner(string address, SuccessInventoryByOwner success, ErrorCallback errorCallback) 
+            => await InventoryService.InventoryByOwner(address, success, errorCallback);
 
         /// <inheritdoc cref="IDynamicMetadataService.WriteDynamicMetadata"/>
-        public async void WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, ErrorCallback errorCallback) => await DynamicMetadataService.WriteDynamicMetadata(network, contract, tokenId, metadata, success, errorCallback);
+        public async void WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, ErrorCallback errorCallback) 
+            => await DynamicMetadataService.WriteDynamicMetadata(network, contract, tokenId, metadata, success, errorCallback);
         
         /// <inheritdoc cref="IAccountService.IsConnected"/>
-        public async void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback) => await AccountService.IsConnected(success, errorCallback);
+        public async void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback) 
+            => await AccountService.IsConnected(success, errorCallback);
         
         /// <inheritdoc cref="IWalletService.ReinitializeWalletConnect"/>
-        public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, ErrorCallback errorCallback) => WalletService.ReinitializeWalletConnect(success, errorCallback);
+        public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, ErrorCallback errorCallback) 
+            => WalletService.ReinitializeWalletConnect(success, errorCallback);
 
         /// <inheritdoc cref="IWalletService.RequestToSign"/>
-        public void RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback) => WalletService.RequestToSign(messageToSign, success, errorCallback);
+        public async void RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback) 
+            => await WalletService.RequestToSign(messageToSign, success, errorCallback);
 
         /// <inheritdoc cref="IQRCodeService.GetQRCode"/>
-        public void GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback) => QRCodeService.GetQRCode(success, errorCallback);
+        public async void GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback) 
+            => await QRCodeService.GetQRCode(success, errorCallback);
 
         /// <inheritdoc cref="IWalletService.Handshake"/>
-        public void Handshake(HandshakeSuccess success, ErrorCallback errorCallback) => WalletService.Handshake(success, errorCallback);
+        public async void Handshake(HandshakeSuccess success, ErrorCallback errorCallback) 
+            => await WalletService.Handshake(success, errorCallback);
 
         /// <inheritdoc cref="IWalletService.CreateWallet"/>
-        public void CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback) => WalletService.CreateWallet(path, password, success, errorCallback);
+        public async void CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback) 
+            => await WalletService.CreateWallet(path, password, success, errorCallback);
 
         /// <inheritdoc cref="IAccountService.CreateKeyStore"/>
         public async void CreateKeyStore(string privateKey, string password, string publicKey, string path,
@@ -168,14 +178,14 @@ namespace EmergenceSDK.Services
             => await AccountService.LoadAccount(account, success, errorCallback);
 
         /// <inheritdoc cref="IWalletService.GetBalance"/>
-        public void GetBalance(BalanceSuccess success, ErrorCallback errorCallback)
+        public async void GetBalance(BalanceSuccess success, ErrorCallback errorCallback)
         {
             if (skipWallet)
             {
                 success?.Invoke("No wallet");
                 return;
             }
-            WalletService.GetBalance(success, errorCallback);
+            await WalletService.GetBalance(success, errorCallback);
         }
 
         /// <inheritdoc cref="IAccountService.GetAccessToken"/>
@@ -207,28 +217,28 @@ namespace EmergenceSDK.Services
             => await AccountService.Finish(success, errorCallback);
 
         /// <inheritdoc cref="IContractService"/>
-        public void LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success,
+        public async void LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success,
             ErrorCallback errorCallback) 
-            => ContractService.LoadContract(contractAddress, ABI, network, success, errorCallback);
+            => await ContractService.LoadContract(contractAddress, ABI, network, success, errorCallback);
 
         /// <inheritdoc cref="IContractService.GetTransactionStatus{T}"/>
-        public void GetTransactionStatus<T>(string transactionHash, string nodeURL,
+        public async void GetTransactionStatus<T>(string transactionHash, string nodeURL,
             GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback) 
-            => ContractService.GetTransactionStatus(transactionHash, nodeURL, success, errorCallback);
+            => await ContractService.GetTransactionStatus(transactionHash, nodeURL, success, errorCallback);
 
         /// <inheritdoc cref="IContractService.GetBlockNumber{T,U}"/>
-        public void GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
+        public async void GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
             GetBlockNumberSuccess<T> success, ErrorCallback errorCallback) 
-            => ContractService.GetBlockNumber(transactionHash, nodeURL, body, success, errorCallback);
+            => await ContractService.GetBlockNumber(transactionHash, nodeURL, body, success, errorCallback);
         
         /// <inheritdoc cref="IContractService.ReadMethod{T,U}"/>
-        public void ReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback) 
-            => ContractService.ReadMethod(contractInfo, body, success, errorCallback);
+        public async void ReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback) 
+            => await ContractService.ReadMethod(contractInfo, body, success, errorCallback);
 
         /// <inheritdoc cref="IContractService.WriteMethod{T,U}"/>
-        public void WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value,
+        public async void WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value,
             U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback) 
-            => ContractService.WriteMethod(contractInfo, localAccountName, gasPrice, value, body, success, errorCallback);
+            => await ContractService.WriteMethod(contractInfo, localAccountName, gasPrice, value, body, success, errorCallback);
 
     }
 }

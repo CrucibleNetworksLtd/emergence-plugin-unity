@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -9,16 +10,9 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    public class ContractService : MonoBehaviour, IContractService
+    public class ContractService : IContractService
     {
-        public void LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success,
-            ErrorCallback errorCallback)
-        {
-            StartCoroutine(CoroutineLoadContract(contractAddress, ABI, network, success, errorCallback));
-        }
-
-        public IEnumerator CoroutineLoadContract(string contractAddress, string ABI, string network,
-            LoadContractSuccess success, ErrorCallback errorCallback)
+        public async UniTask LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success, ErrorCallback errorCallback)
         {
             Contract data = new Contract()
             {
@@ -26,23 +20,26 @@ namespace EmergenceSDK.Internal.Services
                 ABI = ABI,
                 network = network,
             };
-
+    
             WWWForm form = new WWWForm();
             form.AddField("contractAddress", contractAddress);
             form.AddField("ABI", ABI);
             form.AddField("network", network);
-
+    
             string dataString = SerializationHelper.Serialize(data, false);
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "loadContract";
-
-            using (UnityWebRequest request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST))
+    
+            using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
             {
                 byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(dataString);
                 request.uploadHandler = new UploadHandlerRaw(bodyRaw);
                 request.uploadHandler.contentType = "application/json";
                 request.downloadHandler = new DownloadHandlerBuffer();
-                yield return request.SendWebRequest();
+        
+                await request.SendWebRequest().ToUniTask();
+        
                 EmergenceUtils.PrintRequestResult("Load Contract", request);
+        
                 if (EmergenceUtils.ProcessRequest<LoadContractResponse>(request, errorCallback, out var response))
                 {
                     success?.Invoke();
@@ -50,51 +47,38 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
-        public void GetTransactionStatus<T>(string transactionHash, string nodeURL,
-            GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback)
+        public async UniTask GetTransactionStatus<T>(string transactionHash, string nodeURL, GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback)
         {
-
-            StartCoroutine(CoroutineGetTransactionStatus<T>(transactionHash, nodeURL, success, errorCallback));
-        }
-
-        private IEnumerator CoroutineGetTransactionStatus<T>(string transactionHash, string nodeURL,
-            GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback)
-        {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "GetTransactionStatus?transactionHash=" +
-                         transactionHash + "&nodeURL=" + nodeURL;
-
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "GetTransactionStatus?transactionHash=" + transactionHash + "&nodeURL=" + nodeURL;
+    
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
-                yield return request.SendWebRequest();
+                await request.SendWebRequest().ToUniTask();
+        
                 EmergenceUtils.PrintRequestResult("Get Transaction Status", request);
+        
                 if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
                 {
-                    success?.Invoke(response); // Should we change this pattern?
+                    success?.Invoke(response);
                 }
             }
         }
 
-        public void GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
-            GetBlockNumberSuccess<T> success, ErrorCallback errorCallback)
-        {
-            StartCoroutine(CoroutineGetBlockNumber<T, U>(transactionHash, nodeURL, body, success, errorCallback));
-        }
-
-        private IEnumerator CoroutineGetBlockNumber<T, U>(string transactionHash, string nodeURL, U body,
-            GetBlockNumberSuccess<T> success, ErrorCallback errorCallback)
+        public async UniTask GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body, GetBlockNumberSuccess<T> success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
-
+    
             string dataString = SerializationHelper.Serialize(body, false);
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
+    
+            using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
             {
-                request.method = "POST";
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
                 request.uploadHandler.contentType = "application/json";
-
-                yield return request.SendWebRequest();
+        
+                await request.SendWebRequest().ToUniTask();
+        
                 EmergenceUtils.PrintRequestResult("Get Block Number", request);
+        
                 if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response);
@@ -102,25 +86,21 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
-        public void ReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback)
-        {
-            StartCoroutine(CoroutineReadMethod<T, U>(contractInfo, body, success, errorCallback));
-        }
-
-        public IEnumerator CoroutineReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback)
+        public async UniTask ReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback)
         {
             string url = contractInfo.ToReadUrl();
-
+            
             string dataString = SerializationHelper.Serialize(body, false);
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            
+            using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
             {
-                request.method = "POST";
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
                 request.uploadHandler.contentType = "application/json";
-
-                yield return request.SendWebRequest();
+                
+                await request.SendWebRequest().ToUniTask();
+                
                 EmergenceUtils.PrintRequestResult("Read Contract", request);
+                
                 if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response);
@@ -128,13 +108,7 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
-        public void WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
-        {
-            StartCoroutine(CoroutineWriteMethod<T, U>(contractInfo, localAccountName, gasPrice, value, body, success, errorCallback));
-        }
-
-        public IEnumerator CoroutineWriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value, 
-            U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
+        public async UniTask WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
         {
             string gasPriceString = String.Empty;
             string localAccountNameString = String.Empty;
@@ -149,20 +123,22 @@ namespace EmergenceSDK.Internal.Services
 
             string dataString = SerializationHelper.Serialize(body, false);
 
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-                request.method = "POST";
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
                 request.uploadHandler.contentType = "application/json";
 
-                yield return request.SendWebRequest();
+                await request.SendWebRequest().ToUniTask();
+
                 EmergenceUtils.PrintRequestResult("Write Contract", request);
+        
                 if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
                 {
                     success?.Invoke(response);
                 }
             }
         }
+
     }
 }
