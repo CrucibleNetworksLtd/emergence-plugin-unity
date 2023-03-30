@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Internal.UI.Screens;
@@ -55,7 +56,7 @@ namespace EmergenceSDK.Services
             AvatarService = new AvatarService();
             InventoryService = new InventoryService();
             DynamicMetadataService = new DynamicMetadataService();
-            AccountService = gameObject.AddComponent<AccountService>();
+            AccountService = new AccountService();
             WalletService = gameObject.AddComponent<WalletService>();
             QRCodeService = gameObject.AddComponent<QRCodeService>();
             ContractService = gameObject.AddComponent<ContractService>();
@@ -134,7 +135,7 @@ namespace EmergenceSDK.Services
         public async void WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, ErrorCallback errorCallback) => await DynamicMetadataService.WriteDynamicMetadata(network, contract, tokenId, metadata, success, errorCallback);
         
         /// <inheritdoc cref="IAccountService.IsConnected"/>
-        public void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback) => AccountService.IsConnected(success, errorCallback);
+        public async void IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback) => await AccountService.IsConnected(success, errorCallback);
         
         /// <inheritdoc cref="IWalletService.ReinitializeWalletConnect"/>
         public void ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, ErrorCallback errorCallback) => WalletService.ReinitializeWalletConnect(success, errorCallback);
@@ -152,14 +153,13 @@ namespace EmergenceSDK.Services
         public void CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback) => WalletService.CreateWallet(path, password, success, errorCallback);
 
         /// <inheritdoc cref="IAccountService.CreateKeyStore"/>
-        public void CreateKeyStore(string privateKey, string password, string publicKey, string path,
+        public async void CreateKeyStore(string privateKey, string password, string publicKey, string path,
             CreateKeyStoreSuccess success, ErrorCallback errorCallback) 
-            => AccountService.CreateKeyStore(privateKey, password, publicKey, path, success, errorCallback);
+            => await AccountService.CreateKeyStore(privateKey, password, publicKey, path, success, errorCallback);
 
         /// <inheritdoc cref="IAccountService.LoadAccount"/>
-        public void LoadAccount(string name, string password, string path, string nodeURL, string chainId,
-            LoadAccountSuccess success, ErrorCallback errorCallback) 
-            => AccountService.LoadAccount(name, password, path, nodeURL, chainId, success, errorCallback);
+        public async void LoadAccount(Account account, LoadAccountSuccess success, ErrorCallback errorCallback) 
+            => await AccountService.LoadAccount(account, success, errorCallback);
 
         /// <inheritdoc cref="IWalletService.GetBalance"/>
         public void GetBalance(BalanceSuccess success, ErrorCallback errorCallback)
@@ -173,29 +173,32 @@ namespace EmergenceSDK.Services
         }
 
         /// <inheritdoc cref="IAccountService.GetAccessToken"/>
-        public void GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback) => AccountService.GetAccessToken(success, errorCallback);
+        public async void GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback) 
+            => await AccountService.GetAccessToken(success, errorCallback);
 
         /// <inheritdoc cref="IAccountService.ValidateAccessToken"/>
-        public void ValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback) => AccountService.ValidateAccessToken(success, errorCallback);
+        public async void ValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback) 
+            => await AccountService.ValidateAccessToken(success, errorCallback);
 
         /// <inheritdoc cref="IAccountService.ValidateSignedMessage"/>
-        public void ValidateSignedMessage(string message, string signedMessage, string address,
+        public async void ValidateSignedMessage(string message, string signedMessage, string address,
             ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
-            => AccountService.ValidateSignedMessage(message, signedMessage, address, success, errorCallback);
+            => await AccountService.ValidateSignedMessage(message, signedMessage, address, success, errorCallback);
 
         /// <inheritdoc cref="IAccountService.Disconnect"/>
-        public void Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
+        public async void Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
         {
             if (skipWallet)
             {
                 success?.Invoke();
                 return;
             }
-            AccountService.Disconnect(success, errorCallback);
+            await AccountService.Disconnect(success, errorCallback);
         }
 
         /// <inheritdoc cref="IAccountService.Finish"/>
-        public void Finish(SuccessFinish success, ErrorCallback errorCallback) => AccountService.Finish(success, errorCallback);
+        public async void Finish(SuccessFinish success, ErrorCallback errorCallback) 
+            => await AccountService.Finish(success, errorCallback);
 
         /// <inheritdoc cref="IContractService"/>
         public void LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success,
