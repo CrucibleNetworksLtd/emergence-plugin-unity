@@ -52,7 +52,7 @@ namespace EmergenceSDK.Services
         private void Awake()
         {
             Instance = this;
-            PersonaService = gameObject.AddComponent<PersonaService>();
+            PersonaService = new PersonaService();
             AvatarService = new AvatarService();
             InventoryService = new InventoryService();
             DynamicMetadataService = new DynamicMetadataService();
@@ -105,22 +105,28 @@ namespace EmergenceSDK.Services
         }
         
         /// <inheritdoc cref="IPersonaService.GetPersonas"/>
-        public void GetPersonas(SuccessPersonas success, ErrorCallback errorCallback) => PersonaService.GetPersonas(success, errorCallback);
+        public async void GetPersonas(SuccessPersonas success, ErrorCallback errorCallback) 
+            => await PersonaService.GetPersonas(success, errorCallback);
         
         /// <inheritdoc cref="IPersonaService.GetCurrentPersona(SuccessGetCurrentPersona, ErrorCallback)"/>
-        public void GetCurrentPersona(SuccessGetCurrentPersona success, ErrorCallback errorCallback) => PersonaService.GetCurrentPersona(success, errorCallback);
+        public async void GetCurrentPersona(SuccessGetCurrentPersona success, ErrorCallback errorCallback) 
+            => await PersonaService.GetCurrentPersona(success, errorCallback);
         
         /// <inheritdoc cref="IPersonaService.CreatePersona"/>
-        public void CreatePersona(Persona persona, SuccessCreatePersona success, ErrorCallback errorCallback) => PersonaService.CreatePersona(persona, success, errorCallback);
+        public async void CreatePersona(Persona persona, SuccessCreatePersona success, ErrorCallback errorCallback) 
+            => await PersonaService.CreatePersona(persona, success, errorCallback);
         
         /// <inheritdoc cref="IPersonaService.EditPersona"/>
-        public void EditPersona(Persona persona, SuccessEditPersona success, ErrorCallback errorCallback) => PersonaService.EditPersona(persona, success, errorCallback);
+        public async void EditPersona(Persona persona, SuccessEditPersona success, ErrorCallback errorCallback) 
+            => await PersonaService.EditPersona(persona, success, errorCallback);
         
         /// <inheritdoc cref="IPersonaService.DeletePersona"/>
-        public void DeletePersona(Persona persona, SuccessDeletePersona success, ErrorCallback errorCallback) => PersonaService.DeletePersona(persona, success, errorCallback);
+        public async void DeletePersona(Persona persona, SuccessDeletePersona success, ErrorCallback errorCallback) 
+            => await PersonaService.DeletePersona(persona, success, errorCallback);
         
         /// <inheritdoc cref="IPersonaService.SetCurrentPersona"/>
-        public void SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, ErrorCallback errorCallback) => PersonaService.SetCurrentPersona(persona, success, errorCallback);
+        public async void SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, ErrorCallback errorCallback) 
+            => await PersonaService.SetCurrentPersona(persona, success, errorCallback);
         
         /// <inheritdoc cref="IAvatarService.AvatarByOwner"/>
         public async void AvatarByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback) => await AvatarService.AvatarByOwner(address, success, errorCallback);
