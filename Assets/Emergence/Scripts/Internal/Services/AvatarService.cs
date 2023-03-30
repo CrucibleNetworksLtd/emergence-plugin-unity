@@ -10,7 +10,7 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class AvatarService : IAvatarService
     {
-        public async UniTask AvatarByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback)
+        public async UniTask AvatarsByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "byOwner?address=" + address;
 

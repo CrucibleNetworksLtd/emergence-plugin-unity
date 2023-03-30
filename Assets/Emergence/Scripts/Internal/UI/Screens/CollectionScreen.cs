@@ -7,6 +7,7 @@ using EmergenceSDK.Types.Inventory;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Avatar = EmergenceSDK.Types.Avatar;
 
 namespace EmergenceSDK.Internal.UI.Screens
 {
@@ -64,9 +65,11 @@ namespace EmergenceSDK.Internal.UI.Screens
         private InventoryItem selectedItem;
 
         private List<InventoryUIItem> items = new List<InventoryUIItem>();
+        private List<Avatar> avatars = new List<Avatar>();
 
         private FilterParams filterParams = new FilterParams();
         private IInventoryService inventoryService;
+        private IAvatarService avatarService;
 
         private void Awake()
         {
@@ -121,6 +124,15 @@ namespace EmergenceSDK.Internal.UI.Screens
                 }
                 Modal.Instance.Hide();
             }
+            
+            
+            avatarService = EmergenceServices.GetService<IAvatarService>();
+            avatarService.AvatarsByOwner(EmergenceSingleton.Instance.GetCachedAddress(), AvatarsByOwnerSuccess, InventoryRefreshErrorCallback);
+        }
+
+        private void AvatarsByOwnerSuccess(List<Avatar> avatar)
+        {
+            avatars = avatar;
         }
 
         private void InventoryRefreshErrorCallback(string error, long code)
@@ -144,8 +156,9 @@ namespace EmergenceSDK.Internal.UI.Screens
                 bool blockchainResult = filterParams.blockchain.Equals("ANY") || itemBlockchain.Equals(filterParams.blockchain);
                 
                 //Avatar filter
-                bool isAvatar = !item.inventoryItem.Meta?.Content?.Any(o => o.MimeType.Equals("model/gltf-binary")) ?? true;
-                bool avatarResult = filterParams.avatars || isAvatar;
+                bool isAvatar = avatars.Any(a => $"{item.inventoryItem.Blockchain.ToUpper()}:{item.inventoryItem.Contract.ToUpper()}"
+                                                 == $"{a.chain.ToUpper()}:{a.contractAddress.ToUpper()}");
+                bool avatarResult = filterParams.avatars || !isAvatar;
                 
                 if (searchStringResult && blockchainResult && avatarResult)
                 {
