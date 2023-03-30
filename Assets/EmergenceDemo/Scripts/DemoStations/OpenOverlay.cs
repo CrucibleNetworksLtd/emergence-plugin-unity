@@ -6,6 +6,9 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public class OpenOverlay : DemoStation<OpenOverlay>, IDemoStation
     {
+        private IPersonaService personaService;
+        private IAvatarService avatarService;
+
         public bool IsReady
         {
             get => isReady;
@@ -15,14 +18,13 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 isReady = value;
             }
         }
-        
-        private void OnEnable() 
-        {
-            EmergenceServices.Instance.PersonaService.OnCurrentPersonaUpdated += OnPersonaUpdated;
-        }
 
         private void Start()
         {
+            personaService = EmergenceServices.GetService<IPersonaService>();
+            personaService.OnCurrentPersonaUpdated += OnPersonaUpdated;
+            avatarService = EmergenceServices.GetService<IAvatarService>();
+            
             instructionsGO.SetActive(false);
         }
 
@@ -49,7 +51,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             Debug.Log("Changing avatar");
             if (persona != null && !string.IsNullOrEmpty(persona.avatarId))
             {
-                EmergenceServices.Instance.AvatarById(persona.avatarId, (avatar =>
+                avatarService.AvatarById(persona.avatarId, (avatar =>
                 {
                     DemoAvatarManager.Instance.SwapAvatars(avatar.meta.content[1].url);
                 

@@ -4,12 +4,13 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    public class AccountService : IAccountService
+    internal class AccountService : IAccountService
     {
         public string CurrentAccessToken
         {
@@ -21,6 +22,13 @@ namespace EmergenceSDK.Internal.Services
         
         public bool DisconnectInProgress => disconnectInProgress;
         private bool disconnectInProgress = false;
+        
+        public Expiration Expiration { get; private set; }
+
+        public void ProcessExpiration(string expirationMessage)
+        {
+            Expiration = SerializationHelper.Deserialize<Expiration>(expirationMessage);
+        }
 
         public async UniTask IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
         {
@@ -81,7 +89,7 @@ namespace EmergenceSDK.Internal.Services
             if (EmergenceUtils.ProcessRequest<AccessTokenResponse>(request, errorCallback, out var response))
             {
                 currentAccessToken = SerializationHelper.Serialize(response.AccessToken, false);
-                EmergenceUtils.ProcessExpiration(response.AccessToken.message);
+                ProcessExpiration(response.AccessToken.message);
                 success?.Invoke(currentAccessToken);
             }
         }

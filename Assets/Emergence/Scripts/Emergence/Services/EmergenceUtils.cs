@@ -8,11 +8,15 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Services
 {
-    public static class EmergenceUtils
+    public class EmergenceUtils
     {
-        public static void ProcessExpiration(string expirationMessage)
+        private static EmergenceUtils Instance => instance ??= new EmergenceUtils();
+        private static EmergenceUtils instance;
+        private readonly IAccountService accountService;
+
+        public EmergenceUtils()
         {
-            EmergenceServices.Instance.expiration = SerializationHelper.Deserialize<EmergenceServices.Expiration>(expirationMessage);
+            accountService = EmergenceServices.GetService<IAccountService>();
         }
 
         public static bool RequestError(UnityWebRequest request)
@@ -110,8 +114,8 @@ namespace EmergenceSDK.Services
             }
             try
             {
-                Debug.Log("AccessToken: " + EmergenceServices.Instance.CurrentAccessToken);
-                request.SetRequestHeader("Authorization", EmergenceServices.Instance.CurrentAccessToken);
+                Debug.Log("AccessToken: " + Instance.accountService.CurrentAccessToken);
+                request.SetRequestHeader("Authorization", Instance.accountService.CurrentAccessToken);
 
                 if (headers != null) {
                     foreach (var key in headers.Keys) {

@@ -5,6 +5,8 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public class SignMessage : DemoStation<SignMessage>, IDemoStation
     {
+        private IWalletService wallletService;
+
         public bool IsReady
         {
             get => isReady;
@@ -17,6 +19,8 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         
         private void Start()
         {
+            wallletService = EmergenceServices.GetService<IWalletService>();
+            
             instructionsGO.SetActive(false);
             IsReady = false;
         }
@@ -35,7 +39,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             if (HasBeenActivated() && IsReady)
             {
-                EmergenceServices.Instance.RequestToSign("Test message", SignSuccess, SignErrorCallback);
+                wallletService.RequestToSign("Test message", SignSuccess, SignErrorCallback);
             }
         }
 

@@ -5,7 +5,7 @@ namespace EmergenceSDK.Services
     /// <summary>
     /// Provides access to the avatar API. This service is off chain.
     /// </summary>
-    public interface IAvatarService
+    public interface IAvatarService : IEmergenceService
     {
         /// <summary>
         /// Attempts to get the avatars for the given address. If successful, the success callback will be called with the avatars.

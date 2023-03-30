@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -47,6 +48,8 @@ namespace EmergenceSDK.Internal.UI
         }
 
         private Material clonedMaterial;
+        private IAvatarService avatarService;
+
         public Material Material
         {
             get
@@ -93,8 +96,10 @@ namespace EmergenceSDK.Internal.UI
 
         public void Refresh(Texture2D texture, Persona persona, bool selected)
         {
-            this.Persona = persona;
-            Index = this.transform.GetSiblingIndex();
+            avatarService = EmergenceServices.GetService<IAvatarService>();
+            
+            Persona = persona;
+            Index = transform.GetSiblingIndex();
             nameText.transform.parent.gameObject.SetActive(false);
             nameText.text = persona.name;
 
@@ -110,7 +115,7 @@ namespace EmergenceSDK.Internal.UI
 
             if (!string.IsNullOrEmpty(persona.avatarId))
             {
-                EmergenceServices.Instance.AvatarById(persona.avatarId, (avatar =>
+                avatarService.AvatarById(persona.avatarId, (avatar =>
                 {
                     
                     // Add fetched avatar to persona

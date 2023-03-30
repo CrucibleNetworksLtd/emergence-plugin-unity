@@ -1,4 +1,5 @@
-﻿using EmergenceSDK.Internal.Utils;
+﻿using System;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,6 +31,9 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private States state = States.Splash;
         private const float splashDuration = 3.0f;
+        
+        private IWalletService walletService;
+        
         private void Awake()
         {
             skipButton.onClick.AddListener(OnConnectWallet);
@@ -38,6 +42,11 @@ namespace EmergenceSDK.Internal.UI.Screens
             space3Button.onClick.AddListener(OnNext);
 
             Reset();
+        }
+
+        private void Start()
+        {
+            walletService = EmergenceServices.GetService<IWalletService>();
         }
 
         private void OnDestroy()
@@ -95,13 +104,6 @@ namespace EmergenceSDK.Internal.UI.Screens
             }
         }
 
-        private float timeCounter = 0.0f;
-        private const string cheatcode = "nowallet";
-        private int codeIndex = 0;
-        private float cheatTimeOut = 10.0f;
-
-        private bool cheatActive = false;
-
         private void Update()
         {
             if (state != States.Splash)
@@ -117,42 +119,6 @@ namespace EmergenceSDK.Internal.UI.Screens
             {
                 splashTimer = 0.0f;
                 OnNext();
-            }
-
-            timeCounter -= Time.deltaTime;
-            if (timeCounter <= 0.0f)
-            {
-                timeCounter += cheatTimeOut;
-                codeIndex = 0;
-            }
-
-            string currentKey = KeyToString.GetCurrentAlphaKey();
-
-            if (currentKey.Trim().Length == 1)
-            {
-                if (currentKey.Equals(cheatcode[codeIndex].ToString()))
-                {
-                    codeIndex++;
-                    timeCounter += cheatTimeOut;
-
-                    if (codeIndex >= cheatcode.Length)
-                    {
-                        cheatActive = true;
-                        Debug.Log("CHEAT ACTIVATED!");
-                        codeIndex = 0;
-
-                        string accessTokenJson = System.IO.File.ReadAllText("accessToken.json");
-
-                        EmergenceServices.Instance.SkipWallet(cheatActive, accessTokenJson);
-                        ScreenManager.Instance.ShowDashboard();
-                    }
-                }
-                else
-                {
-                    codeIndex = 0;
-                    timeCounter += cheatTimeOut;
-                    Debug.LogWarning("CHEAT SEQUENCE RESET!");
-                }
             }
         }
 

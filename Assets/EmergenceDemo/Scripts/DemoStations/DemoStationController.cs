@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Services;
@@ -7,7 +8,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public class DemoStationController : MonoBehaviour
     {
-        private static bool IsLoggedIn() => EmergenceServices.Instance.AccountService.CurrentAccessToken.Length != 0;
+        private bool IsLoggedIn() => accountService.CurrentAccessToken.Length != 0;
         
         public DemoStation<OpenOverlay> openOverlay;
         
@@ -19,6 +20,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         public DemoStation<WriteMethod> writeMethod;
 
         private List<IDemoStation> stationsRequiringLogin;
+        private IAccountService accountService;
 
         public async void Awake()
         {
@@ -37,6 +39,11 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             
             await UniTask.WaitUntil(IsLoggedIn);
             ActivateStations();
+        }
+
+        public void Start()
+        {
+            accountService = EmergenceServices.GetService<IAccountService>();
         }
 
         private void ActivateStations()

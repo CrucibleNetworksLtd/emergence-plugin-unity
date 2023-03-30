@@ -5,7 +5,7 @@ namespace EmergenceSDK.Services
     /// <summary>
     /// Gives access to dynamic metadata. This service is off chain.
     /// </summary>
-    public interface IDynamicMetadataService
+    public interface IDynamicMetadataService : IEmergenceService
     {
         /// <summary>
         /// Attempts to write dynamic metadata to the specified contract.

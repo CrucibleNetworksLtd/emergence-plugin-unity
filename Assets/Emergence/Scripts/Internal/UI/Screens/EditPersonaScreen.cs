@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EmergenceSDK.Internal.Utils;
@@ -45,6 +46,9 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private HashSet<string> imagesRefreshing = new HashSet<string>();
         private bool requestingInProgress = false;
+
+        private IPersonaService personaService;
+        private IAvatarService avatarService;
 
         private enum States
         {
@@ -125,6 +129,9 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public void Refresh(Persona persona, bool isDefault, bool isNew = false)
         {
+            personaService = EmergenceServices.GetService<IPersonaService>();
+            avatarService = EmergenceServices.GetService<IAvatarService>();
+            
             // Redesigned flow state
             state = isNew ? States.CreateAvatar : States.EditInformation;
 
@@ -180,7 +187,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
             go.GetComponent<AvatarScrollItem>().Refresh(defaultImage, null);
 
-            EmergenceServices.Instance.AvatarByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
+            avatarService.AvatarByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
             {
                 Modal.Instance.Show("Retrieving avatar images...");
                 requestingInProgress = true;
@@ -212,7 +219,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () =>
             {
                 Modal.Instance.Show("Deleting Persona...");
-                EmergenceServices.Instance.DeletePersona(currentPersona, () =>
+                personaService.DeletePersona(currentPersona, () =>
                 {
                     Debug.Log("Deleting Persona");
                     Modal.Instance.Hide();
@@ -257,7 +264,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     {
                         Modal.Instance.Show("Saving Changes...");
 
-                        EmergenceServices.Instance.CreatePersona(currentPersona, () =>
+                        personaService.CreatePersona(currentPersona, () =>
                         {
                             Debug.Log("New Persona saved");
                             Modal.Instance.Hide();
@@ -278,7 +285,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     {
                         Modal.Instance.Show("Saving Changes...");
 
-                        EmergenceServices.Instance.EditPersona(currentPersona, () =>
+                        personaService.EditPersona(currentPersona, () =>
                         {
                             Debug.Log("Changes to Persona saved");
                             Modal.Instance.Hide();

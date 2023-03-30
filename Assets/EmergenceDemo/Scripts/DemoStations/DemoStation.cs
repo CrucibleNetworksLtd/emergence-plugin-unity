@@ -1,3 +1,4 @@
+using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using TMPro;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
     {
         [FormerlySerializedAs("instructions")] 
         public GameObject instructionsGO;
-        
+
         protected TextMeshProUGUI InstructionsText => instructionsText ??= instructionsGO.GetComponentInChildren<TextMeshProUGUI>();
         private TextMeshProUGUI instructionsText;
 

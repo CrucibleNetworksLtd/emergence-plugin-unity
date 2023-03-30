@@ -66,6 +66,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private List<InventoryUIItem> items = new List<InventoryUIItem>();
 
         private FilterParams filterParams = new FilterParams();
+        private IInventoryService inventoryService;
 
         private void Awake()
         {
@@ -83,7 +84,8 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public void Refresh(Action<InventoryItem> customOnClickHandler)
         {
-            EmergenceServices.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryByOwnerSuccess, InventoryRefreshErrorCallback);
+            inventoryService = EmergenceServices.GetService<IInventoryService>();
+            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryByOwnerSuccess, InventoryRefreshErrorCallback);
             void InventoryByOwnerSuccess(List<InventoryItem> inventoryItems)
             {
                 foreach (var item in items)

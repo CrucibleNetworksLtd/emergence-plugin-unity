@@ -1,4 +1,6 @@
-﻿using EmergenceSDK.Internal.Utils;
+﻿using System.Collections;
+using EmergenceSDK.Internal.Services;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using TMPro;
 using UnityEngine;
@@ -19,13 +21,26 @@ namespace EmergenceSDK.Internal.UI.Screens
         public static HeaderScreen Instance;
 
         private readonly float refreshTimeOut = 30.0f;
-        private float remainingTime = 0.0f;
+        private IWalletService walletService;
+        private IAccountService accountService;
+        
+        private Coroutine refreshCoroutine;
+
         private void Awake()
         {
             Instance = this;
             menuButton.onClick.AddListener(OnMenuOpenClick);
             disconnectButton.onClick.AddListener(OnDisconnectClick);
             disconnectModalButton.onClick.AddListener(OnMenuCloseClick);
+        }
+        
+        private void Start()
+        {
+            walletService = EmergenceServices.GetService<WalletService>();
+            accountService = EmergenceServices.GetService<AccountService>();
+            Hide();
+
+            refreshCoroutine = StartCoroutine(RefreshWalletBalance());
         }
 
         private void OnDestroy()
@@ -34,56 +49,45 @@ namespace EmergenceSDK.Internal.UI.Screens
             disconnectButton.onClick.RemoveListener(OnDisconnectClick);
             disconnectModalButton.onClick.RemoveListener(OnMenuCloseClick);
         }
-
-        private void Update()
+        
+        IEnumerator RefreshWalletBalance()
         {
-            if (!headerInformation.activeSelf)
+            while (gameObject.activeSelf && headerInformation.activeSelf)
             {
-                return;
-            }
-
-            remainingTime -= Time.deltaTime;
-
-            if (remainingTime <= 0.0f)
-            {
-                remainingTime += refreshTimeOut;
-
-                EmergenceServices.Instance.GetBalance((balance) =>
-                {
-                    string converted = UnitConverter.Convert(balance, UnitConverter.EtherUnitType.WEI, UnitConverter.EtherUnitType.ETHER, ",");
-                    string[] splitted = converted.Split(new string[] { "," }, System.StringSplitOptions.None);
-
-                    string result = splitted[0];
-
-                    if (splitted.Length == 2)
+                walletService.GetBalance((balance) =>
                     {
-                        result += "." + splitted[1].Substring(0, UnitConverter.SIGNIFICANT_DIGITS);
-                    }
+                        string converted = UnitConverter.Convert(balance, UnitConverter.EtherUnitType.WEI, UnitConverter.EtherUnitType.ETHER, ",");
+                        string[] splitted = converted.Split(new string[] { "," }, System.StringSplitOptions.None);
 
-                    walletBalance.text = result;// + " " + Emergence.Instance.TokenSymbol;
-                },
-                (error, code) =>
-                {
-                    Debug.LogError("[" + code + "] " + error);
-                    ModalPromptOK.Instance.Show("Sorry, there was a problem getting your balance, will retry in " + refreshTimeOut.ToString("0") + " seconds");
-                });
+                        string result = splitted[0];
+
+                        if (splitted.Length == 2)
+                        {
+                            result += "." + splitted[1].Substring(0, UnitConverter.SIGNIFICANT_DIGITS);
+                        }
+
+                        walletBalance.text = result;// + " " + Emergence.Instance.TokenSymbol;
+                    },
+                    (error, code) =>
+                    {
+                        Debug.LogError("[" + code + "] " + error);
+                        ModalPromptOK.Instance.Show("Sorry, there was a problem getting your balance, will retry in " + refreshTimeOut.ToString("0") + " seconds");
+                    });
+                yield return new WaitForSeconds(refreshTimeOut);
             }
-        }
-
-        private void Start()
-        {
-            Hide();
         }
 
         public void Hide()
         {
             headerInformation.SetActive(false);
+            if (refreshCoroutine != null) 
+                StopCoroutine(refreshCoroutine);
         }
 
         public void Show()
         {
             headerInformation.SetActive(true);
-            remainingTime = 0.0f;
+            refreshCoroutine = StartCoroutine(RefreshWalletBalance());
         }
 
         public void Refresh(string address)
@@ -104,7 +108,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private void OnDisconnectClick()
         {
             Modal.Instance.Show("Disconnecting wallet...");
-            EmergenceServices.Instance.Disconnect(() =>
+            accountService.Disconnect(() =>
             {
                 Modal.Instance.Hide();
                 Hide();

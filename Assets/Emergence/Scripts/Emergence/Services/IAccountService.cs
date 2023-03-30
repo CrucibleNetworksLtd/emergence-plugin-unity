@@ -6,11 +6,18 @@ namespace EmergenceSDK.Services
     /// <summary>
     /// 
     /// </summary>
-    public interface IAccountService
+    public interface IAccountService : IEmergenceService
     {
         string CurrentAccessToken { get; set; }
         bool HasAccessToken { get; }
         bool DisconnectInProgress { get; }
+        
+        Expiration Expiration { get; }
+
+        /// <summary>
+        /// Sets the expiration object from the expiration message
+        /// </summary>
+        void ProcessExpiration(string expirationMessage);
 
         /// <summary>
         /// Attempts to check if the user is connected to Emergence, connection status is provided in the IsConnectedSuccess callback.

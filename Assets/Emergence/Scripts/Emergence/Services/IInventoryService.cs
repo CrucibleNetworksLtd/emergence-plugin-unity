@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 
 namespace EmergenceSDK.Services
 {
-    public interface IInventoryService
+    public interface IInventoryService : IEmergenceService
     {
         /// <summary>
         /// Attempts to get the inventory for the given address. If successful, the success callback will be called with the inventory.

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -52,6 +53,8 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private HashSet<string> imagesRefreshing = new HashSet<string>();
         private bool requestingInProgress = false;
+
+        private IPersonaService personaService;
 
         private void Awake()
         {
@@ -107,6 +110,8 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public void Refresh()
         {
+            personaService = EmergenceServices.GetService<IPersonaService>();
+            
             HideUI();
             detailsPanel.SetActive(false);
             HeaderScreen.Instance.Show();
@@ -117,7 +122,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
             Modal.Instance.Show("Loading Personas...");
 
-            EmergenceServices.Instance.GetPersonas((personas, currentPersona) =>
+            personaService.GetPersonas((personas, currentPersona) =>
             {
                 Modal.Instance.Show("Retrieving avatars...");
 
@@ -250,7 +255,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private void OnUsePersonaAsCurrent()
         {
             Modal.Instance.Show("Loading Personas...");
-            EmergenceServices.Instance.SetCurrentPersona(selectedPersona, () =>
+            personaService.SetCurrentPersona(selectedPersona, () =>
             {
                 Refresh();
             },
@@ -272,7 +277,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             ModalPromptYESNO.Instance.Show("Delete " + selectedPersona.name, "are you sure?", () =>
             {
                 Modal.Instance.Show("Deleting Persona...");
-                EmergenceServices.Instance.DeletePersona(selectedPersona, () =>
+                personaService.DeletePersona(selectedPersona, () =>
                 {
                     Debug.Log("Deleting Persona");
                     Modal.Instance.Hide();

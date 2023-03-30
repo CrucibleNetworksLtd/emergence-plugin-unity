@@ -3,7 +3,7 @@ using EmergenceSDK.Types;
 
 namespace EmergenceSDK.Services
 {
-    public interface IPersonaService
+    public interface IPersonaService : IEmergenceService
     {
         Persona CurrentPersona { get; }
         

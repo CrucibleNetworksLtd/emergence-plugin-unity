@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 
 namespace EmergenceSDK.Services
 {
-    public interface IWalletService
+    public interface IWalletService : IEmergenceService
     {
         public string WalletAddress { get; }
         

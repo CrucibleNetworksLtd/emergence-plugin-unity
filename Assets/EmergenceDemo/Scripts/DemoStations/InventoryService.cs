@@ -17,7 +17,8 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private List<GameObject> items = new List<GameObject>();
 
         private bool isInventoryVisible = false;
-        
+        private IInventoryService inventoryService;
+
         public bool IsReady
         {
             get => isReady;
@@ -30,6 +31,8 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Start()
         {
+            inventoryService = EmergenceServices.GetService<IInventoryService>();
+            
             instructionsGO.SetActive(false);
             IsReady = false;
         }
@@ -70,7 +73,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 Cursor.visible = false;
             }
 
-            EmergenceServices.Instance.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), SuccessInventoryByOwner, ErrorCallback);
+            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), SuccessInventoryByOwner, ErrorCallback);
         }
 
         private void ErrorCallback(string error, long code)

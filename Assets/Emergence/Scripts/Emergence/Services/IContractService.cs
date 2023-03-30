@@ -3,7 +3,7 @@ using EmergenceSDK.Internal.Utils;
 
 namespace EmergenceSDK.Services
 {
-    public interface IContractService
+    public interface IContractService : IEmergenceService
     {
         UniTask LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success,
             ErrorCallback errorCallback);

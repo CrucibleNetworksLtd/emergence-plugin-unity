@@ -10,6 +10,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
     public class DynamicMetadataController : DemoStation<DynamicMetadataController>, IDemoStation
     {
         public DeployedSmartContract deployedContract;
+        private IDynamicMetadataService dynamicMetaDataService;
 
         public bool IsReady
         {
@@ -23,6 +24,8 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Start()
         {
+            dynamicMetaDataService = EmergenceServices.GetService<IDynamicMetadataService>();
+            
             instructionsGO.SetActive(false);
             IsReady = false;
         }
@@ -66,7 +69,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             var curMetadata = int.Parse(item.Meta.DynamicMetadata);
             curMetadata++;
 
-            EmergenceServices.Instance.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
+            dynamicMetaDataService.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
                 curMetadata.ToString(), UpdateDynamicMetadataSuccess, (string error, long code) => {});
             
             void UpdateDynamicMetadataSuccess(string response)
