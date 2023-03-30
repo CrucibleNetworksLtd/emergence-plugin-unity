@@ -58,7 +58,7 @@ namespace EmergenceSDK.Services
             DynamicMetadataService = new DynamicMetadataService();
             AccountService = new AccountService();
             WalletService = gameObject.AddComponent<WalletService>();
-            QRCodeService = gameObject.AddComponent<QRCodeService>();
+            QRCodeService = new QRCodeService();
             ContractService = gameObject.AddComponent<ContractService>();
         }
 

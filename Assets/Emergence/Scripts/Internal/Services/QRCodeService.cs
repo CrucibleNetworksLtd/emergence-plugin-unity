@@ -1,4 +1,5 @@
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using UnityEngine;
@@ -6,32 +7,25 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    public class QRCodeService : MonoBehaviour, IQRCodeService
+    public class QRCodeService : IQRCodeService
     {
-        public void GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback)
-        {
-            StartCoroutine(CoroutineGetQrCode(success, errorCallback));
-        }
-
-        private IEnumerator CoroutineGetQrCode(QRCodeSuccess success, ErrorCallback errorCallback)
+        public async UniTask GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "qrcode";
 
-            using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+            using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
+            await request.SendWebRequest().ToUniTask();
+
+            EmergenceUtils.PrintRequestResult("GetQrCode", request);
+
+            if (EmergenceUtils.RequestError(request))
             {
-                yield return request.SendWebRequest();
-
-                EmergenceUtils.PrintRequestResult("GetQrCode", request);
-
-                if (EmergenceUtils.RequestError(request))
-                {
-                    errorCallback?.Invoke(request.error, request.responseCode);
-                }
-                else
-                {
-                    string deviceId = request.GetResponseHeader("deviceId");
-                    success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture, deviceId);
-                }
+                errorCallback?.Invoke(request.error, request.responseCode);
+            }
+            else
+            {
+                string deviceId = request.GetResponseHeader("deviceId");
+                success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture, deviceId);
             }
         }
     }

@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+
 namespace EmergenceSDK.Services
 {
     public interface IQRCodeService
@@ -5,6 +7,6 @@ namespace EmergenceSDK.Services
         /// <summary>
         /// Attempts to get the login QR code, it will return the QR code as a texture in the success callback
         /// </summary>
-        void GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback);
+        UniTask GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback);
     }
 }
