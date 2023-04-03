@@ -1,11 +1,8 @@
-using System.Collections;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
-using Newtonsoft.Json;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services

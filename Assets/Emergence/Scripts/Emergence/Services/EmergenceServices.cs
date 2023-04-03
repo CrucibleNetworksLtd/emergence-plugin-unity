@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
-using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
-using Newtonsoft.Json;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 

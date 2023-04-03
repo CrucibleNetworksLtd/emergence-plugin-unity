@@ -4,7 +4,6 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {

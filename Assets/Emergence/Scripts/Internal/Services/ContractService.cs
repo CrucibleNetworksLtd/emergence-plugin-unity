@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;

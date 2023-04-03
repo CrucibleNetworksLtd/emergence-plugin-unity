@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -6,9 +5,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
-using UnityEngine;
 using UnityEngine.Networking;
-using Debug = UnityEngine.Debug;
 
 namespace EmergenceSDK.Internal.Services
 {

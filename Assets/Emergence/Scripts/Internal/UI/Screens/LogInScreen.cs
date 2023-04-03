@@ -1,5 +1,4 @@
-﻿using System;
-using EmergenceSDK.Services;
+﻿using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;

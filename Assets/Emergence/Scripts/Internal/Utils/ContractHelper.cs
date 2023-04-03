@@ -1,5 +1,4 @@
 ﻿using EmergenceSDK.Services;
-using UnityEngine;
 
 namespace EmergenceSDK.Internal.Utils
 {
