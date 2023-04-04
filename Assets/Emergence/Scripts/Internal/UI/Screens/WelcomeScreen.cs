@@ -1,5 +1,6 @@
 ﻿using EmergenceSDK.Services;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace EmergenceSDK.Internal.UI.Screens
@@ -106,7 +107,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             if (state != States.Splash)
             {
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (Keyboard.current[Key.Space].wasPressedThisFrame)
                 {
                     OnNext();
                 }

@@ -5,6 +5,7 @@ using EmergenceSDK.ScriptableObjects;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace EmergenceSDK.Types
 {
@@ -30,7 +31,7 @@ namespace EmergenceSDK.Types
         
 
         [Header("Keyboard shortcut to open Emergence")] [SerializeField]
-        private KeyCode key = KeyCode.Tab;
+        private Key key = Key.Tab;
 
         [SerializeField] private bool shift = true;
 
@@ -162,18 +163,19 @@ namespace EmergenceSDK.Types
 
         private void Update()
         {
-            bool shortcutPressed = Input.GetKeyDown(key)
-                                   && (shift && (Input.GetKey(KeyCode.LeftShift) ||
-                                                 Input.GetKey(KeyCode.RightShift)) || !shift)
-                                   && (ctrl && (Input.GetKey(KeyCode.LeftControl) ||
-                                                Input.GetKey(KeyCode.RightControl)) || !ctrl);
+            bool shortcutPressed = Keyboard.current[key].wasPressedThisFrame
+                                   && (shift && (Keyboard.current[Key.LeftShift].isPressed ||
+                                                 Keyboard.current[Key.RightShift].isPressed) || !shift)
+                                   && (ctrl && (Keyboard.current[Key.LeftCtrl].isPressed ||
+                                                Keyboard.current[Key.RightCtrl].isPressed) || !ctrl);
+
 
             if (shortcutPressed)
             {
                 OpenEmergenceUI();
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Keyboard.current[Key.Escape].wasPressedThisFrame)
             {
                 if (ScreenManager.Instance != null)
                 {
