@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class InventoryService : DemoStation<InventoryService>, IDemoStation
+    public class InventoryDemo : DemoStation<InventoryDemo>, IDemoStation
     {
         [SerializeField] private GameObject itemEntryPrefab;
         [SerializeField] private GameObject contentGO;

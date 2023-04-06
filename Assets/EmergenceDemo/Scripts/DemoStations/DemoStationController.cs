@@ -12,7 +12,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         public DemoStation<OpenOverlay> openOverlay;
         
         public DemoStation<DynamicMetadataController> dynamicMetadataController;
-        public DemoStation<InventoryService> inventoryService;
+        public DemoStation<InventoryDemo> inventoryService;
         public DemoStation<MintAvatar> mintAvatar;
         public DemoStation<ReadMethod> readMethod;
         public DemoStation<SignMessage> signMessage;

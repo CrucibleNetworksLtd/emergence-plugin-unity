@@ -28,33 +28,38 @@ namespace EmergenceSDK.Internal.UI
             this.item = item;
             
             ItemName.text = item?.Meta?.Name;
-            SetImageUrl(item?.Meta?.Content?.FirstOrDefault()?.URL);
+            
+            var thumbnailType = ThumbnailType.None;
+            
+            if (item?.Meta?.Content?.FirstOrDefault()?.MimeType == "image/png" ||
+                item?.Meta?.Content?.FirstOrDefault()?.MimeType == "image/jpeg")
+            {
+                thumbnailType = ThumbnailType.Static;
+            }
+            else if (item?.Meta?.Content?.FirstOrDefault()?.MimeType == "image/gif")
+            {
+                thumbnailType = ThumbnailType.Gif;
+            }
+
+            SetImageUrl(item?.Meta?.Content?.FirstOrDefault()?.URL, thumbnailType);
         }
 
-        public void SetImageUrl(string imageUrl)
+        public void SetImageUrl(string imageUrl, ThumbnailType thumbnailType)
         {
-            if (string.IsNullOrEmpty(imageUrl))
+            switch (thumbnailType)
             {
-                RequestImage.Instance.AskForDefaultImage();
+                case ThumbnailType.Static:
+                    RequestImage.Instance.AskForImage(imageUrl, Instance_OnImageReady, Instance_OnImageFailed);
+                    break;
+                case ThumbnailType.Gif:
+                    ItemThumbnail.LoadGif(imageUrl);
+                    break;
+                case ThumbnailType.None:
+                    ItemThumbnail.LoadStaticImage(RequestImage.Instance.DefaultThumbnail);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(thumbnailType), thumbnailType, null);
             }
-            else if (IsGifUrl(imageUrl)) 
-            {
-                ItemThumbnail.LoadGif(imageUrl);
-            }
-            else 
-            {
-                RequestImage.Instance.AskForImage(imageUrl, Instance_OnImageReady, Instance_OnImageFailed);
-            }
-        }
-
-        private bool IsGifUrl(string url)
-        {
-            string lowerUrl = url.ToLower();
-            string[] urlParts = lowerUrl.Split('.');
-            string extension = urlParts[urlParts.Length - 1];
-
-            // Check if the extension is "gif" and the URL has a valid format
-            return extension == "gif" && Uri.IsWellFormedUriString(url, UriKind.Absolute);
         }
 
         
@@ -67,6 +72,13 @@ namespace EmergenceSDK.Internal.UI
         {
             ItemThumbnail.LoadStaticImage(RequestImage.Instance.DefaultThumbnail);
             Debug.LogWarning("[" + imageUrl + "] " + error + " " + errorCode);
+        }
+        
+        public enum ThumbnailType
+        {
+            Static,
+            Gif,
+            None
         }
     }
 }
