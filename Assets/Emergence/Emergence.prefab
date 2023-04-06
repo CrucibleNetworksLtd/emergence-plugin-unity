@@ -68,7 +68,8 @@ MonoBehaviour:
   m_text: Loading Emergence...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 031994eb5c175384ca2c4f429b24af78, type: 2}
-  m_sharedMaterial: {fileID: -2426909319969139822, guid: 031994eb5c175384ca2c4f429b24af78, type: 2}
+  m_sharedMaterial: {fileID: -2426909319969139822, guid: 031994eb5c175384ca2c4f429b24af78,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -368,9 +369,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3621d27f4d229c646aae8cea4aa420de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  launchEVMServerOnAwake: 0
-  launchEVMServerOnStart: 1
   Configuration: {fileID: 11400000, guid: 59ea788f73e88824c8d4aa8afe83df38, type: 2}
+  _environment: 0
   key: 9
   shift: 1
   ctrl: 0
@@ -506,6 +506,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 593664461e0a7f746af91fc149782ce9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DefaultThumbnail: {fileID: 2800000, guid: 88478abd98d6b4d9ca77f729ac5fd523, type: 3}
 --- !u!114 &1814599757418968499
 MonoBehaviour:
   m_ObjectHideFlags: 0

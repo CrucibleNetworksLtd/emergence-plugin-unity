@@ -1,18 +1,23 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Utils
 {
     public class RequestImage : MonoBehaviour
     {
+        public Texture2D DefaultThumbnail;
+        
         public static RequestImage Instance { get; private set; }
 
         private Dictionary<string, Texture2D> cachedTextures = new Dictionary<string, Texture2D>();
-
-        private delegate void DownloadReady(string url, Texture2D texture, DownloadImage self);
-        private delegate void DownloadFailed(string url, string error, long errorCode);
+        
+        private CancellationTokenSource cancellationTokenSource;
+        
+        public delegate void DownloadReady(string url, Texture2D texture, DownloadImage self);
+        public delegate void DownloadFailed(string url, string error, long errorCode);
 
         public delegate void ImageReady(string url, Texture2D texture);
         public delegate void ImageFailed(string url, string error, long errorCode);
@@ -27,12 +32,12 @@ namespace EmergenceSDK.Internal.Utils
         /// </summary>
         public bool AskForImage(string url)
         {
-            bool result = true;
             if (url == null)
             {
-                result = false;
+                return false;
             }
-            else if (cachedTextures.ContainsKey(url) && cachedTextures[url] != null)
+            
+            if (cachedTextures.ContainsKey(url) && cachedTextures[url] != null)
             {
                 OnImageReady?.Invoke(url, cachedTextures[url]);
             }
@@ -41,7 +46,14 @@ namespace EmergenceSDK.Internal.Utils
                 urlQueue.Enqueue(url);
             }
 
-            return result;
+            return true;
+        }
+        
+        
+        
+        public void AskForDefaultImage()
+        {
+            OnImageReady?.Invoke(null, DefaultThumbnail);
         }
 
         private class CallbackContainer
@@ -76,132 +88,81 @@ namespace EmergenceSDK.Internal.Utils
                 }
             }
         }
+        
+        private void HandleImageDownloadSuccess(string url, Texture2D texture, DownloadImage self)
+        {
+            cachedTextures[url] = texture;
 
-        #region Monobehaviour
+            if (callbackCache.ContainsKey(url))
+            {
+                callbackCache[url].imageReadyCallback?.Invoke(url, texture);
+                callbackCache.Remove(url);
+            }
+            else
+            {
+                OnImageReady?.Invoke(url, texture);
+            }
+            
+            pool.ReturnUsedObject(ref self);
+        }
+
+        private void HandleImageDownloadFailure(string url, string error, long errorCode)
+        {
+            // Add the DefaultThumbnail to the cache with the failed URL
+            cachedTextures[url] = DefaultThumbnail;
+            if (callbackCache.ContainsKey(url))
+            {
+                callbackCache[url].imageFailedCallback?.Invoke(url, error, errorCode);
+                callbackCache.Remove(url);
+            }
+            // Supply DefaultThumbnail as the texture when there's a failure
+            OnImageReady?.Invoke(url, DefaultThumbnail);
+        }
+        
+        private async UniTaskVoid ProcessUrlQueue()
+        {
+            while (!cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                if (urlQueue.Count > 0)
+                {
+                    string currentUrl = urlQueue.Dequeue();
+                    var websiteAlive = await Helpers.IsWebsiteAlive(currentUrl);
+                    if (!websiteAlive)
+                    {
+                        HandleImageDownloadFailure(currentUrl, "Website is not alive", 0);
+                        continue;
+                    }
+
+                    if (!cachedTextures.ContainsKey(currentUrl))
+                    {
+                        cachedTextures.Add(currentUrl, null);
+                        DownloadImage(currentUrl);
+                    }
+                }
+
+                await UniTask.DelayFrame(1, cancellationToken: cancellationTokenSource.Token);
+            }
+        }
+
+        private void DownloadImage(string url)
+        {
+            pool.GetNewObject().Download(this, url, HandleImageDownloadSuccess, HandleImageDownloadFailure);
+        }
 
         private void Awake()
         {
             Instance = this;
+            cancellationTokenSource = new CancellationTokenSource();
         }
 
-        private void Update()
+        private void Start()
         {
-            if (urlQueue.Count > 0)
-            {
-                string currentUrl = urlQueue.Dequeue();
-
-                if (!cachedTextures.ContainsKey(currentUrl))
-                {
-                    cachedTextures.Add(currentUrl, null);
-
-                    pool.GetNewObject().Download(this, currentUrl,
-                        (url, texture, self) =>
-                        {
-                            cachedTextures[url] = texture;
-
-                            if (callbackCache.ContainsKey(url))
-                            {
-                                callbackCache[url].imageReadyCallback?.Invoke(url, texture);
-                                callbackCache.Remove(url);
-                            }
-                            else
-                            {
-
-                                OnImageReady?.Invoke(url, texture);
-                            }
-
-                            pool.ReturnUsedObject(ref self);
-                        },
-                        (url, error, errorCode) =>
-                        {
-                            cachedTextures.Remove(url);
-                            if (callbackCache.ContainsKey(url))
-                            {
-                                callbackCache[url].imageFailedCallback?.Invoke(url, error, errorCode);
-                                callbackCache.Remove(url);
-                            }
-                            else
-                            {
-                                OnImageFailed?.Invoke(url, error, errorCode);
-                            }
-                        });
-                }
-            }
+            ProcessUrlQueue().Forget();
         }
 
-        #endregion Monobehaviour
-
-        private class DownloadImage
+        private void OnDestroy()
         {
-            UnityWebRequest request = null;
-            DownloadReady successCallback = null;
-            DownloadFailed failedCallback = null;
-
-            public void Download(RequestImage ri, string url, DownloadReady success, DownloadFailed failed)
-            {
-                request = UnityWebRequestTexture.GetTexture(url);
-                successCallback = success;
-                failedCallback = failed;
-
-                ri.StartCoroutine(MakeRequest());
-            }
-
-            private IEnumerator MakeRequest()
-            {
-                yield return request.SendWebRequest();
-
-                if (request.responseCode == 200)
-                {
-                    Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, 0, false);
-                    bool error = false;
-
-                    if (request.downloadedBytes > 0)
-                    {
-                        try
-                        {
-                            texture = DownloadHandlerTexture.GetContent(request);
-                        }
-                        catch (System.Exception e)
-                        {
-                            Debug.LogError(e.Message);
-                            error = true;
-                        }
-
-                        if (texture == null)
-                        {
-                            Debug.LogWarning("Couldn't convert downloaded image at " + request.url);
-                            failedCallback?.Invoke(request.url, "Couldn't convert downloaded image", 0);
-                        }
-                    }
-                    else
-                    {
-                        error = true;
-                    }
-
-                    if (error)
-                    {
-                        // Transparent texture
-                        texture.SetPixels(new Color[]
-                        {
-                            new Color(0,0,0,0),
-                            new Color(0,0,0,0),
-                            new Color(0,0,0,0),
-                            new Color(0,0,0,0),
-                        });
-
-                        texture.Apply();
-                    }
-
-                    successCallback?.Invoke(request.url, texture, this);
-                }
-                else
-                {
-                    failedCallback?.Invoke(request.url, request.error, request.responseCode);
-                    Debug.LogWarning("Failed to download image at " + request.url);
-                }
-
-                request = null;
-            }
+            cancellationTokenSource.Cancel();
         }
     }
 }

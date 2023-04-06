@@ -1,17 +1,20 @@
+using System;
 using System.Linq;
+using DG.Tweening.Core.Enums;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types.Inventory;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace EmergenceSDK.Internal.UI
 {
     public class InventoryItemEntry : MonoBehaviour
     {
-        [SerializeField] 
-        private InventoryItemThumbnail itemThumbnail;
-        [SerializeField] 
-        private TextMeshProUGUI itemName;
+        [FormerlySerializedAs("itemThumbnail")] [SerializeField] 
+        private InventoryItemThumbnail ItemThumbnail;
+        [FormerlySerializedAs("itemName")] [SerializeField] 
+        private TextMeshProUGUI ItemName;
         private string url;
         
         private bool loadOnStart;
@@ -20,45 +23,44 @@ namespace EmergenceSDK.Internal.UI
         
         private InventoryItem item;
 
-        private void Awake()
-        {
-            RequestImage.Instance.OnImageReady += Instance_OnImageReady;
-            RequestImage.Instance.OnImageFailed += Instance_OnImageFailed;
-        }
-        
-        private void OnDestroy()
-        {
-            RequestImage.Instance.OnImageReady -= Instance_OnImageReady;
-            RequestImage.Instance.OnImageFailed -= Instance_OnImageFailed;
-        }
-
         public void SetItem(InventoryItem item)
         {
             this.item = item;
             
-            itemName.text = item?.Meta?.Name;
-            SetImageUrl(item?.Meta?.Content?.First().URL);
+            ItemName.text = item?.Meta?.Name;
+            SetImageUrl(item?.Meta?.Content?.FirstOrDefault()?.URL);
         }
 
         public void SetImageUrl(string imageUrl)
         {
-            //TODO: more robust check for gif
-            if (!string.IsNullOrEmpty(imageUrl) && imageUrl.ToLower().Contains("gif")) 
+            if (string.IsNullOrEmpty(imageUrl))
             {
-                itemThumbnail.LoadGif(imageUrl);
+                RequestImage.Instance.AskForDefaultImage();
+            }
+            else if (IsGifUrl(imageUrl)) 
+            {
+                ItemThumbnail.LoadGif(imageUrl);
             }
             else 
             {
-                RequestImage.Instance.AskForImage(imageUrl);
+                RequestImage.Instance.AskForImage(imageUrl, Instance_OnImageReady, Instance_OnImageFailed);
             }
         }
-        
-        private void Instance_OnImageReady(string _url, Texture2D texture)
+
+        private bool IsGifUrl(string url)
         {
-            if (_url.Equals(item?.Meta?.Content?.First().URL))
-            {
-                itemThumbnail.LoadStaticImage(texture);
-            }
+            string lowerUrl = url.ToLower();
+            string[] urlParts = lowerUrl.Split('.');
+            string extension = urlParts[urlParts.Length - 1];
+
+            // Check if the extension is "gif" and the URL has a valid format
+            return extension == "gif" && Uri.IsWellFormedUriString(url, UriKind.Absolute);
+        }
+
+        
+        private void Instance_OnImageReady(string urlIn, Texture2D texture)
+        {
+            ItemThumbnail.LoadStaticImage(texture);
         }
 
         private void Instance_OnImageFailed(string imageUrl, string error, long errorCode)

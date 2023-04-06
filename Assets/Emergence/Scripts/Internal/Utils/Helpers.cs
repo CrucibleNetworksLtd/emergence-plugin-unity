@@ -1,5 +1,8 @@
-﻿using EmergenceSDK.Types;
+﻿using System;
+using EmergenceSDK.Types;
 using UnityEngine;
+using UnityEngine.Networking;
+using Cysharp.Threading.Tasks;
 
 namespace EmergenceSDK.Internal.Utils
 {
@@ -23,11 +26,34 @@ namespace EmergenceSDK.Internal.Utils
                 Debug.Log($"New URL is \"{NewURL}\"");
                 return NewURL;
             }
-            else
-            {
-                return IPFSURL;
-            }
+
+            return IPFSURL;
         }
 
+        public static async UniTask<bool> IsWebsiteAlive(string url)
+        {
+            using (UnityWebRequest request = UnityWebRequest.Head(url))
+            {
+                request.timeout = 5; // set timeout to 5 seconds
+
+                try
+                {
+                    await request.SendWebRequest().ToUniTask();
+            
+                    // Check for successful response
+                    if (request.result == UnityWebRequest.Result.Success)
+                    {
+                        return true; // website is alive
+                    }
+
+                    return false; // website is down
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Error in IsWebsiteAlive: " + e.Message);
+                    return false; // website is down or error occurred
+                }
+            }
+        }
     }
 }
