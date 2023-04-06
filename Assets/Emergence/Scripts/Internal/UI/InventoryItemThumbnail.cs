@@ -31,9 +31,10 @@ namespace EmergenceSDK.Internal.UI
 
         private async UniTask SetGifFromUrl(string imageUrl, bool autoPlay = true)
         {
-            if (string.IsNullOrEmpty(imageUrl))
+            bool isWebsiteAlive = await Helpers.IsWebsiteAlive(imageUrl);
+            if (string.IsNullOrEmpty(imageUrl) || !isWebsiteAlive)
             {
-                Debug.LogError("URL is nothing.");
+                Debug.LogWarning("URL is invalid.");
                 return;
             }
 
@@ -43,7 +44,7 @@ namespace EmergenceSDK.Internal.UI
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("File load error.\n" + request.error);
+                    Debug.LogWarning("File load error.\n" + request.error);
                     itemImage.texture = RequestImage.Instance.DefaultThumbnail;
                     return;
                 }

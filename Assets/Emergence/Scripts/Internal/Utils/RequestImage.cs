@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -48,9 +47,7 @@ namespace EmergenceSDK.Internal.Utils
 
             return true;
         }
-        
-        
-        
+
         public void AskForDefaultImage()
         {
             OnImageReady?.Invoke(null, DefaultThumbnail);
@@ -144,9 +141,9 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
 
-        private void DownloadImage(string url)
+        private async void DownloadImage(string url)
         {
-            pool.GetNewObject().Download(this, url, HandleImageDownloadSuccess, HandleImageDownloadFailure);
+            await pool.GetNewObject().Download(this, url, HandleImageDownloadSuccess, HandleImageDownloadFailure);
         }
 
         private void Awake()

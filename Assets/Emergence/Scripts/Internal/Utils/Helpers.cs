@@ -50,7 +50,7 @@ namespace EmergenceSDK.Internal.Utils
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Error in IsWebsiteAlive: " + e.Message);
+                    Debug.LogWarning("Error in IsWebsiteAlive: " + e.Message);
                     return false; // website is down or error occurred
                 }
             }
