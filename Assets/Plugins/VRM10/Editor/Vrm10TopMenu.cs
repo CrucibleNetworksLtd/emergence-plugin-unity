@@ -7,7 +7,8 @@ namespace UniVRM10
         private const string UserMenuPrefix = VRMVersion.MENU;
         private const string DevelopmentMenuPrefix = VRMVersion.MENU + "/Development";
 
-        [MenuItem(UserMenuPrefix + "/Export VRM-1.0", priority = 1)]
+        //Removed Menu Item for Emergence, comment back in if you want to use this
+        //[MenuItem(UserMenuPrefix + "/Export VRM-1.0", priority = 1)]
         private static void OpenExportDialog() => VRM10ExportDialog.Open();
 
 #if VRM_DEVELOP        

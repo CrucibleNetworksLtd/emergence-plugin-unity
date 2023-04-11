@@ -42,7 +42,8 @@ namespace StarterAssets.Editor
 			method.Invoke(null, new object[]{Path.Combine(Application.dataPath, "TutorialInfo/Layout.wlt"), false});
 		}
 	
-		[MenuItem("Tutorial/Show Tutorial Instructions")]
+		//Removed Menu Item for Emergence, comment back in if you want to use this
+		//[MenuItem("Tutorial/Show Tutorial Instructions")]
 		static Readme SelectReadme() 
 		{
 			var ids = AssetDatabase.FindAssets("Readme t:Readme");

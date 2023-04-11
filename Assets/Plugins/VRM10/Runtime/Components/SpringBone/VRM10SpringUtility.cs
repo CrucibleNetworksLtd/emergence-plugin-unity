@@ -7,7 +7,8 @@
 
 #if UNITY_EDITOR
 #region save
-        [MenuItem(VRMVersion.MENU + "/SaveSpringBoneToJSON", validate = true)]
+        //Removed Menu Item for Emergence, comment back in if you want to use this
+		//[MenuItem(VRMVersion.MENU + "/SaveSpringBoneToJSON", validate = true)]
         static bool SaveSpringBoneToJSONIsEnable()
         {
             var root = Selection.activeObject as GameObject;
@@ -25,7 +26,8 @@
             return true;
         }
 
-        [MenuItem(VRMVersion.MENU + "/SaveSpringBoneToJSON")]
+        //Removed Menu Item for Emergence, comment back in if you want to use this
+		//[MenuItem(VRMVersion.MENU + "/SaveSpringBoneToJSON")]
         static void SaveSpringBoneToJSON()
         {
             var path = EditorUtility.SaveFilePanel(
@@ -53,7 +55,8 @@
 #endregion
 
 #region load
-        [MenuItem(VRMVersion.MENU + "/LoadSpringBoneFromJSON", true)]
+        //Removed Menu Item for Emergence, comment back in if you want to use this
+		//[MenuItem(VRMVersion.MENU + "/LoadSpringBoneFromJSON", true)]
         static bool LoadSpringBoneFromJSONIsEnable()
         {
             var root = Selection.activeObject as GameObject;
@@ -71,7 +74,8 @@
             return true;
         }
 
-        [MenuItem(VRMVersion.MENU + "/LoadSpringBoneFromJSON")]
+        //Removed Menu Item for Emergence, comment back in if you want to use this
+		//[MenuItem(VRMVersion.MENU + "/LoadSpringBoneFromJSON")]
         static void LoadSpringBoneFromJSON()
         {
             var path = EditorUtility.OpenFilePanel(

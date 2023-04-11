@@ -13,19 +13,24 @@ namespace UniGLTF
         private const string UserMeshUtilityPrefix = UniGLTFVersion.MENU + "/Mesh Utility";
         private const string DevelopmentMenuPrefix = UniGLTFVersion.MENU + "/Development";
 
-        [MenuItem(UserGltfMenuPrefix + "/Version: " + UniGLTFVersion.UNIGLTF_VERSION, validate = true)]
+        //Removed Menu Item for Emergence, comment back in if you want to use this
+        //[MenuItem(UserGltfMenuPrefix + "/Version: " + UniGLTFVersion.UNIGLTF_VERSION, validate = true)]
         private static bool ShowVersionValidation() => false;
 
-        [MenuItem(UserGltfMenuPrefix + "/Version: " + UniGLTFVersion.UNIGLTF_VERSION, priority = 0)]
+        //Removed Menu Item for Emergence, comment back in if you want to use this
+        //[MenuItem(UserGltfMenuPrefix + "/Version: " + UniGLTFVersion.UNIGLTF_VERSION, priority = 0)]
         private static void ShowVersion() { }
 
-        [MenuItem(UserGltfMenuPrefix + "/Export to GLB", priority = 1)]
+        //Removed Menu Item for Emergence, comment back in if you want to use this
+        //[MenuItem(UserGltfMenuPrefix + "/Export to GLB", priority = 1)]
         private static void ExportGameObjectToGltf() => TopMenuImplementation.ExportGameObjectToGltfFile();
 
-        [MenuItem(UserGltfMenuPrefix + "/Import from GLTF (*.gltf|*.glb|*.zip)", priority = 2)]
+        //Removed Menu Item for Emergence, comment back in if you want to use this
+        //[MenuItem(UserGltfMenuPrefix + "/Import from GLTF (*.gltf|*.glb|*.zip)", priority = 2)]
         private static void ImportGltfFile() => TopMenuImplementation.ImportGltfFileToGameObject();
 
-        [MenuItem(UserMeshUtilityPrefix + "/MeshProcessing Wizard", priority = 10)]
+        //Removed Menu Item for Emergence, comment back in if you want to use this
+        //[MenuItem(UserMeshUtilityPrefix + "/MeshProcessing Wizard", priority = 10)]
         private static void OpenMeshProcessingWindow() => MeshUtility.MeshProcessDialog.OpenWindow();
 
 #if VRM_DEVELOP
