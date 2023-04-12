@@ -137,6 +137,8 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "killSession";
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
+            request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
+            request.SetRequestHeader("auth", currentAccessToken);
             await request.SendWebRequest().ToUniTask();
             EmergenceUtils.PrintRequestResult("Disconnect request completed", request);
 

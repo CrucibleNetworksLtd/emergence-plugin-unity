@@ -56,7 +56,10 @@ namespace EmergenceSDK.Services
         /// </summary>
         UniTask Disconnect(DisconnectSuccess success, ErrorCallback errorCallback);
         
-        //TODO: Fill this in
+        /// <summary>
+        /// Safely shuts down the local EVM
+        /// <remarks>Does nothing if not using local EVM</remarks>
+        /// </summary>
         UniTask Finish(SuccessFinish success, ErrorCallback errorCallback);
     }
 }
