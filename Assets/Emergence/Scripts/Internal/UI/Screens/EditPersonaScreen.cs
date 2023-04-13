@@ -208,7 +208,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             },
             (error, code) =>
             {
-                Debug.LogError("[" + code + "] " + error);
+                ErrorLogger.LogError(error, code);
                 Modal.Instance.Hide();
             });
         }
@@ -226,7 +226,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 },
                 (error, code) =>
                 {
-                    Debug.LogError("[" + code + "] " + error);
+                    ErrorLogger.LogError(error, code);
                     Modal.Instance.Hide();
                 });
             });
@@ -273,7 +273,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                         },
                         (error, code) =>
                         {
-                            Debug.LogError("[" + code + "] " + error);
+                            ErrorLogger.LogError(error, code);
                             Modal.Instance.Hide();
                             ModalPromptOK.Instance.Show("Error creating persona");
                         });
@@ -293,7 +293,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                         },
                         (error, code) =>
                         {
-                            Debug.LogError("[" + code + "] " + error);
+                            ErrorLogger.LogError(error, code);
                             Modal.Instance.Hide();
                             ModalPromptOK.Instance.Show("Error editing persona");
                         });

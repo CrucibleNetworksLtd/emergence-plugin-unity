@@ -1,4 +1,5 @@
 using EmergenceSDK.Internal.UI.Screens;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -70,7 +71,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             curMetadata++;
 
             dynamicMetaDataService.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
-                curMetadata.ToString(), UpdateDynamicMetadataSuccess, (string error, long code) => {});
+                curMetadata.ToString(), UpdateDynamicMetadataSuccess, ErrorLogger.LogError);
             
             void UpdateDynamicMetadataSuccess(string response)
             {

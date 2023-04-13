@@ -1,4 +1,5 @@
-﻿using EmergenceSDK.Services;
+﻿using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
@@ -74,7 +75,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                             },
                             (error, code) =>
                             {
-                                Debug.LogError("[" + code + "] " + error);
+                                ErrorLogger.LogError(error, code);
                                 Reinitialize();
                             });
                     }

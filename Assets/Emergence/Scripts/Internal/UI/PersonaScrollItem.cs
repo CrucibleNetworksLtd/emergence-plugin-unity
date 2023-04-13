@@ -114,7 +114,7 @@ namespace EmergenceSDK.Internal.UI
 
             if (!string.IsNullOrEmpty(persona.avatarId))
             {
-                avatarService.AvatarById(persona.avatarId, (avatar =>
+                avatarService.AvatarById(persona.avatarId, avatar =>
                 {
                     
                     // Add fetched avatar to persona
@@ -126,10 +126,7 @@ namespace EmergenceSDK.Internal.UI
                         waitingForImageRequest = false;
                         OnImageCompleted?.Invoke(persona, false);
                     }
-                }), (message, code) =>
-                {
-                    Debug.LogError("Error fetching Avatar by id: " + message);
-                });
+                }, ErrorLogger.LogError);
             }
             else
             {

@@ -39,30 +39,19 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             if (HasBeenActivated() && IsReady)
             {
-                ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI,
-                                             deployedContract.contract.name, OnMintSuccess, OnMintError);
+                ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.contract.name, OnMintSuccess, ErrorLogger.LogError);
             }
         }
         
         private void OnMintSuccess()
         {
             var contractInfo = new ContractInfo(deployedContract.contractAddress, "mint", deployedContract.contract.name, deployedContract.chain.DefaultNodeURL);
-            ContractHelper.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", new string[] { }, OnWriteSuccess, OnWriteError);
-        }
-
-        private void OnMintError(string message, long id)
-        {
-            Debug.LogError("Error while loading contract: " + message);
+            ContractHelper.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", new string[] { }, OnWriteSuccess, ErrorLogger.LogError);
         }
 
         private void OnWriteSuccess(BaseResponse<string> response)
         {
             Debug.Log("Mint response: " + response.message);
-        }
-
-        private void OnWriteError(string message, long id)
-        {
-            Debug.LogError("Error while minting avatar: " + message);
         }
     }
 }

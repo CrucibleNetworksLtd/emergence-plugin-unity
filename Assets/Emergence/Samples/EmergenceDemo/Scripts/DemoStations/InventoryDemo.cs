@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using EmergenceSDK.Internal.UI;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
@@ -72,14 +73,9 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 Cursor.visible = false;
             }
 
-            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), SuccessInventoryByOwner, ErrorCallback);
+            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), SuccessInventoryByOwner, ErrorLogger.LogError);
         }
-
-        private void ErrorCallback(string error, long code)
-        {
-            Debug.LogError("[" + code + "] " + error);
-        }
-
+        
         private void SuccessInventoryByOwner(List<InventoryItem> inventoryItems)
         {
             foreach (var item in items)

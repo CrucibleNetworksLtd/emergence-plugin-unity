@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
@@ -137,7 +138,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void InventoryRefreshErrorCallback(string error, long code)
         {
-            Debug.LogError("[" + code + "] " + error);
+            ErrorLogger.LogError(error, code);
             Modal.Instance.Hide();
         }
 

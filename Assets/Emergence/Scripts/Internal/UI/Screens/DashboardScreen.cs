@@ -121,96 +121,97 @@ namespace EmergenceSDK.Internal.UI.Screens
 
             Modal.Instance.Show("Loading Personas...");
 
-            personaService.GetPersonas((personas, currentPersona) =>
-            {
-                Modal.Instance.Show("Retrieving avatars...");
-
-                this.activePersona = currentPersona;
-
-                requestingInProgress = true;
-                imagesRefreshing.Clear();
-
-                List<PersonaScrollItem> scrollItems = new List<PersonaScrollItem>();
-                int selectedIndex = 0;
-                for (int i = 0; i < personas.Count; i++)
-                {
-                    GameObject go = personaButtonPool.GetNewObject();
-
-                    go.transform.SetParent(personaScrollContents);
-                    go.transform.localScale = Vector3.one;
-
-                    scrollItems.Add(personaScrollContents.GetChild(i).GetComponent<PersonaScrollItem>());
-
-                    Persona persona = personas[i];
-                    if (persona.avatar != null)
-                    {
-                        if (string.IsNullOrEmpty(persona.avatar.avatarId))
-                        {
-                            persona.avatar = null;
-                        }
-                        else if (string.IsNullOrEmpty(persona.avatar.meta.content.First().url))
-                        {
-                            persona.avatar = null;
-                        }
-                    }
-
-                    bool selected = false;
-                    if (currentPersona != null)
-                    {
-                        selected = currentPersona.id.Equals(persona.id);
-
-                        if (selected)
-                        {
-                            selectedIndex = i;
-                        }
-                    }
-                }
-
-                if (scrollItems.Count > 0)
-                {
-                    scrollItems[selectedIndex].transform.SetSiblingIndex(Mathf.FloorToInt(personas.Count / 2));
-                }
-
-                for (int i = 0; i < personas.Count; i++)
-                {
-                    Persona persona = personas[i];
-                    imagesRefreshing.Add(persona.id);
-                    scrollItems[i].Refresh(defaultTexture, persona, i == selectedIndex);
-                }
-
-                personasList.Clear();
-                for (int i = 0; i < personaScrollContents.childCount; i++)
-                {
-                    personasList.Add(personaScrollContents.GetChild(i).GetComponent<PersonaScrollItem>().Persona);
-                }
-
-                PersonaCarousel.Instance.Refresh(Mathf.FloorToInt(personas.Count / 2));
-
-                if (personas.Count > 0)
-                {
-                    UIForPersonas();
-                }
-                else
-                {
-                    UIForNoPersonas();
-                }
-
-                PersonaScrollItem_OnSelected(activePersona, -1);
-
-                requestingInProgress = false;
-                
-                
-                
-                if (imagesRefreshing.Count <= 0)
-                {
-                    Modal.Instance.Hide();
-                }
-            },
+            personaService.GetPersonas(GetPersonasSuccess,
             (error, code) =>
             {
-                Debug.LogError("[" + code + "] " + error);
+                ErrorLogger.LogError(error, code);
                 Modal.Instance.Hide();
             });
+        }
+
+        private void GetPersonasSuccess(List<Persona> personas, Persona currentPersona)
+        {
+            Modal.Instance.Show("Retrieving avatars...");
+
+            this.activePersona = currentPersona;
+
+            requestingInProgress = true;
+            imagesRefreshing.Clear();
+
+            List<PersonaScrollItem> scrollItems = new List<PersonaScrollItem>();
+            int selectedIndex = 0;
+            for (int i = 0; i < personas.Count; i++)
+            {
+                GameObject go = personaButtonPool.GetNewObject();
+
+                go.transform.SetParent(personaScrollContents);
+                go.transform.localScale = Vector3.one;
+
+                scrollItems.Add(personaScrollContents.GetChild(i).GetComponent<PersonaScrollItem>());
+
+                Persona persona = personas[i];
+                if (persona.avatar != null)
+                {
+                    if (string.IsNullOrEmpty(persona.avatar.avatarId))
+                    {
+                        persona.avatar = null;
+                    }
+                    else if (string.IsNullOrEmpty(persona.avatar.meta.content.First().url))
+                    {
+                        persona.avatar = null;
+                    }
+                }
+
+                bool selected = false;
+                if (currentPersona != null)
+                {
+                    selected = currentPersona.id.Equals(persona.id);
+
+                    if (selected)
+                    {
+                        selectedIndex = i;
+                    }
+                }
+            }
+
+            if (scrollItems.Count > 0)
+            {
+                scrollItems[selectedIndex].transform.SetSiblingIndex(Mathf.FloorToInt(personas.Count / 2));
+            }
+
+            for (int i = 0; i < personas.Count; i++)
+            {
+                Persona persona = personas[i];
+                imagesRefreshing.Add(persona.id);
+                scrollItems[i].Refresh(defaultTexture, persona, i == selectedIndex);
+            }
+
+            personasList.Clear();
+            for (int i = 0; i < personaScrollContents.childCount; i++)
+            {
+                personasList.Add(personaScrollContents.GetChild(i).GetComponent<PersonaScrollItem>().Persona);
+            }
+
+            PersonaCarousel.Instance.Refresh(Mathf.FloorToInt(personas.Count / 2));
+
+            if (personas.Count > 0)
+            {
+                UIForPersonas();
+            }
+            else
+            {
+                UIForNoPersonas();
+            }
+
+            PersonaScrollItem_OnSelected(activePersona, -1);
+
+            requestingInProgress = false;
+
+
+            if (imagesRefreshing.Count <= 0)
+            {
+                Modal.Instance.Hide();
+            }
         }
 
         private void OnCreatePersona()
@@ -260,7 +261,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             },
             (error, code) =>
             {
-                Debug.LogError("[" + code + "] " + error);
+                ErrorLogger.LogError(error, code);
                 Modal.Instance.Hide();
             });
         }
@@ -284,7 +285,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 },
                 (error, code) =>
                 {
-                    Debug.LogError("[" + code + "] " + error);
+                    ErrorLogger.LogError(error, code);
                     Modal.Instance.Hide();
                 });
             });

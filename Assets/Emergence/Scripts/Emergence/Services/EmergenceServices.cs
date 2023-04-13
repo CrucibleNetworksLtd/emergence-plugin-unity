@@ -70,7 +70,7 @@ namespace EmergenceSDK.Services
                         },
                         (error, code) =>
                         {
-                            Debug.LogError("[" + code + "] " + error);
+                            ErrorLogger.LogError(error, code);
                             refreshingToken = false;
                         });
                     });

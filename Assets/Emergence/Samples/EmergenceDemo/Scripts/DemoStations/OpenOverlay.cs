@@ -1,3 +1,4 @@
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using UnityEngine;
@@ -55,10 +56,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 {
                     DemoAvatarManager.Instance.SwapAvatars(avatar.meta.content[1].url);
                 
-                }), (message, code) =>
-                {
-                    Debug.LogError("Error fetching Avatar by id: " + message);
-                });
+                }), ErrorLogger.LogError);
             }
             else
             {
