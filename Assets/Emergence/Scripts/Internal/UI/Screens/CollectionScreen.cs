@@ -65,7 +65,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private bool isItemSelected = false;
         private InventoryItem selectedItem;
 
-        private List<InventoryUIItem> items = new List<InventoryUIItem>();
+        private GenericPool<InventoryUIItem> items = new GenericPool<InventoryUIItem>();
         private List<Avatar> avatars = new List<Avatar>();
 
         private FilterParams filterParams = new FilterParams();
@@ -96,8 +96,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 {
                     Destroy(item.entryGo);
                 }
-
-                items.Clear();
+                items.ReturnAllUsedObjects();
 
                 Debug.Log("Received items: " + inventoryItems.Count);
                 Modal.Instance.Show("Retrieving inventory items...");
@@ -106,7 +105,9 @@ namespace EmergenceSDK.Internal.UI.Screens
                 {
                     GameObject entry = Instantiate(itemEntryPrefab, contentGO.transform, false);
 
-                    items.Add(new InventoryUIItem(inventoryItems[i], entry));
+                    var newObject = items.GetNewObject();
+                    newObject.entryGo = entry;
+                    newObject.inventoryItem = inventoryItems[i];
 
                     Button entryButton = entry.GetComponent<Button>();
                     InventoryItem item = inventoryItems[i];

@@ -52,14 +52,18 @@ namespace EmergenceSDK.Internal.UI
                 using (var decoder = new MG.GIF.Decoder(request.downloadHandler.data))
                 {
                     var img = decoder.NextImage();
-
+                    LoadStaticImage(img.CreateTexture());
+                    return;
+                    
+                    //EXPERIMENTAL: This code does enable gif playback, but it is ver resource intensive and causes a lot of lag.
+                    //Remove the return statement above to enable it.
                     while (img != null)
                     {
                         frames.Add(img.CreateTexture());
                         frameDelays.Add(img.Delay / 1000.0f);
                         img = decoder.NextImage();
 
-                        await UniTask.Delay(1000 / 60); // 60 FPS
+                        await UniTask.Delay(1000 / 60);
                     }
                 }
 
@@ -79,7 +83,7 @@ namespace EmergenceSDK.Internal.UI
             isPlaying = true;
             curFrame = 0;
 
-            while (isPlaying)
+            while (isPlaying && itemImage != null)
             {
                 itemImage.texture = frames[curFrame];
                 float delay = frameDelays[curFrame];
