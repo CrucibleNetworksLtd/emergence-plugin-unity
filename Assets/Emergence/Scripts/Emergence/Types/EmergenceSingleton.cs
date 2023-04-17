@@ -43,11 +43,6 @@ namespace EmergenceSDK.Types
         }
 
         [Serializable]
-        public class EmergenceCachedPersonaUpdated : UnityEvent
-        {
-        }
-
-        [Serializable]
         public class EmergenceUIOpened : UnityEvent
         {
         }
@@ -59,7 +54,6 @@ namespace EmergenceSDK.Types
 
         [Header("Events")] public EmergenceUIOpened OnEmergenceUIOpened;
         public EmergenceUIClosed OnEmergenceUIClosed;
-        public EmergenceCachedPersonaUpdated CachedPersonaUpdated;
 
         // Not showing this event in the Inspector because the actual visibility 
         // parameter value would be overwritten by the value set in the inspector

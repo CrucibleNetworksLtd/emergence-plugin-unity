@@ -1,5 +1,6 @@
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
+using EmergenceSDK.Services;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
 
@@ -18,6 +19,9 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 isReady = value;
             }
         }
+        
+        private IContractService ContractService => contractService ??= EmergenceServices.GetService<IContractService>();
+        private IContractService contractService;
 
         private void Start()
         {
@@ -45,15 +49,19 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void IncrementCurrentCount()
         {
-            ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.chain.networkName, 
+            ContractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.chain.networkName, 
                 OnLoadContractSuccess, (message, id) => Debug.LogError("Error while loading contract: " + message));
         }
 
         private void OnLoadContractSuccess()
         {
             var contractInfo = new ContractInfo(deployedContract.contractAddress, "IncrementCount", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL);
-            ContractHelper.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", new string[] { },
-                (response) => Debug.Log("WriteMethod finished"), (message, id) => Debug.LogError("Error while incrementing current count: " + message));
+            ContractService.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", "0", new string[] { }, WriteMethodSuccess, ErrorLogger.LogError);
+        }
+
+        private void WriteMethodSuccess(BaseResponse<string> response)
+        {
+            Debug.Log("WriteMethod finished");
         }
     }
 }

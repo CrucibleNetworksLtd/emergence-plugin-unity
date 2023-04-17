@@ -1,5 +1,6 @@
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
+using EmergenceSDK.Services;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
 
@@ -18,6 +19,9 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 isReady = value;
             }
         }
+
+        private IContractService ContractService => contractService ??= EmergenceServices.GetService<IContractService>();
+        private IContractService contractService;
         
         private void Start()
         {
@@ -39,14 +43,14 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             if (HasBeenActivated() && IsReady)
             {
-                ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.contract.name, OnMintSuccess, ErrorLogger.LogError);
+                ContractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.contract.name, OnMintSuccess, ErrorLogger.LogError);
             }
         }
         
         private void OnMintSuccess()
         {
             var contractInfo = new ContractInfo(deployedContract.contractAddress, "mint", deployedContract.contract.name, deployedContract.chain.DefaultNodeURL);
-            ContractHelper.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", new string[] { }, OnWriteSuccess, ErrorLogger.LogError);
+            ContractService.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", "0", new string[] { }, OnWriteSuccess, ErrorLogger.LogError);
         }
 
         private void OnWriteSuccess(BaseResponse<string> response)

@@ -1,5 +1,6 @@
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
+using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
@@ -19,6 +20,9 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 isReady = value;
             }
         }
+        
+        private IContractService ContractService => contractService ??= EmergenceServices.GetService<IContractService>();
+        private IContractService contractService;
         
         private void Start()
         {
@@ -46,14 +50,14 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void ReadCurrentCount()
         {
-            ContractHelper.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI,
+            ContractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI,
                 deployedContract.chain.networkName, OnLoadSuccess, (message, id) => { Debug.LogError("Error while loading contract: " + message); });
         }
 
         private void OnLoadSuccess()
         {
             ContractInfo contractInfo = new ContractInfo(deployedContract.contractAddress, "GetCurrentCount", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL);
-            ContractHelper.ReadMethod<BaseResponse<string>, string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
+            ContractService.ReadMethod<BaseResponse<string>, string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
                 (response) => Debug.Log($"ReadContract finished: {response.message}"), ErrorLogger.LogError);
         }
     }

@@ -60,6 +60,4 @@ namespace EmergenceSDK.EmergenceDemo
             }
         }
     }
-    
-    
 }
