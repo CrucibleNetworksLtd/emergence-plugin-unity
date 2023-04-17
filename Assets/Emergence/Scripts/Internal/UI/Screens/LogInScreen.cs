@@ -19,7 +19,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public static LogInScreen Instance;
         
-        private IAccountService accountService;
+        private ISessionService sessionService;
         private IWalletService walletService;
         private IQRCodeService qrService;
         
@@ -41,7 +41,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void Start()
         {
-            accountService = EmergenceServices.GetService<IAccountService>();
+            sessionService = EmergenceServices.GetService<ISessionService>();
             walletService = EmergenceServices.GetService<IWalletService>();
             qrService = EmergenceServices.GetService<IQRCodeService>();
         }
@@ -86,7 +86,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 case States.RefreshAccessToken:
                 {
                     state = States.RefreshingAccessToken;
-                    accountService.GetAccessToken((token) =>
+                    sessionService.GetAccessToken((token) =>
                         {
                             state = States.LoginFinished;
                             PlayerPrefs.SetInt(EmergenceSingleton.HAS_LOGGED_IN_ONCE_KEY, 1);

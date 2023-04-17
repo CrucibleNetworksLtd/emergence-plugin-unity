@@ -2,6 +2,9 @@ using Cysharp.Threading.Tasks;
 
 namespace EmergenceSDK.Services
 {
+    /// <summary>
+    /// Service for interacting with the NFT inventory API.
+    /// </summary>
     public interface IInventoryService : IEmergenceService
     {
         /// <summary>

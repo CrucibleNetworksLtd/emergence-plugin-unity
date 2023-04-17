@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class AccountService : IAccountService
+    internal class SessionService : ISessionService
     {
         public string CurrentAccessToken
         {

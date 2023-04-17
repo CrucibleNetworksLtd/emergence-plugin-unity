@@ -8,7 +8,7 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class WalletService : IWalletService
     {
-        private readonly IAccountService accountService;
+        private readonly ISessionService sessionService;
         private string walletAddress = string.Empty;
 
         public bool HasAddress => walletAddress != null && walletAddress.Trim() != string.Empty;
@@ -19,9 +19,9 @@ namespace EmergenceSDK.Internal.Services
             set => walletAddress = value;
         }
 
-        public WalletService(IAccountService accountService)
+        public WalletService(ISessionService sessionService)
         {
-            this.accountService = accountService;
+            this.sessionService = sessionService;
         }
 
         public async UniTask ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, ErrorCallback errorCallback)
@@ -99,7 +99,7 @@ namespace EmergenceSDK.Internal.Services
         
         public async UniTask GetBalance(BalanceSuccess success, ErrorCallback errorCallback)
         {
-            if (accountService.DisconnectInProgress)
+            if (sessionService.DisconnectInProgress)
                 return;
     
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "getbalance" + "?nodeUrl=" +

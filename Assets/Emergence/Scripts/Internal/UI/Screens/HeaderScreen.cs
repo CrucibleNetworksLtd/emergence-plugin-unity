@@ -22,7 +22,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private readonly float refreshTimeOut = 30.0f;
         private IWalletService walletService;
-        private IAccountService accountService;
+        private ISessionService sessionService;
         
         private Coroutine refreshCoroutine;
 
@@ -37,7 +37,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private void Start()
         {
             walletService = EmergenceServices.GetService<WalletService>();
-            accountService = EmergenceServices.GetService<AccountService>();
+            sessionService = EmergenceServices.GetService<SessionService>();
             Hide();
 
             refreshCoroutine = StartCoroutine(RefreshWalletBalance());
@@ -108,7 +108,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private void OnDisconnectClick()
         {
             Modal.Instance.Show("Disconnecting wallet...");
-            accountService.Disconnect(() =>
+            sessionService.Disconnect(() =>
             {
                 Modal.Instance.Hide();
                 Hide();

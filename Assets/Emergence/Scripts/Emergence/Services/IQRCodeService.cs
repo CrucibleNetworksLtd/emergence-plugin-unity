@@ -2,6 +2,9 @@ using Cysharp.Threading.Tasks;
 
 namespace EmergenceSDK.Services
 {
+    /// <summary>
+    /// Service that gives access to the QR code for login
+    /// </summary>
     public interface IQRCodeService : IEmergenceService
     {
         /// <summary>

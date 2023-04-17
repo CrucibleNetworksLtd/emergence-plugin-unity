@@ -12,11 +12,11 @@ namespace EmergenceSDK.Services
     {
         private static EmergenceUtils Instance => instance ??= new EmergenceUtils();
         private static EmergenceUtils instance;
-        private readonly IAccountService accountService;
+        private readonly ISessionService sessionService;
 
         public EmergenceUtils()
         {
-            accountService = EmergenceServices.GetService<IAccountService>();
+            sessionService = EmergenceServices.GetService<ISessionService>();
         }
 
         public static bool RequestError(UnityWebRequest request)
@@ -114,8 +114,8 @@ namespace EmergenceSDK.Services
             }
             try
             {
-                Debug.Log("AccessToken: " + Instance.accountService.CurrentAccessToken);
-                request.SetRequestHeader("Authorization", Instance.accountService.CurrentAccessToken);
+                Debug.Log("AccessToken: " + Instance.sessionService.CurrentAccessToken);
+                request.SetRequestHeader("Authorization", Instance.sessionService.CurrentAccessToken);
 
                 if (headers != null) {
                     foreach (var key in headers.Keys) {

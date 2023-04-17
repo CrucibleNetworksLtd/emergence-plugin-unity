@@ -20,7 +20,7 @@ namespace EmergenceSDK.Services
         private static EmergenceServices Instance;
 
         private bool refreshingToken = false;
-        private IAccountService accountService;
+        private ISessionService sessionService;
 
         private bool skipWallet = false;
         
@@ -34,13 +34,13 @@ namespace EmergenceSDK.Services
         {
             Instance = this;
 
-            accountService = new AccountService();
-            services.Add(accountService);
-            services.Add(new PersonaService(accountService));
+            sessionService = new SessionService();
+            services.Add(sessionService);
+            services.Add(new PersonaService(sessionService));
             services.Add(new AvatarService());
             services.Add(new InventoryService());
             services.Add(new DynamicMetadataService());
-            services.Add(new WalletService(accountService));
+            services.Add(new WalletService(sessionService));
             services.Add(new QRCodeService());
             services.Add(new ContractService());
             
@@ -55,16 +55,16 @@ namespace EmergenceSDK.Services
 
             bool uiIsVisible = ScreenManager.Instance.gameObject.activeSelf;
 
-            if (!skipWallet && uiIsVisible && !refreshingToken && accountService.HasAccessToken)
+            if (!skipWallet && uiIsVisible && !refreshingToken && sessionService.HasAccessToken)
             {
                 long now = DateTimeOffset.Now.ToUnixTimeSeconds();
 
-                if (accountService.Expiration.expiresOn - now < 0)
+                if (sessionService.Expiration.expiresOn - now < 0)
                 {
                     refreshingToken = true;
                     ModalPromptOK.Instance.Show("Token expired. Check your wallet for renewal", () =>
                     {
-                        accountService.GetAccessToken((token) =>
+                        sessionService.GetAccessToken((token) =>
                         {
                             refreshingToken = false;
                         },
@@ -83,8 +83,8 @@ namespace EmergenceSDK.Services
             skipWallet = skip;
 
             BaseResponse<AccessTokenResponse> response = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(accessTokenJson);
-            accountService.CurrentAccessToken = SerializationHelper.Serialize(response.message.AccessToken, false);
-            accountService.ProcessExpiration(response.message.AccessToken.message);
+            sessionService.CurrentAccessToken = SerializationHelper.Serialize(response.message.AccessToken, false);
+            sessionService.ProcessExpiration(response.message.AccessToken.message);
         }
     }
 }

@@ -2,8 +2,14 @@ using Cysharp.Threading.Tasks;
 
 namespace EmergenceSDK.Services
 {
+    /// <summary>
+    /// Service for interacting with the wallet API.
+    /// </summary>
     public interface IWalletService : IEmergenceService
     {
+        /// <summary>
+        /// Address of the wallet that is currently logged in
+        /// </summary>
         public string WalletAddress { get; }
 
         /// <summary>

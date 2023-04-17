@@ -4,9 +4,9 @@ using EmergenceSDK.Types;
 namespace EmergenceSDK.Services
 {
     /// <summary>
-    /// 
+    /// Service for interacting with the current Session
     /// </summary>
-    public interface IAccountService : IEmergenceService
+    public interface ISessionService : IEmergenceService
     {
         string CurrentAccessToken { get; set; }
         bool HasAccessToken { get; }
