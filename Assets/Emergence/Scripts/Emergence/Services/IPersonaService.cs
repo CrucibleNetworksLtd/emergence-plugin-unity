@@ -9,10 +9,21 @@ namespace EmergenceSDK.Services
     public interface IPersonaService : IEmergenceService
     {
         /// <summary>
+        /// Current Persona's access token.
+        /// <remarks>This is token should be kept completely private</remarks>
+        /// </summary>
+        string CurrentAccessToken { get; }
+        bool HasAccessToken { get; }
+        /// <summary>
         /// Event fired when the current persona is updated.
         /// </summary>
         event PersonaUpdated OnCurrentPersonaUpdated;
-
+        
+        /// <summary>
+        /// Attempts to get an access token, the success callback will fire with the token if successful
+        /// </summary>
+        UniTask GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback);
+        
         /// <summary>
         /// Attempts to create a new persona and confirms it was successful if the SuccessCreatePersona delegate is called
         /// </summary>

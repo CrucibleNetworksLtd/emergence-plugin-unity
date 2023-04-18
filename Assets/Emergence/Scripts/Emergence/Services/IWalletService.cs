@@ -23,13 +23,14 @@ namespace EmergenceSDK.Services
         UniTask Handshake(HandshakeSuccess success, ErrorCallback errorCallback);
 
         /// <summary>
-        /// Attempts to create a new wallet, the success callback will fire if successful
-        /// </summary>
-        UniTask CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback);
-
-        /// <summary>
         /// Attempts to get the balance of the wallet, the success callback will fire with the balance if successful
         /// </summary>
         UniTask GetBalance(BalanceSuccess success, ErrorCallback errorCallback);
+        
+
+        /// <summary>
+        /// Attempts to validate a signed message, the success callback will fire with the validation result if the call is successful
+        /// </summary>
+        UniTask ValidateSignedMessage(string message, string signedMessage, string address, ValidateSignedMessageSuccess success, ErrorCallback errorCallback);
     }
 }

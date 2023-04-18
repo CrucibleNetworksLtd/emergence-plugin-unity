@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
@@ -8,7 +9,6 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class WalletService : IWalletService
     {
-        private readonly ISessionService sessionService;
         private string walletAddress = string.Empty;
 
         public bool HasAddress => walletAddress != null && walletAddress.Trim() != string.Empty;
@@ -19,8 +19,12 @@ namespace EmergenceSDK.Internal.Services
             set => walletAddress = value;
         }
 
-        public WalletService(ISessionService sessionService)
+        private IPersonaService personaService;
+        private ISessionService sessionService;
+
+        public WalletService(IPersonaService personaService, ISessionService sessionService)
         {
+            this.personaService = personaService;
             this.sessionService = sessionService;
         }
 
@@ -78,24 +82,6 @@ namespace EmergenceSDK.Internal.Services
                 success?.Invoke(WalletAddress);
             }
         }
-
-        public async UniTask CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback)
-        {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "createWallet" + "?path=" + path +
-                         "&password=" + password;
-
-            using UnityWebRequest request = UnityWebRequest.Get(url);
-            request.method = "POST";
-        
-            await request.SendWebRequest().ToUniTask();
-        
-            EmergenceUtils.PrintRequestResult("Create Wallet", request);
-        
-            if (EmergenceUtils.ProcessRequest<string>(request, errorCallback, out var response))
-            {
-                success?.Invoke();
-            }
-        }
         
         public async UniTask GetBalance(BalanceSuccess success, ErrorCallback errorCallback)
         {
@@ -115,6 +101,31 @@ namespace EmergenceSDK.Internal.Services
                 success?.Invoke(response.balance);
             }
         }
+        
+        public async UniTask ValidateSignedMessage(string message, string signedMessage, string address,
+            ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
+        {
+            ValidateSignedMessageRequest data = new ValidateSignedMessageRequest()
+            {
+                message = message,
+                signedMessage = signedMessage,
+                address = address
+            };
 
+            string dataString = SerializationHelper.Serialize(data, false);
+
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "validate-signed-message" + "?request=" + personaService.CurrentAccessToken;
+
+            using UnityWebRequest request = UnityWebRequest.Post(url, "");
+            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+            request.uploadHandler.contentType = "application/json";
+            await request.SendWebRequest().ToUniTask();
+            EmergenceUtils.PrintRequestResult("ValidateSignedMessage", request);
+            if (EmergenceUtils.ProcessRequest<ValidateSignedMessageResponse>(request, errorCallback, out var response))
+            {
+                success?.Invoke(response.valid);
+            }
+        }
+        
     }
 }

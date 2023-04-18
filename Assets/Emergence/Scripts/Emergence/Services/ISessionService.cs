@@ -4,12 +4,10 @@ using EmergenceSDK.Types;
 namespace EmergenceSDK.Services
 {
     /// <summary>
-    /// Service for interacting with the current Session
+    /// Service for interacting with the current Wallet Connect Session
     /// </summary>
     public interface ISessionService : IEmergenceService
     {
-        string CurrentAccessToken { get; set; }
-        bool HasAccessToken { get; }
         bool DisconnectInProgress { get; }
         
         Expiration Expiration { get; }
@@ -24,42 +22,10 @@ namespace EmergenceSDK.Services
         /// </summary>
         UniTask IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback);
 
-        /// <summary>
-        /// Attempts to create a key store, the success callback will fire if successful
-        /// </summary>
-        UniTask CreateKeyStore(string privateKey, string password, string publicKey, string path,
-            CreateKeyStoreSuccess success, ErrorCallback errorCallback);
-
-        /// <summary>
-        /// Attempts to load an account, the success callback will fire if successful
-        /// </summary>
-        UniTask LoadAccount(Account account, LoadAccountSuccess success, ErrorCallback errorCallback);
-
-        /// <summary>
-        /// Attempts to get an access token, the success callback will fire with the token if successful
-        /// </summary>
-        UniTask GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback);
-
-        /// <summary>
-        /// Attempts to validate an access token, the success callback will fire with the validation result if the call is successful
-        /// </summary>
-        UniTask ValidateAccessToken(ValidateAccessTokenSuccess success, ErrorCallback errorCallback);
-
-        /// <summary>
-        /// Attempts to validate a signed message, the success callback will fire with the validation result if the call is successful
-        /// </summary>
-        UniTask ValidateSignedMessage(string message, string signedMessage, string address,
-            ValidateSignedMessageSuccess success, ErrorCallback errorCallback);
 
         /// <summary>
         /// Attempts to disconnect the user from Emergence, the success callback will fire if successful
         /// </summary>
         UniTask Disconnect(DisconnectSuccess success, ErrorCallback errorCallback);
-        
-        /// <summary>
-        /// Safely shuts down the local EVM
-        /// <remarks>Does nothing if not using local EVM</remarks>
-        /// </summary>
-        UniTask Finish(SuccessFinish success, ErrorCallback errorCallback);
     }
 }

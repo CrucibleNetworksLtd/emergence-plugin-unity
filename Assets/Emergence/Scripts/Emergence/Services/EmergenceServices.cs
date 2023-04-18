@@ -13,8 +13,6 @@ namespace EmergenceSDK.Services
     {
         private static EmergenceServices instance;
 
-        private bool refreshingToken = false;
-        private ISessionService sessionService;
         private List<IEmergenceService> services = new List<IEmergenceService>();
         
         public static T GetService<T>() where T : IEmergenceService
@@ -26,13 +24,14 @@ namespace EmergenceSDK.Services
         {
             instance = this;
 
-            sessionService = new SessionService();
+            var personaService = new PersonaService();
+            services.Add(personaService);
+            var sessionService = new SessionService(personaService);
             services.Add(sessionService);
-            services.Add(new PersonaService(sessionService));
             services.Add(new AvatarService());
             services.Add(new InventoryService());
             services.Add(new DynamicMetadataService());
-            services.Add(new WalletService(sessionService));
+            services.Add(new WalletService(personaService, sessionService));
             services.Add(new QRCodeService());
             services.Add(new ContractService());
         }

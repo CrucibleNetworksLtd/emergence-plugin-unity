@@ -118,9 +118,9 @@ namespace EmergenceSDK.Services
             }
             try
             {
-                var sessionService = EmergenceServices.GetService<ISessionService>();
-                Debug.Log("AccessToken: " + sessionService.CurrentAccessToken);
-                request.SetRequestHeader("Authorization", sessionService.CurrentAccessToken);
+                var personaService = EmergenceServices.GetService<IPersonaService>();
+                Debug.Log("AccessToken: " + personaService.CurrentAccessToken);
+                request.SetRequestHeader("Authorization", personaService.CurrentAccessToken);
 
                 if (headers != null) {
                     foreach (var key in headers.Keys) {
