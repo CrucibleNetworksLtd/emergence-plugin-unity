@@ -4,7 +4,7 @@ using EmergenceSDK.Types;
 namespace EmergenceSDK.Services
 {
     /// <summary>
-    /// Service for interacting with the current Wallet Connect Session
+    /// Service for interacting with the current Wallet Connect Session.
     /// </summary>
     public interface ISessionService : IEmergenceService
     {

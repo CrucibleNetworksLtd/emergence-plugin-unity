@@ -2,6 +2,9 @@ using Cysharp.Threading.Tasks;
 
 namespace EmergenceSDK.Services
 {
+    /// <summary>
+    /// Service for interacting with the chain API.
+    /// </summary>
     public interface IChainService : IEmergenceService
     {
         /// <summary>

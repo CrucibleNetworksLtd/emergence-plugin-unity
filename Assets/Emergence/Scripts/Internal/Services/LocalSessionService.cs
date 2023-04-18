@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
+    //COMING SOON: Local EVM support
     internal class LocalSessionService : SessionService
     {
         public LocalSessionService(IPersonaService personaService) : base(personaService)

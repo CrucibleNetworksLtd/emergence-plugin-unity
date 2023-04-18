@@ -4,7 +4,7 @@ using EmergenceSDK.Types;
 namespace EmergenceSDK.Services
 {
     /// <summary>
-    /// Service for interacting with the persona API.
+    /// Service for interacting with the persona API. This service is off chain.
     /// </summary>
     public interface IPersonaService : IEmergenceService
     {

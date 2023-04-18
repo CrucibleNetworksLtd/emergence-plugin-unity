@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 namespace EmergenceSDK.Services
 {
     /// <summary>
-    /// Provides access to the avatar API. This service is off chain.
+    /// Provides access to the avatar API.
     /// </summary>
     public interface IAvatarService : IEmergenceService
     {

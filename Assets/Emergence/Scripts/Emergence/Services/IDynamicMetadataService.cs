@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 namespace EmergenceSDK.Services
 {
     /// <summary>
-    /// Gives access to dynamic metadata. This service is off chain.
+    /// Gives access to dynamic metadata.
     /// </summary>
     public interface IDynamicMetadataService : IEmergenceService
     {
