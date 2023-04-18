@@ -31,5 +31,10 @@ namespace EmergenceSDK.Types
             get;
             set;
         }
+
+        public override string ToString()
+        {
+            return $"Persona: {name} ({id})";
+        }
     }
 }

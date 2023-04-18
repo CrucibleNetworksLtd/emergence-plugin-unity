@@ -49,8 +49,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void IncrementCurrentCount()
         {
-            ContractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.chain.networkName, 
-                OnLoadContractSuccess, (message, id) => Debug.LogError("Error while loading contract: " + message));
+            ContractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.chain.networkName, OnLoadContractSuccess, ErrorLogger.LogError);
         }
 
         private void OnLoadContractSuccess()

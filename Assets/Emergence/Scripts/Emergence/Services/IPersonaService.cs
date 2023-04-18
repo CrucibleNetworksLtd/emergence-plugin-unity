@@ -9,11 +9,6 @@ namespace EmergenceSDK.Services
     public interface IPersonaService : IEmergenceService
     {
         /// <summary>
-        /// The currently active persona.
-        /// </summary>
-        Persona CurrentPersona { get; }
-        
-        /// <summary>
         /// Event fired when the current persona is updated.
         /// </summary>
         event PersonaUpdated OnCurrentPersonaUpdated;

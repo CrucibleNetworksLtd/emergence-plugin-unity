@@ -2,7 +2,6 @@
 {
     public class AccessTokenResponse
     {
-
         public AccessToken AccessToken;
     }
     public class AccessToken

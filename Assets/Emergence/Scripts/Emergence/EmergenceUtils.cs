@@ -8,27 +8,19 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Services
 {
-    public class EmergenceUtils
+    /// <summary>
+    /// A static class containing utility methods for making HTTP requests and handling responses in the Emergence SDK.
+    /// </summary>
+    public static class EmergenceUtils
     {
-        private static EmergenceUtils Instance => instance ??= new EmergenceUtils();
-        private static EmergenceUtils instance;
-        private readonly ISessionService sessionService;
-
-        public EmergenceUtils()
-        {
-            sessionService = EmergenceServices.GetService<ISessionService>();
-        }
-
+        /// <summary>
+        /// Checks if there was an error in the UnityWebRequest result.
+        /// </summary>
         public static bool RequestError(UnityWebRequest request)
         {
-            bool error = false;
-#if UNITY_2020_1_OR_NEWER
-            error = (request.result == UnityWebRequest.Result.ConnectionError ||
-                     request.result == UnityWebRequest.Result.ProtocolError ||
-                     request.result == UnityWebRequest.Result.DataProcessingError);
-#else
-            error = (request.isHttpError || request.isNetworkError);
-#endif
+             bool error = request.result == UnityWebRequest.Result.ConnectionError ||
+                          request.result == UnityWebRequest.Result.ProtocolError ||
+                          request.result == UnityWebRequest.Result.DataProcessingError;
 
             if (error && request.responseCode == 512)
             {
@@ -38,6 +30,9 @@ namespace EmergenceSDK.Services
             return error;
         }
 
+        /// <summary>
+        /// Prints the result of a UnityWebRequest to the console.
+        /// </summary>
         public static void PrintRequestResult(string name, UnityWebRequest request)
         {
             Debug.Log(name + " completed " + request.responseCode);
@@ -50,7 +45,10 @@ namespace EmergenceSDK.Services
                 Debug.Log(request.downloadHandler.text);
             }
         }
-
+        
+        /// <summary>
+        /// Processes a UnityWebRequest response and returns the result as a response object.
+        /// </summary>
         public static bool ProcessRequest<T>(UnityWebRequest request, ErrorCallback errorCallback, out T response)
         {
             Debug.Log("Processing request: " + request.url);
@@ -80,6 +78,9 @@ namespace EmergenceSDK.Services
             return isOk;
         }
 
+        /// <summary>
+        /// Processes the response of a UnityWebRequest and returns the result as a response object or an error response object.
+        /// </summary>
         public static bool ProcessResponse<T>(UnityWebRequest request, out BaseResponse<T> response, out BaseResponse<string> errorResponse)
         {
             bool isOk = true;
@@ -99,6 +100,9 @@ namespace EmergenceSDK.Services
             return isOk;
         }
 
+        /// <summary>
+        /// Performs an asynchronous UnityWebRequest and returns the result as a string.
+        /// </summary>
         public static async UniTask<string> PerformAsyncWebRequest(string url, string method, ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null)
         {
             UnityWebRequest request;
@@ -114,8 +118,9 @@ namespace EmergenceSDK.Services
             }
             try
             {
-                Debug.Log("AccessToken: " + Instance.sessionService.CurrentAccessToken);
-                request.SetRequestHeader("Authorization", Instance.sessionService.CurrentAccessToken);
+                var sessionService = EmergenceServices.GetService<ISessionService>();
+                Debug.Log("AccessToken: " + sessionService.CurrentAccessToken);
+                request.SetRequestHeader("Authorization", sessionService.CurrentAccessToken);
 
                 if (headers != null) {
                     foreach (var key in headers.Keys) {
