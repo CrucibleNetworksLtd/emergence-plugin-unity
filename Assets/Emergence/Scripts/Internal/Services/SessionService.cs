@@ -65,15 +65,15 @@ namespace EmergenceSDK.Internal.Services
                 success?.Invoke();
             }
         }
-
-        //Local EVM only
-        public async UniTask Finish(SuccessFinish success, ErrorCallback errorCallback)
+        
+        public async UniTask GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "finish";
+            string url = EmergenceSingleton.Instance.Configuration.APIBase + "qrcode";
 
-            using UnityWebRequest request = UnityWebRequest.Get(url);
+            using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             await request.SendWebRequest().ToUniTask();
-            EmergenceUtils.PrintRequestResult("Finish request completed", request);
+
+            EmergenceUtils.PrintRequestResult("GetQrCode", request);
 
             if (EmergenceUtils.RequestError(request))
             {
@@ -81,7 +81,8 @@ namespace EmergenceSDK.Internal.Services
             }
             else
             {
-                success?.Invoke();
+                string deviceId = request.GetResponseHeader("deviceId");
+                success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture, deviceId);
             }
         }
     }

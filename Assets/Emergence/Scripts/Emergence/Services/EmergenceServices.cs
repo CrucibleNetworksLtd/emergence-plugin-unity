@@ -32,8 +32,8 @@ namespace EmergenceSDK.Services
             services.Add(new InventoryService());
             services.Add(new DynamicMetadataService());
             services.Add(new WalletService(personaService, sessionService));
-            services.Add(new QRCodeService());
             services.Add(new ContractService());
+            services.Add(new ChainService());
         }
     }
 }

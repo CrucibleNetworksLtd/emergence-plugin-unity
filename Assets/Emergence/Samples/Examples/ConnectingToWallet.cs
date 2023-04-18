@@ -6,18 +6,18 @@ namespace EmergenceSDK.Samples.Examples
 {
     public class ConnectingToWallet : MonoBehaviour
     {
-        private IQRCodeService qrService;
+        private ISessionService sessionService;
         private IWalletService walletService;
 
         private void Awake()
         {
-            qrService = EmergenceServices.GetService<IQRCodeService>();
+            sessionService = EmergenceServices.GetService<ISessionService>();
             walletService = EmergenceServices.GetService<IWalletService>();
         }
 
         private void Start()
         {
-            qrService.GetQRCode(GotQRCode, ErrorLogger.LogError);
+            sessionService.GetQRCode(GotQRCode, ErrorLogger.LogError);
         }
 
         private void GotQRCode(Texture2D qrcode, string deviceid)

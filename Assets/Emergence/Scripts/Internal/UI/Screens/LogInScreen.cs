@@ -21,7 +21,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         private IPersonaService personaService;
         private IWalletService walletService;
-        private IQRCodeService qrService;
+        private ISessionService sessionService;
         
 
         private enum States
@@ -43,7 +43,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             personaService = EmergenceServices.GetService<IPersonaService>();
             walletService = EmergenceServices.GetService<IWalletService>();
-            qrService = EmergenceServices.GetService<IQRCodeService>();
+            sessionService = EmergenceServices.GetService<ISessionService>();
         }
 
         private void Update()
@@ -57,7 +57,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     {
                         timeRemaining += QRRefreshTimeOut;
 
-                        qrService.GetQRCode((texture, deviceId) =>
+                        sessionService.GetQRCode((texture, deviceId) =>
                             {
                                 EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
                                 rawQRImage.texture = texture;
