@@ -15,6 +15,9 @@ namespace EmergenceSDK.Services
 
         private List<IEmergenceService> services = new List<IEmergenceService>();
         
+        /// <summary>
+        /// Gets the service of the specified type.
+        /// </summary>
         public static T GetService<T>() where T : IEmergenceService
         {
             return instance.services.OfType<T>().FirstOrDefault();

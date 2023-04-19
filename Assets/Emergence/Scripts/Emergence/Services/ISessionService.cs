@@ -10,13 +10,6 @@ namespace EmergenceSDK.Services
     {
         bool DisconnectInProgress { get; }
         
-        Expiration Expiration { get; }
-
-        /// <summary>
-        /// Sets the expiration object from the expiration message
-        /// </summary>
-        void ProcessExpiration(string expirationMessage);
-
         /// <summary>
         /// Attempts to get the login QR code, it will return the QR code as a texture in the success callback
         /// </summary>
@@ -26,7 +19,6 @@ namespace EmergenceSDK.Services
         /// Attempts to check if the user is connected to Emergence, connection status is provided in the IsConnectedSuccess callback.
         /// </summary>
         UniTask IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback);
-
 
         /// <summary>
         /// Attempts to disconnect the user from Emergence, the success callback will fire if successful

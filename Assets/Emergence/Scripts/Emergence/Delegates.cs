@@ -50,8 +50,6 @@ namespace EmergenceSDK.Services
     
     public delegate void AccessTokenSuccess(string accessToken);
     
-    public delegate void ValidateAccessTokenSuccess(bool valid);
-    
     public delegate void ValidateSignedMessageSuccess(bool valid);
     
     public delegate void DisconnectSuccess();
