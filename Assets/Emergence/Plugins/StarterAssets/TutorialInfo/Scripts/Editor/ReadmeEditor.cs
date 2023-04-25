@@ -28,7 +28,7 @@ namespace StarterAssets.Editor
 			
 				if (readme && !readme.loadedLayout)
 				{
-					LoadLayout();
+					//LoadLayout();
 					readme.loadedLayout = true;
 				}
 			} 
@@ -57,7 +57,7 @@ namespace StarterAssets.Editor
 			}
 			else
 			{
-				Debug.Log("Couldn't find a readme");
+				//Debug.Log("Couldn't find a readme");
 				return null;
 			}
 		}
