@@ -90,7 +90,6 @@ namespace EmergenceSDK
         
         private async UniTaskVoid SendEmail()
         {
-            //Does this works??????
             var data = new EmailSubmissionFormPayload
             {
                 service_id = "service_txbxvyw",
