@@ -73,6 +73,7 @@ namespace EmergenceSDK
         {
             public string from_email;
             public string from_engine = $"Unity {Application.unityVersion}";
+            public string from_os = SystemInfo.operatingSystem;
             public string from_emergenceversion = "0.1.0";//TODO: Get this from the package info
             public string from_emergenceevmtype = "EVMOnline";//"EVMOnline" or "LocalEVM"
         }
