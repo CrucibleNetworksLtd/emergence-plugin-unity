@@ -30,9 +30,9 @@ namespace EmergenceSDK
         private string email;
         private string baseUrl = "https://api.emailjs.com/api/v1.0/email/send";
         private Vector2 scrollPosition;
-        
+
         string emailsubmissionformHasopened = "EmailSubmissionForm_hasOpened";
-        
+
         public static void Init()
         {
             if (!EditorPrefs.GetBool("EmailSubmissionForm_hasOpened", false))
