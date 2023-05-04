@@ -20,15 +20,13 @@ namespace EmergenceSDK
             EmailSubmissionForm.Init();
         }
     }
-    
+
     /// <summary>
     /// UI for email submission, this is not needed for the SDK to work. Feel free to remove this file.
     /// <remarks>We will use your email to send you updates about Emergence, and sometimes other information about web3 tech... could be cool!</remarks>
     /// </summary>
     public class EmailSubmissionForm : EditorWindow
     {
-        
-        
         private string email;
         private string baseUrl = "https://api.emailjs.com/api/v1.0/email/send";
         private Vector2 scrollPosition;
@@ -42,15 +40,14 @@ namespace EmergenceSDK
                 ShowWindow();
             }
         }
-        
-        
+
         [MenuItem("Window/Emergence SDK/Email Submission")]
         public static void ShowWindow()
         {
             EditorPrefs.SetBool("EmailSubmissionForm_hasOpened", true);
             GetWindow<EmailSubmissionForm>("Email Submission Form");
         }
-        
+
         void OnGUI()
         {
             EditorGUILayout.LabelField("Register for developer updates (optional):");
@@ -87,7 +84,6 @@ namespace EmergenceSDK
             public EmailSubmissionFormParams template_params;
         }
 
-        
         private async UniTaskVoid SendEmail()
         {
             var data = new EmailSubmissionFormPayload
