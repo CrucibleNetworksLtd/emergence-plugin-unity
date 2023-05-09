@@ -9,6 +9,7 @@ namespace EmergenceSDK.Services
     {
         /// <summary>
         /// Attempts to get the inventory for the given address. If successful, the success callback will be called with the inventory.
+        /// <remarks>We currently support Ethereum, Polygon, Flow, Tezos, Solana and ImmutableX</remarks>
         /// </summary>
         UniTask InventoryByOwner(string address, SuccessInventoryByOwner success, ErrorCallback errorCallback);
     }
