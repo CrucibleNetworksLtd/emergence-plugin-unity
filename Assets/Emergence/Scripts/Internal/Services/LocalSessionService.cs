@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -18,7 +19,14 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "finish";
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("Finish request completed", request);
 
             if (EmergenceUtils.RequestError(request))

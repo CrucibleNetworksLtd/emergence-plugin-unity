@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -33,7 +34,14 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "reinitializewalletconnect";
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("ReinitializeWalletConnect", request);
         
             if (EmergenceUtils.ProcessRequest<ReinitializeWalletConnectResponse>(request, errorCallback, out var response))
@@ -54,7 +62,14 @@ namespace EmergenceSDK.Internal.Services
             request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(content));
             request.uploadHandler.contentType = "application/json";
         
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("RequestToSignWalletConnect", request);
         
             if (EmergenceUtils.ProcessRequest<WalletSignMessage>(request, errorCallback, out var response))
@@ -71,7 +86,14 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
         
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
         
             EmergenceUtils.PrintRequestResult("Handshake", request);
         
@@ -92,7 +114,14 @@ namespace EmergenceSDK.Internal.Services
                          EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL + "&address=" + WalletAddress;
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
         
             EmergenceUtils.PrintRequestResult("Get Balance", request);
         
@@ -119,7 +148,14 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = UnityWebRequest.Post(url, "");
             request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
             request.uploadHandler.contentType = "application/json";
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("ValidateSignedMessage", request);
             if (EmergenceUtils.ProcessRequest<ValidateSignedMessageResponse>(request, errorCallback, out var response))
             {

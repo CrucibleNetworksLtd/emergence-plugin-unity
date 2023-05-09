@@ -34,7 +34,14 @@ namespace EmergenceSDK.Internal.Services
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             
             EmergenceUtils.PrintRequestResult("IsConnected", request);
             if (EmergenceUtils.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
@@ -51,7 +58,14 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             request.SetRequestHeader("auth", personaService.CurrentAccessToken);
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("Disconnect request completed", request);
 
             if (EmergenceUtils.RequestError(request))
@@ -71,7 +85,14 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "qrcode";
 
             using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
 
             EmergenceUtils.PrintRequestResult("GetQrCode", request);
 

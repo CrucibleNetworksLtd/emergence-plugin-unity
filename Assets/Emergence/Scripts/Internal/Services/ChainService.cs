@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -14,7 +15,14 @@ namespace EmergenceSDK.Internal.Services
     
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
-                await request.SendWebRequest().ToUniTask();
+                try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
         
                 EmergenceUtils.PrintRequestResult("Get Transaction Status", request);
         
@@ -36,7 +44,14 @@ namespace EmergenceSDK.Internal.Services
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
                 request.uploadHandler.contentType = "application/json";
         
-                await request.SendWebRequest().ToUniTask();
+                try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
         
                 EmergenceUtils.PrintRequestResult("Get Block Number", request);
         

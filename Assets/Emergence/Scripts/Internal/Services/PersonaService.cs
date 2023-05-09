@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -48,7 +49,14 @@ namespace EmergenceSDK.Internal.Services
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("GetAccessToken", request);
             if (EmergenceUtils.ProcessRequest<AccessTokenResponse>(request, errorCallback, out var response))
             {
@@ -63,7 +71,14 @@ namespace EmergenceSDK.Internal.Services
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("Authorization", CurrentAccessToken);
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("GetPersonas", request);
 
             if (EmergenceUtils.RequestError(request))
@@ -85,7 +100,14 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("Authorization", CurrentAccessToken);
 
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("Get Current Persona", request);
 
             if (EmergenceUtils.RequestError(request))
@@ -114,7 +136,14 @@ namespace EmergenceSDK.Internal.Services
 
             request.SetRequestHeader("Authorization", CurrentAccessToken);
 
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("Save Persona", request);
 
             if (EmergenceUtils.RequestError(request))
@@ -154,7 +183,14 @@ namespace EmergenceSDK.Internal.Services
 
             request.SetRequestHeader("Authorization", CurrentAccessToken);
 
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("Save Persona", request);
 
             if (EmergenceUtils.RequestError(request))
@@ -175,7 +211,14 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.method = "DELETE";
             request.SetRequestHeader("Authorization", CurrentAccessToken);
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("Delete Persona Request", request);
 
             if (EmergenceUtils.RequestError(request))
@@ -196,7 +239,14 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.method = "PATCH";
             request.SetRequestHeader("Authorization", CurrentAccessToken);
-            await request.SendWebRequest().ToUniTask();
+            try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
             EmergenceUtils.PrintRequestResult("Set Current Persona", request);
 
             if (EmergenceUtils.RequestError(request))

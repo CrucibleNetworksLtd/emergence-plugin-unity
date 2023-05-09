@@ -35,7 +35,14 @@ namespace EmergenceSDK.Internal.Services
                 request.uploadHandler.contentType = "application/json";
                 request.downloadHandler = new DownloadHandlerBuffer();
         
-                await request.SendWebRequest().ToUniTask();
+                try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
         
                 EmergenceUtils.PrintRequestResult("Load Contract", request);
         
@@ -57,7 +64,14 @@ namespace EmergenceSDK.Internal.Services
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
                 request.uploadHandler.contentType = "application/json";
                 
-                await request.SendWebRequest().ToUniTask();
+                try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
                 
                 EmergenceUtils.PrintRequestResult("Read Contract", request);
                 
@@ -89,7 +103,14 @@ namespace EmergenceSDK.Internal.Services
                 request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
                 request.uploadHandler.contentType = "application/json";
 
-                await request.SendWebRequest().ToUniTask();
+                try
+                {
+                    await request.SendWebRequest().ToUniTask();
+                }
+                catch (Exception e)
+                {
+                    errorCallback?.Invoke(e.Message, e.HResult);
+                }
 
                 EmergenceUtils.PrintRequestResult("Write Contract", request);
         
