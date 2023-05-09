@@ -12,18 +12,18 @@ namespace EmergenceSDK.Internal.Utils
         {
             if (IPFSURL.Contains("ipfs://") || IPFSURL.Contains("IPFS://"))
             {
-                Debug.Log("Found IPFS URL, replacing with public node...");
+                EmergenceLogger.LogInfo("Found IPFS URL, replacing with public node...");
         
                 string IPFSNode = "http://ipfs.openmeta.xyz/ipfs/";
                 string CustomIPFSNode = EmergenceSingleton.Instance.Configuration.defaultIpfsGateway;
                 if (!string.IsNullOrEmpty(CustomIPFSNode))
                 {
-                    Debug.Log($"Found custom IPFS node in game config, replacing with \"{CustomIPFSNode}\"");
+                    EmergenceLogger.LogInfo($"Found custom IPFS node in game config, replacing with \"{CustomIPFSNode}\"");
                     IPFSNode = CustomIPFSNode;
                 }
                 string NewURL = IPFSURL.Replace("ipfs://", IPFSNode);
                 NewURL = NewURL.Replace("IPFS://", IPFSNode);
-                Debug.Log($"New URL is \"{NewURL}\"");
+                EmergenceLogger.LogInfo($"New URL is \"{NewURL}\"");
                 return NewURL;
             }
 
@@ -50,7 +50,7 @@ namespace EmergenceSDK.Internal.Utils
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning("Error in IsWebsiteAlive: " + e.Message);
+                    EmergenceLogger.LogWarning("Error in IsWebsiteAlive: " + e.Message);
                     return false; // website is down or error occurred
                 }
             }

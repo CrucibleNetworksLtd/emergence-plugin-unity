@@ -56,7 +56,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 {
                     DemoAvatarManager.Instance.SwapAvatars(avatar.meta.content[1].url);
                 
-                }), ErrorLogger.LogError);
+                }), EmergenceLogger.LogError);
             }
             else
             {

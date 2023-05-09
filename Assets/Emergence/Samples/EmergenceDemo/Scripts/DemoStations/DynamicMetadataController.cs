@@ -63,7 +63,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         
         private void UpdateDynamicMetadata(InventoryItem item)
         {
-            Debug.Log("Updating Dynamic metadata");
+            EmergenceLogger.LogInfo("Updating Dynamic metadata");
             if (string.IsNullOrEmpty(item.Meta.DynamicMetadata)) 
                 return;
             
@@ -71,7 +71,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             curMetadata++;
 
             dynamicMetaDataService.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
-                curMetadata.ToString(), UpdateDynamicMetadataSuccess, ErrorLogger.LogError);
+                curMetadata.ToString(), UpdateDynamicMetadataSuccess, EmergenceLogger.LogError);
             
             void UpdateDynamicMetadataSuccess(string response)
             {

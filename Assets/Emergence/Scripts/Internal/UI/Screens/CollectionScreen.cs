@@ -98,7 +98,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 }
                 items.ReturnAllUsedObjects();
 
-                Debug.Log("Received items: " + inventoryItems.Count);
+                EmergenceLogger.LogInfo("Received items: " + inventoryItems.Count);
                 Modal.Instance.Show("Retrieving inventory items...");
 
                 for (int i = 0; i < inventoryItems.Count; i++)
@@ -139,7 +139,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void InventoryRefreshErrorCallback(string error, long code)
         {
-            ErrorLogger.LogError(error, code);
+            EmergenceLogger.LogError(error, code);
             Modal.Instance.Hide();
         }
 
@@ -187,28 +187,28 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         private void OnPropsToggleValueChanged(bool selected)
         {
-            Debug.LogWarning("Prop filtering is currently not implemented");
+            EmergenceLogger.LogWarning("Prop filtering is currently not implemented");
             filterParams.props = selected;
             RefreshFilteredResults();
         }
         
         private void OnClothingToggleValueChanged(bool selected)
         {
-            Debug.LogWarning("Clothing filtering is currently not implemented");
+            EmergenceLogger.LogWarning("Clothing filtering is currently not implemented");
             filterParams.clothing = selected;
             RefreshFilteredResults();
         }
         
         private void OnWeaponsToggleValueChanged(bool selected)
         {
-            Debug.LogWarning("Weapon filtering is currently not implemented");
+            EmergenceLogger.LogWarning("Weapon filtering is currently not implemented");
             filterParams.weapons = selected;
             RefreshFilteredResults();
         }
 
         private void OnBlockchainDropdownValueChanged(int selection)
         {
-            Debug.Log(blockchainDropdown.options[selection].text);
+            EmergenceLogger.LogInfo(blockchainDropdown.options[selection].text);
             filterParams.blockchain = blockchainDropdown.options[selection].text.ToUpper();
             RefreshFilteredResults();
         }

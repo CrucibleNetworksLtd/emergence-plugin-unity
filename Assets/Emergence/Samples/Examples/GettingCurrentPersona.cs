@@ -23,7 +23,7 @@ namespace EmergenceSDK.Samples.Examples
         private async void GetCurrentPersonaAsync()
         {
             // Waits for the personaService to return the current persona and then calls the GetPersonaSuccess method
-            await personaService.GetCurrentPersona(GetPersonaSuccess, ErrorLogger.LogError);
+            await personaService.GetCurrentPersona(GetPersonaSuccess, EmergenceLogger.LogError);
         }
 
         // This method is called when the personaService successfully returns the current persona

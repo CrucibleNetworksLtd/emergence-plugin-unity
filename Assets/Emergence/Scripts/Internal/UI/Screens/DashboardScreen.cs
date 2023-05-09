@@ -124,7 +124,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             personaService.GetPersonas(GetPersonasSuccess,
             (error, code) =>
             {
-                ErrorLogger.LogError(error, code);
+                EmergenceLogger.LogError(error, code);
                 Modal.Instance.Hide();
             });
         }
@@ -261,7 +261,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             },
             (error, code) =>
             {
-                ErrorLogger.LogError(error, code);
+                EmergenceLogger.LogError(error, code);
                 Modal.Instance.Hide();
             });
         }
@@ -279,13 +279,13 @@ namespace EmergenceSDK.Internal.UI.Screens
                 Modal.Instance.Show("Deleting Persona...");
                 personaService.DeletePersona(selectedPersona, () =>
                 {
-                    Debug.Log("Deleting Persona");
+                    EmergenceLogger.LogInfo("Deleting Persona");
                     Modal.Instance.Hide();
                     Refresh();
                 },
                 (error, code) =>
                 {
-                    ErrorLogger.LogError(error, code);
+                    EmergenceLogger.LogError(error, code);
                     Modal.Instance.Hide();
                 });
             });

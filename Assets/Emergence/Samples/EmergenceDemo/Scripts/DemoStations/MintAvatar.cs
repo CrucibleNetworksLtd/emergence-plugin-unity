@@ -43,14 +43,14 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             if (HasBeenActivated() && IsReady)
             {
-                ContractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.contract.name, OnMintSuccess, ErrorLogger.LogError);
+                ContractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.contract.name, OnMintSuccess, EmergenceLogger.LogError);
             }
         }
         
         private void OnMintSuccess()
         {
             var contractInfo = new ContractInfo(deployedContract.contractAddress, "mint", deployedContract.contract.name, deployedContract.chain.DefaultNodeURL);
-            ContractService.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", "0", new string[] { }, OnWriteSuccess, ErrorLogger.LogError);
+            ContractService.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", "0", new string[] { }, OnWriteSuccess, EmergenceLogger.LogError);
         }
 
         private void OnWriteSuccess(BaseResponse<string> response)

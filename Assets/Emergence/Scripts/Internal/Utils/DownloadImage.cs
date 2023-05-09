@@ -36,13 +36,13 @@ namespace EmergenceSDK.Internal.Utils
                     }
                     catch (System.Exception e)
                     {
-                        Debug.LogError(e.Message);
+                        EmergenceLogger.LogError(e.Message);
                         error = true;
                     }
 
                     if (texture == null)
                     {
-                        Debug.LogWarning("Couldn't convert downloaded image at " + request.url);
+                        EmergenceLogger.LogWarning("Couldn't convert downloaded image at " + request.url);
                         failedCallback?.Invoke(request.url, "Couldn't convert downloaded image", 0);
                     }
                 }
@@ -70,7 +70,7 @@ namespace EmergenceSDK.Internal.Utils
             else
             {
                 failedCallback?.Invoke(request.url, request.error, request.responseCode);
-                Debug.LogWarning("Failed to download image at " + request.url);
+                EmergenceLogger.LogWarning("Failed to download image at " + request.url);
             }
 
             request = null;

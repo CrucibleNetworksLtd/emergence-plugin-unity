@@ -14,7 +14,7 @@ namespace EmergenceSDK.Internal.Utils
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error serializing {typeof(T).Name}: {e.Message}");
+                EmergenceLogger.LogError($"Error serializing {typeof(T).Name}: {e.Message}");
                 throw;
             }
         }
@@ -27,7 +27,7 @@ namespace EmergenceSDK.Internal.Utils
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error deserializing {typeof(T).Name}: {e.Message}");
+                EmergenceLogger.LogError($"Error deserializing {typeof(T).Name}: {e.Message}");
                 throw;
             }
         }

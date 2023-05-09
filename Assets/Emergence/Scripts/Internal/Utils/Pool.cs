@@ -98,7 +98,7 @@ namespace EmergenceSDK.Internal.Utils
             }
             else
             {
-                Debug.LogError("Object " + go.name + " not used");
+                EmergenceLogger.LogError("Object " + go.name + " not used");
                 DestroyImmediate(go);
             }
         }

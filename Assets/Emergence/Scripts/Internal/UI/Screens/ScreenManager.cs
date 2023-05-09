@@ -1,4 +1,5 @@
 ﻿using System;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
 using UnityEngine;
@@ -151,7 +152,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             {
                 case ScreenStates.WaitForServer:
                     // TODO modal
-                    Debug.Log("Waiting for server");
+                    EmergenceLogger.LogInfo("Waiting for server");
                     break;
                 case ScreenStates.Welcome:
                     welcomeScreen.SetActive(true);

@@ -65,7 +65,7 @@ namespace EmergenceSDK.Internal.Utils
             }
             else
             {
-                Debug.LogError("Object " + go + " not used");
+                EmergenceLogger.LogError("Object " + go + " not used");
             }
 
             go = default(T);

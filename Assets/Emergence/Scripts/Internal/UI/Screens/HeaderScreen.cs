@@ -70,7 +70,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     },
                     (error, code) =>
                     {
-                        ErrorLogger.LogError(error, code);
+                        EmergenceLogger.LogError(error, code);
                         ModalPromptOK.Instance.Show("Sorry, there was a problem getting your balance, will retry in " + refreshTimeOut.ToString("0") + " seconds");
                     });
                 yield return new WaitForSeconds(refreshTimeOut);
@@ -114,7 +114,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 Hide();
                 ScreenManager.Instance.Restart();
             },
-            ErrorLogger.LogError);
+            EmergenceLogger.LogError);
         }
     }
 }

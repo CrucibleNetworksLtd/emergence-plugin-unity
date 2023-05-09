@@ -32,7 +32,7 @@ namespace EmergenceSDK.Samples.Examples
         {
             // Loads the contract using the deployedContract variable and calls the Load method once it's loaded
             contractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, 
-                deployedContract.contract.name, OnLoadSuccess, ErrorLogger.LogError);
+                deployedContract.contract.name, OnLoadSuccess, EmergenceLogger.LogError);
         }
 
         // This method is called once the contract is loaded
@@ -44,7 +44,7 @@ namespace EmergenceSDK.Samples.Examples
 
             // Calls the ReadMethod method to execute the smart contract method defined in the ABI with an empty input parameter
             contractService.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", value, body,
-                OnWriteSuccess, ErrorLogger.LogError);
+                OnWriteSuccess, EmergenceLogger.LogError);
         }
 
         private void OnWriteSuccess(BaseResponse<string> response)

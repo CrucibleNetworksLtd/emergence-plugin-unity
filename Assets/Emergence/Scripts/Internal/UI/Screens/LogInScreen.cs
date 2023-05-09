@@ -69,13 +69,13 @@ namespace EmergenceSDK.Internal.UI.Screens
                                     },
                                     (error, code) =>
                                     {
-                                        Debug.LogError("[" + code + "] " + error);
+                                        EmergenceLogger.LogError("[" + code + "] " + error);
                                         Reinitialize();
                                     });
                             },
                             (error, code) =>
                             {
-                                ErrorLogger.LogError(error, code);
+                                EmergenceLogger.LogError(error, code);
                                 Reinitialize();
                             });
                     }
@@ -94,7 +94,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                         },
                         (error, code) =>
                         {
-                            Debug.LogError("[" + code + "] " + error);
+                            EmergenceLogger.LogError("[" + code + "] " + error);
                             Reinitialize();
                         });
                     break;

@@ -58,7 +58,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             ContractInfo contractInfo = new ContractInfo(deployedContract.contractAddress, "GetCurrentCount", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL);
             ContractService.ReadMethod<BaseResponse<string>, string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
-                (response) => Debug.Log($"ReadContract finished: {response.message}"), ErrorLogger.LogError);
+                (response) => Debug.Log($"ReadContract finished: {response.message}"), EmergenceLogger.LogError);
         }
     }
 }

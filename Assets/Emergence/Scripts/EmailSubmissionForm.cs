@@ -2,6 +2,7 @@
 using System;
 using System.Text;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Utils;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.Networking;
@@ -115,11 +116,11 @@ namespace EmergenceSDK
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("Email sent successfully!");
+                EmergenceLogger.LogInfo("Email sent successfully!");
             }
             else
             {
-                Debug.LogError(request.error);
+                EmergenceLogger.LogError(request.error);
             }
         }
     }

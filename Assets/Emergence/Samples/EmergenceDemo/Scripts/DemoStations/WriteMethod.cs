@@ -49,13 +49,13 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void IncrementCurrentCount()
         {
-            ContractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.chain.networkName, OnLoadContractSuccess, ErrorLogger.LogError);
+            ContractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, deployedContract.chain.networkName, OnLoadContractSuccess, EmergenceLogger.LogError);
         }
 
         private void OnLoadContractSuccess()
         {
             var contractInfo = new ContractInfo(deployedContract.contractAddress, "IncrementCount", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL);
-            ContractService.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", "0", new string[] { }, WriteMethodSuccess, ErrorLogger.LogError);
+            ContractService.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", "0", new string[] { }, WriteMethodSuccess, EmergenceLogger.LogError);
         }
 
         private void WriteMethodSuccess(BaseResponse<string> response)

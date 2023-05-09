@@ -110,7 +110,7 @@ namespace EmergenceSDK.Types
 
         public void SetCachedAddress(string _address)
         {
-            Debug.Log("Setting cached address to: " + _address);
+            EmergenceLogger.LogInfo("Setting cached address to: " + _address);
             address = _address;
         }
 
@@ -120,7 +120,7 @@ namespace EmergenceSDK.Types
         {
             if (transform.childCount < 1)
             {
-                Debug.LogError("Missing children");
+                EmergenceLogger.LogError("Missing children");
                 return;
             }
             
@@ -132,7 +132,7 @@ namespace EmergenceSDK.Types
         {
             if (transform.childCount < 1)
             {
-                Debug.LogError("Missing children");
+                EmergenceLogger.LogError("Missing children");
                 return;
             }
 

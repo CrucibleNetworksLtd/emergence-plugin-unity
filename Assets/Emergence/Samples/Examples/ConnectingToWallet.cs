@@ -17,7 +17,7 @@ namespace EmergenceSDK.Samples.Examples
 
         private void Start()
         {
-            sessionService.GetQRCode(GotQRCode, ErrorLogger.LogError);
+            sessionService.GetQRCode(GotQRCode, EmergenceLogger.LogError);
         }
 
         private void GotQRCode(Texture2D qrcode, string deviceid)
@@ -27,7 +27,7 @@ namespace EmergenceSDK.Samples.Examples
             //.....
 
             //Wait for the user to connect to the wallet
-            walletService.Handshake(OnHandshakeSuccess, ErrorLogger.LogError);
+            walletService.Handshake(OnHandshakeSuccess, EmergenceLogger.LogError);
         }
 
         private void OnHandshakeSuccess(string walletaddress)

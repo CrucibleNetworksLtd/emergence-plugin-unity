@@ -124,7 +124,7 @@ namespace EmergenceSDK.Internal.UI
                         waitingForImageRequest = false;
                         OnImageCompleted?.Invoke(persona, false);
                     }
-                }, ErrorLogger.LogError);
+                }, EmergenceLogger.LogError);
             }
             else
             {

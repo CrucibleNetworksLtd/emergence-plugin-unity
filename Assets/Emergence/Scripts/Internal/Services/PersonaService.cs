@@ -138,7 +138,7 @@ namespace EmergenceSDK.Internal.Services
                 await tokenURIRequest.SendWebRequest().ToUniTask();
                 EmergenceUtils.PrintRequestResult("Avatar tokenURI", tokenURIRequest);
                 TokenURIResponse res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenURIRequest.downloadHandler.text)[0];
-                // Debug.Log("GUID: " + res.GUID);
+                // EmergenceLogger.LogInfo("GUID: " + res.GUID);
                 // rebuild the avatarId field with the GUID
                 persona.avatarId = persona.avatar.chain + ":" + persona.avatar.contractAddress + ":" +
                                    persona.avatar.tokenId + ":" + res.GUID;

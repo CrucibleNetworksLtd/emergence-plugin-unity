@@ -34,7 +34,7 @@ namespace EmergenceSDK.Internal.UI
             bool isWebsiteAlive = await Helpers.IsWebsiteAlive(imageUrl);
             if (string.IsNullOrEmpty(imageUrl) || !isWebsiteAlive)
             {
-                Debug.LogWarning("URL is invalid.");
+                EmergenceLogger.LogWarning("URL is invalid.");
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace EmergenceSDK.Internal.UI
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogWarning("File load error.\n" + request.error);
+                    EmergenceLogger.LogWarning("File load error.\n" + request.error);
                     itemImage.texture = RequestImage.Instance.DefaultThumbnail;
                     return;
                 }

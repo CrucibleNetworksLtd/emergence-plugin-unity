@@ -104,7 +104,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private void AvatarScrollItem_OnAvatarSelected(Avatar avatar)
         {
             currentAvatar = avatar;
-            // Debug.Log("Avatar selected: " + avatar.meta.name);
+            // EmergenceLogger.LogInfo("Avatar selected: " + avatar.meta.name);
 
             if (currentAvatar == null)
             {
@@ -122,7 +122,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             },
             (url, error, errorCode) =>
             {
-                Debug.LogError("[" + url + "] " + error + " " + errorCode);
+                EmergenceLogger.LogError("[" + url + "] " + error + " " + errorCode);
             });
         }
 
@@ -208,7 +208,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             },
             (error, code) =>
             {
-                ErrorLogger.LogError(error, code);
+                EmergenceLogger.LogError(error, code);
                 Modal.Instance.Hide();
             });
         }
@@ -220,13 +220,13 @@ namespace EmergenceSDK.Internal.UI.Screens
                 Modal.Instance.Show("Deleting Persona...");
                 personaService.DeletePersona(currentPersona, () =>
                 {
-                    Debug.Log("Deleting Persona");
+                    EmergenceLogger.LogInfo("Deleting Persona");
                     Modal.Instance.Hide();
                     ScreenManager.Instance.ShowDashboard();
                 },
                 (error, code) =>
                 {
-                    ErrorLogger.LogError(error, code);
+                    EmergenceLogger.LogError(error, code);
                     Modal.Instance.Hide();
                 });
             });
@@ -265,15 +265,15 @@ namespace EmergenceSDK.Internal.UI.Screens
 
                         personaService.CreatePersona(currentPersona, () =>
                         {
-                            Debug.Log("New Persona saved");
+                            EmergenceLogger.LogInfo("New Persona saved");
                             Modal.Instance.Hide();
-                            Debug.Log(currentPersona);
+                            EmergenceLogger.LogInfo(currentPersona.ToString());
                             ClearCurrentPersona();
                             ScreenManager.Instance.ShowDashboard();
                         },
                         (error, code) =>
                         {
-                            ErrorLogger.LogError(error, code);
+                            EmergenceLogger.LogError(error, code);
                             Modal.Instance.Hide();
                             ModalPromptOK.Instance.Show("Error creating persona");
                         });
@@ -286,14 +286,14 @@ namespace EmergenceSDK.Internal.UI.Screens
 
                         personaService.EditPersona(currentPersona, () =>
                         {
-                            Debug.Log("Changes to Persona saved");
+                            EmergenceLogger.LogInfo("Changes to Persona saved");
                             Modal.Instance.Hide();
                             ClearCurrentPersona();
                             ScreenManager.Instance.ShowDashboard();
                         },
                         (error, code) =>
                         {
-                            ErrorLogger.LogError(error, code);
+                            EmergenceLogger.LogError(error, code);
                             Modal.Instance.Hide();
                             ModalPromptOK.Instance.Show("Error editing persona");
                         });
@@ -383,7 +383,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 }
                 else if (imagesRefreshing.Count > 0)
                 {
-                    Debug.LogWarning("Image completed but not accounted for: [" + avatar.avatarId + "][" + avatar.meta.content.First().url + "][" + success + "]");
+                    EmergenceLogger.LogWarning("Image completed but not accounted for: [" + avatar.avatarId + "][" + avatar.meta.content.First().url + "][" + success + "]");
                 }
             }
         }

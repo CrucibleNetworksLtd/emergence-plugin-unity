@@ -35,14 +35,14 @@ namespace EmergenceSDK.Services
         /// </summary>
         public static void PrintRequestResult(string name, UnityWebRequest request)
         {
-            Debug.Log(name + " completed " + request.responseCode);
+            EmergenceLogger.LogInfo(name + " completed " + request.responseCode);
             if (RequestError(request))
             {
-                Debug.LogError(request.error);
+                EmergenceLogger.LogError(request.error);
             }
             else
             {
-                Debug.Log(request.downloadHandler.text);
+                EmergenceLogger.LogInfo(request.downloadHandler.text);
             }
         }
         
@@ -51,7 +51,7 @@ namespace EmergenceSDK.Services
         /// </summary>
         public static bool ProcessRequest<T>(UnityWebRequest request, ErrorCallback errorCallback, out T response)
         {
-            Debug.Log("Processing request: " + request.url);
+            EmergenceLogger.LogInfo("Processing request: " + request.url);
             
             bool isOk = false;
             response = default(T);
@@ -119,7 +119,7 @@ namespace EmergenceSDK.Services
             try
             {
                 var personaService = EmergenceServices.GetService<IPersonaService>();
-                Debug.Log("AccessToken: " + personaService.CurrentAccessToken);
+                EmergenceLogger.LogInfo("AccessToken: " + personaService.CurrentAccessToken);
                 request.SetRequestHeader("Authorization", personaService.CurrentAccessToken);
 
                 if (headers != null) {
