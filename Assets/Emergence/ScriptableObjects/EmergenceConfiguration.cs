@@ -19,9 +19,6 @@ namespace EmergenceSDK.ScriptableObjects
         private string _personaURLStaging = "https://x8iq9e5fq1.execute-api.us-east-1.amazonaws.com/staging/";
         private string _personaURLProduction = "https://x8iq9e5fq1.execute-api.us-east-1.amazonaws.com/staging/";
         
-        // public string AvatarURL = "https://dysaw5zhak.us-east-1.awsapprunner.com/AvatarSystem/";
-        // public string InventoryURL = "https://dysaw5zhak.us-east-1.awsapprunner.com/InventoryService/";
-        // public string PersonaURL = "https://x8iq9e5fq1.execute-api.us-east-1.amazonaws.com/staging/";
 
         public string AvatarURL
         {

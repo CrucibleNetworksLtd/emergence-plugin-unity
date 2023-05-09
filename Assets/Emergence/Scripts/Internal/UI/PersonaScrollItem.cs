@@ -75,7 +75,6 @@ namespace EmergenceSDK.Internal.UI
             selectButton.onClick.AddListener(OnSelectClicked);
 
             RequestImage.Instance.OnImageReady += Instance_OnImageReady;
-            RequestImage.Instance.OnImageFailed += Instance_OnImageFailed;
         }
 
         private void OnDestroy()
@@ -83,7 +82,6 @@ namespace EmergenceSDK.Internal.UI
             selectButton.onClick.RemoveListener(OnSelectClicked);
 
             RequestImage.Instance.OnImageReady -= Instance_OnImageReady;
-            RequestImage.Instance.OnImageFailed -= Instance_OnImageFailed;
         }
 
         public delegate void Selected(Persona persona, int childIndex);
@@ -152,16 +150,6 @@ namespace EmergenceSDK.Internal.UI
                 photo.texture = Persona.AvatarImage;
                 waitingForImageRequest = false;
                 OnImageCompleted?.Invoke(Persona, true);
-            }
-        }
-
-        private void Instance_OnImageFailed(string url, string error, long errorCode)
-        {
-            if (waitingForImageRequest && url == Persona.avatar.meta.content.First().url)
-            {
-                waitingForImageRequest = false;
-                Debug.LogError("[" + url + "] [" + errorCode + "] " + error);
-                OnImageCompleted?.Invoke(Persona, false);
             }
         }
     }

@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using System.Text;
 using Cysharp.Threading.Tasks;
@@ -31,11 +32,11 @@ namespace EmergenceSDK
         private string baseUrl = "https://api.emailjs.com/api/v1.0/email/send";
         private Vector2 scrollPosition;
 
-        string emailsubmissionformHasopened = "EmailSubmissionForm_hasOpened";
+        private const string EmailSubmissionFormHasOpened = "EmailSubmissionForm_hasOpened";
 
         public static void Init()
         {
-            if (!EditorPrefs.GetBool("EmailSubmissionForm_hasOpened", false))
+            if (!EditorPrefs.GetBool(EmailSubmissionFormHasOpened, false))
             {
                 ShowWindow();
             }
@@ -44,7 +45,7 @@ namespace EmergenceSDK
         [MenuItem("Window/Emergence SDK/Email Submission")]
         public static void ShowWindow()
         {
-            EditorPrefs.SetBool("EmailSubmissionForm_hasOpened", true);
+            EditorPrefs.SetBool(EmailSubmissionFormHasOpened, true);
             GetWindow<EmailSubmissionForm>("Email Submission Form");
         }
 
@@ -123,3 +124,4 @@ namespace EmergenceSDK
         }
     }
 }
+#endif

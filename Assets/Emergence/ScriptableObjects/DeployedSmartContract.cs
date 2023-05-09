@@ -6,7 +6,6 @@ namespace EmergenceSDK.ScriptableObjects
     public class DeployedSmartContract : ScriptableObject
     {
         public string contractAddress;
-        // public string ABI;
         public SmartContract contract;
         public EmergenceChain chain;
     }

@@ -103,16 +103,6 @@ namespace EmergenceSDK.Types
             OnEmergenceUIVisibilityChanged?.Invoke(false);
         }
 
-        public string GetCurrentAccessToken()
-        {
-            return accessToken;
-        }
-
-        public bool HasAccessToken()
-        {
-            return !string.IsNullOrEmpty(accessToken);
-        }
-
         public string GetCachedAddress()
         {
             return address;
@@ -124,11 +114,6 @@ namespace EmergenceSDK.Types
             address = _address;
         }
 
-        public bool HasCachedAddress()
-        {
-            return !string.IsNullOrEmpty(address);
-        }
-        
         #region Monobehaviour
         
         private new void Awake() 

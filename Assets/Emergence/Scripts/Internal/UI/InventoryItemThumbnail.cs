@@ -53,10 +53,10 @@ namespace EmergenceSDK.Internal.UI
                 {
                     var img = decoder.NextImage();
                     LoadStaticImage(img.CreateTexture());
-                    return;
-                    
+
                     //EXPERIMENTAL: This code does enable gif playback, but it is ver resource intensive and causes a lot of lag.
-                    //Remove the return statement above to enable it.
+                    //Comment back in to try it out!
+                    /*
                     while (img != null)
                     {
                         frames.Add(img.CreateTexture());
@@ -74,6 +74,8 @@ namespace EmergenceSDK.Internal.UI
                 else
                 {
                     itemImage.texture = frames[0];
+                }
+                */
                 }
             }
         }

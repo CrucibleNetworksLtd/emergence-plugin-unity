@@ -14,7 +14,7 @@ namespace EmergenceSDK.Types
         
         [JsonIgnore]
         private Avatar _avatar;
-        //TODO: Remove
+        
         [JsonIgnore]
         public Avatar avatar
         {

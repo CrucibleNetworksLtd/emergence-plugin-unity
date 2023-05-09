@@ -15,7 +15,6 @@ namespace EmergenceSDK.Types
 
             public class AvatarMetaContent
             {
-                // public string type;
                 public string url;
                 public string representation;
                 public string mimeType;

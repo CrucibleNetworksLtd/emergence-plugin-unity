@@ -21,7 +21,6 @@ namespace EmergenceSDK.Internal.Utils
         public delegate void ImageReady(string url, Texture2D texture);
         public delegate void ImageFailed(string url, string error, long errorCode);
         public event ImageReady OnImageReady;
-        public event ImageFailed OnImageFailed;
 
         private Queue<string> urlQueue = new Queue<string>();
         private GenericPool<DownloadImage> pool = new GenericPool<DownloadImage>(5, 1);

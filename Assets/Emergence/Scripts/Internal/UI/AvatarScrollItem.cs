@@ -29,14 +29,12 @@ namespace EmergenceSDK.Internal.UI
         {
             selectButton.onClick.AddListener(OnSelectClicked);
             RequestImage.Instance.OnImageReady += Instance_OnImageReady;
-            RequestImage.Instance.OnImageFailed += Instance_OnImageFailed;
         }
 
         private void OnDestroy()
         {
             selectButton.onClick.RemoveListener(OnSelectClicked);
             RequestImage.Instance.OnImageReady -= Instance_OnImageReady;
-            RequestImage.Instance.OnImageFailed -= Instance_OnImageFailed;
         }
 
         public delegate void Selected(Avatar avatar);
@@ -77,16 +75,6 @@ namespace EmergenceSDK.Internal.UI
                 avatarRawImage.texture = texture;
                 waitingForImageRequest = false;
                 OnImageCompleted?.Invoke(avatar, true);
-            }
-        }
-
-        private void Instance_OnImageFailed(string url, string error, long errorCode)
-        {
-            if (waitingForImageRequest && url.Equals(avatar.meta.content.First().url))
-            {
-                waitingForImageRequest = false;
-                Debug.LogError("[" + url + "] " + error + " " + errorCode);
-                OnImageCompleted?.Invoke(avatar, false);
             }
         }
     }
