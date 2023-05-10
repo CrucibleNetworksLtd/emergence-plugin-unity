@@ -10,10 +10,16 @@ namespace EmergenceSDK.Services
     {
         /// <summary>
         /// Current Persona's access token.
-        /// <remarks>This is token should be kept completely private</remarks>
+        /// <remarks>This token should be kept completely private</remarks>
         /// </summary>
         string CurrentAccessToken { get; }
+        
+        /// <summary>
+        /// Whether or not the current persona has an access token.
+        /// <remarks>This can be used to determine if you are connected to a session</remarks>
+        /// </summary>
         bool HasAccessToken { get; }
+        
         /// <summary>
         /// Event fired when the current persona is updated.
         /// </summary>
