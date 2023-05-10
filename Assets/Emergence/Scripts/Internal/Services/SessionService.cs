@@ -12,6 +12,7 @@ namespace EmergenceSDK.Internal.Services
     {
         
         public bool DisconnectInProgress => disconnectInProgress;
+        public event Action OnSessionDisconnected;
         private bool disconnectInProgress = false;
         
         public Expiration Expiration { get; private set; }
@@ -21,6 +22,9 @@ namespace EmergenceSDK.Internal.Services
         public SessionService(IPersonaService personaService)
         {
             this.personaService = personaService;
+            
+            if(personaService is PersonaService personaServiceInstance)
+                OnSessionDisconnected += () => personaServiceInstance.OnSessionDisconnected();
         }
         
         public void ProcessExpiration(string expirationMessage)
@@ -76,6 +80,7 @@ namespace EmergenceSDK.Internal.Services
             else
             {
                 disconnectInProgress = false;
+                OnSessionDisconnected?.Invoke();
                 success?.Invoke();
             }
         }

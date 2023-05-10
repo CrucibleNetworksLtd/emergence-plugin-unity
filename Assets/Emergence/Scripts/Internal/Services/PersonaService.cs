@@ -19,8 +19,6 @@ namespace EmergenceSDK.Internal.Services
         }
         private string currentAccessToken = string.Empty;
         public bool HasAccessToken => currentAccessToken.Length > 0;
-        
-        private readonly ISessionService sessionService;
         public event PersonaUpdated OnCurrentPersonaUpdated;
     
         private Persona cachedPersona;
@@ -30,11 +28,13 @@ namespace EmergenceSDK.Internal.Services
 
             private set 
             {
-                if (cachedPersona != null && cachedPersona.id.Equals(value.id)) 
-                    return; // don't do anything if the new persona is the same as the cached one)
+                if (cachedPersona?.id == value?.id)
+                    return;
+
                 cachedPersona = value;
                 OnCurrentPersonaUpdated?.Invoke(cachedPersona);
             }
+
         }
 
         public bool GetCurrentPersona(out Persona currentPersona)
@@ -260,5 +260,10 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
+        internal void OnSessionDisconnected()
+        {
+            CurrentAccessToken = "";
+            cachedPersona = null;
+        }
     }
 }

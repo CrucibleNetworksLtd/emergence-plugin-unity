@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Types;
 
@@ -8,17 +9,20 @@ namespace EmergenceSDK.Services
     /// </summary>
     public interface ISessionService : IEmergenceService
     {
+        /// <summary>
+        /// Set to true when mid way through a disconnect, disconnection can take a few seconds so this is useful for disabling UI elements for example
+        /// </summary>
         bool DisconnectInProgress { get; }
+        
+        /// <summary>
+        /// Fired when the session is disconnected
+        /// </summary>
+        event Action OnSessionDisconnected;
         
         /// <summary>
         /// Attempts to get the login QR code, it will return the QR code as a texture in the success callback
         /// </summary>
         UniTask GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback);
-        
-        /// <summary>
-        /// Attempts to check if the user is connected to Emergence, connection status is provided in the IsConnectedSuccess callback.
-        /// </summary>
-        UniTask IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback);
 
         /// <summary>
         /// Attempts to disconnect the user from Emergence, the success callback will fire if successful
