@@ -13,8 +13,8 @@ namespace EmergenceSDK.Services
         UniTask GetTransactionStatus<T>(string transactionHash, string nodeURL, GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback);
 
         /// <summary>
-        /// Gets the block number of a transaction. If successful, the success callback will be called.
+        /// Gets the highest block number of the chain. If successful, the success callback will be called.
         /// </summary>
-        UniTask GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body, GetBlockNumberSuccess<T> success, ErrorCallback errorCallback);
+        UniTask GetHighestBlockNumber<T>(string nodeURL, GetBlockNumberSuccess<T> success, ErrorCallback errorCallback);
     }
 }

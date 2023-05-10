@@ -33,17 +33,12 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
-        public async UniTask GetBlockNumber<T, U>(string transactionHash, string nodeURL, U body, GetBlockNumberSuccess<T> success, ErrorCallback errorCallback)
+        public async UniTask GetHighestBlockNumber<T>(string nodeURL, GetBlockNumberSuccess<T> success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
-    
-            string dataString = SerializationHelper.Serialize(body, false);
-    
+
             using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
             {
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
-                request.uploadHandler.contentType = "application/json";
-        
                 try
                 {
                     await request.SendWebRequest().ToUniTask();
