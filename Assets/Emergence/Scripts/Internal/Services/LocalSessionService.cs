@@ -20,13 +20,13 @@ namespace EmergenceSDK.Internal.Services
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
             try
-                {
-                    await request.SendWebRequest().ToUniTask();
-                }
-                catch (Exception e)
-                {
-                    errorCallback?.Invoke(e.Message, e.HResult);
-                }
+            {
+                await request.SendWebRequest().ToUniTask();
+            }
+            catch (Exception e)
+            {
+                errorCallback?.Invoke(e.Message, e.HResult);
+            }
             EmergenceUtils.PrintRequestResult("Finish request completed", request);
 
             if (EmergenceUtils.RequestError(request))

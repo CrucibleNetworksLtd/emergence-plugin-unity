@@ -35,13 +35,13 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             try
-                {
-                    await request.SendWebRequest().ToUniTask();
-                }
-                catch (Exception e)
-                {
-                    errorCallback?.Invoke(e.Message, e.HResult);
-                }
+            {
+                await request.SendWebRequest().ToUniTask();
+            }
+            catch (Exception e)
+            {
+                errorCallback?.Invoke(e.Message, e.HResult);
+            }
             
             EmergenceUtils.PrintRequestResult("IsConnected", request);
             if (EmergenceUtils.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
@@ -59,13 +59,13 @@ namespace EmergenceSDK.Internal.Services
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             request.SetRequestHeader("auth", personaService.CurrentAccessToken);
             try
-                {
-                    await request.SendWebRequest().ToUniTask();
-                }
-                catch (Exception e)
-                {
-                    errorCallback?.Invoke(e.Message, e.HResult);
-                }
+            {
+                await request.SendWebRequest().ToUniTask();
+            }
+            catch (Exception e)
+            {
+                errorCallback?.Invoke(e.Message, e.HResult);
+            }
             EmergenceUtils.PrintRequestResult("Disconnect request completed", request);
 
             if (EmergenceUtils.RequestError(request))
@@ -86,13 +86,13 @@ namespace EmergenceSDK.Internal.Services
 
             using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             try
-                {
-                    await request.SendWebRequest().ToUniTask();
-                }
-                catch (Exception e)
-                {
-                    errorCallback?.Invoke(e.Message, e.HResult);
-                }
+            {
+                await request.SendWebRequest().ToUniTask();
+            }
+            catch (Exception e)
+            {
+                errorCallback?.Invoke(e.Message, e.HResult);
+            }
 
             EmergenceUtils.PrintRequestResult("GetQrCode", request);
 
