@@ -1,5 +1,5 @@
-// Disable the following define to disable logging
-#define ENABLE_LOGS
+// Comment in the following define to disable logging
+//#define DISABLE_EMERGENCE_LOGS
 
 using System;
 using System.Diagnostics;
@@ -12,7 +12,7 @@ namespace EmergenceSDK.Internal.Utils
     /// </summary>
     public static class EmergenceLogger 
     {
-        public enum LogLevel
+        private enum LogLevel
         {
             Off = 0,
             Error = 1,
@@ -21,17 +21,10 @@ namespace EmergenceSDK.Internal.Utils
         }
 
         /// <summary>
-        /// Change this to toggle Emergence Logging
+        /// Change this to change Emergence Logging level
         /// </summary>
         private static readonly LogLevel logLevel = LogLevel.Info;
-
-        public static void LogWarning(string warning, long errorCode)
-        {
-            if (IsEnabledFor(LogLevel.Warning))
-            {
-                LogWithCode(warning, errorCode, LogLevel.Warning);
-            }
-        }
+        
 
         public static void LogWarning(string message)
         {
@@ -41,6 +34,7 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
         
+        /// <remarks>This may log a warning depending on the code.</remarks>
         public static void LogError(string error, long errorCode)
         {
             if (IsEnabledFor(LogLevel.Error))
@@ -65,15 +59,17 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
 
-        private static bool IsEnabledFor(LogLevel logLevel)
+        private static bool IsEnabledFor(LogLevel logLevelIn)
         {
-            return logLevel <= EmergenceLogger.logLevel;
+            return logLevelIn <= EmergenceLogger.logLevel;
         }
 
-        [Conditional("ENABLE_LOGS")]
-        private static void LogWithCode(string message, long errorCode, LogLevel logLevel) 
+        private static void LogWithCode(string message, long errorCode, LogLevel logLevelIn) 
         {
-            bool isError = (logLevel == LogLevel.Error);
+#if DISABLE_EMERGENCE_LOGS
+            return;
+#endif
+            bool isError = (logLevelIn == LogLevel.Error);
             switch (errorCode) 
             {
                 case 408:
@@ -87,42 +83,44 @@ namespace EmergenceSDK.Internal.Utils
             string callingClass = "";
             StackTrace trace = new StackTrace();
             StackFrame[] frames = trace.GetFrames();
-            if (frames.Length >= 3) // Get the class name from the caller's caller
+            if (frames != null && frames.Length >= 3) // Get the class name from the caller's caller
             {
-                callingClass = frames[2].GetMethod().DeclaringType.FullName;
+                callingClass = frames[2].GetMethod().DeclaringType?.FullName;
             }
 
             if (isError)
             {
-                EmergenceLogger.LogError($"{errorCode} Error in {callingClass}: {message}");
+                Debug.LogError($"{errorCode} Error in {callingClass}: {message}");
             }
             else
             {
-                EmergenceLogger.LogWarning($"{errorCode} Warning in {callingClass}: {message}");
+                Debug.LogWarning($"{errorCode} Warning in {callingClass}: {message}");
             }
         }
 
-        [Conditional("ENABLE_LOGS")]
-        private static void LogWithoutCode(string message, LogLevel logLevel)
+        private static void LogWithoutCode(string message, LogLevel logLevelIn)
         {
+#if DISABLE_EMERGENCE_LOGS
+            return;
+#endif
             string callingClass = "";
             StackTrace trace = new StackTrace();
             StackFrame[] frames = trace.GetFrames();
-            if (frames.Length >= 3) // Get the class name from the caller's caller
+            if (frames != null && frames.Length >= 3) // Get the class name from the caller's caller
             {
-                callingClass = frames[2].GetMethod().DeclaringType.FullName;
+                callingClass = frames[2].GetMethod().DeclaringType?.FullName;
             }
 
-            switch (logLevel)
+            switch (logLevelIn)
             {
                 case LogLevel.Info:
-                    EmergenceLogger.LogInfo($"{callingClass}: {message}");
+                    Debug.Log($"{callingClass}: {message}");
                     break;
                 case LogLevel.Warning:
-                    EmergenceLogger.LogWarning($"{callingClass}: {message}");
+                    Debug.LogWarning($"{callingClass}: {message}");
                     break;
                 case LogLevel.Error:
-                    EmergenceLogger.LogError($"{callingClass}: {message}");
+                    Debug.LogError($"{callingClass}: {message}");
                     break;
             }
         }
