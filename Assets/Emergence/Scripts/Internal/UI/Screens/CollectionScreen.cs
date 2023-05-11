@@ -89,7 +89,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         public void Refresh(Action<InventoryItem> customOnClickHandler)
         {
             inventoryService = EmergenceServices.GetService<IInventoryService>();
-            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryByOwnerSuccess, InventoryRefreshErrorCallback);
+            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible, InventoryByOwnerSuccess, InventoryRefreshErrorCallback);
             void InventoryByOwnerSuccess(List<InventoryItem> inventoryItems)
             {
                 foreach (var item in items)

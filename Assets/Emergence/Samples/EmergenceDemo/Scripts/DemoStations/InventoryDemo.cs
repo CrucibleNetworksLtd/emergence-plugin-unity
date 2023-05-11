@@ -73,7 +73,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 Cursor.visible = false;
             }
 
-            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), SuccessInventoryByOwner, EmergenceLogger.LogError);
+            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible, SuccessInventoryByOwner, EmergenceLogger.LogError);
         }
         
         private void SuccessInventoryByOwner(List<InventoryItem> inventoryItems)
