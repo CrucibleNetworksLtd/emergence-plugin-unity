@@ -9,11 +9,6 @@ namespace EmergenceSDK.Services
     public interface IContractService : IEmergenceService
     {
         /// <summary>
-        /// Loads a contract into the local server's memory. If successful, the success callback will be called.
-        /// </summary>
-        UniTask LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success, ErrorCallback errorCallback);
-
-        /// <summary>
         /// Calls a "read" method on the given contract.
         /// <remarks>The contract in question must be loaded using <see cref="LoadContract"/></remarks>
         /// </summary>

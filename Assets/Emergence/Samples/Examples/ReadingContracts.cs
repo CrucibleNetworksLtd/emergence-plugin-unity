@@ -26,19 +26,11 @@ namespace EmergenceSDK.Samples.Examples
             ReadContract();
         }
 
-        public void ReadContract()
-        {
-            // Loads the contract using the deployedContract variable and calls the Load method once it's loaded
-            contractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI, 
-                deployedContract.contract.name, OnLoadSuccess, EmergenceLogger.LogError);
-        }
-
-        // This method is called once the contract is loaded
-        private void OnLoadSuccess()
+        private void ReadContract()
         {
             // Creates a ContractInfo object with the smart contract address, method name, network name, and default node URL
             var contractInfo = new ContractInfo(deployedContract.contractAddress, "[METHOD NAME]",
-                deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL);
+                deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL, deployedContract.contract.ABI);
 
             // Calls the ReadMethod method to execute the smart contract method defined in the ABI with an empty input parameter
             contractService.ReadMethod<BaseResponse<string>, string[]>(contractInfo, body, ReadSuccess, EmergenceLogger.LogError);

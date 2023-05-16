@@ -50,8 +50,10 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void ReadCurrentCount()
         {
-            ContractService.LoadContract(deployedContract.contractAddress, deployedContract.contract.ABI,
-                deployedContract.chain.networkName, OnLoadSuccess, (message, id) => { Debug.LogError("Error while loading contract: " + message); });
+            ContractInfo contractInfo = new ContractInfo(deployedContract.contractAddress, "GetCurrentCount", deployedContract.chain.networkName,
+                deployedContract.chain.DefaultNodeURL, deployedContract.contract.ABI);
+            ContractService.ReadMethod<ContractResponse, string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
+                ReadMethodSuccess, EmergenceLogger.LogError);
         }
 
         public class ContractResponse
@@ -62,13 +64,6 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             {
                  return string.Join(", ", response);
             }
-        }
-        
-        private void OnLoadSuccess()
-        {
-            ContractInfo contractInfo = new ContractInfo(deployedContract.contractAddress, "GetCurrentCount", deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL);
-            ContractService.ReadMethod<ContractResponse, string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
-                ReadMethodSuccess, EmergenceLogger.LogError);
         }
 
         private void ReadMethodSuccess(ContractResponse response)

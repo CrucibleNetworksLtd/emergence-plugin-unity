@@ -8,13 +8,15 @@ namespace EmergenceSDK.Internal.Utils
         public string MethodName { get; }
         public string Network { get; }
         public string NodeUrl { get; }
+        public string ABI { get; }
         
-        public ContractInfo(string contractAddress, string methodName, string network, string nodeUrl)
+        public ContractInfo(string contractAddress, string methodName, string network, string nodeUrl, string abi)
         {
             ContractAddress = contractAddress;
             MethodName = methodName;
             Network = network;
             NodeUrl = nodeUrl;
+            ABI = abi;
         }
         
         public string ToReadUrl() => EmergenceSingleton.Instance.Configuration.APIBase + "readMethod?contractAddress=" + 
