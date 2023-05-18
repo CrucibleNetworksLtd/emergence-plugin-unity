@@ -61,7 +61,7 @@ namespace EmergenceSDK.Internal.Services
 
         private bool CheckForNewContract(ContractInfo contractInfo) => !loadedAddresses.Contains(contractInfo.ContractAddress);
 
-        public async UniTask ReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback)
+        public async UniTask ReadMethod<T>(ContractInfo contractInfo, string body, ReadMethodSuccess<T> success, ErrorCallback errorCallback)
         {
             if (CheckForNewContract(contractInfo))
             {
@@ -75,11 +75,9 @@ namespace EmergenceSDK.Internal.Services
 
             string url = contractInfo.ToReadUrl();
 
-            string dataString = SerializationHelper.Serialize(body, false);
-
             using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
             {
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(body));
                 request.uploadHandler.contentType = "application/json";
 
                 try
@@ -100,7 +98,7 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
-        public async UniTask WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
+        public async UniTask WriteMethod<T>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value, string body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
         {
             if (CheckForNewContract(contractInfo))
             {
@@ -123,12 +121,10 @@ namespace EmergenceSDK.Internal.Services
 
             string url = contractInfo.ToWriteUrl(localAccountNameString, gasPriceString, value);
 
-            string dataString = SerializationHelper.Serialize(body, false);
-
             using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(body));
                 request.uploadHandler.contentType = "application/json";
 
                 try

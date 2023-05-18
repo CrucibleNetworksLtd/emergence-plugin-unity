@@ -52,7 +52,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             ContractInfo contractInfo = new ContractInfo(deployedContract.contractAddress, "GetCurrentCount", deployedContract.chain.networkName,
                 deployedContract.chain.DefaultNodeURL, deployedContract.contract.ABI);
-            ContractService.ReadMethod<ContractResponse, string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
+            ContractService.ReadMethod<ContractResponse>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() }.ToString(),
                 ReadMethodSuccess, EmergenceLogger.LogError);
         }
 

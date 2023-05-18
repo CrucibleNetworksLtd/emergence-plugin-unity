@@ -12,7 +12,7 @@ namespace EmergenceSDK.Samples.Examples
         // This must be set in the inspector
         public DeployedSmartContract deployedContract;
         // Public string array that is used as input data for the smart contract method
-        public string[] body = new string[] { };
+        public string body = "";
 
         private IContractService contractService;
         
@@ -33,7 +33,7 @@ namespace EmergenceSDK.Samples.Examples
                 deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL, deployedContract.contract.ABI);
 
             // Calls the ReadMethod method to execute the smart contract method defined in the ABI with an empty input parameter
-            contractService.ReadMethod<BaseResponse<string>, string[]>(contractInfo, body, ReadSuccess, EmergenceLogger.LogError);
+            contractService.ReadMethod<BaseResponse<string>>(contractInfo, body, ReadSuccess, EmergenceLogger.LogError);
         }
 
         // This method is called when the ReadMethod method executes successfully

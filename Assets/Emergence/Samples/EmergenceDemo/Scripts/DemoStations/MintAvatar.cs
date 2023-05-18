@@ -46,7 +46,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 var contractInfo = new ContractInfo(deployedContract.contractAddress, "mint", deployedContract.contract.name,
                     deployedContract.chain.DefaultNodeURL, deployedContract.contract.ABI);
             
-                ContractService.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", "0", new string[] { }, OnWriteSuccess, EmergenceLogger.LogError);
+                ContractService.WriteMethod<BaseResponse<string>>(contractInfo, "", "", "0", "", OnWriteSuccess, EmergenceLogger.LogError);
             }
         }
         

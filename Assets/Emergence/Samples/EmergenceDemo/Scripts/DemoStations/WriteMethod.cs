@@ -51,7 +51,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             var contractInfo = new ContractInfo(deployedContract.contractAddress, "IncrementCount", deployedContract.chain.networkName,
                 deployedContract.chain.DefaultNodeURL, deployedContract.contract.ABI);
-            ContractService.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", "0", new string[] { }, WriteMethodSuccess, EmergenceLogger.LogError);
+            ContractService.WriteMethod<BaseResponse<string>>(contractInfo, "", "", "0", "", WriteMethodSuccess, EmergenceLogger.LogError);
         }
 
         private void WriteMethodSuccess(BaseResponse<string> response)
