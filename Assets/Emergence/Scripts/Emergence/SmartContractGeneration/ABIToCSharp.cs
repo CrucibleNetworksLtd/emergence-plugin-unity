@@ -17,7 +17,7 @@ namespace ABIToDotNet
         public ABIToCSharp(ContractInfo contractInfo)
         {
             this.contractInfo = contractInfo ?? throw new ArgumentNullException(nameof(contractInfo));
-            className = contractInfo.MethodName;
+            className = $"{this.contractInfo.Network}_{contractInfo.MethodName}";
             cSharpClass = GenerateCSharpClassFromABI();
         }
 
@@ -31,6 +31,7 @@ namespace ABIToDotNet
 
             // Generate the class definition
             AppendLineWithIndent(sb, "// This is a generated class, be aware that any changes made to it will be overwritten");
+            AppendLineWithIndent(sb, $"// Generated from contract {contractInfo.ContractAddress} on network {contractInfo.Network}");
             sb.AppendLine($"using Cysharp.Threading.Tasks;");
             sb.AppendLine($"using EmergenceSDK.Internal.Utils;");
             sb.AppendLine($"using EmergenceSDK.Services;");
