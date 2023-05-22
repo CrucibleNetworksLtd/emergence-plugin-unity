@@ -3,6 +3,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.IO;
+using ABIToDotNet;
 using EmergenceSDK.Internal.Utils;
 
 public class ContractInfoCreationUI : EditorWindow
@@ -86,7 +87,7 @@ public class ContractInfoCreationUI : EditorWindow
         string filePath = Path.Combine(networkPath, $"{methodName}.cs");
         if (!File.Exists(filePath))
         {
-            File.WriteAllText(filePath, newContractInfo.ToString());
+            File.WriteAllText(filePath, new ABIToCSharp(newContractInfo).CSharpClass);
             Debug.Log("Created ContractInfo file: " + filePath);
         }
         else
