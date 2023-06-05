@@ -243,7 +243,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
             selectedPersona = persona;
 
-            bool active = persona.id == activePersona.id;
+            bool active = activePersona != null && persona.id == activePersona.id;
 
             detailsTitleText.text = persona.name;
             detailsBioText.text = persona.bio;
