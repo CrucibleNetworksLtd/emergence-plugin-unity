@@ -20,7 +20,7 @@ namespace EmergenceSDK.Samples.Examples
             sessionService.GetQRCode(GotQRCode, EmergenceLogger.LogError);
         }
 
-        private void GotQRCode(Texture2D qrcode, string deviceid)
+        private void GotQRCode(Texture2D qrcode)
         {
             //Present the QR code to the user for scanning
 

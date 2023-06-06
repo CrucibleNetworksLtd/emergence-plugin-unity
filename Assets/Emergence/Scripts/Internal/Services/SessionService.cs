@@ -108,7 +108,8 @@ namespace EmergenceSDK.Internal.Services
             else
             {
                 string deviceId = request.GetResponseHeader("deviceId");
-                success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture, deviceId);
+                EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
+                success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture);
             }
         }
     }

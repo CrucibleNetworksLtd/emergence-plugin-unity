@@ -36,7 +36,7 @@ namespace EmergenceSDK.Services
     
     public delegate void RequestToSignSuccess(string signedMessage);
     
-    public delegate void QRCodeSuccess(Texture2D qrCode, string deviceId);
+    public delegate void QRCodeSuccess(Texture2D qrCode);
     
     public delegate void HandshakeSuccess(string walletAddress);
     
