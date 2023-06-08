@@ -1,18 +1,22 @@
 #if UNITY_EDITOR
+using EmergenceSDK.EmergenceDemo.DemoStations;
 using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
 using UnityEditor;
 using UnityEngine;
 
 namespace EmergenceSDK
 {
-    public class ChainServiceTest : EditorWindow
+    public class SignedOutTesting : EditorWindow
     {
-        [MenuItem("Window/Emergence Internal/Chain Service")]
+        
+        [MenuItem("Window/Emergence Internal/Signed Out Testing")]
         private static void OpenWindow()
         {
-            ChainServiceTest window = GetWindow<ChainServiceTest>("Chain Service");
+            SignedOutTesting window = GetWindow<SignedOutTesting>("Signed Out Testing");
             window.Show();
         }
 
@@ -24,6 +28,8 @@ namespace EmergenceSDK
                 GetTransactionStatusPressed();
             if (GUILayout.Button("GetHighestBlockNumber")) 
                 GetHighestBlockNumberPressed();
+            
+            EditorGUILayout.Separator();
         }
 
         private void GetTransactionStatusPressed()
