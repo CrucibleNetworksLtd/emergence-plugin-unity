@@ -1,27 +1,22 @@
 #if UNITY_EDITOR
-using EmergenceSDK.EmergenceDemo.DemoStations;
 using EmergenceSDK.Internal.Utils;
-using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
 using UnityEditor;
 using UnityEngine;
 
 namespace EmergenceSDK
 {
-    public class SignedOutTesting : EditorWindow
+    public class ChainTesting : BaseTestWindow
     {
-        
-        [MenuItem("Window/Emergence Internal/Signed Out Testing")]
-        private static void OpenWindow()
-        {
-            SignedOutTesting window = GetWindow<SignedOutTesting>("Signed Out Testing");
-            window.Show();
-        }
-
         private void OnGUI()
         {
+            if (!ReadyToTest(out var msg))
+            {
+                EditorGUILayout.LabelField(msg);
+                return;
+            }
+            
             EditorGUILayout.LabelField("Test Chain Service");
             
             if (GUILayout.Button("GetTransactionStatus")) 
