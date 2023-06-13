@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System;
 using EmergenceSDK.Types;
 using UnityEditor;
@@ -33,3 +35,5 @@ namespace EmergenceSDK.InternalTesting
         protected virtual void CleanUp() { }
     }
 }
+
+#endif

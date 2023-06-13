@@ -33,6 +33,9 @@ namespace EmergenceSDK.InternalTesting
             
             PersonaTesting personaTesting = GetWindow<PersonaTesting>("Persona Test Panel", desiredDockNextTo);
             personaTesting.Show();
+            
+            WalletTesting walletTesting = GetWindow<WalletTesting>("Wallet Test Panel", desiredDockNextTo);
+            walletTesting.Show();
         }
 
         private void OnGUI()
