@@ -5,7 +5,7 @@ using EmergenceSDK.Types.Responses;
 using UnityEditor;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.InternalTesting
 {
     public class ChainTesting : BaseTestWindow
     {

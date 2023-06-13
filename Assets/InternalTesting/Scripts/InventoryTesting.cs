@@ -8,7 +8,7 @@ using EmergenceSDK.Types.Inventory;
 using UnityEditor;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.InternalTesting
 {
     public class InventoryTesting : BaseTestWindow
     {
@@ -22,6 +22,7 @@ namespace EmergenceSDK
                 EditorGUILayout.LabelField(msg);
                 return;
             }
+            needsCleanUp = true;
             
             EditorGUILayout.LabelField("Test Inventory Service");
             

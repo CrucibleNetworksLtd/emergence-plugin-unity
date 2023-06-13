@@ -9,7 +9,7 @@ using EmergenceSDK.Types.Responses;
 using UnityEditor;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.InternalTesting
 {
     public class ContractTesting : BaseTestWindow
     {
@@ -27,6 +27,7 @@ namespace EmergenceSDK
                 EditorGUILayout.LabelField(msg);
                 return;
             }
+            needsCleanUp = true;
             
             EditorGUILayout.LabelField("Test Contract Service");
             

@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using Avatar = EmergenceSDK.Types.Avatar;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.InternalTesting
 {
     public class AvatarTesting : BaseTestWindow
     {
@@ -22,6 +22,7 @@ namespace EmergenceSDK
                 EditorGUILayout.LabelField(msg);
                 return;
             }
+            needsCleanUp = true;
             
             EditorGUILayout.LabelField("Test Avatar Service");
 

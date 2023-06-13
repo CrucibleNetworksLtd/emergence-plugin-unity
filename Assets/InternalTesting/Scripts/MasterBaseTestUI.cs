@@ -2,16 +2,18 @@
 
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using UnityEditor;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.InternalTesting
 {
     public class MasterBaseTestUI : BaseTestWindow
     {
         private Texture2D qrcode;
         private bool displayQR = false;
-        
+        private bool needToGenerateQR = true;
+
         [MenuItem("Window/Emergence Internal/In Game Test Panel")]
         private static void OpenWindow()
         {
@@ -40,10 +42,18 @@ namespace EmergenceSDK
                 EditorGUILayout.LabelField("Please run the game to test EmergenceSDK");
                 return;
             }
+            needsCleanUp = true;
+
+            if (IsLoggedIn())
+            {
+                EditorGUILayout.LabelField("Signed in as: " + EmergenceSingleton.Instance.GetCachedAddress());
+                return;
+            }
 
             EditorGUILayout.LabelField("QR");
-            if (GUILayout.Button("Generate QR"))
+            if (needToGenerateQR)
             {
+                needToGenerateQR = false;
                 EmergenceServices.GetService<ISessionService>().GetQRCode(OnGetQRCodeSuccess, EmergenceLogger.LogError);
             }
 
@@ -70,6 +80,7 @@ namespace EmergenceSDK
         protected override void CleanUp()
         {
             displayQR = false;
+            needToGenerateQR = true;
         }
     }
 }
