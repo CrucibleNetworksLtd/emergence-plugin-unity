@@ -37,7 +37,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = EmergenceSingleton.Instance.Configuration.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
 
-            using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 try
                 {

@@ -11,6 +11,8 @@ namespace EmergenceSDK.Internal.Services
     internal class WalletService : IWalletService
     {
         private string walletAddress = string.Empty;
+        
+        private bool completedHandshake = false;
 
         public bool HasAddress => walletAddress != null && walletAddress.Trim() != string.Empty;
 
@@ -99,6 +101,15 @@ namespace EmergenceSDK.Internal.Services
         
             if (EmergenceUtils.ProcessRequest<HandshakeResponse>(request, errorCallback, out var response))
             {
+                if (response == null)
+                {
+                    string errorMessage = completedHandshake ? "Handshake already completed." : "Handshake failed, check server status.";
+                    int errorCode = completedHandshake ? 0 : -1;
+                    errorCallback?.Invoke(errorMessage, errorCode);
+                    return;
+                }
+                
+                completedHandshake = true;
                 WalletAddress = response.address;
                 EmergenceSingleton.Instance.SetCachedAddress(response.address);
                 success?.Invoke(WalletAddress);

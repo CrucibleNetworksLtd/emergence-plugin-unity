@@ -57,9 +57,8 @@ namespace EmergenceSDK.Internal.UI.Screens
                     {
                         timeRemaining += QRRefreshTimeOut;
 
-                        sessionService.GetQRCode((texture, deviceId) =>
+                        sessionService.GetQRCode((texture) =>
                             {
-                                EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
                                 rawQRImage.texture = texture;
 
                                 walletService.Handshake((walletAddress) =>
