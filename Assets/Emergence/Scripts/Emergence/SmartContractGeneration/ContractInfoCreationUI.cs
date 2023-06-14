@@ -9,7 +9,7 @@ using EmergenceSDK.Internal.Utils;
 public class ContractInfoCreationUI : EditorWindow
 {
     private string address;
-    private string methodName;
+    private string contractName;
     private string network;
     private string abi;
 
@@ -24,7 +24,7 @@ public class ContractInfoCreationUI : EditorWindow
         GUILayout.Label("Contract Info Creation", EditorStyles.boldLabel);
 
         address = EditorGUILayout.TextField("Contract Address", address);
-        methodName = EditorGUILayout.TextField("Method Name", methodName);
+        contractName = EditorGUILayout.TextField("Contract Name", contractName);
         network = EditorGUILayout.TextField("Network", network);
         abi = EditorGUILayout.TextField("ABI", abi);
 
@@ -45,9 +45,9 @@ public class ContractInfoCreationUI : EditorWindow
             return false;
         }
 
-        if (string.IsNullOrEmpty(methodName))
+        if (string.IsNullOrEmpty(contractName))
         {
-            EditorUtility.DisplayDialog("Input Error", "Method name cannot be empty.", "OK");
+            EditorUtility.DisplayDialog("Input Error", "Contract name cannot be empty.", "OK");
             return false;
         }
 
@@ -68,7 +68,7 @@ public class ContractInfoCreationUI : EditorWindow
 
     private void CreateContractInfo()
     {
-        ContractInfo newContractInfo = new ContractInfo(address, methodName, network, "", abi);
+        ContractInfo newContractInfo = new ContractInfo(address, contractName, network, "", abi);
 
         // Get the path of the current script
         string scriptPath = AssetDatabase.GetAssetPath(MonoScript.FromScriptableObject(this));
@@ -84,7 +84,7 @@ public class ContractInfoCreationUI : EditorWindow
         }
 
         // Create a new file with the contract info
-        string filePath = Path.Combine(networkPath, $"{methodName}.cs");
+        string filePath = Path.Combine(networkPath, $"{contractName}.cs");
         if (!File.Exists(filePath))
         {
             File.WriteAllText(filePath, new ABIToCSharp(newContractInfo).CSharpClass);
