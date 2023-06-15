@@ -32,6 +32,7 @@ namespace ABIToDotNet
             // Generate the class definition
             AppendLineWithIndent(sb, "// This is a generated class, be aware that any changes made to it will be overwritten");
             AppendLineWithIndent(sb, $"// Generated from contract {contractInfo.ContractAddress} on network {contractInfo.Network}");
+            AppendLineWithIndent(sb , $"#define {contractInfo.ContractAddress.Substring(2)}");
             sb.AppendLine($"using Cysharp.Threading.Tasks;");
             sb.AppendLine($"using EmergenceSDK.Internal.Utils;");
             sb.AppendLine($"using EmergenceSDK.Services;");

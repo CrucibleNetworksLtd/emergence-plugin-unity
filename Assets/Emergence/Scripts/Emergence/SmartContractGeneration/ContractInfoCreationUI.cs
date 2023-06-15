@@ -85,15 +85,9 @@ public class ContractInfoCreationUI : EditorWindow
 
         // Create a new file with the contract info
         string filePath = Path.Combine(networkPath, $"{contractName}.cs");
-        if (!File.Exists(filePath))
-        {
-            File.WriteAllText(filePath, new ABIToCSharp(newContractInfo).CSharpClass);
-            Debug.Log("Created ContractInfo file: " + filePath);
-        }
-        else
-        {
-            Debug.Log("ContractInfo file already exists: " + filePath);
-        }
+        
+        File.WriteAllText(filePath, new ABIToCSharp(newContractInfo).CSharpClass);
+        EmergenceLogger.LogInfo("Created ContractInfo file: " + filePath);
     }
 }
 

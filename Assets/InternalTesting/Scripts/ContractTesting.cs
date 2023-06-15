@@ -40,14 +40,35 @@ namespace EmergenceSDK.InternalTesting
                 WriteMethodPressed();
             writeContract = (DeployedSmartContract)EditorGUILayout.ObjectField("WriteContract", writeContract, typeof(DeployedSmartContract), true);
             writeContractMethodName = EditorGUILayout.TextField("Write Contract Method Name", writeContractMethodName);
+            
+#if C9571AaF9EbCa8C08EC37D962310d0Ab9F8A5Dd2
+            EditorGUILayout.LabelField("Generated Counter Contract");
+            if (GUILayout.Button("Read Counter"))
+                ReadCounterPressed();
+            
+            if (GUILayout.Button("Write Counter"))
+                WriteCounterPressed();
+#endif
         }
-                
+        
+        
+#if C9571AaF9EbCa8C08EC37D962310d0Ab9F8A5Dd2
+        private void ReadCounterPressed()
+        {
+            throw new System.NotImplementedException();
+        }
+        
+        private void WriteCounterPressed()
+        {
+            throw new System.NotImplementedException();
+        }
+#endif
         private void ReadMethodPressed()
         {
             var contractInfo = new ContractInfo(readContract.contractAddress, readContractMethodName,
                 readContract.chain.networkName, readContract.chain.DefaultNodeURL, readContract.contract.ABI);
-            EmergenceServices.GetService<IContractService>().ReadMethod<ReadMethod.ContractResponse, string[]>(contractInfo,
-                new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
+            EmergenceServices.GetService<IContractService>().ReadMethod<ReadMethod.ContractResponse>(contractInfo,
+                EmergenceSingleton.Instance.GetCachedAddress(),
                 (result) => EditorUtility.DisplayDialog("Read Method Result", "Result: " + result, "OK"),
                 EmergenceLogger.LogError);
         }
@@ -56,8 +77,8 @@ namespace EmergenceSDK.InternalTesting
         {
             var contractInfo = new ContractInfo(writeContract.contractAddress, writeContractMethodName,
                 writeContract.chain.networkName, writeContract.chain.DefaultNodeURL, writeContract.contract.ABI);
-            EmergenceServices.GetService<IContractService>().WriteMethod<BaseResponse<string>, string[]>(contractInfo,
-                "", "", "0", new string[] { },
+            EmergenceServices.GetService<IContractService>().WriteMethod<BaseResponse<string>>(contractInfo,
+                "", "", "0", "",
                 (response) => EditorUtility.DisplayDialog("Write Method Response", "Response: " + response, "OK"),
                 EmergenceLogger.LogError);
         }
