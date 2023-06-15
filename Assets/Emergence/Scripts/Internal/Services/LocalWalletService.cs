@@ -18,7 +18,7 @@ namespace EmergenceSDK.Internal.Services
         //Local EVM only
         public async UniTask CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "createWallet" + "?path=" + path +
+            string url = StaticConfig.APIBase + "createWallet" + "?path=" + path +
                          "&password=" + password;
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
@@ -38,7 +38,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask CreateKeyStore(string privateKey, string password, string publicKey, string path,
             CreateKeyStoreSuccess success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "createKeyStore" + "?privateKey=" +
+            string url = StaticConfig.APIBase + "createKeyStore" + "?privateKey=" +
                          privateKey + "&password=" + password + "&publicKey=" + publicKey + "&path=" + path;
 
             using UnityWebRequest request = UnityWebRequest.Post(url, "");
@@ -56,7 +56,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask LoadAccount(Account account, LoadAccountSuccess success, ErrorCallback errorCallback)
         {
             string dataString = SerializationHelper.Serialize(account, false);
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "loadAccount";
+            string url = StaticConfig.APIBase + "loadAccount";
 
             using UnityWebRequest request = UnityWebRequest.Post(url, "");
             request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));

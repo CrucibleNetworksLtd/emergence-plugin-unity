@@ -19,11 +19,11 @@ namespace EmergenceSDK.Internal.Utils
             ABI = abi;
         }
         
-        public string ToReadUrl() => EmergenceSingleton.Instance.Configuration.APIBase + "readMethod?contractAddress=" + 
+        public string ToReadUrl() => StaticConfig.APIBase + "readMethod?contractAddress=" + 
                                  ContractAddress + "&methodName=" + MethodName + "&nodeUrl=" + NodeUrl + "&network=" + Network;
         
         public string ToWriteUrl(string localAccountName, string gasPrice, string value) => 
-            EmergenceSingleton.Instance.Configuration.APIBase + "writeMethod?contractAddress=" +
+            StaticConfig.APIBase + "writeMethod?contractAddress=" +
             ContractAddress + "&methodName=" + MethodName + localAccountName + gasPrice +
             "&network=" + Network + "&nodeUrl=" + NodeUrl + "&value=" + value;
     }

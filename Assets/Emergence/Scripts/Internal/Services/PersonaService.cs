@@ -45,7 +45,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "get-access-token";
+            string url = StaticConfig.APIBase + "get-access-token";
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);

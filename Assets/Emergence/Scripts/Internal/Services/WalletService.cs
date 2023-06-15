@@ -33,7 +33,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask ReinitializeWalletConnect(ReinitializeWalletConnectSuccess success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "reinitializewalletconnect";
+            string url = StaticConfig.APIBase + "reinitializewalletconnect";
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
             try
@@ -56,7 +56,7 @@ namespace EmergenceSDK.Internal.Services
         {
             var content = "{\"message\": \"" + messageToSign + "\"}";
 
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "request-to-sign";
+            string url = StaticConfig.APIBase + "request-to-sign";
 
             using UnityWebRequest request = UnityWebRequest.Post(url, "");
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
@@ -82,7 +82,7 @@ namespace EmergenceSDK.Internal.Services
         
         public async UniTask Handshake(HandshakeSuccess success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "handshake" + "?nodeUrl=" +
+            string url = StaticConfig.APIBase + "handshake" + "?nodeUrl=" +
                          EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL;
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
@@ -121,7 +121,7 @@ namespace EmergenceSDK.Internal.Services
             if (sessionService.DisconnectInProgress)
                 return;
     
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "getbalance" + "?nodeUrl=" +
+            string url = StaticConfig.APIBase + "getbalance" + "?nodeUrl=" +
                          EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL + "&address=" + WalletAddress;
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
@@ -154,7 +154,7 @@ namespace EmergenceSDK.Internal.Services
 
             string dataString = SerializationHelper.Serialize(data, false);
 
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "validate-signed-message" + "?request=" + personaService.CurrentAccessToken;
+            string url = StaticConfig.APIBase + "validate-signed-message" + "?request=" + personaService.CurrentAccessToken;
 
             using UnityWebRequest request = UnityWebRequest.Post(url, "");
             request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));

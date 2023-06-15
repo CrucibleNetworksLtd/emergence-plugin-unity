@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using UnityEngine.Networking;
@@ -16,7 +17,7 @@ namespace EmergenceSDK.Internal.Services
         //Local EVM only
         public async UniTask Finish(SuccessFinish success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "finish";
+            string url = StaticConfig.APIBase + "finish";
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
             try

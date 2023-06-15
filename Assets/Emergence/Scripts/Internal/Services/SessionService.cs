@@ -34,7 +34,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask IsConnected(IsConnectedSuccess success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "isConnected";
+            string url = StaticConfig.APIBase + "isConnected";
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
@@ -57,7 +57,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
         {
             disconnectInProgress = true;
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "killSession";
+            string url = StaticConfig.APIBase + "killSession";
 
             using UnityWebRequest request = UnityWebRequest.Get(url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
@@ -87,7 +87,7 @@ namespace EmergenceSDK.Internal.Services
         
         public async UniTask GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "qrcode";
+            string url = StaticConfig.APIBase + "qrcode";
 
             using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             try

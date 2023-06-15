@@ -11,7 +11,7 @@ namespace EmergenceSDK.Internal.Services
     {
         public async UniTask GetTransactionStatus<T>(string transactionHash, string nodeURL, GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "GetTransactionStatus?transactionHash=" + transactionHash + "&nodeURL=" + nodeURL;
+            string url = StaticConfig.APIBase + "GetTransactionStatus?transactionHash=" + transactionHash + "&nodeURL=" + nodeURL;
     
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
@@ -35,7 +35,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask GetHighestBlockNumber<T>(string nodeURL, GetBlockNumberSuccess<T> success, ErrorCallback errorCallback)
         {
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
+            string url = StaticConfig.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {

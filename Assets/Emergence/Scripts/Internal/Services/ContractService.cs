@@ -29,7 +29,7 @@ namespace EmergenceSDK.Internal.Services
             form.AddField("network", network);
 
             string dataString = SerializationHelper.Serialize(data, false);
-            string url = EmergenceSingleton.Instance.Configuration.APIBase + "loadContract";
+            string url = StaticConfig.APIBase + "loadContract";
 
             using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
             {

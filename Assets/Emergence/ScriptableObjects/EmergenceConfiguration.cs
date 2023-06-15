@@ -6,12 +6,6 @@ namespace EmergenceSDK.ScriptableObjects
     [CreateAssetMenu(fileName = "Configuration", menuName = "EmergenceConfiguration", order = 1)]
     public class EmergenceConfiguration : ScriptableObject
     {
-        /// <summary>
-        /// URL pointing to the Emergence API.
-        /// <remarks>Changing this will break Emergence</remarks>
-        /// </summary>
-        [HideInInspector]
-        public string APIBase = "https://evm3.openmeta.xyz/api/";
         public string defaultIpfsGateway = "http://ipfs.openmeta.xyz/ipfs/";
         public EmergenceChain Chain;
 
