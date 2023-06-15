@@ -11,7 +11,7 @@ namespace EmergenceSDK.ScriptableObjects
         /// <remarks>Changing this will break Emergence</remarks>
         /// </summary>
         [HideInInspector]
-        public string APIBase = "https://evm2.openmeta.xyz/api/";
+        public string APIBase = "https://evm3.openmeta.xyz/api/";
         public string defaultIpfsGateway = "http://ipfs.openmeta.xyz/ipfs/";
         public EmergenceChain Chain;
 
