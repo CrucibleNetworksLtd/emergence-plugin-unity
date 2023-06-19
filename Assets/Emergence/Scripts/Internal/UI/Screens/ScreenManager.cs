@@ -205,10 +205,10 @@ namespace EmergenceSDK.Internal.UI.Screens
             ChangeState(ScreenStates.EditPersona);
         }
 
-        public void ShowCollection(Action<InventoryItem> customOnClickHandler = null)
+        public void ShowCollection()
         {
             ChangeState(ScreenStates.Collection);
-            CollectionScreen.Instance.Refresh(customOnClickHandler);
+            CollectionScreen.Instance.Refresh();
         }
 
         public void Restart()

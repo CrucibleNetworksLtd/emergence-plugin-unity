@@ -71,6 +71,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         private FilterParams filterParams = new FilterParams();
         private IInventoryService inventoryService;
         private IAvatarService avatarService;
+        
+        public event Action<InventoryItem> OnItemClicked;
 
         private void Awake()
         {
@@ -86,50 +88,43 @@ namespace EmergenceSDK.Internal.UI.Screens
             blockchainDropdown.onValueChanged.AddListener(OnBlockchainDropdownValueChanged);
         }
 
-        public void Refresh(Action<InventoryItem> customOnClickHandler)
+        public void Refresh()
         {
             inventoryService = EmergenceServices.GetService<IInventoryService>();
             inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible, InventoryByOwnerSuccess, InventoryRefreshErrorCallback);
-            void InventoryByOwnerSuccess(List<InventoryItem> inventoryItems)
-            {
-                foreach (var item in items)
-                {
-                    Destroy(item.entryGo);
-                }
-                items.ReturnAllUsedObjects();
 
-                EmergenceLogger.LogInfo("Received items: " + inventoryItems.Count);
-                Modal.Instance.Show("Retrieving inventory items...");
-
-                for (int i = 0; i < inventoryItems.Count; i++)
-                {
-                    GameObject entry = Instantiate(itemEntryPrefab, contentGO.transform, false);
-
-                    var newObject = items.GetNewObject();
-                    newObject.entryGo = entry;
-                    newObject.inventoryItem = inventoryItems[i];
-
-                    Button entryButton = entry.GetComponent<Button>();
-                    InventoryItem item = inventoryItems[i];
-
-                    if (customOnClickHandler != null)
-                    {
-                        entryButton.onClick.AddListener(() => customOnClickHandler(item));
-                    }
-                    else
-                    {
-                        entryButton.onClick.AddListener(() => OnInventoryItemPressed(item));
-                    }
-
-                    InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
-                    itemEntry.SetItem(inventoryItems[i]);
-                }
-                Modal.Instance.Hide();
-            }
-            
-            
             avatarService = EmergenceServices.GetService<IAvatarService>();
             avatarService.AvatarsByOwner(EmergenceSingleton.Instance.GetCachedAddress(), AvatarsByOwnerSuccess, InventoryRefreshErrorCallback);
+        }
+        
+        private void InventoryByOwnerSuccess(List<InventoryItem> inventoryItems)
+        {
+            foreach (var item in items)
+            {
+                Destroy(item.entryGo);
+            }
+            items.ReturnAllUsedObjects();
+
+            EmergenceLogger.LogInfo("Received items: " + inventoryItems.Count);
+            Modal.Instance.Show("Retrieving inventory items...");
+
+            for (int i = 0; i < inventoryItems.Count; i++)
+            {
+                GameObject entry = Instantiate(itemEntryPrefab, contentGO.transform, false);
+
+                var newObject = items.GetNewObject();
+                newObject.entryGo = entry;
+                newObject.inventoryItem = inventoryItems[i];
+
+                Button entryButton = entry.GetComponent<Button>();
+                InventoryItem item = inventoryItems[i];
+                entryButton.onClick.AddListener(() => OnInventoryItemPressed(item));
+                entryButton.onClick.AddListener(() => OnItemClicked?.Invoke(item));
+
+                InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
+                itemEntry.SetItem(inventoryItems[i]);
+            }
+            Modal.Instance.Hide();
         }
 
         private void AvatarsByOwnerSuccess(List<Avatar> avatar)

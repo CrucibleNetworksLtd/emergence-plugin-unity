@@ -52,7 +52,8 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void ShowNFTPicker()
         {
             EmergenceSingleton.Instance.OpenEmergenceUI();
-            ScreenManager.Instance.ShowCollection(UpdateDynamicMetadata);
+            ScreenManager.Instance.ShowCollection();
+            CollectionScreen.Instance.OnItemClicked += UpdateDynamicMetadata;
         }
 
         private class DynamicMetaData
@@ -79,7 +80,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 if (dynamicMetaData.statusCode == 0)
                 {
                     CollectionScreen.Instance.OpenSidebar(item);
-                    CollectionScreen.Instance.Refresh(null);
+                    CollectionScreen.Instance.Refresh();
                 }
             
             }
