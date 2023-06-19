@@ -15,16 +15,16 @@ namespace EmergenceSDK.Internal.UI.Screens
     
     public class CollectionScreen : MonoBehaviour
     {
-        struct InventoryUIItem
+        private class InventoryUIItem
         {
+            public Guid id;
             public InventoryItem inventoryItem;
             public GameObject entryGo;
-            public InventoryUIItem(InventoryItem inventoryItem, GameObject entryGo)
+
+            public InventoryUIItem()
             {
-                this.inventoryItem = inventoryItem;
-                this.entryGo = entryGo;
+                id = Guid.NewGuid();
             }
-        
         }
         
         private class FilterParams
@@ -108,21 +108,22 @@ namespace EmergenceSDK.Internal.UI.Screens
             EmergenceLogger.LogInfo("Received items: " + inventoryItems.Count);
             Modal.Instance.Show("Retrieving inventory items...");
 
-            for (int i = 0; i < inventoryItems.Count; i++)
+            var displayItems = inventoryItems.Where(item => item.Meta != null).ToList();
+            for (int i = 0; i < displayItems.Count; i++)
             {
                 GameObject entry = Instantiate(itemEntryPrefab, contentGO.transform, false);
 
                 var newObject = items.GetNewObject();
                 newObject.entryGo = entry;
-                newObject.inventoryItem = inventoryItems[i];
+                newObject.inventoryItem = displayItems[i];
 
                 Button entryButton = entry.GetComponent<Button>();
-                InventoryItem item = inventoryItems[i];
+                InventoryItem item = displayItems[i];
                 entryButton.onClick.AddListener(() => OnInventoryItemPressed(item));
                 entryButton.onClick.AddListener(() => OnItemClicked?.Invoke(item));
 
                 InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
-                itemEntry.SetItem(inventoryItems[i]);
+                itemEntry.SetItem(displayItems[i]);
             }
             Modal.Instance.Hide();
         }
