@@ -7,7 +7,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace EmergenceSDK.Internal.UI
+namespace EmergenceSDK.Internal.UI.Inventory
 {
     public class InventoryItemEntry : MonoBehaviour
     {

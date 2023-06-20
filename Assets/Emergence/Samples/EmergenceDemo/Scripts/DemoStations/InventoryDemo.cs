@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using EmergenceSDK.Internal.UI;
+using EmergenceSDK.Internal.UI.Inventory;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using EmergenceSDK.Internal.UI.Inventory;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -17,14 +18,8 @@ namespace EmergenceSDK.Internal.UI.Screens
     {
         private class InventoryUIItem
         {
-            public Guid id;
             public InventoryItem inventoryItem;
             public GameObject entryGo;
-
-            public InventoryUIItem()
-            {
-                id = Guid.NewGuid();
-            }
         }
         
         private class FilterParams

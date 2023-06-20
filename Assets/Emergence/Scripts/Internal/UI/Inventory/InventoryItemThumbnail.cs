@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-namespace EmergenceSDK.Internal.UI
+namespace EmergenceSDK.Internal.UI.Inventory
 {
     public class InventoryItemThumbnail : MonoBehaviour
     {
