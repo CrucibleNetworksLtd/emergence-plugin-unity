@@ -10,5 +10,20 @@ namespace EmergenceSDK.Types.Inventory
         public List<InventoryItemMetaContent> Content { get; set; }
         public List<object> Restrictions { get; set; }
         public string DynamicMetadata { get; set; }
+
+        public InventoryItemMetaData()
+        {
+            // Default constructor
+        }
+
+        public InventoryItemMetaData(InventoryItemMetaData other)
+        {
+            Name = other.Name;
+            Description = other.Description;
+            Attributes = new List<InventoryItemMetaAttributes>(other.Attributes);
+            Content = new List<InventoryItemMetaContent>(other.Content);
+            Restrictions = new List<object>(other.Restrictions);
+            DynamicMetadata = other.DynamicMetadata;
+        }
     }
 }

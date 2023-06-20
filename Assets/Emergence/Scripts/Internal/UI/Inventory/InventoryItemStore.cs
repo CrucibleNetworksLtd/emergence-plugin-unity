@@ -13,6 +13,8 @@ namespace EmergenceSDK.Internal.UI.Inventory
         private HashSet<InventoryItem> items = new HashSet<InventoryItem>();
         private Dictionary<string, InventoryItemEntry> entryDictionary = new Dictionary<string, InventoryItemEntry>();
         
+        private List<InventoryItemEntry> spentEntries = new List<InventoryItemEntry>();
+        
         public InventoryItemStore(Func<GameObject> instantiateItemEntry)
         {
             this.instantiateItemEntry = instantiateItemEntry;
@@ -23,12 +25,18 @@ namespace EmergenceSDK.Internal.UI.Inventory
             var displayItems = items.Where(item => item.Meta != null).ToList();
             foreach (InventoryItem item in displayItems)
             {
-                InventoryItemEntry entry = CreateEntry(item);
-                entryDictionary.Add(item.ID, entry);
+                if(AddItem(item))
+                    UpdateItem(item);
             }
         }
-        
-        private void AddItem(InventoryItem item)
+
+        private void UpdateItem(InventoryItem item)
+        {
+            items.Remove(item);
+            items.Add(item);
+        }
+
+        private bool AddItem(InventoryItem item)
         {
             if (items.Add(item))
             {
@@ -36,13 +44,25 @@ namespace EmergenceSDK.Internal.UI.Inventory
                 {
                     InventoryItemEntry entry = CreateEntry(item);
                     entryDictionary.Add(item.ID, entry);
+                    return true;
                 }
             }
+            return false;
         }
 
         private InventoryItemEntry CreateEntry(InventoryItem item)
         {
-            GameObject entry = instantiateItemEntry();
+            GameObject entry;
+            if(spentEntries.Count > 0)
+            {
+                entry = spentEntries[0].gameObject;
+                entry.SetActive(true);
+                spentEntries.RemoveAt(0);
+            }
+            else
+            {
+                entry = instantiateItemEntry();
+            }
             InventoryItemEntry entryComponent = entry.GetComponent<InventoryItemEntry>();
             entryComponent.SetItem(item);
             
@@ -64,6 +84,10 @@ namespace EmergenceSDK.Internal.UI.Inventory
         {
             if (entryDictionary.ContainsKey(itemId))
             {
+                var entry = entryDictionary[itemId];
+                spentEntries.Add(entryDictionary[itemId]);
+                entry.gameObject.SetActive(false);
+
                 entryDictionary.Remove(itemId);
             }
             items.RemoveWhere(item => item.ID == itemId);

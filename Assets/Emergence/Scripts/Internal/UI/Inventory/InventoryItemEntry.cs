@@ -21,6 +21,10 @@ namespace EmergenceSDK.Internal.UI.Inventory
         private bool rotateOnLoading;
         private bool outputDebugLog;
         
+        /// <summary>
+        /// A shallow copy of the item that this entry represents, editing this item will have no effect on the inventory.
+        /// </summary>
+        public InventoryItem Item => new InventoryItem(item);
         private InventoryItem item;
 
         public void SetItem(InventoryItem item)

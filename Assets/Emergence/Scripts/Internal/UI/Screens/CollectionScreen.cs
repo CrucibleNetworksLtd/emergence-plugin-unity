@@ -16,12 +16,6 @@ namespace EmergenceSDK.Internal.UI.Screens
     
     public class CollectionScreen : MonoBehaviour
     {
-        private class InventoryUIItem
-        {
-            public InventoryItem inventoryItem;
-            public GameObject entryGo;
-        }
-        
         private class FilterParams
         {
             public string searchString ;
@@ -60,7 +54,6 @@ namespace EmergenceSDK.Internal.UI.Screens
         private bool isItemSelected = false;
         private InventoryItem selectedItem;
 
-        private GenericPool<InventoryUIItem> items = new GenericPool<InventoryUIItem>();
         private List<Avatar> avatars = new List<Avatar>();
 
         private FilterParams filterParams = new FilterParams();
@@ -68,6 +61,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         private IAvatarService avatarService;
         
         public event Action<InventoryItem> OnItemClicked;
+        
+        private InventoryItemStore inventoryItemStore;
 
         private void Awake()
         {
@@ -81,8 +76,12 @@ namespace EmergenceSDK.Internal.UI.Screens
             weaponsToggle.onValueChanged.AddListener(OnWeaponsToggleValueChanged);
             
             blockchainDropdown.onValueChanged.AddListener(OnBlockchainDropdownValueChanged);
+            
+            inventoryItemStore = new InventoryItemStore(InstantiateItemEntry);
         }
 
+        private GameObject InstantiateItemEntry() => Instantiate(itemEntryPrefab, contentGO.transform, false);
+        
         public void Refresh()
         {
             inventoryService = EmergenceServices.GetService<IInventoryService>();
@@ -94,31 +93,17 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         private void InventoryByOwnerSuccess(List<InventoryItem> inventoryItems)
         {
-            foreach (var item in items)
-            {
-                Destroy(item.entryGo);
-            }
-            items.ReturnAllUsedObjects();
-
             EmergenceLogger.LogInfo("Received items: " + inventoryItems.Count);
             Modal.Instance.Show("Retrieving inventory items...");
+            
+            inventoryItemStore.SetItems(inventoryItems);
 
-            var displayItems = inventoryItems.Where(item => item.Meta != null).ToList();
-            for (int i = 0; i < displayItems.Count; i++)
+            foreach (var entry in inventoryItemStore.GetAllEntries())
             {
-                GameObject entry = Instantiate(itemEntryPrefab, contentGO.transform, false);
-
-                var newObject = items.GetNewObject();
-                newObject.entryGo = entry;
-                newObject.inventoryItem = displayItems[i];
-
                 Button entryButton = entry.GetComponent<Button>();
-                InventoryItem item = displayItems[i];
+                InventoryItem item = entry.Item;
                 entryButton.onClick.AddListener(() => OnInventoryItemPressed(item));
                 entryButton.onClick.AddListener(() => OnItemClicked?.Invoke(item));
-
-                InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
-                itemEntry.SetItem(displayItems[i]);
             }
             Modal.Instance.Hide();
         }
@@ -136,30 +121,29 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void RefreshFilteredResults()
         {
-            foreach (var item in items)
+            foreach (var itemEntry in inventoryItemStore.GetAllEntries())
             {
-                //TODO: implement MVC based long term code here
-                
+                var item = itemEntry.Item;
                 // Search string filter
-                string itemName = item.inventoryItem.Meta?.Name.ToLower();
+                string itemName = item.Meta?.Name.ToLower();
                 bool searchStringResult = string.IsNullOrEmpty(itemName) || itemName.StartsWith(filterParams.searchString.ToLower()) || string.IsNullOrEmpty(filterParams.searchString);
 
                 // Blockchain filter
-                string itemBlockchain = item.inventoryItem.Blockchain;
+                string itemBlockchain = item.Blockchain;
                 bool blockchainResult = filterParams.blockchain.Equals("ANY") || itemBlockchain.Equals(filterParams.blockchain);
                 
                 //Avatar filter
-                bool isAvatar = avatars.Any(a => $"{item.inventoryItem.Blockchain.ToUpper()}:{item.inventoryItem.Contract.ToUpper()}"
+                bool isAvatar = avatars.Any(a => $"{item.Blockchain.ToUpper()}:{item.Contract.ToUpper()}"
                                                  == $"{a.chain.ToUpper()}:{a.contractAddress.ToUpper()}");
                 bool avatarResult = filterParams.avatars || !isAvatar;
                 
                 if (searchStringResult && blockchainResult && avatarResult)
                 {
-                    item.entryGo.SetActive(true);
+                    itemEntry.gameObject.SetActive(true);
                 }
                 else
                 {
-                    item.entryGo.SetActive(false);
+                    itemEntry.gameObject.SetActive(false);
                 }
             }
         }

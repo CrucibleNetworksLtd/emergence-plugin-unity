@@ -20,5 +20,29 @@ namespace EmergenceSDK.Types.Inventory
         public InventoryItemMetaData Meta { get; set; }
         public bool Deleted { get; set; }
         public string TotalStock { get; set; }
+
+        public InventoryItem()
+        {
+            // Default constructor
+        }
+
+        public InventoryItem(InventoryItem other)
+        {
+            ID = other.ID;
+            Blockchain = other.Blockchain;
+            Contract = other.Contract;
+            TokenId = other.TokenId;
+            Creators = new List<InventoryItemCreators>(other.Creators);
+            Owners = other.Owners;
+            Royalties = other.Royalties;
+            LazySupply = other.LazySupply;
+            Pending = new List<object>(other.Pending);
+            MintedAt = other.MintedAt;
+            LastUpdatedAt = other.LastUpdatedAt;
+            Supply = other.Supply;
+            Meta = new InventoryItemMetaData(other.Meta);
+            Deleted = other.Deleted;
+            TotalStock = other.TotalStock;
+        }
     }
 }
