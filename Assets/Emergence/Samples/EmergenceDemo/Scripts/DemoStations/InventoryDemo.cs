@@ -15,10 +15,10 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         [SerializeField] private GameObject contentGO;
         [SerializeField] private GameObject scrollView;
 
-        private List<GameObject> items = new List<GameObject>();
-
         private bool isInventoryVisible = false;
         private IInventoryService inventoryService;
+        
+        private InventoryItemStore inventoryItemStore;
 
         public bool IsReady
         {
@@ -33,6 +33,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void Start()
         {
             inventoryService = EmergenceServices.GetService<IInventoryService>();
+            inventoryItemStore = new InventoryItemStore(CreateEntry);
             
             instructionsGO.SetActive(false);
             IsReady = false;
@@ -55,6 +56,8 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 ShowInventory();
             }
         }
+
+        private GameObject CreateEntry() => Instantiate(itemEntryPrefab, contentGO.transform, false);
 
         public void ShowInventory()
         {
@@ -79,23 +82,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         
         private void SuccessInventoryByOwner(List<InventoryItem> inventoryItems)
         {
-            foreach (var item in items)
-            {
-                Destroy(item);
-            }
-
-            items.Clear();
-
-            for (int i = 0; i < inventoryItems.Count; i++)
-            {
-                GameObject entry = Instantiate(itemEntryPrefab, contentGO.transform, false);
-
-                InventoryItemEntry itemEntry = entry.GetComponent<InventoryItemEntry>();
-                itemEntry.SetItem(inventoryItems[i]);
-
-                items.Add(entry);
-            }
+            inventoryItemStore.SetItems(inventoryItems);
         }
     }
-
 }
