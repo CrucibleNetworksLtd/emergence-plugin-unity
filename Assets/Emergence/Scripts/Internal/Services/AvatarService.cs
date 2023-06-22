@@ -13,7 +13,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "byOwner?address=" + address;
 
-            string response = await EmergenceUtils.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
+            string response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
 
             GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response);
 
@@ -24,9 +24,9 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "id?id=" + id;
             
-            string response = await EmergenceUtils.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
+            string response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
             
-            GetAvatarResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarResponse>(response.ToString());
+            GetAvatarResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarResponse>(response);
 
             success?.Invoke(avatarResponse.message);
         }
