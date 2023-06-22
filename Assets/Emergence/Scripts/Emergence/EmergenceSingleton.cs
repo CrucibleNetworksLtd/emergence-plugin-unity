@@ -105,7 +105,7 @@ namespace EmergenceSDK.Types
 
         public string GetCachedAddress()
         {
-            return "0x2c34d1ed258F78962FDeEcd8C78563e0dcB86521"; //address;
+            return address;
         }
 
         public void SetCachedAddress(string _address)
