@@ -24,5 +24,14 @@
         public string TransactionHash { get; set; }
         public string LogsBloom { get; set; }
         public int Confirmations { get; set; }
+        
+        public override string ToString()
+        {
+            return $"To: {To}\nType: {Type}\nLogs: {Logs}\nStatus: {Status}\nContractAddress: {ContractAddress}\n" +
+                   $"EffectiveGasPrice: {EffectiveGasPrice}\nGasUsed: {GasUsed}\nCumulativeGasUsed: {CumulativeGasUsed}\n" +
+                   $"Root: {Root}\nFrom: {From}\nBlockNumber: {BlockNumber}\nBlockHash: {BlockHash}\n" +
+                   $"TransactionIndex: {TransactionIndex}\nTransactionHash: {TransactionHash}\nLogsBloom: {LogsBloom}\n" +
+                   $"Confirmations: {Confirmations}";
+        }
     }
 }

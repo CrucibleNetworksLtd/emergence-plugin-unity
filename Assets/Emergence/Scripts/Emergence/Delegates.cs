@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
+using EmergenceSDK.Types.Responses;
 using UnityEngine;
 using Avatar = EmergenceSDK.Types.Avatar;
 
@@ -58,7 +59,7 @@ namespace EmergenceSDK.Services
     
     public delegate void LoadContractSuccess();
     
-    public delegate void GetTransactionStatusSuccess<T>(T response);
+    public delegate void GetTransactionStatusSuccess(GetTransactionStatusResponse response);
     
     public delegate void GetBlockNumberSuccess<T>(T response);
     

@@ -10,7 +10,7 @@ namespace EmergenceSDK.Services
         /// <summary>
         /// Gets the status of a transaction. If successful, the success callback will be called.
         /// </summary>
-        UniTask GetTransactionStatus<T>(string transactionHash, string nodeURL, GetTransactionStatusSuccess<T> success, ErrorCallback errorCallback);
+        UniTask GetTransactionStatus(string transactionHash, string nodeURL, GetTransactionStatusSuccess success, ErrorCallback errorCallback);
 
         /// <summary>
         /// Gets the highest block number of the chain. If successful, the success callback will be called.
