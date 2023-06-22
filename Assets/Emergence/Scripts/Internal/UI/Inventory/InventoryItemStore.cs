@@ -20,12 +20,18 @@ namespace EmergenceSDK.Internal.UI.Inventory
             this.instantiateItemEntry = instantiateItemEntry;
         }
         
-        public void SetItems(List<InventoryItem> items)
+        public void SetItems(List<InventoryItem> itemsIn)
         {
-            var displayItems = items.Where(item => item.Meta != null).ToList();
+            var displayItems = itemsIn.Where(item => item.Meta != null).ToList();
+            // Remove items that are no longer in the list
+            var removedItems = entryDictionary.Keys.Except(displayItems.Select(item => item.ID)).ToList();
+            foreach (var itemId in removedItems)
+            {
+                RemoveEntry(itemId);
+            }
             foreach (InventoryItem item in displayItems)
             {
-                if(AddItem(item))
+                if(!AddItem(item))
                     UpdateItem(item);
             }
         }
