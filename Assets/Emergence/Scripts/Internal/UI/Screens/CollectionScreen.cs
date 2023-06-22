@@ -60,6 +60,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         private IInventoryService inventoryService;
         private IAvatarService avatarService;
         
+        private int count = 0;
+        
         public event Action<InventoryItem> OnItemClicked;
         
         private InventoryItemStore inventoryItemStore;
@@ -95,8 +97,27 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             EmergenceLogger.LogInfo("Received items: " + inventoryItems.Count);
             Modal.Instance.Show("Retrieving inventory items...");
-            
-            inventoryItemStore.SetItems(inventoryItems);
+
+            List<InventoryItem> filteredItems;
+
+            switch (count)
+            {
+                case 0:
+                    filteredItems = new List<InventoryItem>();
+                    filteredItems.AddRange(inventoryItems.Except(new []{inventoryItems[0]}));
+                    break;
+                case 1:
+                    filteredItems = new List<InventoryItem>();
+                    filteredItems.Add(inventoryItems[0]);
+                    break;
+                
+                default:
+                    filteredItems = inventoryItems; 
+                    break;
+            }
+
+            count++;
+            inventoryItemStore.SetItems(filteredItems);
 
             foreach (var entry in inventoryItemStore.GetAllEntries())
             {
