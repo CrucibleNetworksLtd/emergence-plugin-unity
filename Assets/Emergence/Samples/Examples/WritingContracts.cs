@@ -36,7 +36,7 @@ namespace EmergenceSDK.Samples.Examples
                 deployedContract.chain.networkName, deployedContract.chain.DefaultNodeURL, deployedContract.contract.ABI);
 
             // Calls the ReadMethod method to execute the smart contract method defined in the ABI with an empty input parameter
-            contractService.WriteMethod<BaseResponse<string>, string[]>(contractInfo, "", "", value, body,
+            contractService.WriteMethod(contractInfo, "", "", value, body,
                 OnWriteSuccess, EmergenceLogger.LogError);
         }
 

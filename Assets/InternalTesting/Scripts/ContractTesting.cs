@@ -46,7 +46,7 @@ namespace EmergenceSDK.InternalTesting
         {
             var contractInfo = new ContractInfo(readContract.contractAddress, readContractMethodName,
                 readContract.chain.networkName, readContract.chain.DefaultNodeURL, readContract.contract.ABI);
-            EmergenceServices.GetService<IContractService>().ReadMethod<ReadMethod.ContractResponse, string[]>(contractInfo,
+            EmergenceServices.GetService<IContractService>().ReadMethod(contractInfo,
                 new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
                 (result) => EditorUtility.DisplayDialog("Read Method Result", "Result: " + result, "OK"),
                 EmergenceLogger.LogError);
@@ -56,7 +56,7 @@ namespace EmergenceSDK.InternalTesting
         {
             var contractInfo = new ContractInfo(writeContract.contractAddress, writeContractMethodName,
                 writeContract.chain.networkName, writeContract.chain.DefaultNodeURL, writeContract.contract.ABI);
-            EmergenceServices.GetService<IContractService>().WriteMethod<BaseResponse<string>, string[]>(contractInfo,
+            EmergenceServices.GetService<IContractService>().WriteMethod(contractInfo,
                 "", "", "0", new string[] { },
                 (response) => EditorUtility.DisplayDialog("Write Method Response", "Response: " + response, "OK"),
                 EmergenceLogger.LogError);

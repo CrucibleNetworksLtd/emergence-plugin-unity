@@ -63,7 +63,7 @@ namespace EmergenceSDK.Services
     
     public delegate void GetBlockNumberSuccess(GetBlockNumberResponse response);
     
-    public delegate void ReadMethodSuccess<T>(T response);
+    public delegate void ReadMethodSuccess(ReadContractResponse response);
     
-    public delegate void WriteMethodSuccess<T>(T response);
+    public delegate void WriteMethodSuccess(WriteContractResponse response);
 }

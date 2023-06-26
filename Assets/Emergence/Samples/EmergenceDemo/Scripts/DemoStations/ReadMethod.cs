@@ -3,6 +3,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
+using EmergenceSDK.Types.Responses;
 using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
@@ -52,8 +53,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             ContractInfo contractInfo = new ContractInfo(deployedContract.contractAddress, "GetCurrentCount", deployedContract.chain.networkName,
                 deployedContract.chain.DefaultNodeURL, deployedContract.contract.ABI);
-            ContractService.ReadMethod<ContractResponse, string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
-                ReadMethodSuccess, EmergenceLogger.LogError);
+            ContractService.ReadMethod<string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() }, ReadMethodSuccess, EmergenceLogger.LogError);
         }
 
         public class ContractResponse
@@ -65,8 +65,8 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                  return string.Join(", ", response);
             }
         }
-
-        private void ReadMethodSuccess(ContractResponse response)
+        
+        private void ReadMethodSuccess(ReadContractResponse response)
         {
             Debug.Log($"ReadContract finished: {response}");
         }

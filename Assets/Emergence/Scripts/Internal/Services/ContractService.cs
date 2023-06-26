@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -23,130 +24,73 @@ namespace EmergenceSDK.Internal.Services
                 network = network,
             };
 
-            WWWForm form = new WWWForm();
-            form.AddField("contractAddress", contractAddress);
-            form.AddField("ABI", ABI);
-            form.AddField("network", network);
-
             string dataString = SerializationHelper.Serialize(data, false);
             string url = StaticConfig.APIBase + "loadContract";
 
-            using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, dataString);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+
+            if (EmergenceUtils.ProcessRequest<LoadContractResponse>(request, errorCallback, out var response))
             {
-                byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(dataString);
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.uploadHandler.contentType = "application/json";
-                request.downloadHandler = new DownloadHandlerBuffer();
-
-                try
-                {
-                    await request.SendWebRequest().ToUniTask();
-                }
-                catch (Exception e)
-                {
-                    errorCallback?.Invoke(e.Message, e.HResult);
-                }
-
-                EmergenceUtils.PrintRequestResult("Load Contract", request);
-
-                if (EmergenceUtils.ProcessRequest<LoadContractResponse>(request, errorCallback, out var response))
-                {
-                    loadedAddresses.Add(contractAddress);
-                    success?.Invoke();
-                }
+                loadedAddresses.Add(contractAddress);
+                success?.Invoke();
             }
-
+            
             return loadedAddresses.Contains(contractAddress);
         }
 
         private bool CheckForNewContract(ContractInfo contractInfo) => !loadedAddresses.Contains(contractInfo.ContractAddress);
 
-        public async UniTask ReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback)
+        public async UniTask ReadMethod<T>(ContractInfo contractInfo, T body, ReadMethodSuccess success, ErrorCallback errorCallback)
         {
-            if (CheckForNewContract(contractInfo))
-            {
-                bool loadedSuccessfully = await LoadContract(contractInfo.ContractAddress, contractInfo.ABI, contractInfo.Network, null, errorCallback);
-                if (!loadedSuccessfully)
-                {
-                    errorCallback?.Invoke("Error loading contract", -1);
-                    return;
-                }
-            }
+            if (await LoadContractIfNew(contractInfo, errorCallback)) 
+                return;
 
             string url = contractInfo.ToReadUrl();
-
             string dataString = SerializationHelper.Serialize(body, false);
 
-            using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
-            {
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
-                request.uploadHandler.contentType = "application/json";
-
-                try
-                {
-                    await request.SendWebRequest().ToUniTask();
-                }
-                catch (Exception e)
-                {
-                    errorCallback?.Invoke(e.Message, e.HResult);
-                }
-
-                EmergenceUtils.PrintRequestResult("Read Contract", request);
-
-                if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
-                {
-                    success?.Invoke(response);
-                }
-            }
+            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, dataString);
+            var readContractResponse = SerializationHelper.Deserialize<BaseResponse<ReadContractResponse>>(response);
+            success?.Invoke(readContractResponse.message);
         }
 
-        public async UniTask WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback)
+        private async Task<bool> LoadContractIfNew(ContractInfo contractInfo, ErrorCallback errorCallback)
         {
             if (CheckForNewContract(contractInfo))
             {
-                bool loadedSuccessfully = await LoadContract(contractInfo.ContractAddress, contractInfo.ABI, contractInfo.Network, null, errorCallback);
+                bool loadedSuccessfully = await LoadContract(contractInfo.ContractAddress, contractInfo.ABI,
+                    contractInfo.Network, null, errorCallback);
                 if (!loadedSuccessfully)
                 {
                     errorCallback?.Invoke("Error loading contract", -1);
-                    return;
+                    return true;
                 }
             }
 
-            string gasPriceString = String.Empty;
-            string localAccountNameString = String.Empty;
+            return false;
+        }
 
-            if (!string.IsNullOrEmpty(gasPrice) && !string.IsNullOrEmpty(localAccountName))
+        public async UniTask WriteMethod<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, WriteMethodSuccess success, ErrorCallback errorCallback)
+        {
+            if (await LoadContractIfNew(contractInfo, errorCallback)) 
+                return;
+
+            string gasPrice = String.Empty;
+            string localAccountName = String.Empty;
+
+            if (!string.IsNullOrEmpty(gasPriceIn) && !string.IsNullOrEmpty(localAccountNameIn))
             {
-                gasPriceString = "&gasPrice=" + gasPrice;
-                localAccountNameString = "&localAccountName=" + localAccountName;
+                gasPrice = "&gasPrice=" + gasPriceIn;
+                localAccountName = "&localAccountName=" + localAccountNameIn;
             }
 
-            string url = contractInfo.ToWriteUrl(localAccountNameString, gasPriceString, value);
-
+            string url = contractInfo.ToWriteUrl(localAccountName, gasPrice, value);
             string dataString = SerializationHelper.Serialize(body, false);
-
-            using (UnityWebRequest request = UnityWebRequest.Post(url, ""))
-            {
-                request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
-                request.uploadHandler.contentType = "application/json";
-
-                try
-                {
-                    await request.SendWebRequest().ToUniTask();
-                }
-                catch (Exception e)
-                {
-                    errorCallback?.Invoke(e.Message, e.HResult);
-                }
-
-                EmergenceUtils.PrintRequestResult("Write Contract", request);
-
-                if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
-                {
-                    success?.Invoke(response);
-                }
-            }
+            
+            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, dataString);
+            var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response);
+            success?.Invoke(writeContractResponse.message);
         }
     }
 }

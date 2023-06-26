@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Services;
 using UnityEngine.Networking;
@@ -18,6 +19,11 @@ namespace EmergenceSDK.Internal.Services
         //This timeout avoids this issue: https://forum.unity.com/threads/catching-curl-error-28.1274846/
         private const int TimeoutMilliseconds = 4999;
 
+        public static UnityWebRequest CreateRequest(string method, string url, string bodyData = "")
+        {
+            return GetRequestFromMethodType(method, url, bodyData);
+        }
+        
         /// <summary>
         /// Performs an asynchronous UnityWebRequest and returns the result as a string.
         /// </summary>
@@ -118,6 +124,48 @@ namespace EmergenceSDK.Internal.Services
         private void RemoveOpenRequest(UnityWebRequest request)
         {
             openRequests.TryRemove(request, out _);
+        }
+
+        public static async UniTask<string> PerformAsyncWebRequest(UnityWebRequest request, ErrorCallback errorCallback)
+        {
+            try
+            {
+                var sendTask = request.SendWebRequest().ToUniTask();
+
+                try
+                {
+                    await sendTask.Timeout(TimeSpan.FromMilliseconds(TimeoutMilliseconds));
+
+                    // Rest of the code if the request completes within the timeout
+
+                    var response = request.result;
+                    if (response == UnityWebRequest.Result.Success)
+                    {
+                        return request.downloadHandler.text;
+                    }
+                    else
+                    {
+                        errorCallback?.Invoke(request.error, request.responseCode);
+                        return request.error;
+                    }
+                }
+                catch (TimeoutException)
+                {
+                    request.Abort(); // Abort the request
+
+                    errorCallback?.Invoke("Request timed out.", 0);
+                    return "Request timed out.";
+                }
+            }
+            catch (Exception ex) when (!(ex is OperationCanceledException))
+            {
+                errorCallback?.Invoke(request.error, request.responseCode);
+                return ex.Message;
+            }
+            finally
+            {
+                Instance.RemoveOpenRequest(request); // Remove the request from tracking
+            }
         }
     }
 }

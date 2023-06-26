@@ -12,12 +12,12 @@ namespace EmergenceSDK.Services
         /// Calls a "read" method on the given contract.
         /// <remarks>The contract in question must be loaded using <see cref="LoadContract"/></remarks>
         /// </summary>
-        UniTask ReadMethod<T, U>(ContractInfo contractInfo, U body, ReadMethodSuccess<T> success, ErrorCallback errorCallback);
+        UniTask ReadMethod<T>(ContractInfo contractInfo, T body, ReadMethodSuccess success, ErrorCallback errorCallback);
 
         /// <summary>
         /// Calls a "write" method on the given contract.
         /// <remarks>The contract in question must be loaded using <see cref="LoadContract"/></remarks>
         /// </summary>
-        UniTask WriteMethod<T, U>(ContractInfo contractInfo, string localAccountName, string gasPrice, string value, U body, WriteMethodSuccess<T> success, ErrorCallback errorCallback);
+        UniTask WriteMethod<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, WriteMethodSuccess success, ErrorCallback errorCallback);
     }
 }
