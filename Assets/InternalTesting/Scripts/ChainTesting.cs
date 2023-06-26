@@ -37,7 +37,7 @@ namespace EmergenceSDK.InternalTesting
         private void GetHighestBlockNumberPressed()
         {
             var chainService = EmergenceServices.GetService<IChainService>();
-            chainService.GetHighestBlockNumber<BaseResponse<string>>("https://goerli.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134",
+            chainService.GetHighestBlockNumber("https://goerli.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134",
                 (blockNumber) => Debug.Log("Block Number: " + blockNumber), EmergenceLogger.LogError);
         }
     }

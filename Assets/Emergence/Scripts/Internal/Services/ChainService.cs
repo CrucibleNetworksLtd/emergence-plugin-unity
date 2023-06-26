@@ -18,28 +18,13 @@ namespace EmergenceSDK.Internal.Services
             success?.Invoke(transactionStatusResponse.message);
         }
 
-        public async UniTask GetHighestBlockNumber<T>(string nodeURL, GetBlockNumberSuccess<T> success, ErrorCallback errorCallback)
+        public async UniTask GetHighestBlockNumber(string nodeURL, GetBlockNumberSuccess success, ErrorCallback errorCallback)
         {
+            //GetBlockNumberResponse
             string url = StaticConfig.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
-            {
-                try
-                {
-                    await request.SendWebRequest().ToUniTask();
-                }
-                catch (Exception e)
-                {
-                    errorCallback?.Invoke(e.Message, e.HResult);
-                }
-        
-                EmergenceUtils.PrintRequestResult("Get Block Number", request);
-        
-                if (EmergenceUtils.ProcessRequest<T>(request, errorCallback, out var response))
-                {
-                    success?.Invoke(response);
-                }
-            }
+            string response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
+            var blockNumberResponse = SerializationHelper.Deserialize<BaseResponse<GetBlockNumberResponse>>(response);
+            success?.Invoke(blockNumberResponse.message);
         }
     }
 }

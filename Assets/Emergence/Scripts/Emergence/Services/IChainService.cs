@@ -16,6 +16,6 @@ namespace EmergenceSDK.Services
         /// Gets the highest block number of the chain. If successful, the success callback will be called.
         /// <remarks>This can be compared with a transaction block number to get further information</remarks>
         /// </summary>
-        UniTask GetHighestBlockNumber<T>(string nodeURL, GetBlockNumberSuccess<T> success, ErrorCallback errorCallback);
+        UniTask GetHighestBlockNumber(string nodeURL, GetBlockNumberSuccess success, ErrorCallback errorCallback);
     }
 }

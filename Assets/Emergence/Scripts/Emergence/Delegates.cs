@@ -61,7 +61,7 @@ namespace EmergenceSDK.Services
     
     public delegate void GetTransactionStatusSuccess(GetTransactionStatusResponse response);
     
-    public delegate void GetBlockNumberSuccess<T>(T response);
+    public delegate void GetBlockNumberSuccess(GetBlockNumberResponse response);
     
     public delegate void ReadMethodSuccess<T>(T response);
     
