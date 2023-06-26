@@ -12,7 +12,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask InventoryByOwner(string address, InventoryChain chain, SuccessInventoryByOwner success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address + "&chain=" + InventoryKeys.ChainToKey[chain];
-            string response = await EmergenceUtils.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
+            string response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
 
             InventoryByOwnerResponse inventoryResponse = SerializationHelper.Deserialize<InventoryByOwnerResponse>(response);
 
