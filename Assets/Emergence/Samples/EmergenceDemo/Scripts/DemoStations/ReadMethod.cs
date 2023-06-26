@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
@@ -68,7 +69,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         
         private void ReadMethodSuccess(ReadContractResponse response)
         {
-            Debug.Log($"ReadContract finished: {response}");
+            Debug.Log($"ReadContract finished: {response.response.First()}");
         }
     }
 }

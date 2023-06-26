@@ -88,7 +88,9 @@ namespace EmergenceSDK.Internal.Services
             string url = contractInfo.ToWriteUrl(localAccountName, gasPrice, value);
             string dataString = SerializationHelper.Serialize(body, false);
             
-            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, dataString);
+            var headers = new Dictionary<string, string>();
+            headers.Add("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
+            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, dataString, headers);
             var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response);
             success?.Invoke(writeContractResponse.message);
         }
