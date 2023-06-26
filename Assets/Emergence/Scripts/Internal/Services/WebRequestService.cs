@@ -32,46 +32,8 @@ namespace EmergenceSDK.Internal.Services
             UnityWebRequest request = GetRequestFromMethodType(method, url, bodyData);
             Instance.AddOpenRequest(request);
 
-            try
-            {
-                SetupRequestHeaders(request, headers);
-
-                var sendTask = request.SendWebRequest().ToUniTask();
-
-                try
-                {
-                    await sendTask.Timeout(TimeSpan.FromMilliseconds(TimeoutMilliseconds));
-
-                    // Rest of the code if the request completes within the timeout
-
-                    var response = request.result;
-                    if (response == UnityWebRequest.Result.Success)
-                    {
-                        return request.downloadHandler.text;
-                    }
-                    else
-                    {
-                        errorCallback?.Invoke(request.error, request.responseCode);
-                        return request.error;
-                    }
-                }
-                catch (TimeoutException)
-                {
-                    request.Abort(); // Abort the request
-
-                    errorCallback?.Invoke("Request timed out.", 0);
-                    return "Request timed out.";
-                }
-            }
-            catch (Exception ex) when (!(ex is OperationCanceledException))
-            {
-                errorCallback?.Invoke(request.error, request.responseCode);
-                return ex.Message;
-            }
-            finally
-            {
-                Instance.RemoveOpenRequest(request); // Remove the request from tracking
-            }
+            SetupRequestHeaders(request, headers);
+            return await PerformAsyncWebRequest(request, errorCallback);
         }
 
         private static void SetupRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)

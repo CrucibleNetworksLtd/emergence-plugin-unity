@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -22,6 +23,8 @@ namespace EmergenceSDK.Internal.Services
         public event PersonaUpdated OnCurrentPersonaUpdated;
     
         private Persona cachedPersona;
+        private Dictionary<string, string> AuthDict => new Dictionary<string, string>() { { "deviceId", EmergenceSingleton.Instance.CurrentDeviceId } };
+
         public Persona CurrentPersona
         {
             get => cachedPersona;
@@ -46,34 +49,20 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
         {
             string url = StaticConfig.APIBase + "get-access-token";
-
-            using UnityWebRequest request = UnityWebRequest.Get(url);
-            request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-            try
-            {
-                await request.SendWebRequest().ToUniTask();
-            }
-            catch (Exception e)
-            {
-                errorCallback?.Invoke(e.Message, e.HResult);
-            }
-            EmergenceUtils.PrintRequestResult("GetAccessToken", request);
-            if (EmergenceUtils.ProcessRequest<AccessTokenResponse>(request, errorCallback, out var response))
-            {
-                currentAccessToken = SerializationHelper.Serialize(response.AccessToken, false);
-                success?.Invoke(currentAccessToken);
-            }
+            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback, "", AuthDict);
+            var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response);
+            currentAccessToken = SerializationHelper.Serialize(accessTokenResponse.message.AccessToken, false);
+            success?.Invoke(currentAccessToken);
         }
         
         public async UniTask GetPersonas(SuccessPersonas success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "personas";
-
-            using UnityWebRequest request = UnityWebRequest.Get(url);
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, "");
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
             }
             catch (Exception e)
             {
@@ -96,13 +85,11 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask GetCurrentPersona(SuccessGetCurrentPersona success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
-
-            using UnityWebRequest request = UnityWebRequest.Get(url);
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, "");
             request.SetRequestHeader("Authorization", CurrentAccessToken);
-
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
             }
             catch (Exception e)
             {
@@ -129,69 +116,36 @@ namespace EmergenceSDK.Internal.Services
             string jsonPersona = SerializationHelper.Serialize(persona);
 
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
-
-            using UnityWebRequest request = UnityWebRequest.Post(url, string.Empty);
-            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
-            request.uploadHandler.contentType = "application/json";
-
-            request.SetRequestHeader("Authorization", CurrentAccessToken);
-
-            try
-            {
-                await request.SendWebRequest().ToUniTask();
-            }
-            catch (Exception e)
-            {
-                errorCallback?.Invoke(e.Message, e.HResult);
-            }
-            EmergenceUtils.PrintRequestResult("Save Persona", request);
-
-            if (EmergenceUtils.RequestError(request))
-            {
-                errorCallback?.Invoke(request.error, request.responseCode);
-            }
-            else
-            {
-                success?.Invoke();
-            }
+            await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback, jsonPersona, AuthDict);
+            success?.Invoke();
         }
 
     
         public async UniTask EditPersona(Persona persona, SuccessEditPersona success, ErrorCallback errorCallback)
         {
             // Fetch the current avatar GUID and add it to the avatarId field of the persona
-            if (persona.avatar != null) 
+            if (persona.avatar != null)
             {
-                string personaAvatarTokenURI = Helpers.InternalIPFSURLToHTTP(persona.avatar.tokenURI);
-                using UnityWebRequest tokenURIRequest = UnityWebRequest.Get(personaAvatarTokenURI);
-                await tokenURIRequest.SendWebRequest().ToUniTask();
-                EmergenceUtils.PrintRequestResult("Avatar tokenURI", tokenURIRequest);
-                TokenURIResponse res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenURIRequest.downloadHandler.text)[0];
-                // EmergenceLogger.LogInfo("GUID: " + res.GUID);
-                // rebuild the avatarId field with the GUID
-                persona.avatarId = persona.avatar.chain + ":" + persona.avatar.contractAddress + ":" +
-                                   persona.avatar.tokenId + ":" + res.GUID;
+                await UpdateAvatarOnPersonaEdit(persona, errorCallback);
             }
 
             string jsonPersona = SerializationHelper.Serialize(persona);
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
 
-            using UnityWebRequest request = UnityWebRequest.Post(url, string.Empty);
+            using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, "");
             request.method = "PATCH";
             request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
             request.uploadHandler.contentType = "application/json";
 
             request.SetRequestHeader("Authorization", CurrentAccessToken);
-
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
             }
             catch (Exception e)
             {
                 errorCallback?.Invoke(e.Message, e.HResult);
             }
-            EmergenceUtils.PrintRequestResult("Save Persona", request);
 
             if (EmergenceUtils.RequestError(request))
             {
@@ -204,22 +158,33 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
+        private static async UniTask UpdateAvatarOnPersonaEdit(Persona persona, ErrorCallback errorCallback)
+        {
+            string personaAvatarTokenUri = Helpers.InternalIPFSURLToHTTP(persona.avatar.tokenURI);
+            UnityWebRequest tokenUriRequest = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, personaAvatarTokenUri, "");
+            await WebRequestService.PerformAsyncWebRequest(tokenUriRequest, errorCallback);
+            TokenURIResponse res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenUriRequest.downloadHandler.text)[0];
+            // rebuild the avatarId field with the GUID
+            persona.avatarId = persona.avatar.chain + ":" + persona.avatar.contractAddress + ":" +
+                               persona.avatar.tokenId + ":" + res.GUID;
+        }
+
         public async UniTask DeletePersona(Persona persona, SuccessDeletePersona success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona/" + persona.id;
 
-            using UnityWebRequest request = UnityWebRequest.Get(url);
+            using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url);
             request.method = "DELETE";
             request.SetRequestHeader("Authorization", CurrentAccessToken);
+            
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
             }
             catch (Exception e)
             {
                 errorCallback?.Invoke(e.Message, e.HResult);
             }
-            EmergenceUtils.PrintRequestResult("Delete Persona Request", request);
 
             if (EmergenceUtils.RequestError(request))
             {
@@ -230,18 +195,18 @@ namespace EmergenceSDK.Internal.Services
                 success?.Invoke();
             }
         }
-
+ 
     
         public async UniTask SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "setActivePersona/" + persona.id;
 
-            using UnityWebRequest request = UnityWebRequest.Get(url);
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.method = "PATCH";
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
             }
             catch (Exception e)
             {
