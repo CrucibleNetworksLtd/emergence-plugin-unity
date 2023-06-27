@@ -35,10 +35,12 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = StaticConfig.APIBase + "reinitializewalletconnect";
 
-            using UnityWebRequest request = UnityWebRequest.Get(url);
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
@@ -46,9 +48,9 @@ namespace EmergenceSDK.Internal.Services
             }
             EmergenceUtils.PrintRequestResult("ReinitializeWalletConnect", request);
         
-            if (EmergenceUtils.ProcessRequest<ReinitializeWalletConnectResponse>(request, errorCallback, out var response))
+            if (EmergenceUtils.ProcessRequest<ReinitializeWalletConnectResponse>(request, errorCallback, out var processedResponse))
             {
-                success?.Invoke(response.disconnected);
+                success?.Invoke(processedResponse.disconnected);
             }
         }
         
@@ -58,15 +60,14 @@ namespace EmergenceSDK.Internal.Services
 
             string url = StaticConfig.APIBase + "request-to-sign";
 
-            using UnityWebRequest request = UnityWebRequest.Post(url, "");
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, content);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-            request.method = "POST";
-            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(content));
-            request.uploadHandler.contentType = "application/json";
         
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
@@ -74,9 +75,9 @@ namespace EmergenceSDK.Internal.Services
             }
             EmergenceUtils.PrintRequestResult("RequestToSignWalletConnect", request);
         
-            if (EmergenceUtils.ProcessRequest<WalletSignMessage>(request, errorCallback, out var response))
+            if (EmergenceUtils.ProcessRequest<WalletSignMessage>(request, errorCallback, out var processedResponse))
             {
-                success?.Invoke(response.signedMessage);
+                success?.Invoke(processedResponse.signedMessage);
             }
         }
         
@@ -85,12 +86,14 @@ namespace EmergenceSDK.Internal.Services
             string url = StaticConfig.APIBase + "handshake" + "?nodeUrl=" +
                          EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL;
 
-            using UnityWebRequest request = UnityWebRequest.Get(url);
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
         
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
@@ -99,9 +102,9 @@ namespace EmergenceSDK.Internal.Services
         
             EmergenceUtils.PrintRequestResult("Handshake", request);
         
-            if (EmergenceUtils.ProcessRequest<HandshakeResponse>(request, errorCallback, out var response))
+            if (EmergenceUtils.ProcessRequest<HandshakeResponse>(request, errorCallback, out var processedResponse))
             {
-                if (response == null)
+                if (processedResponse == null)
                 {
                     string errorMessage = completedHandshake ? "Handshake already completed." : "Handshake failed, check server status.";
                     int errorCode = completedHandshake ? 0 : -1;
@@ -110,8 +113,8 @@ namespace EmergenceSDK.Internal.Services
                 }
                 
                 completedHandshake = true;
-                WalletAddress = response.address;
-                EmergenceSingleton.Instance.SetCachedAddress(response.address);
+                WalletAddress = processedResponse.address;
+                EmergenceSingleton.Instance.SetCachedAddress(processedResponse.address);
                 success?.Invoke(WalletAddress);
             }
         }
@@ -124,10 +127,12 @@ namespace EmergenceSDK.Internal.Services
             string url = StaticConfig.APIBase + "getbalance" + "?nodeUrl=" +
                          EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL + "&address=" + WalletAddress;
 
-            using UnityWebRequest request = UnityWebRequest.Get(url);
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
@@ -136,9 +141,9 @@ namespace EmergenceSDK.Internal.Services
         
             EmergenceUtils.PrintRequestResult("Get Balance", request);
         
-            if (EmergenceUtils.ProcessRequest<GetBalanceResponse>(request, errorCallback, out var response))
+            if (EmergenceUtils.ProcessRequest<GetBalanceResponse>(request, errorCallback, out var processedResponse))
             {
-                success?.Invoke(response.balance);
+                success?.Invoke(processedResponse.balance);
             }
         }
         
@@ -156,21 +161,21 @@ namespace EmergenceSDK.Internal.Services
 
             string url = StaticConfig.APIBase + "validate-signed-message" + "?request=" + personaService.CurrentAccessToken;
 
-            using UnityWebRequest request = UnityWebRequest.Post(url, "");
-            request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(dataString));
-            request.uploadHandler.contentType = "application/json";
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, dataString);
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
                 errorCallback?.Invoke(e.Message, e.HResult);
             }
             EmergenceUtils.PrintRequestResult("ValidateSignedMessage", request);
-            if (EmergenceUtils.ProcessRequest<ValidateSignedMessageResponse>(request, errorCallback, out var response))
+            if (EmergenceUtils.ProcessRequest<ValidateSignedMessageResponse>(request, errorCallback, out var processedResponse))
             {
-                success?.Invoke(response.valid);
+                success?.Invoke(processedResponse.valid);
             }
         }
         
