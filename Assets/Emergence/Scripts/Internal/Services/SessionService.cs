@@ -36,11 +36,11 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = StaticConfig.APIBase + "isConnected";
 
-            using UnityWebRequest request = UnityWebRequest.Get(url);
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
             }
             catch (Exception e)
             {
@@ -59,12 +59,12 @@ namespace EmergenceSDK.Internal.Services
             disconnectInProgress = true;
             string url = StaticConfig.APIBase + "killSession";
 
-            using UnityWebRequest request = UnityWebRequest.Get(url);
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             request.SetRequestHeader("auth", personaService.CurrentAccessToken);
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
             }
             catch (Exception e)
             {
@@ -92,7 +92,7 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             try
             {
-                await request.SendWebRequest().ToUniTask();
+                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
             }
             catch (Exception e)
             {
