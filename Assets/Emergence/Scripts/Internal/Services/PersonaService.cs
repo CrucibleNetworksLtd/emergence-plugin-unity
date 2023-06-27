@@ -58,7 +58,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask GetPersonas(SuccessPersonas success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "personas";
-            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, "");
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
@@ -85,7 +85,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask GetCurrentPersona(SuccessGetCurrentPersona success, ErrorCallback errorCallback)
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
-            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, "");
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
@@ -116,7 +116,7 @@ namespace EmergenceSDK.Internal.Services
             string jsonPersona = SerializationHelper.Serialize(persona);
 
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
-            await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback, jsonPersona, AuthDict);
+            await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, errorCallback, jsonPersona, AuthDict);
             success?.Invoke();
         }
 
@@ -173,7 +173,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona/" + persona.id;
 
-            using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url);
+            using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             request.method = "DELETE";
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             
