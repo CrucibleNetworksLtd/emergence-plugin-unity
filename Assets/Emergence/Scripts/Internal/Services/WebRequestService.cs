@@ -73,7 +73,8 @@ namespace EmergenceSDK.Internal.Services
         private static UnityWebRequest GeneratePostRequest(string url, string bodyData)
         {
             var request = UnityWebRequest.Post(url, string.Empty);
-            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyData));
+            if(bodyData.Length > 0)
+                request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyData));
             request.uploadHandler.contentType = "application/json";
             return request;
         }
