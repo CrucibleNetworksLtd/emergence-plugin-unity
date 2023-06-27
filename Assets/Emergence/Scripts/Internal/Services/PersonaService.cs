@@ -50,7 +50,9 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = StaticConfig.APIBase + "get-access-token";
             var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback, "", AuthDict);
-            var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response);
+            if(response.IsSuccess == false)
+                return;
+            var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response.Response);
             currentAccessToken = SerializationHelper.Serialize(accessTokenResponse.message.AccessToken, false);
             success?.Invoke(currentAccessToken);
         }
@@ -62,7 +64,9 @@ namespace EmergenceSDK.Internal.Services
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
-                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
@@ -89,7 +93,9 @@ namespace EmergenceSDK.Internal.Services
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
-                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
@@ -116,7 +122,10 @@ namespace EmergenceSDK.Internal.Services
             string jsonPersona = SerializationHelper.Serialize(persona);
 
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
-            await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, errorCallback, jsonPersona, AuthDict);
+            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, errorCallback, jsonPersona, AuthDict);
+            if(response.IsSuccess == false)
+                return;
+            
             success?.Invoke();
         }
 
@@ -140,7 +149,9 @@ namespace EmergenceSDK.Internal.Services
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
-                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
@@ -162,7 +173,9 @@ namespace EmergenceSDK.Internal.Services
         {
             string personaAvatarTokenUri = Helpers.InternalIPFSURLToHTTP(persona.avatar.tokenURI);
             UnityWebRequest tokenUriRequest = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, personaAvatarTokenUri, "");
-            await WebRequestService.PerformAsyncWebRequest(tokenUriRequest, errorCallback);
+            var response = await WebRequestService.PerformAsyncWebRequest(tokenUriRequest, errorCallback);
+            if(response.IsSuccess == false)
+                return;
             TokenURIResponse res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenUriRequest.downloadHandler.text)[0];
             // rebuild the avatarId field with the GUID
             persona.avatarId = persona.avatar.chain + ":" + persona.avatar.contractAddress + ":" +
@@ -179,7 +192,9 @@ namespace EmergenceSDK.Internal.Services
             
             try
             {
-                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
@@ -206,7 +221,9 @@ namespace EmergenceSDK.Internal.Services
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
-                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {

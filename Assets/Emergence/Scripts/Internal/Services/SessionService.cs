@@ -44,7 +44,9 @@ namespace EmergenceSDK.Internal.Services
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             try
             {
-                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
@@ -52,9 +54,9 @@ namespace EmergenceSDK.Internal.Services
             }
             
             EmergenceUtils.PrintRequestResult("IsConnected", request);
-            if (EmergenceUtils.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var response))
+            if (EmergenceUtils.ProcessRequest<IsConnectedResponse>(request, errorCallback, out var processedResponse))
             {
-                success?.Invoke(response.isConnected);
+                success?.Invoke(processedResponse.isConnected);
             }
         }
 
@@ -68,7 +70,9 @@ namespace EmergenceSDK.Internal.Services
             request.SetRequestHeader("auth", personaService.CurrentAccessToken);
             try
             {
-                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {
@@ -96,7 +100,9 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             try
             {
-                await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                if(response.IsSuccess == false)
+                    return;
             }
             catch (Exception e)
             {

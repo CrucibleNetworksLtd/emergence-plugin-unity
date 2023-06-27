@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using UnityEngine.Networking;
@@ -41,7 +42,7 @@ namespace EmergenceSDK.Internal.Services
         /// <summary>
         /// Performs an asynchronous UnityWebRequest and returns the result as a string.
         /// </summary>
-        public static async UniTask<string> PerformAsyncWebRequest(string url, string method, ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null)
+        public static async UniTask<WebResponse> PerformAsyncWebRequest(string url, string method, ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null)
         {
             UnityWebRequest request = GetRequestFromMethodType(method, url, bodyData);
             Instance.AddOpenRequest(request);
@@ -103,7 +104,7 @@ namespace EmergenceSDK.Internal.Services
             openRequests.TryRemove(request, out _);
         }
 
-        public static async UniTask<string> PerformAsyncWebRequest(UnityWebRequest request, ErrorCallback errorCallback)
+        public static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request, ErrorCallback errorCallback)
         {
             try
             {
@@ -118,12 +119,12 @@ namespace EmergenceSDK.Internal.Services
                     var response = request.result;
                     if (response == UnityWebRequest.Result.Success)
                     {
-                        return request.downloadHandler.text;
+                        return new WebResponse(true, request.downloadHandler.text);
                     }
                     else
                     {
                         errorCallback?.Invoke(request.error, request.responseCode);
-                        return request.error;
+                        return new WebResponse(false, request.error);
                     }
                 }
                 catch (TimeoutException)
@@ -131,13 +132,13 @@ namespace EmergenceSDK.Internal.Services
                     request.Abort(); // Abort the request
 
                     errorCallback?.Invoke("Request timed out.", 0);
-                    return "Request timed out.";
+                    return new WebResponse(false,"Request timed out.");
                 }
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 errorCallback?.Invoke(request.error, request.responseCode);
-                return ex.Message;
+                return new WebResponse(false, ex.Message);
             }
             finally
             {

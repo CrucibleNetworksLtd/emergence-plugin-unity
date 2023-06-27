@@ -13,8 +13,10 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask GetTransactionStatus(string transactionHash, string nodeURL, GetTransactionStatusSuccess success, ErrorCallback errorCallback)
         {
             string url = StaticConfig.APIBase + "GetTransactionStatus?transactionHash=" + transactionHash + "&nodeURL=" + nodeURL;
-            string response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
-            var transactionStatusResponse = SerializationHelper.Deserialize<BaseResponse<GetTransactionStatusResponse>>(response);
+            WebResponse response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
+            if(response.IsSuccess == false)
+                return;
+            var transactionStatusResponse = SerializationHelper.Deserialize<BaseResponse<GetTransactionStatusResponse>>(response.Response);
             success?.Invoke(transactionStatusResponse.message);
         }
 
@@ -22,8 +24,10 @@ namespace EmergenceSDK.Internal.Services
         {
             //GetBlockNumberResponse
             string url = StaticConfig.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
-            string response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
-            var blockNumberResponse = SerializationHelper.Deserialize<BaseResponse<GetBlockNumberResponse>>(response);
+            WebResponse response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
+            if(response.IsSuccess == false)
+                return;
+            var blockNumberResponse = SerializationHelper.Deserialize<BaseResponse<GetBlockNumberResponse>>(response.Response);
             success?.Invoke(blockNumberResponse.message);
         }
     }

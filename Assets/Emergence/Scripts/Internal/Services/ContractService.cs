@@ -29,9 +29,9 @@ namespace EmergenceSDK.Internal.Services
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, dataString);
             request.downloadHandler = new DownloadHandlerBuffer();
-            await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+            var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
 
-            if (EmergenceUtils.ProcessRequest<LoadContractResponse>(request, errorCallback, out var response))
+            if (response.IsSuccess && EmergenceUtils.ProcessRequest<LoadContractResponse>(request, errorCallback, out var processedResponse))
             {
                 loadedAddresses.Add(contractAddress);
                 success?.Invoke();
@@ -51,7 +51,9 @@ namespace EmergenceSDK.Internal.Services
             string dataString = SerializationHelper.Serialize(body, false);
 
             var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, dataString);
-            var readContractResponse = SerializationHelper.Deserialize<BaseResponse<ReadContractResponse>>(response);
+            if(response.IsSuccess == false)
+                return;
+            var readContractResponse = SerializationHelper.Deserialize<BaseResponse<ReadContractResponse>>(response.Response);
             success?.Invoke(readContractResponse.message);
         }
 
@@ -91,7 +93,9 @@ namespace EmergenceSDK.Internal.Services
             var headers = new Dictionary<string, string>();
             headers.Add("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, dataString, headers);
-            var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response);
+            if(response.IsSuccess == false)
+                return;
+            var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response.Response);
             success?.Invoke(writeContractResponse.message);
         }
     }
