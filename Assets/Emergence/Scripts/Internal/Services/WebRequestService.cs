@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
@@ -12,12 +13,25 @@ namespace EmergenceSDK.Internal.Services
     internal class WebRequestService
     {
         private static WebRequestService instance;
-        public static WebRequestService Instance => instance ?? (instance = new WebRequestService());
+        public static WebRequestService Instance => instance ??= new WebRequestService();
 
         private ConcurrentDictionary<UnityWebRequest, DateTime> openRequests = new ConcurrentDictionary<UnityWebRequest, DateTime>();
 
         //This timeout avoids this issue: https://forum.unity.com/threads/catching-curl-error-28.1274846/
-        private const int TimeoutMilliseconds = 4999;
+        private const int TimeoutMilliseconds = 9999;
+
+        private WebRequestService()
+        {
+            EmergenceSingleton.Instance.OnGameClosing += CancelAllRequests;
+        }
+
+        private void CancelAllRequests()
+        {
+            foreach (var openRequest in openRequests)
+            {
+                openRequest.Key.Abort();
+            }
+        }
 
         public static UnityWebRequest CreateRequest(string method, string url, string bodyData = "")
         {

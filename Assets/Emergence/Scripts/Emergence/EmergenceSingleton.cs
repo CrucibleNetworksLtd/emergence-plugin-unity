@@ -2,6 +2,7 @@
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -20,6 +21,8 @@ namespace EmergenceSDK.Types
         public EmergenceConfiguration Configuration;
 
         public string CurrentDeviceId { get; set; }
+
+        public event Action OnGameClosing;
         
         public enum Environment
         {
@@ -204,6 +207,19 @@ namespace EmergenceSDK.Types
         private void EmergenceManager_OnButtonEsc()
         {
             CloseEmergenceUI();
+        }
+        
+        private void OnApplicationQuit()
+        {
+            OnGameClosing?.Invoke();
+        }
+
+        private void OnApplicationPlaymodeStateChanged(PlayModeStateChange state)
+        {
+            if (state == PlayModeStateChange.ExitingPlayMode || state == PlayModeStateChange.ExitingEditMode)
+            {
+                OnGameClosing?.Invoke();
+            }
         }
 
     }

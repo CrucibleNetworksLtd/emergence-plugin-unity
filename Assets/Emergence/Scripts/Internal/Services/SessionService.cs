@@ -25,8 +25,12 @@ namespace EmergenceSDK.Internal.Services
             
             if(personaService is PersonaService personaServiceInstance)
                 OnSessionDisconnected += () => personaServiceInstance.OnSessionDisconnected();
+
+            EmergenceSingleton.Instance.OnGameClosing += OnGameEnd;
         }
-        
+
+        private async void OnGameEnd() => await Disconnect(null, null);
+
         public void ProcessExpiration(string expirationMessage)
         {
             Expiration = SerializationHelper.Deserialize<Expiration>(expirationMessage);
