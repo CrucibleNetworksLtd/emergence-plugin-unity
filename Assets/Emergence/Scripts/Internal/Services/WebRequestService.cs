@@ -106,6 +106,7 @@ namespace EmergenceSDK.Internal.Services
 
         public static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request, ErrorCallback errorCallback)
         {
+            EmergenceLogger.LogInfo($"Performing {request.method} request to {request.url}, DeviceId: {EmergenceSingleton.Instance.CurrentDeviceId}");
             try
             {
                 var sendTask = request.SendWebRequest().ToUniTask();
