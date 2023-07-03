@@ -90,7 +90,7 @@ namespace EmergenceSDK.Internal.Utils
 
             if (isError)
             {
-                Debug.LogError($"{errorCode} Error in {callingClass}: {message}");
+                Debug.LogWarning($"{errorCode} Error in {callingClass}: {message}");
             }
             else
             {
@@ -120,7 +120,7 @@ namespace EmergenceSDK.Internal.Utils
                     Debug.LogWarning($"{callingClass}: {message}");
                     break;
                 case LogLevel.Error:
-                    Debug.LogError($"{callingClass}: {message}");
+                    Debug.LogWarning($"{callingClass}: {message}");
                     break;
             }
         }

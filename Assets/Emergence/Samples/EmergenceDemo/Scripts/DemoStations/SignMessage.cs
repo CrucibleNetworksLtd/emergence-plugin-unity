@@ -1,3 +1,4 @@
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEngine;
 
@@ -45,12 +46,12 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void SignErrorCallback(string message, long code)
         {
-            Debug.LogError("Error signing message: " + message);
+            EmergenceLogger.LogError("Error signing message: " + message);
         }
 
         private void SignSuccess(string message)
         {
-            Debug.Log("Message signed succesfully: " + message);
+            EmergenceLogger.LogInfo("Message signed succesfully: " + message);
         }
     }
 }
