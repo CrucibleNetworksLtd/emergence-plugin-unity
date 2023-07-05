@@ -69,17 +69,6 @@ namespace EmergenceSDK.Internal.Utils
 #if DISABLE_EMERGENCE_LOGS
             return;
 #endif
-            bool isError = (logLevelIn == LogLevel.Error);
-            switch (errorCode) 
-            {
-                case 408:
-                case 502:
-                case 503:
-                case 504:
-                    isError = false;
-                    break;
-            }
-
             string callingClass = "";
             StackTrace trace = new StackTrace();
             StackFrame[] frames = trace.GetFrames();
@@ -87,15 +76,7 @@ namespace EmergenceSDK.Internal.Utils
             {
                 callingClass = frames[2].GetMethod().DeclaringType?.FullName;
             }
-
-            if (isError)
-            {
-                Debug.LogWarning($"{errorCode} Error in {callingClass}: {message}");
-            }
-            else
-            {
-                Debug.LogWarning($"{errorCode} Warning in {callingClass}: {message}");
-            }
+            Debug.LogWarning($"{errorCode} Warning in {callingClass}: {message}");
         }
 
         private static void LogWithoutCode(string message, LogLevel logLevelIn)
