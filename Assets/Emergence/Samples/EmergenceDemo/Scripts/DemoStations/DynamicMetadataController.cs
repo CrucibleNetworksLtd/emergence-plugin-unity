@@ -77,12 +77,13 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             void UpdateDynamicMetadataSuccess(string response)
             {
                 var dynamicMetaData = JsonUtility.FromJson<DynamicMetaData>(response);
+                EmergenceLogger.LogInfo($"Dynamic metadata updated: {dynamicMetaData?.message}");
                 if (dynamicMetaData.statusCode == 0)
                 {
-                    CollectionScreen.Instance.OpenSidebar(item);
                     CollectionScreen.Instance.Refresh();
+                    item.Meta.DynamicMetadata = dynamicMetaData.message;
+                    CollectionScreen.Instance.OpenSidebar(item);
                 }
-            
             }
         }
     }

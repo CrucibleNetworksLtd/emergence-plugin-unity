@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
-using EmergenceSDK.Types.Responses;
 using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services

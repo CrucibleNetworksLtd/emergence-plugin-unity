@@ -158,7 +158,7 @@ namespace EmergenceSDK.Internal.Utils
 
         private void OnDestroy()
         {
-            cancellationTokenSource.Cancel();
+            cancellationTokenSource?.Cancel();
         }
     }
 }

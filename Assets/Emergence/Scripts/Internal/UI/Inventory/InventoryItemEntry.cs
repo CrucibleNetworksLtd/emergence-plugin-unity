@@ -16,7 +16,7 @@ namespace EmergenceSDK.Internal.UI.Inventory
         [FormerlySerializedAs("itemName")] [SerializeField] 
         private TextMeshProUGUI ItemName;
         private string url;
-        
+
         private bool loadOnStart;
         private bool rotateOnLoading;
         private bool outputDebugLog;

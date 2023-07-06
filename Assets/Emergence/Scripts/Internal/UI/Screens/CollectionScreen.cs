@@ -63,6 +63,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         public event Action<InventoryItem> OnItemClicked;
         
         private InventoryItemStore inventoryItemStore;
+        
+        public InventoryItem GetItemDetails(InventoryItem item) => inventoryItemStore.GetEntry(item.ID).Item;
 
         private void Awake()
         {
@@ -102,6 +104,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             {
                 Button entryButton = entry.GetComponent<Button>();
                 InventoryItem item = entry.Item;
+                entryButton.onClick.RemoveAllListeners();
                 entryButton.onClick.AddListener(() => OnInventoryItemPressed(item));
                 entryButton.onClick.AddListener(() => OnItemClicked?.Invoke(item));
             }

@@ -38,8 +38,10 @@ namespace EmergenceSDK.Internal.UI.Inventory
 
         private void UpdateItem(InventoryItem item)
         {
-            items.Remove(item);
-            items.Add(item);
+            if (entryDictionary.TryGetValue(item.ID, out InventoryItemEntry entry))
+            {
+                entry.SetItem(item);
+            }
         }
 
         private bool AddItem(InventoryItem item)

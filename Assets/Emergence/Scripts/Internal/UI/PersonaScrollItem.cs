@@ -119,7 +119,7 @@ namespace EmergenceSDK.Internal.UI
                     Persona.avatar = avatar;
                     waitingForImageRequest = true;
 
-                    if (!RequestImage.Instance.AskForImage(avatar.meta.content.First().url))
+                    if (!RequestImage.Instance.AskForImage(avatar.meta?.content?.First()?.url))
                     {
                         waitingForImageRequest = false;
                         OnImageCompleted?.Invoke(persona, false);

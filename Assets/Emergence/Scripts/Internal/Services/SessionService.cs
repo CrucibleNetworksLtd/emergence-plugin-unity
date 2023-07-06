@@ -65,15 +65,18 @@ namespace EmergenceSDK.Internal.Services
         {
             disconnectInProgress = true;
             string url = StaticConfig.APIBase + "killSession";
-
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
-            request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-            request.SetRequestHeader("auth", personaService.CurrentAccessToken);
             try
             {
+                request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
+                request.SetRequestHeader("auth", personaService.CurrentAccessToken);
                 var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
-                if(response.IsSuccess == false)
+                if (response.IsSuccess == false)
                     return;
+            }
+            catch (ArgumentException)
+            {
+                //Already disconnected
             }
             catch (Exception e)
             {
