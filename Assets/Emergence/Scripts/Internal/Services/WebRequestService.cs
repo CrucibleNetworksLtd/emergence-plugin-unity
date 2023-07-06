@@ -80,6 +80,10 @@ namespace EmergenceSDK.Internal.Services
                     throw new Exception("Unsupported HTTP method: " + method);
             }
 
+            
+            ret.disposeUploadHandlerOnDispose = true;
+            ret.disposeDownloadHandlerOnDispose = true;
+            
             return ret;
         }
 
