@@ -52,6 +52,7 @@ namespace EmergenceSDK.Internal.Services
             {
                 success?.Invoke(processedResponse.disconnected);
             }
+            WebRequestService.CleanupRequest(request);
         }
         
         public async UniTask RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback)
@@ -67,7 +68,10 @@ namespace EmergenceSDK.Internal.Services
             {
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
                 if(response.IsSuccess == false)
+                {
+                    WebRequestService.CleanupRequest(request);
                     return;
+                }
             }
             catch (Exception e)
             {
@@ -79,6 +83,7 @@ namespace EmergenceSDK.Internal.Services
             {
                 success?.Invoke(processedResponse.signedMessage);
             }
+            WebRequestService.CleanupRequest(request);
         }
         
         public async UniTask Handshake(HandshakeSuccess success, ErrorCallback errorCallback)
@@ -93,7 +98,10 @@ namespace EmergenceSDK.Internal.Services
             {
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
                 if(response.IsSuccess == false)
+                {
+                    WebRequestService.CleanupRequest(request);
                     return;
+                }
             }
             catch (Exception e)
             {
@@ -109,6 +117,7 @@ namespace EmergenceSDK.Internal.Services
                     string errorMessage = completedHandshake ? "Handshake already completed." : "Handshake failed, check server status.";
                     int errorCode = completedHandshake ? 0 : -1;
                     errorCallback?.Invoke(errorMessage, errorCode);
+                    WebRequestService.CleanupRequest(request);
                     return;
                 }
                 
@@ -117,6 +126,7 @@ namespace EmergenceSDK.Internal.Services
                 EmergenceSingleton.Instance.SetCachedAddress(processedResponse.address);
                 success?.Invoke(WalletAddress);
             }
+            WebRequestService.CleanupRequest(request);
         }
         
         public async UniTask GetBalance(BalanceSuccess success, ErrorCallback errorCallback)
@@ -132,7 +142,10 @@ namespace EmergenceSDK.Internal.Services
             {
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
                 if(response.IsSuccess == false)
+                {
+                    WebRequestService.CleanupRequest(request);
                     return;
+                }
             }
             catch (Exception e)
             {
@@ -145,6 +158,7 @@ namespace EmergenceSDK.Internal.Services
             {
                 success?.Invoke(processedResponse.balance);
             }
+            WebRequestService.CleanupRequest(request);
         }
         
         public async UniTask ValidateSignedMessage(string message, string signedMessage, string address,
@@ -166,7 +180,10 @@ namespace EmergenceSDK.Internal.Services
             {
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
                 if(response.IsSuccess == false)
+                {
+                    WebRequestService.CleanupRequest(request);
                     return;
+                }
             }
             catch (Exception e)
             {
@@ -177,6 +194,7 @@ namespace EmergenceSDK.Internal.Services
             {
                 success?.Invoke(processedResponse.valid);
             }
+            WebRequestService.CleanupRequest(request);
         }
         
     }

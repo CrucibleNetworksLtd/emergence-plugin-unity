@@ -52,6 +52,7 @@ namespace EmergenceSDK.Internal.UI.Inventory
 
             using (var decoder = new Decoder(request.downloadHandler.data))
             {
+                WebRequestService.CleanupRequest(request);
                 try
                 {
                     var img = decoder.NextImage();

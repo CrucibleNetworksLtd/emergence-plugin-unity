@@ -58,6 +58,7 @@ namespace EmergenceSDK.Internal.Services
             {
                 success?.Invoke(processedResponse.isConnected);
             }
+            WebRequestService.CleanupRequest(request);
         }
 
         public async UniTask Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
@@ -91,6 +92,7 @@ namespace EmergenceSDK.Internal.Services
                 OnSessionDisconnected?.Invoke();
                 success?.Invoke();
             }
+            WebRequestService.CleanupRequest(request);
         }
         
         public async UniTask GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback)
@@ -121,6 +123,7 @@ namespace EmergenceSDK.Internal.Services
                 EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
                 success?.Invoke((request.downloadHandler as DownloadHandlerTexture).texture);
             }
+            WebRequestService.CleanupRequest(request);
         }
     }
 }

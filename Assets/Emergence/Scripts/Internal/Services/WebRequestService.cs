@@ -48,7 +48,15 @@ namespace EmergenceSDK.Internal.Services
             Instance.AddOpenRequest(request);
 
             SetupRequestHeaders(request, headers);
-            return await PerformAsyncWebRequest(request, errorCallback);
+            var ret = await PerformAsyncWebRequest(request, errorCallback);
+            CleanupRequest(request);
+            return ret;
+        }
+
+        public static void CleanupRequest(UnityWebRequest request)
+        {
+            Instance.RemoveOpenRequest(request);
+            request.uploadHandler?.Dispose();
         }
 
         private static void SetupRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)
@@ -79,7 +87,6 @@ namespace EmergenceSDK.Internal.Services
                 default:
                     throw new Exception("Unsupported HTTP method: " + method);
             }
-
             
             ret.disposeUploadHandlerOnDispose = true;
             ret.disposeDownloadHandlerOnDispose = true;

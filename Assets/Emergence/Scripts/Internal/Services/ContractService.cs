@@ -36,7 +36,7 @@ namespace EmergenceSDK.Internal.Services
                 loadedAddresses.Add(contractAddress);
                 success?.Invoke();
             }
-            
+            WebRequestService.CleanupRequest(request);
             return loadedAddresses.Contains(contractAddress);
         }
 

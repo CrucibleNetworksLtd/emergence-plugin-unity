@@ -14,6 +14,7 @@ namespace EmergenceSDK.EmergenceDemo
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, vrmURL, "");
             await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
             byte[] response = request.downloadHandler.data;
+            WebRequestService.CleanupRequest(request);
 
             var vrm10 = await Vrm10.LoadBytesAsync(response, true);
             GameObject playerArmature = GameObject.Find("PlayerArmature");

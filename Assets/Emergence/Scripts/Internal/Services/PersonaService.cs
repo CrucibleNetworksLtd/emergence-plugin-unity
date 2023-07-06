@@ -81,6 +81,7 @@ namespace EmergenceSDK.Internal.Services
             else
             {
                 PersonasResponse personasResponse = SerializationHelper.Deserialize<PersonasResponse>(request.downloadHandler.text);
+                WebRequestService.CleanupRequest(request);
                 CurrentPersona = personasResponse.personas.FirstOrDefault(p => p.id == personasResponse.selected);
                 success?.Invoke(personasResponse.personas, CurrentPersona);
             }
@@ -110,6 +111,7 @@ namespace EmergenceSDK.Internal.Services
             else
             {
                 CurrentPersona = SerializationHelper.Deserialize<Persona>(request.downloadHandler.text);
+                WebRequestService.CleanupRequest(request);
                 success?.Invoke(CurrentPersona);
             }
         }
@@ -167,6 +169,8 @@ namespace EmergenceSDK.Internal.Services
                 CurrentPersona = persona;
                 success?.Invoke();
             }
+            
+            WebRequestService.CleanupRequest(request);
         }
 
         private static async UniTask UpdateAvatarOnPersonaEdit(Persona persona, ErrorCallback errorCallback)
@@ -177,6 +181,7 @@ namespace EmergenceSDK.Internal.Services
             if(response.IsSuccess == false)
                 return;
             TokenURIResponse res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenUriRequest.downloadHandler.text)[0];
+            WebRequestService.CleanupRequest(tokenUriRequest);
             // rebuild the avatarId field with the GUID
             persona.avatarId = persona.avatar.chain + ":" + persona.avatar.contractAddress + ":" +
                                persona.avatar.tokenId + ":" + res.GUID;
@@ -209,6 +214,7 @@ namespace EmergenceSDK.Internal.Services
             {
                 success?.Invoke();
             }
+            WebRequestService.CleanupRequest(request);
         }
  
     
@@ -240,6 +246,7 @@ namespace EmergenceSDK.Internal.Services
                 CurrentPersona = persona;
                 success?.Invoke();
             }
+            WebRequestService.CleanupRequest(request);
         }
 
         internal void OnSessionDisconnected()
