@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
+using MG.GIF;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -38,45 +40,52 @@ namespace EmergenceSDK.Internal.UI.Inventory
                 return;
             }
 
-            using (UnityWebRequest request = UnityWebRequest.Get(imageUrl))
-            {
-                await request.SendWebRequest().ToUniTask();
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, imageUrl, "");
+            await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
 
-                if (request.result != UnityWebRequest.Result.Success)
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                EmergenceLogger.LogWarning("File load error.\n" + request.error);
+                itemImage.texture = RequestImage.Instance.DefaultThumbnail;
+                return;
+            }
+
+            using (var decoder = new Decoder(request.downloadHandler.data))
+            {
+                try
                 {
-                    EmergenceLogger.LogWarning("File load error.\n" + request.error);
+                    var img = decoder.NextImage();
+                    LoadStaticImage(img.CreateTexture());
+                }
+                catch (UnsupportedGifException)
+                {
+                    EmergenceLogger.LogInfo("Invalid gif.");
                     itemImage.texture = RequestImage.Instance.DefaultThumbnail;
                     return;
                 }
 
-                using (var decoder = new MG.GIF.Decoder(request.downloadHandler.data))
+                //EXPERIMENTAL: This code does enable gif playback, but it is ver resource intensive and causes a lot of lag.
+                //Comment back in to try it out!
+                /*
+                while (img != null)
                 {
-                    var img = decoder.NextImage();
-                    LoadStaticImage(img.CreateTexture());
+                    frames.Add(img.CreateTexture());
+                    frameDelays.Add(img.Delay / 1000.0f);
+                    img = decoder.NextImage();
 
-                    //EXPERIMENTAL: This code does enable gif playback, but it is ver resource intensive and causes a lot of lag.
-                    //Comment back in to try it out!
-                    /*
-                    while (img != null)
-                    {
-                        frames.Add(img.CreateTexture());
-                        frameDelays.Add(img.Delay / 1000.0f);
-                        img = decoder.NextImage();
+                    await UniTask.Delay(1000 / 60);
+                }
+            }
 
-                        await UniTask.Delay(1000 / 60);
-                    }
-                }
-
-                if (autoPlay)
-                {
-                    _ = PlayGif();
-                }
-                else
-                {
-                    itemImage.texture = frames[0];
-                }
-                */
-                }
+            if (autoPlay)
+            {
+                _ = PlayGif();
+            }
+            else
+            {
+                itemImage.texture = frames[0];
+            }
+            */
             }
         }
 

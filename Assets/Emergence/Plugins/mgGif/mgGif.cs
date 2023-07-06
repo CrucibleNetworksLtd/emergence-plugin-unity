@@ -8,6 +8,13 @@ using System.Runtime.InteropServices; // unsafe
 
 namespace MG.GIF
 {
+    public class UnsupportedGifException : Exception
+    {
+        public UnsupportedGifException( string message ) : base( message )
+        {
+        }
+    }
+    
     ////////////////////////////////////////////////////////////////////////////////
 
     public class Image : ICloneable
@@ -179,7 +186,7 @@ namespace MG.GIF
         {
             if( Input == null || Input.Length <= 12 )
             {
-                throw new Exception( "Invalid data" );
+                throw new UnsupportedGifException( "Invalid data" );
             }
 
             // signature
@@ -189,7 +196,7 @@ namespace MG.GIF
 
             if( Version != "GIF87a" && Version != "GIF89a" )
             {
-                throw new Exception( "Unsupported GIF version" );
+                throw new UnsupportedGifException( "Unsupported GIF version" );
             }
 
             // read header
