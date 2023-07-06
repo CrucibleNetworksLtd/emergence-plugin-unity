@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -10,8 +11,9 @@ namespace EmergenceSDK.EmergenceDemo
     {
         public async void SwapAvatars(string vrmURL)
         {
-            UnityWebRequest request = UnityWebRequest.Get(vrmURL);
-            byte[] response = (await request.SendWebRequest()).downloadHandler.data;
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, vrmURL, "");
+            await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+            byte[] response = request.downloadHandler.data;
 
             var vrm10 = await Vrm10.LoadBytesAsync(response, true);
             GameObject playerArmature = GameObject.Find("PlayerArmature");
