@@ -16,8 +16,6 @@ namespace EmergenceSDK.Types
         private string accessToken;
         private string address;
 
-        public static string HAS_LOGGED_IN_ONCE_KEY = "HasLoggedInOnce";
-
         public EmergenceConfiguration Configuration;
 
         public string CurrentDeviceId { get; set; }

@@ -101,7 +101,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public void ResetToOnBoardingIfNeeded()
         {
-            if (PlayerPrefs.GetInt(EmergenceSingleton.HAS_LOGGED_IN_ONCE_KEY, 0) == 0)
+            if (PlayerPrefs.GetInt(StaticConfig.HasLoggedInOnceKey, 0) == 0)
             {
                 ChangeState(ScreenStates.Welcome);
             }
@@ -179,7 +179,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public void ShowWelcome()
         {
-            if (PlayerPrefs.GetInt(EmergenceSingleton.HAS_LOGGED_IN_ONCE_KEY, 0) > 0)
+            if (PlayerPrefs.GetInt(StaticConfig.HasLoggedInOnceKey, 0) > 0)
             {
                 ShowLogIn();
             }
