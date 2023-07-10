@@ -10,25 +10,38 @@ namespace EmergenceSDK.Internal.Services
 {
     public class ChainService : IChainService
     {
-        public async UniTask GetTransactionStatus(string transactionHash, string nodeURL, GetTransactionStatusSuccess success, ErrorCallback errorCallback)
+        public async UniTask<ServiceResponse<GetTransactionStatusResponse>> GetTransactionStatusAsync(string transactionHash, string nodeURL)
         {
             string url = StaticConfig.APIBase + "GetTransactionStatus?transactionHash=" + transactionHash + "&nodeURL=" + nodeURL;
-            WebResponse response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
+            WebResponse response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, EmergenceLogger.LogError);
             if(response.IsSuccess == false)
-                return;
+                return new ServiceResponse<GetTransactionStatusResponse>(false);
             var transactionStatusResponse = SerializationHelper.Deserialize<BaseResponse<GetTransactionStatusResponse>>(response.Response);
-            success?.Invoke(transactionStatusResponse.message);
+            return new ServiceResponse<GetTransactionStatusResponse>(true, transactionStatusResponse.message);
+        }
+
+        public async UniTask GetTransactionStatus(string transactionHash, string nodeURL, GetTransactionStatusSuccess success, ErrorCallback errorCallback)
+        {
+            var response = await GetTransactionStatusAsync(transactionHash, nodeURL);
+            if(response.success)
+                success?.Invoke(response.result);
+        }
+
+        public async UniTask<ServiceResponse<GetBlockNumberResponse>> GetHighestBlockNumberAsync(string nodeURL)
+        {
+            string url = StaticConfig.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
+            WebResponse response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, EmergenceLogger.LogError);
+            if(response.IsSuccess == false)
+                return new ServiceResponse<GetBlockNumberResponse>(false);
+            var blockNumberResponse = SerializationHelper.Deserialize<BaseResponse<GetBlockNumberResponse>>(response.Response);
+            return new ServiceResponse<GetBlockNumberResponse>(true, blockNumberResponse.message);
         }
 
         public async UniTask GetHighestBlockNumber(string nodeURL, GetBlockNumberSuccess success, ErrorCallback errorCallback)
         {
-            //GetBlockNumberResponse
-            string url = StaticConfig.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
-            WebResponse response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback);
-            if(response.IsSuccess == false)
-                return;
-            var blockNumberResponse = SerializationHelper.Deserialize<BaseResponse<GetBlockNumberResponse>>(response.Response);
-            success?.Invoke(blockNumberResponse.message);
+            var response = await GetHighestBlockNumberAsync(nodeURL);
+            if(response.success)
+                success?.Invoke(response.result);
         }
     }
 }
