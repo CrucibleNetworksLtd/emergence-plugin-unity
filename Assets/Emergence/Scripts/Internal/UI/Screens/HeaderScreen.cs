@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -24,7 +25,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private IWalletService walletService;
         private ISessionService sessionService;
         
-        private Coroutine refreshCoroutine;
+        private CancellationTokenSource refreshCancellationToken;
 
         private void Awake()
         {
@@ -40,7 +41,8 @@ namespace EmergenceSDK.Internal.UI.Screens
             sessionService = EmergenceServices.GetService<SessionService>();
             Hide();
 
-            refreshCoroutine = StartCoroutine(RefreshWalletBalance());
+            refreshCancellationToken = new CancellationTokenSource();
+            _ = RefreshWalletBalanceAsync(refreshCancellationToken.Token);
         }
 
         private void OnDestroy()
@@ -50,7 +52,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             disconnectModalButton.onClick.RemoveListener(OnMenuCloseClick);
         }
         
-        IEnumerator RefreshWalletBalance()
+        private async UniTaskVoid RefreshWalletBalanceAsync(CancellationToken cancellationToken)
         {
             while (gameObject.activeSelf && headerInformation.activeSelf)
             {
@@ -73,21 +75,22 @@ namespace EmergenceSDK.Internal.UI.Screens
                         EmergenceLogger.LogError(error, code);
                         ModalPromptOK.Instance.Show("Sorry, there was a problem getting your balance, will retry in " + refreshTimeOut.ToString("0") + " seconds");
                     });
-                yield return new WaitForSeconds(refreshTimeOut);
+
+                await UniTask.Delay((int)(refreshTimeOut * 1000), cancellationToken: cancellationToken);
             }
         }
 
         public void Hide()
         {
             headerInformation.SetActive(false);
-            if (refreshCoroutine != null) 
-                StopCoroutine(refreshCoroutine);
+            refreshCancellationToken?.Cancel();
         }
 
         public void Show()
         {
             headerInformation.SetActive(true);
-            refreshCoroutine = StartCoroutine(RefreshWalletBalance());
+            refreshCancellationToken = new CancellationTokenSource();
+            _ = RefreshWalletBalanceAsync(refreshCancellationToken.Token);
         }
 
         public void Refresh(string address)
@@ -109,12 +112,12 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             Modal.Instance.Show("Disconnecting wallet...");
             sessionService.Disconnect(() =>
-            {
-                Modal.Instance.Hide();
-                Hide();
-                ScreenManager.Instance.Restart();
-            },
-            EmergenceLogger.LogError);
+                {
+                    Modal.Instance.Hide();
+                    Hide();
+                    ScreenManager.Instance.Restart();
+                },
+                EmergenceLogger.LogError);
         }
     }
 }
