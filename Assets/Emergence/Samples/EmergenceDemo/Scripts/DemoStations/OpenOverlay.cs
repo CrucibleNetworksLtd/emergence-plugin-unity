@@ -54,7 +54,8 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             {
                 avatarService.AvatarById(persona.avatarId, (avatar =>
                 {
-                    DemoAvatarManager.Instance.SwapAvatars(avatar.meta.content[1].url);
+                    if(avatar.meta != null && avatar.meta.content != null && avatar.meta.content.Count > 1)
+                        DemoAvatarManager.Instance.SwapAvatars(avatar.meta.content[1].url);
                 
                 }), EmergenceLogger.LogError);
             }
