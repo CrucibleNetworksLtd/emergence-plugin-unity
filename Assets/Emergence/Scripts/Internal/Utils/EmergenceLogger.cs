@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using EmergenceSDK.Types;
 using Debug = UnityEngine.Debug;
 
 namespace EmergenceSDK.Internal.Utils
@@ -10,20 +11,21 @@ namespace EmergenceSDK.Internal.Utils
     /// <summary>
     /// Error logger, used to log HTTP errors and other messages to the console or a file.
     /// </summary>
-    internal static class EmergenceLogger 
+    public static class EmergenceLogger 
     {
-        private enum LogLevel
+        public enum LogLevel
         {
             Off = 0,
-            Error = 1,
-            Warning = 2,
-            Info = 3
+            Trace = 1,
+            Error = 2,
+            Warning = 3,
+            Info = 4
         }
 
         /// <summary>
         /// Change this to change Emergence Logging level
         /// </summary>
-        private static readonly LogLevel logLevel = LogLevel.Info;
+        private static readonly LogLevel logLevel = EmergenceSingleton.Instance.LogLevel;
         
 
         public static void LogWarning(string message)
@@ -61,7 +63,7 @@ namespace EmergenceSDK.Internal.Utils
 
         private static bool IsEnabledFor(LogLevel logLevelIn)
         {
-            return logLevelIn <= EmergenceLogger.logLevel;
+            return logLevelIn <= logLevel;
         }
 
         private static void LogWithCode(string message, long errorCode, LogLevel logLevelIn) 

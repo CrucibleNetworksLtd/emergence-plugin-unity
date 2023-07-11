@@ -63,6 +63,9 @@ namespace EmergenceSDK.Types
         [HideInInspector] public EmergenceUIStateChanged OnEmergenceUIVisibilityChanged;
         public EmergencePersona CurrentCachedPersona { get; set; }
 
+        [Header("Set the emergence SDK log level")]
+        public EmergenceLogger.LogLevel LogLevel;
+
         public void OpenEmergenceUI()
         {
             if (ScreenManager.Instance == null)
