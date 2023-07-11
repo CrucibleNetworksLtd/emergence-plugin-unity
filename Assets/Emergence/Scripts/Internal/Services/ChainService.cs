@@ -23,8 +23,10 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask GetTransactionStatus(string transactionHash, string nodeURL, GetTransactionStatusSuccess success, ErrorCallback errorCallback)
         {
             var response = await GetTransactionStatusAsync(transactionHash, nodeURL);
-            if(response.success)
-                success?.Invoke(response.result);
+            if(response.Success)
+                success?.Invoke(response.Result);
+            else
+                errorCallback?.Invoke("Error in GetTransactionStatus.", (long)response.Code);
         }
 
         public async UniTask<ServiceResponse<GetBlockNumberResponse>> GetHighestBlockNumberAsync(string nodeURL)
@@ -40,8 +42,10 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask GetHighestBlockNumber(string nodeURL, GetBlockNumberSuccess success, ErrorCallback errorCallback)
         {
             var response = await GetHighestBlockNumberAsync(nodeURL);
-            if(response.success)
-                success?.Invoke(response.result);
+            if(response.Success)
+                success?.Invoke(response.Result);
+            else
+                errorCallback?.Invoke("Error in GetHighestBlockNumber.", (long)response.Code);
         }
     }
 }

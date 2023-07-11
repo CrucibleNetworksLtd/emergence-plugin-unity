@@ -13,8 +13,10 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask AvatarsByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback)
         {
             var response = await AvatarsByOwnerAsync(address);
-            if(response.success)
-                success?.Invoke(response.result);
+            if(response.Success)
+                success?.Invoke(response.Result);
+            else
+                errorCallback?.Invoke("Error in AvatarsByOwner.", (long)response.Code);
         }
         
         public async UniTask<ServiceResponse<List<Avatar>>> AvatarsByOwnerAsync(string address)
@@ -44,8 +46,10 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask AvatarById(string id, SuccessAvatar success, ErrorCallback errorCallback)
         {
             var response = await AvatarByIdAsync(id);
-            if(response.success)
-                success?.Invoke(response.result);
+            if(response.Success)
+                success?.Invoke(response.Result);
+            else
+                errorCallback?.Invoke("Error in AvatarById.", (long)response.Code);
         }
     }
 }

@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Types;
 
 namespace EmergenceSDK.Services
 {
@@ -11,5 +12,10 @@ namespace EmergenceSDK.Services
         /// Attempts to write dynamic metadata to the specified contract.
         /// </summary>
         UniTask WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, ErrorCallback errorCallback);
+
+        /// <summary>
+        /// Attempts to write dynamic metadata to the specified contract.
+        /// </summary>
+        UniTask<ServiceResponse<string>> WriteDynamicMetadataAsync(string network, string contract, string tokenId, string metadata);
     }
 }

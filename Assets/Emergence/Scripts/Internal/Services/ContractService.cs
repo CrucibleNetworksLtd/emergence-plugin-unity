@@ -13,9 +13,28 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class ContractService : IContractService
     {
-        private List<string> loadedAddresses = new List<string>();
+        private readonly List<string> loadedContractAddresses = new List<string>();
+        private bool CheckForNewContract(ContractInfo contractInfo) => !loadedContractAddresses.Contains(contractInfo.ContractAddress);
+        
+        /// <summary>
+        /// Loads the contract if it is new
+        /// </summary>
+        /// <returns>Returns true if there was an error during loading</returns>
+        private async Task<bool> AttemptToLoadContract(ContractInfo contractInfo)
+        {
+            if (CheckForNewContract(contractInfo))
+            {
+                bool loadedSuccessfully = await LoadContract(contractInfo.ContractAddress, contractInfo.ABI, contractInfo.Network);
+                if (!loadedSuccessfully)
+                {
+                    EmergenceLogger.LogError("Error loading contract");
+                    return false;
+                }
+            }
+            return true;
+        }
 
-        private async UniTask<bool> LoadContract(string contractAddress, string ABI, string network, LoadContractSuccess success, ErrorCallback errorCallback)
+        private async UniTask<bool> LoadContract(string contractAddress, string ABI, string network)
         {
             Contract data = new Contract()
             {
@@ -29,55 +48,45 @@ namespace EmergenceSDK.Internal.Services
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, dataString);
             request.downloadHandler = new DownloadHandlerBuffer();
-            var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+            var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
 
-            if (response.IsSuccess && EmergenceUtils.ProcessRequest<LoadContractResponse>(request, errorCallback, out var processedResponse))
+            if (response.IsSuccess && EmergenceUtils.ProcessRequest<LoadContractResponse>(request, EmergenceLogger.LogError, out var processedResponse))
             {
-                loadedAddresses.Add(contractAddress);
-                success?.Invoke();
+                loadedContractAddresses.Add(contractAddress);
             }
             WebRequestService.CleanupRequest(request);
-            return loadedAddresses.Contains(contractAddress);
+            return loadedContractAddresses.Contains(contractAddress);
         }
 
-        private bool CheckForNewContract(ContractInfo contractInfo) => !loadedAddresses.Contains(contractInfo.ContractAddress);
-
-        public async UniTask ReadMethod<T>(ContractInfo contractInfo, T body, ReadMethodSuccess success, ErrorCallback errorCallback)
+        public async UniTask<ServiceResponse<ReadContractResponse>> ReadMethodAsync<T>(ContractInfo contractInfo, T body)
         {
-            if (await LoadContractIfNew(contractInfo, errorCallback)) 
-                return;
-
+            if (!await AttemptToLoadContract(contractInfo)) 
+                return new ServiceResponse<ReadContractResponse>(false);
+            
             string url = contractInfo.ToReadUrl();
             string dataString = SerializationHelper.Serialize(body, false);
 
             var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, dataString);
             if(response.IsSuccess == false)
-                return;
+                return new ServiceResponse<ReadContractResponse>(false);
             var readContractResponse = SerializationHelper.Deserialize<BaseResponse<ReadContractResponse>>(response.Response);
-            success?.Invoke(readContractResponse.message);
+            return new ServiceResponse<ReadContractResponse>(true, readContractResponse.message);
         }
 
-        private async Task<bool> LoadContractIfNew(ContractInfo contractInfo, ErrorCallback errorCallback)
+        public async UniTask ReadMethod<T>(ContractInfo contractInfo, T body, ReadMethodSuccess success, ErrorCallback errorCallback)
         {
-            if (CheckForNewContract(contractInfo))
-            {
-                bool loadedSuccessfully = await LoadContract(contractInfo.ContractAddress, contractInfo.ABI,
-                    contractInfo.Network, null, errorCallback);
-                if (!loadedSuccessfully)
-                {
-                    errorCallback?.Invoke("Error loading contract", -1);
-                    return true;
-                }
-            }
-
-            return false;
+            var response = await ReadMethodAsync(contractInfo, body);
+            if(response.Success)
+                success?.Invoke(response.Result);
+            else
+                errorCallback?.Invoke("Error in ReadMethod", (long)response.Code);
         }
 
-        public async UniTask WriteMethod<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, WriteMethodSuccess success, ErrorCallback errorCallback)
+        public async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsync<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body)
         {
-            if (await LoadContractIfNew(contractInfo, errorCallback)) 
-                return;
-
+            if (!await AttemptToLoadContract(contractInfo))
+                return new ServiceResponse<WriteContractResponse>(false);
+            
             string gasPrice = String.Empty;
             string localAccountName = String.Empty;
 
@@ -94,9 +103,18 @@ namespace EmergenceSDK.Internal.Services
             headers.Add("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, dataString, headers);
             if(response.IsSuccess == false)
-                return;
+                return new ServiceResponse<WriteContractResponse>(false);
             var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response.Response);
-            success?.Invoke(writeContractResponse.message);
+            return new ServiceResponse<WriteContractResponse>(true, writeContractResponse.message);
+        }
+
+        public async UniTask WriteMethod<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, WriteMethodSuccess success, ErrorCallback errorCallback)
+        {
+            var response = await WriteMethodAsync(contractInfo, localAccountNameIn, gasPriceIn, value, body);
+            if(response.Success)
+                success?.Invoke(response.Result);
+            else
+                errorCallback?.Invoke("Error in WriteMethod", (long)response.Code);
         }
     }
 }
