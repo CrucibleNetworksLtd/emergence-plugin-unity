@@ -10,7 +10,7 @@ namespace EmergenceSDK.Internal.Utils
     /// <summary>
     /// Error logger, used to log HTTP errors and other messages to the console or a file.
     /// </summary>
-    public static class EmergenceLogger 
+    internal static class EmergenceLogger 
     {
         private enum LogLevel
         {
