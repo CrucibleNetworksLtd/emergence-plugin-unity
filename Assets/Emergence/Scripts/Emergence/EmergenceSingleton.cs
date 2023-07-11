@@ -213,7 +213,7 @@ namespace EmergenceSDK.Types
         {
             OnGameClosing?.Invoke();
         }
-
+#if UNITY_EDITOR
         private void OnApplicationPlaymodeStateChanged(PlayModeStateChange state)
         {
             if (state == PlayModeStateChange.ExitingPlayMode || state == PlayModeStateChange.ExitingEditMode)
@@ -221,6 +221,6 @@ namespace EmergenceSDK.Types
                 OnGameClosing?.Invoke();
             }
         }
-
+#endif
     }
 }
