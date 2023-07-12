@@ -88,7 +88,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     personaService.GetAccessToken((token) =>
                         {
                             state = States.LoginFinished;
-                            PlayerPrefs.SetInt(EmergenceSingleton.HAS_LOGGED_IN_ONCE_KEY, 1);
+                            PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
                             ScreenManager.Instance.ShowDashboard();
                         },
                         (error, code) =>

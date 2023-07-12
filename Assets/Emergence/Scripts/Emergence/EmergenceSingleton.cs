@@ -16,8 +16,6 @@ namespace EmergenceSDK.Types
         private string accessToken;
         private string address;
 
-        public static string HAS_LOGGED_IN_ONCE_KEY = "HasLoggedInOnce";
-
         public EmergenceConfiguration Configuration;
 
         public string CurrentDeviceId { get; set; }
@@ -62,6 +60,9 @@ namespace EmergenceSDK.Types
         // parameter value would be overwritten by the value set in the inspector
         [HideInInspector] public EmergenceUIStateChanged OnEmergenceUIVisibilityChanged;
         public EmergencePersona CurrentCachedPersona { get; set; }
+
+        [Header("Set the emergence SDK log level")]
+        public EmergenceLogger.LogLevel LogLevel;
 
         public void OpenEmergenceUI()
         {
@@ -213,7 +214,7 @@ namespace EmergenceSDK.Types
         {
             OnGameClosing?.Invoke();
         }
-
+#if UNITY_EDITOR
         private void OnApplicationPlaymodeStateChanged(PlayModeStateChange state)
         {
             if (state == PlayModeStateChange.ExitingPlayMode || state == PlayModeStateChange.ExitingEditMode)
@@ -221,6 +222,6 @@ namespace EmergenceSDK.Types
                 OnGameClosing?.Invoke();
             }
         }
-
+#endif
     }
 }
