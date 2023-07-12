@@ -100,8 +100,10 @@ namespace EmergenceSDK.Internal.Services
         {
             var request = UnityWebRequest.Post(url, string.Empty);
             if(bodyData.Length > 0)
+            {
                 request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyData));
-            request.uploadHandler.contentType = "application/json";
+                request.uploadHandler.contentType = "application/json";
+            }
             return request;
         }
 

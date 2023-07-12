@@ -61,6 +61,9 @@ namespace EmergenceSDK.Types
         [HideInInspector] public EmergenceUIStateChanged OnEmergenceUIVisibilityChanged;
         public EmergencePersona CurrentCachedPersona { get; set; }
 
+        [Header("Set the emergence SDK log level")]
+        public EmergenceLogger.LogLevel LogLevel;
+
         public void OpenEmergenceUI()
         {
             if (ScreenManager.Instance == null)
@@ -211,7 +214,7 @@ namespace EmergenceSDK.Types
         {
             OnGameClosing?.Invoke();
         }
-
+#if UNITY_EDITOR
         private void OnApplicationPlaymodeStateChanged(PlayModeStateChange state)
         {
             if (state == PlayModeStateChange.ExitingPlayMode || state == PlayModeStateChange.ExitingEditMode)
@@ -219,6 +222,6 @@ namespace EmergenceSDK.Types
                 OnGameClosing?.Invoke();
             }
         }
-
+#endif
     }
 }
