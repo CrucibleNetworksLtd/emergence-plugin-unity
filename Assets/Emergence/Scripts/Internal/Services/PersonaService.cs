@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -46,98 +45,135 @@ namespace EmergenceSDK.Internal.Services
             return currentPersona != null;
         }
 
-        public async UniTask GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
+        public async UniTask<ServiceResponse<string>> GetAccessTokenAsync()
         {
             string url = StaticConfig.APIBase + "get-access-token";
-            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, errorCallback, "", AuthDict);
+            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, EmergenceLogger.LogError, "", AuthDict);
             if(response.IsSuccess == false)
-                return;
+                return new ServiceResponse<string>(false);
             var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response.Response);
             currentAccessToken = SerializationHelper.Serialize(accessTokenResponse.message.AccessToken, false);
-            success?.Invoke(currentAccessToken);
+            return new ServiceResponse<string>(true, currentAccessToken);
+        }
+
+        public async UniTask GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
+        {
+            var response = await GetAccessTokenAsync();
+            if(response.Success)
+                success?.Invoke(response.Result);
+            else
+                errorCallback?.Invoke("Error in GetAccessToken.", (long)response.Code);
         }
         
-        public async UniTask GetPersonas(SuccessPersonas success, ErrorCallback errorCallback)
+        public async UniTask<ServiceResponse<List<Persona>, Persona>> GetPersonasAsync()
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "personas";
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
-                var response  = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if(response.IsSuccess == false)
-                    return;
+                    return new ServiceResponse<List<Persona>, Persona>(false);
             }
             catch (Exception e)
             {
-                errorCallback?.Invoke(e.Message, e.HResult);
+                return new ServiceResponse<List<Persona>, Persona>(false);
             }
             EmergenceUtils.PrintRequestResult("GetPersonas", request);
 
             if (EmergenceUtils.RequestError(request))
             {
-                errorCallback?.Invoke(request.error, request.responseCode);
+                return new ServiceResponse<List<Persona>, Persona>(false);
             }
-            else
-            {
-                PersonasResponse personasResponse = SerializationHelper.Deserialize<PersonasResponse>(request.downloadHandler.text);
-                WebRequestService.CleanupRequest(request);
-                CurrentPersona = personasResponse.personas.FirstOrDefault(p => p.id == personasResponse.selected);
-                success?.Invoke(personasResponse.personas, CurrentPersona);
-            }
+
+            PersonasResponse personasResponse = SerializationHelper.Deserialize<PersonasResponse>(request.downloadHandler.text);
+            WebRequestService.CleanupRequest(request);
+            CurrentPersona = personasResponse.personas.FirstOrDefault(p => p.id == personasResponse.selected);
+            return new ServiceResponse<List<Persona>, Persona>(true, personasResponse.personas, CurrentPersona);
         }
-        
-        public async UniTask GetCurrentPersona(SuccessGetCurrentPersona success, ErrorCallback errorCallback)
+
+        public async UniTask GetPersonas(SuccessPersonas success, ErrorCallback errorCallback)
+        {
+            var response = await GetPersonasAsync();
+            if(response.Success)
+                success?.Invoke(response.Result0, response.Result1);
+            else
+                errorCallback?.Invoke("Error in GetPersonas.", (long)response.Code);
+        }
+
+        public async UniTask<ServiceResponse<Persona>> GetCurrentPersonaAsync()
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
-                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if(response.IsSuccess == false)
-                    return;
+                {
+                    WebRequestService.CleanupRequest(request);
+                    return new ServiceResponse<Persona>(false);
+                }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                errorCallback?.Invoke(e.Message, e.HResult);
+                WebRequestService.CleanupRequest(request);
+                return new ServiceResponse<Persona>(false);
             }
             EmergenceUtils.PrintRequestResult("Get Current Persona", request);
 
             if (EmergenceUtils.RequestError(request))
             {
-                errorCallback?.Invoke(request.error, request.responseCode);
-            }
-            else
-            {
-                CurrentPersona = SerializationHelper.Deserialize<Persona>(request.downloadHandler.text);
                 WebRequestService.CleanupRequest(request);
-                success?.Invoke(CurrentPersona);
+                return new ServiceResponse<Persona>(false);
             }
+
+            CurrentPersona = SerializationHelper.Deserialize<Persona>(request.downloadHandler.text);
+            WebRequestService.CleanupRequest(request);
+            return new ServiceResponse<Persona>(true, CurrentPersona);
+        }
+
+        public async UniTask GetCurrentPersona(SuccessGetCurrentPersona success, ErrorCallback errorCallback)
+        {
+            var response = await GetCurrentPersonaAsync();
+            if(response.Success)
+                success?.Invoke(response.Result);
+            else
+                errorCallback?.Invoke("Error in GetCurrentPersona.", (long)response.Code);
+        }
+
+        public async UniTask<ServiceResponse> CreatePersonaAsync(Persona persona)
+        {
+            if (persona.avatarId == null) 
+                persona.avatarId = "";
+            
+            string jsonPersona = SerializationHelper.Serialize(persona);
+            string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
+            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, jsonPersona, AuthDict);
+            if(response.IsSuccess == false)
+                return new ServiceResponse(false);
+            
+            return new ServiceResponse(true);
         }
 
         public async UniTask CreatePersona(Persona persona, SuccessCreatePersona success, ErrorCallback errorCallback)
         {
-            if (persona.avatarId == null) {
-                persona.avatarId = "";
-            }
-            string jsonPersona = SerializationHelper.Serialize(persona);
-
-            string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
-            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, errorCallback, jsonPersona, AuthDict);
-            if(response.IsSuccess == false)
-                return;
-            
-            success?.Invoke();
+            var response = await CreatePersonaAsync(persona);
+            if(response.Success)
+                success?.Invoke();
+            else
+                errorCallback?.Invoke("Error in CreatePersona.", (long)response.Code);
         }
 
-    
-        public async UniTask EditPersona(Persona persona, SuccessEditPersona success, ErrorCallback errorCallback)
+        public async UniTask<ServiceResponse> EditPersonaAsync(Persona persona)
         {
             // Fetch the current avatar GUID and add it to the avatarId field of the persona
             if (persona.avatar != null)
             {
-                await UpdateAvatarOnPersonaEdit(persona, errorCallback);
+                var avatarResponse = await UpdateAvatarOnPersonaEdit(persona);
+                if(avatarResponse.Success == false)
+                    return new ServiceResponse(false);
             }
 
             string jsonPersona = SerializationHelper.Serialize(persona);
@@ -151,43 +187,52 @@ namespace EmergenceSDK.Internal.Services
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
-                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if(response.IsSuccess == false)
-                    return;
+                    return new ServiceResponse(false);
             }
             catch (Exception e)
             {
-                errorCallback?.Invoke(e.Message, e.HResult);
+                WebRequestService.CleanupRequest(request);
+                return new ServiceResponse(false);
             }
 
             if (EmergenceUtils.RequestError(request))
             {
-                errorCallback?.Invoke(request.error, request.responseCode);
+                WebRequestService.CleanupRequest(request);
+                return new ServiceResponse(false);
             }
-            else
-            {
-                CurrentPersona = persona;
-                success?.Invoke();
-            }
-            
+
             WebRequestService.CleanupRequest(request);
+            CurrentPersona = persona;
+            return new ServiceResponse(true);
+
         }
 
-        private static async UniTask UpdateAvatarOnPersonaEdit(Persona persona, ErrorCallback errorCallback)
+        public async UniTask EditPersona(Persona persona, SuccessEditPersona success, ErrorCallback errorCallback)
+        {
+            var response = await EditPersonaAsync(persona);
+            if(response.Success)
+                success?.Invoke();
+            else
+                errorCallback?.Invoke("Error in EditPersona.", (long)response.Code);
+        }
+
+        private static async UniTask<ServiceResponse> UpdateAvatarOnPersonaEdit(Persona persona)
         {
             string personaAvatarTokenUri = Helpers.InternalIPFSURLToHTTP(persona.avatar.tokenURI);
             UnityWebRequest tokenUriRequest = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, personaAvatarTokenUri, "");
-            var response = await WebRequestService.PerformAsyncWebRequest(tokenUriRequest, errorCallback);
+            var response = await WebRequestService.PerformAsyncWebRequest(tokenUriRequest, EmergenceLogger.LogError);
             if(response.IsSuccess == false)
-                return;
+                return new ServiceResponse(false);
             TokenURIResponse res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenUriRequest.downloadHandler.text)[0];
             WebRequestService.CleanupRequest(tokenUriRequest);
             // rebuild the avatarId field with the GUID
-            persona.avatarId = persona.avatar.chain + ":" + persona.avatar.contractAddress + ":" +
-                               persona.avatar.tokenId + ":" + res.GUID;
+            persona.avatarId = persona.avatar.chain + ":" + persona.avatar.contractAddress + ":" + persona.avatar.tokenId + ":" + res.GUID;
+            return new ServiceResponse(true);
         }
 
-        public async UniTask DeletePersona(Persona persona, SuccessDeletePersona success, ErrorCallback errorCallback)
+        public async UniTask<ServiceResponse> DeletePersonaAsync(Persona persona)
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona/" + persona.id;
 
@@ -197,56 +242,72 @@ namespace EmergenceSDK.Internal.Services
             
             try
             {
-                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if(response.IsSuccess == false)
-                    return;
+                    return new ServiceResponse(false);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                errorCallback?.Invoke(e.Message, e.HResult);
+                WebRequestService.CleanupRequest(request);
+                return new ServiceResponse(false);
             }
 
             if (EmergenceUtils.RequestError(request))
             {
-                errorCallback?.Invoke(request.error, request.responseCode);
+                WebRequestService.CleanupRequest(request);
+                return new ServiceResponse(false);
             }
-            else
-            {
-                success?.Invoke();
-            }
+
             WebRequestService.CleanupRequest(request);
+            return new ServiceResponse(true);
+        }
+
+        public async UniTask DeletePersona(Persona persona, SuccessDeletePersona success, ErrorCallback errorCallback)
+        {
+            var response = await DeletePersonaAsync(persona);
+            if(response.Success)
+                success?.Invoke();
+            else
+                errorCallback?.Invoke("Error in DeletePersona.", (long)response.Code);
         }
  
-    
-        public async UniTask SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, ErrorCallback errorCallback)
+        public async UniTask<ServiceResponse> SetCurrentPersonaAsync(Persona persona)
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "setActivePersona/" + persona.id;
 
-            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
+            using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.method = "PATCH";
             request.SetRequestHeader("Authorization", CurrentAccessToken);
             try
             {
-                var response = await WebRequestService.PerformAsyncWebRequest(request, errorCallback);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if(response.IsSuccess == false)
-                    return;
+                    return new ServiceResponse(false);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                errorCallback?.Invoke(e.Message, e.HResult);
+                WebRequestService.CleanupRequest(request);
+                return new ServiceResponse(false);
             }
-            EmergenceUtils.PrintRequestResult("Set Current Persona", request);
 
             if (EmergenceUtils.RequestError(request))
             {
-                errorCallback?.Invoke(request.error, request.responseCode);
+                WebRequestService.CleanupRequest(request);
+                return new ServiceResponse(false);
             }
-            else
-            {
-                CurrentPersona = persona;
-                success?.Invoke();
-            }
+
             WebRequestService.CleanupRequest(request);
+            CurrentPersona = persona;
+            return new ServiceResponse(true);
+        }
+
+        public async UniTask SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, ErrorCallback errorCallback)
+        {
+            var response = await SetCurrentPersonaAsync(persona);
+            if(response.Success)
+                success?.Invoke();
+            else
+                errorCallback?.Invoke("Error in SetCurrentPersona.", (long)response.Code);
         }
 
         internal void OnSessionDisconnected()

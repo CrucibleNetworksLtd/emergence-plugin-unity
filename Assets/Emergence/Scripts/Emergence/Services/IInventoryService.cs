@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Types;
+using EmergenceSDK.Types.Inventory;
 
 namespace EmergenceSDK.Services
 {
@@ -9,9 +11,11 @@ namespace EmergenceSDK.Services
     public interface IInventoryService : IEmergenceService
     {
         /// <summary>
-        /// Attempts to get the inventory for the given address. If successful, the success callback will be called with the inventory.
-        /// <remarks>We currently support the main nets for: Ethereum, Polygon, Flow, Tezos, Solana and ImmutableX</remarks>
+        /// Attempts to retrieve the inventory of the given address on the given chain.
         /// </summary>
+        UniTask<ServiceResponse<List<InventoryItem>>> InventoryByOwnerAsync(string address, InventoryChain chain);
+        /// <summary>
+        /// Attempts to retrieve the inventory of the given address on the given chain.
         UniTask InventoryByOwner(string address, InventoryChain chain, SuccessInventoryByOwner success, ErrorCallback errorCallback);
     }
     

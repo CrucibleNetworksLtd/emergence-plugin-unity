@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Types;
+using UnityEngine;
 
 namespace EmergenceSDK.Services
 {
@@ -23,10 +24,18 @@ namespace EmergenceSDK.Services
         /// Attempts to get the login QR code, it will return the QR code as a texture in the success callback
         /// </summary>
         UniTask GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback);
+        /// <summary>
+        /// Attempts to get the login QR code
+        /// </summary>
+        UniTask<ServiceResponse<Texture2D>> GetQRCodeAsync();
 
         /// <summary>
         /// Attempts to disconnect the user from Emergence, the success callback will fire if successful
         /// </summary>
         UniTask Disconnect(DisconnectSuccess success, ErrorCallback errorCallback);
+        /// <summary>
+        /// Attempts to disconnect the user from Emergence
+        /// </summary>
+        UniTask<ServiceResponse> DisconnectAsync();
     }
 }
