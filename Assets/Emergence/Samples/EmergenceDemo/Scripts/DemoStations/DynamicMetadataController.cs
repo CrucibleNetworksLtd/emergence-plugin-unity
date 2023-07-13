@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
@@ -80,7 +81,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 EmergenceLogger.LogInfo($"Dynamic metadata updated: {dynamicMetaData?.message}");
                 if (dynamicMetaData.statusCode == 0)
                 {
-                    CollectionScreen.Instance.Refresh();
+                    CollectionScreen.Instance.Refresh().Forget();
                     item.Meta.DynamicMetadata = dynamicMetaData.message;
                     CollectionScreen.Instance.OpenSidebar(item);
                 }

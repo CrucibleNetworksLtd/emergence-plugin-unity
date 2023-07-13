@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
@@ -197,7 +198,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         public void ShowDashboard()
         {
             ChangeState(ScreenStates.Dashboard);
-            DashboardScreen.Instance.Refresh();
+            DashboardScreen.Instance.Refresh().Forget();
         }
 
         public void ShowEditPersona()
@@ -208,7 +209,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         public void ShowCollection()
         {
             ChangeState(ScreenStates.Collection);
-            CollectionScreen.Instance.Refresh();
+            CollectionScreen.Instance.Refresh().Forget();
         }
 
         public void Restart()

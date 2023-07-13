@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.UI.Inventory;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -16,25 +17,6 @@ namespace EmergenceSDK.Internal.UI.Screens
     
     public class CollectionScreen : MonoBehaviour
     {
-        private class FilterParams
-        {
-            public string searchString ;
-            public bool avatars;
-            public bool props;
-            public bool clothing;
-            public bool weapons;
-            public string blockchain;
-            public FilterParams()
-            {
-                searchString = "";
-                avatars = true;
-                props = true;
-                clothing = true;
-                weapons = true;
-                blockchain = "ANY";
-            }
-        }
-        
         public static CollectionScreen Instance;
 
         public GameObject contentGO;
@@ -56,9 +38,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private List<Avatar> avatars = new List<Avatar>();
 
-        private FilterParams filterParams = new FilterParams();
-        private IInventoryService inventoryService;
-        private IAvatarService avatarService;
+        private CollectionScreenFilterParams collectionScreenFilterParams = new CollectionScreenFilterParams();
         
         public event Action<InventoryItem> OnItemClicked;
         
@@ -84,16 +64,26 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private GameObject InstantiateItemEntry() => Instantiate(itemEntryPrefab, contentGO.transform, false);
         
-        public void Refresh()
+        public async UniTask Refresh()
         {
-            inventoryService = EmergenceServices.GetService<IInventoryService>();
-            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible, InventoryByOwnerSuccess, InventoryRefreshErrorCallback);
-
-            avatarService = EmergenceServices.GetService<IAvatarService>();
-            avatarService.AvatarsByOwner(EmergenceSingleton.Instance.GetCachedAddress(), AvatarsByOwnerSuccess, InventoryRefreshErrorCallback);
+            var inventoryService = EmergenceServices.GetService<IInventoryService>();
+            var updatedInventory = await inventoryService.InventoryByOwnerAsync(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible);
+            if (updatedInventory.Success)
+            {
+                UpdateInventory(updatedInventory.Result);
+            }
+            Modal.Instance.Hide();
+            
+            var avatarService = EmergenceServices.GetService<IAvatarService>();
+            var updatedAvatars = await avatarService.AvatarsByOwnerAsync(EmergenceSingleton.Instance.GetCachedAddress());
+            if (updatedAvatars.Success)
+            {
+                avatars = updatedAvatars.Result;
+            }
+            Modal.Instance.Hide();
         }
         
-        private void InventoryByOwnerSuccess(List<InventoryItem> inventoryItems)
+        private void UpdateInventory(List<InventoryItem> inventoryItems)
         {
             EmergenceLogger.LogInfo("Received items: " + inventoryItems.Count);
             Modal.Instance.Show("Retrieving inventory items...");
@@ -108,18 +98,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                 entryButton.onClick.AddListener(() => OnInventoryItemPressed(item));
                 entryButton.onClick.AddListener(() => OnItemClicked?.Invoke(item));
             }
-            Modal.Instance.Hide();
-        }
-
-        private void AvatarsByOwnerSuccess(List<Avatar> avatar)
-        {
-            avatars = avatar;
-        }
-
-        private void InventoryRefreshErrorCallback(string error, long code)
-        {
-            EmergenceLogger.LogError(error, code);
-            Modal.Instance.Hide();
         }
 
         private void RefreshFilteredResults()
@@ -129,16 +107,15 @@ namespace EmergenceSDK.Internal.UI.Screens
                 var item = itemEntry.Item;
                 // Search string filter
                 string itemName = item.Meta?.Name.ToLower();
-                bool searchStringResult = string.IsNullOrEmpty(itemName) || itemName.StartsWith(filterParams.searchString.ToLower()) || string.IsNullOrEmpty(filterParams.searchString);
+                bool searchStringResult = string.IsNullOrEmpty(itemName) || itemName.StartsWith(collectionScreenFilterParams.searchString.ToLower()) || string.IsNullOrEmpty(collectionScreenFilterParams.searchString);
 
                 // Blockchain filter
                 string itemBlockchain = item.Blockchain;
-                bool blockchainResult = filterParams.blockchain.Equals("ANY") || itemBlockchain.Equals(filterParams.blockchain);
+                bool blockchainResult = collectionScreenFilterParams.blockchain.Equals("ANY") || itemBlockchain.Equals(collectionScreenFilterParams.blockchain);
                 
                 //Avatar filter
-                bool isAvatar = avatars.Any(a => $"{item.Blockchain.ToUpper()}:{item.Contract.ToUpper()}"
-                                                 == $"{a.chain.ToUpper()}:{a.contractAddress.ToUpper()}");
-                bool avatarResult = filterParams.avatars || !isAvatar;
+                bool isAvatar = avatars.Any(a => $"{item.Blockchain.ToUpper()}:{item.Contract.ToUpper()}" == $"{a.chain.ToUpper()}:{a.contractAddress.ToUpper()}");
+                bool avatarResult = collectionScreenFilterParams.avatars || !isAvatar;
                 
                 if (searchStringResult && blockchainResult && avatarResult)
                 {
@@ -153,41 +130,41 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void OnSearchFieldValueChanged(string searchString)
         {
-            filterParams.searchString = searchString;
+            collectionScreenFilterParams.searchString = searchString;
             RefreshFilteredResults();
         }
 
         private void OnAvatarsToggleValueChanged(bool selected)
         {
-            filterParams.avatars = selected;
+            collectionScreenFilterParams.avatars = selected;
             RefreshFilteredResults();
         }
         
         private void OnPropsToggleValueChanged(bool selected)
         {
             EmergenceLogger.LogWarning("Prop filtering is currently not implemented");
-            filterParams.props = selected;
+            collectionScreenFilterParams.props = selected;
             RefreshFilteredResults();
         }
         
         private void OnClothingToggleValueChanged(bool selected)
         {
             EmergenceLogger.LogWarning("Clothing filtering is currently not implemented");
-            filterParams.clothing = selected;
+            collectionScreenFilterParams.clothing = selected;
             RefreshFilteredResults();
         }
         
         private void OnWeaponsToggleValueChanged(bool selected)
         {
             EmergenceLogger.LogWarning("Weapon filtering is currently not implemented");
-            filterParams.weapons = selected;
+            collectionScreenFilterParams.weapons = selected;
             RefreshFilteredResults();
         }
 
         private void OnBlockchainDropdownValueChanged(int selection)
         {
             EmergenceLogger.LogInfo(blockchainDropdown.options[selection].text);
-            filterParams.blockchain = blockchainDropdown.options[selection].text.ToUpper();
+            collectionScreenFilterParams.blockchain = blockchainDropdown.options[selection].text.ToUpper();
             RefreshFilteredResults();
         }
 
