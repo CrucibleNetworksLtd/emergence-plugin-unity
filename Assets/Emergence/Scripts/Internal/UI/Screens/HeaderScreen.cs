@@ -52,30 +52,26 @@ namespace EmergenceSDK.Internal.UI.Screens
             disconnectModalButton.onClick.RemoveListener(OnMenuCloseClick);
         }
         
-        private async UniTaskVoid RefreshWalletBalanceAsync(CancellationToken cancellationToken)
+        private async UniTask RefreshWalletBalanceAsync(CancellationToken cancellationToken)
         {
             while (gameObject.activeSelf && headerInformation.activeSelf)
             {
-                walletService.GetBalance((balance) =>
+                var balance = await walletService.GetBalanceAsync();
+                if(balance.Success)
+                {
+                    string converted = UnitConverter.Convert(balance.Result, UnitConverter.EtherUnitType.WEI, UnitConverter.EtherUnitType.ETHER, ",");
+                    string[] splitted = converted.Split(new string[] { "," }, System.StringSplitOptions.None);
+                    string result = splitted[0];
+                    if (splitted.Length == 2)
                     {
-                        string converted = UnitConverter.Convert(balance, UnitConverter.EtherUnitType.WEI, UnitConverter.EtherUnitType.ETHER, ",");
-                        string[] splitted = converted.Split(new string[] { "," }, System.StringSplitOptions.None);
-
-                        string result = splitted[0];
-
-                        if (splitted.Length == 2)
-                        {
-                            result += "." + splitted[1].Substring(0, UnitConverter.SIGNIFICANT_DIGITS);
-                        }
-
-                        walletBalance.text = result;// + " " + Emergence.Instance.TokenSymbol;
-                    },
-                    (error, code) =>
-                    {
-                        EmergenceLogger.LogError(error, code);
-                        ModalPromptOK.Instance.Show("Sorry, there was a problem getting your balance, will retry in " + refreshTimeOut.ToString("0") + " seconds");
-                    });
-
+                        result += "." + splitted[1].Substring(0, UnitConverter.SIGNIFICANT_DIGITS);
+                    }
+                    walletBalance.text = result;// + " " + Emergence.Instance.TokenSymbol;
+                }
+                else
+                {
+                    ModalPromptOK.Instance.Show("Sorry, there was a problem getting your balance, will retry in " + refreshTimeOut.ToString("0") + " seconds");
+                }
                 await UniTask.Delay((int)(refreshTimeOut * 1000), cancellationToken: cancellationToken);
             }
         }
@@ -90,7 +86,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             headerInformation.SetActive(true);
             refreshCancellationToken = new CancellationTokenSource();
-            _ = RefreshWalletBalanceAsync(refreshCancellationToken.Token);
+            RefreshWalletBalanceAsync(refreshCancellationToken.Token).Forget();
         }
 
         public void Refresh(string address)
@@ -108,16 +104,16 @@ namespace EmergenceSDK.Internal.UI.Screens
             disconnectModalButton.gameObject.SetActive(false);
         }
 
-        private void OnDisconnectClick()
+        private async void OnDisconnectClick()
         {
             Modal.Instance.Show("Disconnecting wallet...");
-            sessionService.Disconnect(() =>
-                {
-                    Modal.Instance.Hide();
-                    Hide();
-                    ScreenManager.Instance.Restart();
-                },
-                EmergenceLogger.LogError);
+            var result = await sessionService.DisconnectAsync();
+            Modal.Instance.Hide();
+            if (result.Success)
+            {
+                Hide();
+                ScreenManager.Instance.Restart();
+            }
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using EmergenceSDK.Internal.Utils;
+﻿using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using TMPro;
@@ -14,15 +17,12 @@ namespace EmergenceSDK.Internal.UI.Screens
         public Button backButton;
         public TextMeshProUGUI refreshCounterText;
 
-        private float timeRemaining = 0.0f;
         private readonly float QRRefreshTimeOut = 60.0f;
-
         public static LogInScreen Instance;
         
         private IPersonaService personaService;
         private IWalletService walletService;
         private ISessionService sessionService;
-        
 
         private enum States
         {
@@ -34,77 +34,116 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private States state = States.QR;
 
+        private CancellationTokenSource cts;
+
         private void Awake()
         {
             Instance = this;
         }
 
-        private void Start()
+        private void OnEnable()
         {
-            personaService = EmergenceServices.GetService<IPersonaService>();
-            walletService = EmergenceServices.GetService<IWalletService>();
-            sessionService = EmergenceServices.GetService<ISessionService>();
+            cts = new CancellationTokenSource();
+            HandleStates().Forget();
         }
 
-        private void Update()
+        private void OnDisable()
         {
-            switch (state)
+            cts.Cancel();
+        }
+
+        private async UniTask HandleStates()
+        {
+            try
             {
-                case States.QR:
+                while (!cts.Token.IsCancellationRequested)
                 {
-                    timeRemaining -= Time.deltaTime;
-                    if (timeRemaining <= 0.0f)
+                    switch (state)
                     {
-                        timeRemaining += QRRefreshTimeOut;
-
-                        sessionService.GetQRCode((texture) =>
-                            {
-                                rawQRImage.texture = texture;
-
-                                walletService.Handshake((walletAddress) =>
-                                    {
-                                        state = States.RefreshAccessToken;
-                                        HeaderScreen.Instance.Refresh(walletAddress);
-                                    },
-                                    (error, code) =>
-                                    {
-                                        EmergenceLogger.LogError("[" + code + "] " + error);
-                                        Reinitialize();
-                                    });
-                            },
-                            (error, code) =>
-                            {
-                                EmergenceLogger.LogError(error, code);
-                                Reinitialize();
-                            });
+                        case States.QR:
+                            await HandleQR();
+                            break;
+                        case States.RefreshAccessToken:
+                            await HandleRefreshAccessToken();
+                            break;
+                        case States.RefreshingAccessToken:
+                            break; // Not handled here since this state is intermediary
+                        case States.LoginFinished:
+                            break; // Not handled here since this state is final
                     }
-
-                    refreshCounterText.text = timeRemaining.ToString("0");
-                    break;
                 }
-                case States.RefreshAccessToken:
+            }
+            catch (OperationCanceledException)
+            {
+                // Ignore the exception caused by cancellation
+            }
+        }
+
+        private async UniTask HandleQR()
+        {
+            float timeRemaining = QRRefreshTimeOut;
+
+            while (state == States.QR && timeRemaining > 0)
+            {
+                await UniTask.Delay(1000); // update every second
+                timeRemaining -= 1.0f;
+                refreshCounterText.text = timeRemaining.ToString("0");
+            }
+
+            if (state == States.QR)
+            {
+                state = States.RefreshAccessToken;
+                await RefreshQRCodeAndHandshake();
+            }
+        }
+
+        private async UniTask RefreshQRCodeAndHandshake()
+        {
+            await sessionService.GetQRCode((texture) =>
                 {
-                    state = States.RefreshingAccessToken;
-                    personaService.GetAccessToken((token) =>
+                    rawQRImage.texture = texture;
+
+                    walletService.Handshake((walletAddress) =>
                         {
-                            state = States.LoginFinished;
-                            PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
-                            ScreenManager.Instance.ShowDashboard();
+                            state = States.RefreshAccessToken;
+                            HeaderScreen.Instance.Refresh(walletAddress);
                         },
                         (error, code) =>
                         {
                             EmergenceLogger.LogError("[" + code + "] " + error);
                             Reinitialize();
                         });
-                    break;
-                }
+                },
+                (error, code) =>
+                {
+                    EmergenceLogger.LogError(error, code);
+                    Reinitialize();
+                });
+        }
+
+        private async UniTask HandleRefreshAccessToken()
+        {
+            if (state == States.RefreshAccessToken)
+            {
+                state = States.RefreshingAccessToken;
+                await personaService.GetAccessToken((token) =>
+                    {
+                        state = States.LoginFinished;
+                        PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
+                        ScreenManager.Instance.ShowDashboard();
+                    },
+                    (error, code) =>
+                    {
+                        EmergenceLogger.LogError("[" + code + "] " + error);
+                        Reinitialize();
+                    });
             }
         }
 
         public void Restart()
         {
             state = States.QR;
-            timeRemaining = 0.0f;
+            HandleStates().Forget();
         }
 
         private void Reinitialize()
@@ -112,9 +151,8 @@ namespace EmergenceSDK.Internal.UI.Screens
             ModalPromptOK.Instance.Show("Sorry, there was a problem with your request", () =>
             {
                 state = States.QR;
-                timeRemaining = 0.0f;
+                HandleStates().Forget();
             });
         }
-
     }
 }
