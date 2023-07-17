@@ -22,7 +22,7 @@ namespace EmergenceSDK.Internal.Services
         public event PersonaUpdated OnCurrentPersonaUpdated;
     
         private Persona cachedPersona;
-        private Dictionary<string, string> AuthDict => new Dictionary<string, string>() { { "deviceId", EmergenceSingleton.Instance.CurrentDeviceId } };
+        private Dictionary<string, string> AuthDict => new() { { "deviceId", EmergenceSingleton.Instance.CurrentDeviceId } };
 
         public Persona CurrentPersona
         {

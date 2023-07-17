@@ -16,7 +16,7 @@ namespace EmergenceSDK.Internal.Services
         private static WebRequestService instance;
         public static WebRequestService Instance => instance ??= new WebRequestService();
 
-        private ConcurrentDictionary<UnityWebRequest, DateTime> openRequests = new ConcurrentDictionary<UnityWebRequest, DateTime>();
+        private ConcurrentDictionary<UnityWebRequest, DateTime> openRequests = new();
 
         //This timeout avoids this issue: https://forum.unity.com/threads/catching-curl-error-28.1274846/
         private const int TimeoutMilliseconds = 100000;
