@@ -3,6 +3,11 @@ using UnityEngine;
 
 namespace EmergenceSDK.ScriptableObjects
 {
+    public enum Environment
+    {
+        Staging,
+        Production
+    }
     [CreateAssetMenu(fileName = "Configuration", menuName = "EmergenceConfiguration", order = 1)]
     public class EmergenceConfiguration : ScriptableObject
     {
@@ -22,7 +27,7 @@ namespace EmergenceSDK.ScriptableObjects
         {
             get
             {
-                if (EmergenceSingleton.Instance._environment == EmergenceSingleton.Environment.Staging)
+                if (EmergenceSingleton.Instance.Environment == Environment.Staging)
                 {
                     return _avatarURLStaging;
                 }
@@ -37,7 +42,7 @@ namespace EmergenceSDK.ScriptableObjects
         {
             get
             {
-                if (EmergenceSingleton.Instance._environment == EmergenceSingleton.Environment.Staging)
+                if (EmergenceSingleton.Instance.Environment == Environment.Staging)
                 {
                     return _inventoryURLStaging;
                 }
@@ -52,7 +57,7 @@ namespace EmergenceSDK.ScriptableObjects
         {
             get
             {
-                if (EmergenceSingleton.Instance._environment == EmergenceSingleton.Environment.Staging)
+                if (EmergenceSingleton.Instance.Environment == Environment.Staging)
                 {
                     return _personaURLStaging;
                 }

@@ -1,45 +1,50 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
-using EmergenceSDK.Types;
-using EmergenceSDK.Types.Inventory;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace EmergenceSDK.Internal.UI.Screens
 {
     public class ScreenManager : MonoBehaviour
     {
+        [FormerlySerializedAs("welcomeScreen")]
         [Header("Screen references")]
         [SerializeField]
-        private GameObject welcomeScreen;
+        private GameObject WelcomeScreen;
 
-        [SerializeField]
-        private GameObject screensRoot;
+        [FormerlySerializedAs("screensRoot")] [SerializeField]
+        private GameObject ScreensRoot;
 
-        [SerializeField]
-        private GameObject logInScreen;
+        [FormerlySerializedAs("logInScreen")] [SerializeField]
+        private GameObject LOGInScreen;
 
-        [SerializeField]
-        private GameObject dashboardScreen;
+        [FormerlySerializedAs("dashboardScreen")] [SerializeField]
+        private GameObject DashboardScreen;
 
-        [SerializeField]
-        private GameObject editPersonaScreen;
+        [FormerlySerializedAs("editPersonaScreen")] [SerializeField]
+        private GameObject EditPersonaScreen;
         
-        [SerializeField]
-        private GameObject myCollectionScreen;
+        [FormerlySerializedAs("myCollectionScreen")] [SerializeField]
+        private GameObject MyCollectionScreen;
 
-        [Header("UI Reference")]
-        public Button escButton;
-        public Button escButtonOnboarding;
-        public Button escButtonLogin;
-        public Button personasButton;
-        public Button collectionButton;
-        public Toggle personasToggle;
-        public Toggle collectionToggle;
+        [FormerlySerializedAs("escButton")] [Header("UI Reference")]
+        public Button EscButton;
+        [FormerlySerializedAs("escButtonOnboarding")] public Button EscButtonOnboarding;
+        [FormerlySerializedAs("escButtonLogin")] public Button EscButtonLogin;
+        [FormerlySerializedAs("personasButton")] public Button PersonasButton;
+        [FormerlySerializedAs("collectionButton")] public Button CollectionButton;
+        [FormerlySerializedAs("personasToggle")] public Toggle PersonasToggle;
+        [FormerlySerializedAs("collectionToggle")] public Toggle CollectionToggle;
 
-        [SerializeField]
-        public GameObject disconnectModal;
+        [FormerlySerializedAs("disconnectModal")] [SerializeField]
+        public GameObject DisconnectModal;
+
+        public Action ClosingUI;
+        
+        private InputAction escAction;
 
         private enum ScreenStates
         {
@@ -60,23 +65,39 @@ namespace EmergenceSDK.Internal.UI.Screens
         private void Awake()
         {
             Instance = this;
-            escButton.onClick.AddListener(OnEscButtonPressed);
-            escButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
-            escButtonLogin.onClick.AddListener(OnEscButtonPressed);
-            personasToggle.onValueChanged.AddListener(OnPersonaButtonPressed);
-            collectionToggle.onValueChanged.AddListener(OnCollectionButtonPressed);
+
+            EscButton.onClick.AddListener(OnEscButtonPressed);
+            EscButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
+            EscButtonLogin.onClick.AddListener(OnEscButtonPressed);
+
+            PersonasToggle.onValueChanged.AddListener(OnPersonaButtonPressed);
+            CollectionToggle.onValueChanged.AddListener(OnCollectionButtonPressed);
+            
+            escAction = new InputAction("Esc", binding: "<Keyboard>/escape");
+            escAction.performed += _ => OnEscButtonPressed();
         }
 
+        private void OnEnable()
+        {
+            escAction.Enable();
+        }
+
+        private void OnDisable()
+        {
+            escAction.Disable();
+        }
+        
         private void OnDestroy()
         {
-            escButton.onClick.RemoveListener(OnEscButtonPressed);
-            escButtonOnboarding.onClick.RemoveListener(OnEscButtonPressed);
-            escButtonLogin.onClick.RemoveListener(OnEscButtonPressed);
-            personasToggle.onValueChanged.RemoveListener(OnPersonaButtonPressed);
-            collectionToggle.onValueChanged.RemoveListener(OnCollectionButtonPressed);
+            EscButton.onClick.RemoveListener(OnEscButtonPressed);
+            EscButtonOnboarding.onClick.RemoveListener(OnEscButtonPressed);
+            EscButtonLogin.onClick.RemoveListener(OnEscButtonPressed);
+
+            PersonasToggle.onValueChanged.RemoveListener(OnPersonaButtonPressed);
+            CollectionToggle.onValueChanged.RemoveListener(OnCollectionButtonPressed);
         }
 
-        private void Start()
+        private async void Start()
         {
             // Get all the content size fitters in scroll areas and enable them for runtime
             // Disabling them on edit time avoids dirtying the scene as soon as it loads
@@ -87,67 +108,19 @@ namespace EmergenceSDK.Internal.UI.Screens
                 csf[i].enabled = true;
             }
 
-            ChangeState(this.state);
+            await ChangeState(this.state);
         }
 
-        private void Update()
+        private async UniTask ChangeState(ScreenStates newState)
         {
-            switch (state)
-            {
-                case ScreenStates.WaitForServer:
-                    ShowWelcome();
-                    break;
-            }
-        }
+            WelcomeScreen.SetActive(false);
+            LOGInScreen.SetActive(false);
+            DashboardScreen.SetActive(false);
+            EditPersonaScreen.SetActive(false);
+            DisconnectModal.SetActive(false);
+            MyCollectionScreen.SetActive(false);
 
-        public void ResetToOnBoardingIfNeeded()
-        {
-            if (PlayerPrefs.GetInt(StaticConfig.HasLoggedInOnceKey, 0) == 0)
-            {
-                ChangeState(ScreenStates.Welcome);
-            }
-        }
-
-        public delegate void ButtonEsc();
-        public static event ButtonEsc OnButtonEsc;
-
-        private void OnEscButtonPressed()
-        {
-            OnButtonEsc?.Invoke();
-        }
-
-        public delegate void ButtonPersona();
-
-        public static event ButtonPersona OnButtonPersona;
-
-        private void OnPersonaButtonPressed(bool selected)
-        {
-            if (!selected) return;
-            ShowDashboard();
-            OnButtonPersona?.Invoke();
-        }
-        
-        public delegate void ButtonCollection();
-
-        public static event ButtonCollection OnButtonCollection;
-
-        private void OnCollectionButtonPressed(bool selected)
-        {
-            if (!selected) return;
-            ShowCollection();
-            OnButtonCollection?.Invoke();
-        }
-
-        private void ChangeState(ScreenStates state)
-        {
-            welcomeScreen.SetActive(false);
-            logInScreen.SetActive(false);
-            dashboardScreen.SetActive(false);
-            editPersonaScreen.SetActive(false);
-            disconnectModal.SetActive(false);
-            myCollectionScreen.SetActive(false);
-
-            this.state = state;
+            state = newState;
 
             switch (state)
             {
@@ -156,66 +129,84 @@ namespace EmergenceSDK.Internal.UI.Screens
                     EmergenceLogger.LogInfo("Waiting for server");
                     break;
                 case ScreenStates.Welcome:
-                    welcomeScreen.SetActive(true);
-                    screensRoot.SetActive(false);
+                    WelcomeScreen.SetActive(true);
+                    ScreensRoot.SetActive(false);
                     break;
                 case ScreenStates.LogIn:
-                    logInScreen.SetActive(true);
-                    screensRoot.SetActive(false);
+                    LOGInScreen.SetActive(true);
+                    ScreensRoot.SetActive(false);
                     break;
                 case ScreenStates.Dashboard:
-                    screensRoot.SetActive(true);
-                    dashboardScreen.SetActive(true);
+                    ScreensRoot.SetActive(true);
+                    DashboardScreen.SetActive(true);
+                    await Screens.DashboardScreen.Instance.Refresh();
                     break;
                 case ScreenStates.EditPersona:
-                    editPersonaScreen.SetActive(true);
-                    screensRoot.SetActive(true);
+                    EditPersonaScreen.SetActive(true);
+                    ScreensRoot.SetActive(true);
                     break;
                 case ScreenStates.Collection:
-                    myCollectionScreen.SetActive(true);
-                    screensRoot.SetActive(true);
+                    MyCollectionScreen.SetActive(true);
+                    ScreensRoot.SetActive(true);
+                    await CollectionScreen.Instance.Refresh();
                     break;
             }
         }
 
-        public void ShowWelcome()
+        private void OnEscButtonPressed() => ClosingUI?.Invoke();
+
+        private void OnPersonaButtonPressed(bool selected)
+        {
+            if (selected)
+            {
+                ShowDashboard().Forget();
+            }
+        }
+
+        private void OnCollectionButtonPressed(bool selected)
+        {
+            if (selected)
+            {
+                ShowCollection().Forget();
+            }
+        }
+
+        public async UniTask ShowWelcome()
         {
             if (PlayerPrefs.GetInt(StaticConfig.HasLoggedInOnceKey, 0) > 0)
             {
-                ShowLogIn();
+                await ShowLogIn();
             }
             else
             {
-                ChangeState(ScreenStates.Welcome);
+                await ChangeState(ScreenStates.Welcome);
             }
         }
 
-        public void ShowLogIn()
+        public UniTask ShowLogIn()
         {
-            ChangeState(ScreenStates.LogIn);
+            return ChangeState(ScreenStates.LogIn);
         }
 
-        public void ShowDashboard()
+        public UniTask ShowDashboard()
         {
-            ChangeState(ScreenStates.Dashboard);
-            DashboardScreen.Instance.Refresh().Forget();
+            return ChangeState(ScreenStates.Dashboard);
         }
 
-        public void ShowEditPersona()
+        public UniTask ShowEditPersona()
         {
-            ChangeState(ScreenStates.EditPersona);
+            return ChangeState(ScreenStates.EditPersona);
         }
 
-        public void ShowCollection()
+        public UniTask ShowCollection()
         {
-            ChangeState(ScreenStates.Collection);
-            CollectionScreen.Instance.Refresh().Forget();
+            return ChangeState(ScreenStates.Collection);
         }
 
-        public void Restart()
+        public UniTask Restart()
         {
             LogInScreen.Instance.Restart();
-            state = ScreenStates.WaitForServer;
+            return ChangeState(ScreenStates.WaitForServer);
         }
     }
 }
