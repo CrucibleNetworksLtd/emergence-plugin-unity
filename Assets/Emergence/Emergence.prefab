@@ -28,6 +28,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 673468891862945765}
   m_RootOrder: 1
@@ -164,6 +165,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5503907260583193857}
   m_Father: {fileID: 3122056887335212770}
@@ -264,6 +266,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 673468891862945765}
   m_RootOrder: 0
@@ -351,6 +354,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8378229982546076139}
   - {fileID: 5973671843472310214}
@@ -370,22 +374,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Configuration: {fileID: 11400000, guid: 59ea788f73e88824c8d4aa8afe83df38, type: 2}
-  _environment: 0
-  key: 9
-  shift: 1
-  ctrl: 0
-  OnEmergenceUIOpened:
+  Environment: 0
+  Key: 9
+  Shift: 1
+  Ctrl: 0
+  EmergenceUIOpened:
     m_PersistentCalls:
       m_Calls: []
-  OnEmergenceUIClosed:
+  EmergenceUIClosed:
     m_PersistentCalls:
       m_Calls: []
-  CachedPersonaUpdated:
+  EmergenceUIVisibilityChanged:
     m_PersistentCalls:
       m_Calls: []
-  OnEmergenceUIVisibilityChanged:
-    m_PersistentCalls:
-      m_Calls: []
+  LogLevel: 0
 --- !u!1 &7213555249606172953
 GameObject:
   m_ObjectHideFlags: 0
@@ -414,6 +416,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 673468891862945765}
   m_Father: {fileID: 8378229982546076139}
@@ -444,7 +447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 2100000, guid: 5b22f920c27128f47ba5880e046a5cb0, type: 2}
+  m_Material: {fileID: 2100000, guid: 0806eca6814884337b1a43bba660fdf7, type: 2}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -490,6 +493,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3122056887335212770}
   m_RootOrder: 1
@@ -547,6 +551,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4004312103586897994}
   - {fileID: 7532352296011285854}
@@ -578,7 +583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 2100000, guid: 0806eca6814884337b1a43bba660fdf7, type: 2}
   m_Color: {r: 0.101960786, g: 0.06666667, b: 0.1882353, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
