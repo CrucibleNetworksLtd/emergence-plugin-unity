@@ -3,7 +3,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,9 +19,9 @@ namespace EmergenceSDK.Internal.UI.Screens
         private readonly float QRRefreshTimeOut = 60.0f;
         public static LogInScreen Instance;
         
-        private IPersonaService personaService;
-        private IWalletService walletService;
-        private ISessionService sessionService;
+        private IPersonaService personaService => EmergenceServices.GetService<IPersonaService>();
+        private IWalletService walletService => EmergenceServices.GetService<IWalletService>();
+        private ISessionService sessionService => EmergenceServices.GetService<ISessionService>();
 
         private enum States
         {
@@ -83,6 +82,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             float timeRemaining = QRRefreshTimeOut;
 
+            await RefreshQRCodeAndHandshake();
+            
             while (state == States.QR && timeRemaining > 0)
             {
                 await UniTask.Delay(1000); // update every second
@@ -99,26 +100,24 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private async UniTask RefreshQRCodeAndHandshake()
         {
-            await sessionService.GetQRCode((texture) =>
-                {
-                    rawQRImage.texture = texture;
+            var qrResponse = await sessionService.GetQRCodeAsync();
+            if (!qrResponse.Success)
+            {
+                EmergenceLogger.LogError("Error retrieving QR code.");
+                Reinitialize();
+                return;
+            }
 
-                    walletService.Handshake((walletAddress) =>
-                        {
-                            state = States.RefreshAccessToken;
-                            HeaderScreen.Instance.Refresh(walletAddress);
-                        },
-                        (error, code) =>
-                        {
-                            EmergenceLogger.LogError("[" + code + "] " + error);
-                            Reinitialize();
-                        });
-                },
-                (error, code) =>
-                {
-                    EmergenceLogger.LogError(error, code);
-                    Reinitialize();
-                });
+            rawQRImage.texture = qrResponse.Result;
+            var handshakeResponse = await walletService.HandshakeAsync();
+            if (!handshakeResponse.Success)
+            {
+                EmergenceLogger.LogError("Error retrieving QR code.");
+                Reinitialize();
+                return;
+            }
+            state = States.RefreshAccessToken;
+            HeaderScreen.Instance.Refresh(handshakeResponse.Result);
         }
 
         private async UniTask HandleRefreshAccessToken()
