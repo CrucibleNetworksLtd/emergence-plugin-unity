@@ -42,7 +42,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         [FormerlySerializedAs("disconnectModal")] [SerializeField]
         public GameObject DisconnectModal;
 
-        public Action ClosingUI;
+        public static Action ClosingUI;
         
         private InputAction escAction;
 

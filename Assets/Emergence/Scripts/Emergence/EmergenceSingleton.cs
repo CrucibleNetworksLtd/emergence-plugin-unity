@@ -131,7 +131,7 @@ namespace EmergenceSDK
                 return;
             }
             
-            ScreenManager.Instance.ClosingUI += CloseEmergenceUI;
+            ScreenManager.ClosingUI += CloseEmergenceUI;
             DontDestroyOnLoad(gameObject);
         }
         
