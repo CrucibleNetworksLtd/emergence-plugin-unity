@@ -103,12 +103,12 @@ namespace EmergenceSDK.Internal.UI.Screens
             // Disabling them on edit time avoids dirtying the scene as soon as it loads
             ContentSizeFitter[] csf = gameObject.GetComponentsInChildren<ContentSizeFitter>(true);
 
-            for (int i = 0; i < csf.Length; i++)
+            foreach (var fitter in csf)
             {
-                csf[i].enabled = true;
+                fitter.enabled = true;
             }
 
-            await ChangeState(this.state);
+            await ChangeState(state);
         }
 
         private async UniTask ChangeState(ScreenStates newState)
