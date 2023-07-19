@@ -13,7 +13,7 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class ContractService : IContractService
     {
-        private readonly List<string> loadedContractAddresses = new();
+        private readonly List<string> loadedContractAddresses = new(); 
         private bool CheckForNewContract(ContractInfo contractInfo) => !loadedContractAddresses.Contains(contractInfo.ContractAddress);
         
         /// <summary>

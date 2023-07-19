@@ -76,7 +76,7 @@ namespace EmergenceSDK.Internal.Services
                 if(response.IsSuccess == false)
                     return new ServiceResponse<List<Persona>, Persona>(false);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new ServiceResponse<List<Persona>, Persona>(false);
             }
@@ -191,7 +191,7 @@ namespace EmergenceSDK.Internal.Services
                 if(response.IsSuccess == false)
                     return new ServiceResponse(false);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse(false);
