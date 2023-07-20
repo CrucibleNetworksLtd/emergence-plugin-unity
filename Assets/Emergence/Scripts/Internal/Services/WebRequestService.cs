@@ -42,7 +42,8 @@ namespace EmergenceSDK.Internal.Services
         /// <summary>
         /// Performs an asynchronous UnityWebRequest and returns the result as a string.
         /// </summary>
-        public static async UniTask<WebResponse> PerformAsyncWebRequest(string url, string method, ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null)
+        public static async UniTask<WebResponse> PerformAsyncWebRequest(string method, string url,
+            ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null)
         {
             UnityWebRequest request = GetRequestFromMethodType(method, url, bodyData);
             Instance.AddOpenRequest(request);

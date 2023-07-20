@@ -49,8 +49,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void IncrementCurrentCount()
         {
-            var contractInfo = new ContractInfo(deployedContract.contractAddress, "IncrementCount", deployedContract.chain.networkName,
-                deployedContract.chain.DefaultNodeURL, deployedContract.contract.ABI);
+            var contractInfo = new ContractInfo(deployedContract, "IncrementCount");
             ContractService.WriteMethod(contractInfo, "", "", "0", new string[] { }, WriteMethodSuccess, EmergenceLogger.LogError);
         }
 

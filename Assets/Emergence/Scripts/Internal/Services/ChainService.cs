@@ -13,7 +13,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask<ServiceResponse<GetTransactionStatusResponse>> GetTransactionStatusAsync(string transactionHash, string nodeURL)
         {
             string url = StaticConfig.APIBase + "GetTransactionStatus?transactionHash=" + transactionHash + "&nodeURL=" + nodeURL;
-            WebResponse response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, EmergenceLogger.LogError);
+            WebResponse response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError);
             if(response.IsSuccess == false)
                 return new ServiceResponse<GetTransactionStatusResponse>(false);
             var transactionStatusResponse = SerializationHelper.Deserialize<BaseResponse<GetTransactionStatusResponse>>(response.Response);
@@ -32,7 +32,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask<ServiceResponse<GetBlockNumberResponse>> GetHighestBlockNumberAsync(string nodeURL)
         {
             string url = StaticConfig.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
-            WebResponse response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, EmergenceLogger.LogError);
+            WebResponse response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError);
             if(response.IsSuccess == false)
                 return new ServiceResponse<GetBlockNumberResponse>(false);
             var blockNumberResponse = SerializationHelper.Deserialize<BaseResponse<GetBlockNumberResponse>>(response.Response);
