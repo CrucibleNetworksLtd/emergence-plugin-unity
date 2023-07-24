@@ -66,7 +66,7 @@ namespace EmergenceSDK.Internal.Services
             string url = contractInfo.ToReadUrl();
             string dataString = SerializationHelper.Serialize(body, false);
 
-            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, dataString);
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString);
             if(response.IsSuccess == false)
                 return new ServiceResponse<ReadContractResponse>(false);
             var readContractResponse = SerializationHelper.Deserialize<BaseResponse<ReadContractResponse>>(response.Response);
@@ -84,6 +84,8 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsync<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body)
         {
+            if(!await SwitchChain(contractInfo))
+                return new ServiceResponse<WriteContractResponse>(false);
             if (!await AttemptToLoadContract(contractInfo))
                 return new ServiceResponse<WriteContractResponse>(false);
             
@@ -101,7 +103,7 @@ namespace EmergenceSDK.Internal.Services
             
             var headers = new Dictionary<string, string>();
             headers.Add("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, dataString, headers);
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString, headers);
             if(response.IsSuccess == false)
                 return new ServiceResponse<WriteContractResponse>(false);
             var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response.Response);
@@ -115,6 +117,34 @@ namespace EmergenceSDK.Internal.Services
                 success?.Invoke(response.Result);
             else
                 errorCallback?.Invoke("Error in WriteMethod", (long)response.Code);
+        }
+
+        internal class SwitchChainRequest
+        {
+            public int chainId;
+            public string chainName;
+            public string[] rpcUrls;
+        }
+        
+        private async UniTask<bool> SwitchChain(ContractInfo contractInfo)
+        {
+            string url = StaticConfig.APIBase + "switchChain";
+            
+            var headers = new Dictionary<string, string>
+            {
+                {"deviceId", EmergenceSingleton.Instance.CurrentDeviceId}
+            };
+            var data = new SwitchChainRequest()
+            {
+                chainId = contractInfo.ChainId,
+                chainName = contractInfo.Network,
+                rpcUrls = new[]{contractInfo.NodeUrl}
+            };
+
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError,
+                SerializationHelper.Serialize(data, false), headers);
+
+            return response.IsSuccess;
         }
     }
 }
