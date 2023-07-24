@@ -38,7 +38,7 @@ namespace UniGLTF
         {
             Data = data;
             TextureDescriptorGenerator = new GltfTextureDescriptorGenerator(Data);
-            MaterialDescriptorGenerator = materialGenerator ?? new GltfMaterialDescriptorGenerator();
+            MaterialDescriptorGenerator = materialGenerator ?? new BuiltInGltfMaterialDescriptorGenerator();
 
             ExternalObjectMap = externalObjectMap ?? new Dictionary<SubAssetKey, UnityEngine.Object>();
             textureDeserializer = textureDeserializer ?? new UnityTextureDeserializer();
@@ -49,7 +49,7 @@ namespace UniGLTF
                 Data.MigrationFlags.IsRoughnessTextureValueSquared);
             MaterialFactory = new MaterialFactory(ExternalObjectMap
                 .Where(x => x.Value is Material)
-                .ToDictionary(x => x.Key, x => (Material)x.Value), MaterialFallback.FallbackShaders);
+                .ToDictionary(x => x.Key, x => (Material)x.Value));
             AnimationClipFactory = new AnimationClipFactory(ExternalObjectMap
                 .Where(x => x.Value is AnimationClip)
                 .ToDictionary(x => x.Key, x => (AnimationClip)x.Value));
@@ -136,10 +136,7 @@ namespace UniGLTF
                 foreach (var (key, gltfAnimation) in Enumerable.Zip(AnimationImporterUtil.EnumerateSubAssetKeys(GLTF), GLTF.animations, (x, y) => (x, y)))
                 {
                     await AnimationClipFactory.LoadAnimationClipAsync(key, () =>
-                    {
-                        var clip = AnimationImporterUtil.ConvertAnimationClip(Data, gltfAnimation, InvertAxis.Create());
-                        return Task.FromResult(clip);
-                    });
+                        AnimationImporterUtil.ConvertAnimationClipAsync(Data, gltfAnimation, InvertAxis.Create(), awaitCaller));
                 }
 
                 await awaitCaller.NextFrame();
@@ -292,8 +289,8 @@ namespace UniGLTF
             {
                 // no material. work around.
                 // TODO: https://www.khronos.org/registry/glTF/specs/2.0/glTF-2.0.html#default-material
-                var param = MaterialDescriptor.Default;
-                var material = await MaterialFactory.LoadAsync(param, TextureFactory.GetTextureAsync, awaitCaller);
+                var param = MaterialDescriptorGenerator.GetGltfDefault();
+                await MaterialFactory.LoadAsync(param, TextureFactory.GetTextureAsync, awaitCaller);
             }
             else
             {
@@ -301,7 +298,7 @@ namespace UniGLTF
                 {
                     await awaitCaller.NextFrameIfTimedOut();
                     var param = MaterialDescriptorGenerator.Get(Data, i);
-                    var material = await MaterialFactory.LoadAsync(param, TextureFactory.GetTextureAsync, awaitCaller);
+                    await MaterialFactory.LoadAsync(param, TextureFactory.GetTextureAsync, awaitCaller);
                 }
             }
         }
@@ -338,6 +335,17 @@ namespace UniGLTF
         #region Imported
         protected GameObject Root;
         public List<Transform> Nodes = new List<Transform>();
+        protected bool TryGetNode(int index, out Transform node)
+        {
+            if (index < 0 || index >= Nodes.Count)
+            {
+                Debug.LogWarning($"nodes[{index}] is not found !");
+                node = default;
+                return false;
+            }
+            node = Nodes[index];
+            return true;
+        }
 
         public List<MeshWithMaterials> Meshes = new List<MeshWithMaterials>();
         #endregion

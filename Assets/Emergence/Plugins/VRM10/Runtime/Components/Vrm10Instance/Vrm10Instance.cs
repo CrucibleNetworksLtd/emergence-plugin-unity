@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 
 namespace UniVRM10
@@ -42,17 +45,30 @@ namespace UniVRM10
         public bool DrawLookAtGizmo = true;
 
         /// <summay>
-        /// LookAtTargetTypes.CalcYawPitchToGaze時の注視点
+        /// The model looks at position of the Transform specified in this field.
+        /// That behaviour is available only when LookAtTargetType is SpecifiedTransform.
+        ///
+        /// モデルはここで指定した Transform の位置の方向に目を向けます。
+        /// LookAtTargetType を SpecifiedTransform に設定したときのみ有効です。
         /// </summary>
-        [SerializeField]
-        public Transform Gaze;
+        [SerializeField, FormerlySerializedAs("Gaze")]
+        public Transform LookAtTarget;
 
+        /// <summary>
+        /// Specify "LookAt" behaviour at runtime.
+        ///
+        /// 実行時の目の動かし方を指定します。
+        /// </summary>
         [SerializeField]
         public VRM10ObjectLookAt.LookAtTargetTypes LookAtTargetType;
 
         private UniHumanoid.Humanoid m_humanoid;
         private Vrm10Runtime m_runtime;
-        private ControlRigGenerationOption m_controlRigGenerationOption = ControlRigGenerationOption.None;
+
+        /// <summary>
+        /// ControlRig の生成オプション
+        /// </summary>
+        private bool m_useControlRig;
 
         /// <summary>
         /// VRM ファイルに記録された Humanoid ボーンに対応します。
@@ -79,15 +95,15 @@ namespace UniVRM10
             {
                 if (m_runtime == null)
                 {
-                    m_runtime = new Vrm10Runtime(this, m_controlRigGenerationOption);
+                    m_runtime = new Vrm10Runtime(this, m_useControlRig);
                 }
                 return m_runtime;
             }
         }
 
-        internal void InitializeAtRuntime(ControlRigGenerationOption controlRigGenerationOption)
+        internal void InitializeAtRuntime(bool useControlRig)
         {
-            m_controlRigGenerationOption = controlRigGenerationOption;
+            m_useControlRig = useControlRig;
         }
 
         void Start()
@@ -101,15 +117,7 @@ namespace UniVRM10
 
             // cause new Vrm10Runtime.
             // init LookAt init rotation.
-            var runtime = Runtime;
-
-            if (LookAtTargetType == VRM10ObjectLookAt.LookAtTargetTypes.CalcYawPitchToGaze)
-            {
-                if (Gaze == null)
-                {
-                    LookAtTargetType = VRM10ObjectLookAt.LookAtTargetTypes.SetYawPitch;
-                }
-            }
+            var _ = Runtime;
         }
 
         private void Update()
@@ -156,6 +164,15 @@ namespace UniVRM10
             return true;
         }
 
+        #region Obsolete
 
+        [Obsolete]
+        public Transform Gaze
+        {
+            get => LookAtTarget;
+            set => LookAtTarget = value;
+        }
+
+        #endregion
     }
 }

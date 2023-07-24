@@ -19,10 +19,10 @@ namespace UniVRM10
             switch (renderPipeline)
             {
                 case RenderPipelineTypes.BuiltinRenderPipeline:
-                    return new Vrm10MaterialDescriptorGenerator();
+                    return new BuiltInVrm10MaterialDescriptorGenerator();
 
                 case RenderPipelineTypes.UniversalRenderPipeline:
-                    return new Vrm10UrpMaterialDescriptorGenerator();
+                    return new UrpVrm10MaterialDescriptorGenerator();
 
                 default:
                     throw new NotImplementedException();
@@ -40,7 +40,7 @@ namespace UniVRM10
 
             var materialGenerator = GetMaterialDescriptorGenerator(renderPipeline);
 
-            using (var loader = new Vrm10Importer(result, extractedObjects, materialGenerator: materialGenerator))
+            using (var loader = new Vrm10Importer(result, externalObjectMap: extractedObjects, materialGenerator: materialGenerator))
             {
                 // settings TextureImporters
                 foreach (var textureInfo in loader.TextureDescriptorGenerator.Get().GetEnumerable())
