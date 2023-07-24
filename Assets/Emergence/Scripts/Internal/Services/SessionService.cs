@@ -83,7 +83,7 @@ namespace EmergenceSDK.Internal.Services
                 WebRequestService.CleanupRequest(request);
                 //Already disconnected
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse(false);
@@ -126,7 +126,7 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse<Texture2D>(false);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<Texture2D>(false);

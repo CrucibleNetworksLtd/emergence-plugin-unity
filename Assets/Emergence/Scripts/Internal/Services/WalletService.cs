@@ -45,7 +45,7 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse<bool>(false);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<bool>(false);
@@ -79,7 +79,7 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse<string>(false);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<string>(false);
@@ -121,7 +121,7 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse<string>(false);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<string>(false);
@@ -178,7 +178,7 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse<string>(false);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<string>(false);
@@ -220,7 +220,7 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse<bool>(false);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<bool>(false);

@@ -48,7 +48,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask<ServiceResponse<string>> GetAccessTokenAsync()
         {
             string url = StaticConfig.APIBase + "get-access-token";
-            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, EmergenceLogger.LogError, "", AuthDict);
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError, "", AuthDict);
             if(response.IsSuccess == false)
                 return new ServiceResponse<string>(false);
             var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response.Response);
@@ -76,7 +76,7 @@ namespace EmergenceSDK.Internal.Services
                 if(response.IsSuccess == false)
                     return new ServiceResponse<List<Persona>, Persona>(false);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new ServiceResponse<List<Persona>, Persona>(false);
             }
@@ -150,7 +150,7 @@ namespace EmergenceSDK.Internal.Services
             
             string jsonPersona = SerializationHelper.Serialize(persona);
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
-            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, jsonPersona, AuthDict);
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, jsonPersona, AuthDict);
             if(response.IsSuccess == false)
                 return new ServiceResponse(false);
             
@@ -191,7 +191,7 @@ namespace EmergenceSDK.Internal.Services
                 if(response.IsSuccess == false)
                     return new ServiceResponse(false);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse(false);

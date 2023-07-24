@@ -23,7 +23,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "byOwner?address=" + address;
 
-            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, EmergenceLogger.LogError);
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError);
             if(response.IsSuccess == false)
                 return new ServiceResponse<List<Avatar>>(false);
 
@@ -35,7 +35,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "id?id=" + id;
             
-            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbGET, EmergenceLogger.LogError);
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError);
             if(response.IsSuccess == false)
                 return new ServiceResponse<Avatar>(false);
             

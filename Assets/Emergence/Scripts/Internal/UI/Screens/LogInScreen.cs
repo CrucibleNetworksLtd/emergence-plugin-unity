@@ -66,9 +66,11 @@ namespace EmergenceSDK.Internal.UI.Screens
                             await HandleRefreshAccessToken();
                             break;
                         case States.RefreshingAccessToken:
-                            break; // Not handled here since this state is intermediary
+                            await UniTask.WaitForEndOfFrame(this);
+                            break;
                         case States.LoginFinished:
-                            break; // Not handled here since this state is final
+                            cts.Cancel();
+                            break;
                     }
                 }
             }
@@ -100,6 +102,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private async UniTask RefreshQRCodeAndHandshake()
         {
+            state = States.RefreshingAccessToken;
             var qrResponse = await sessionService.GetQRCodeAsync();
             if (!qrResponse.Success)
             {

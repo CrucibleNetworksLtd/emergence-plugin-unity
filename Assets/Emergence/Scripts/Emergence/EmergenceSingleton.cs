@@ -36,9 +36,13 @@ namespace EmergenceSDK
         [FormerlySerializedAs("key")] [Header("Keyboard shortcut to open Emergence")] [SerializeField]
         private Key Key = Key.Tab;
 
-        [FormerlySerializedAs("shift")] [SerializeField] private bool Shift = true;
+        [FormerlySerializedAs("shift")] 
+        [SerializeField] 
+        private bool Shift = true;
 
-        [FormerlySerializedAs("ctrl")] [SerializeField] private bool Ctrl = false;
+        [FormerlySerializedAs("ctrl")] 
+        [SerializeField] 
+        private bool Ctrl = false;
 
         [FormerlySerializedAs("OnEmergenceUIOpened")] [Header("Events")] public EmergenceUIEvents.EmergenceUIOpened EmergenceUIOpened;
         [FormerlySerializedAs("OnEmergenceUIClosed")] public EmergenceUIEvents.EmergenceUIClosed EmergenceUIClosed;
@@ -61,6 +65,7 @@ namespace EmergenceSDK
                 UIRoot.GetComponentInChildren<EventSystem>().enabled = true;
                 ui.SetActive(false);
                 ScreenManager.Instance.gameObject.SetActive(true);
+                ScreenManager.Instance.ShowWelcome().Forget();
                 CursorHandler.SaveCursor();
                 CursorHandler.UpdateCursor();
                 EmergenceUIOpened.Invoke();
@@ -119,8 +124,8 @@ namespace EmergenceSDK
 
         private new void Awake() 
         {
-            uiToggleAction = new InputAction("UIToggle", binding: "<Keyboard>/tab");
-            uiToggleAction.performed += _ => ToggleUI();
+            uiToggleAction = new InputAction("UIToggle", binding: $"<Keyboard>/{Key.ToString().ToLower()}");
+            uiToggleAction.performed += _ => ToggleUIKeyPressed();
 
             closeAction = new InputAction("CloseAction", binding: "<Keyboard>/escape");
             closeAction.performed += _ => CloseUI();
@@ -145,6 +150,15 @@ namespace EmergenceSDK
 
             ui = transform.GetChild(0).gameObject;
             ui.SetActive(false);
+        }
+        
+        private void ToggleUIKeyPressed()
+        {
+            if ((Shift && !Keyboard.current.shiftKey.isPressed) || (Ctrl && !Keyboard.current.ctrlKey.isPressed))
+            {
+                return;
+            }
+            ToggleUI();
         }
         
         private void ToggleUI()

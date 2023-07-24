@@ -17,7 +17,7 @@ namespace EmergenceSDK.Internal.Services
 
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("Authorization-header", "0iKoO1V2ZG98fPETreioOyEireDTYwby");
-            var response = await WebRequestService.PerformAsyncWebRequest(url, UnityWebRequest.kHttpVerbPOST, EmergenceLogger.LogError, metadata, headers);
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, metadata, headers);
             if(response.IsSuccess == false)
                 return new ServiceResponse<string>(false);
             
