@@ -60,8 +60,6 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse<ReadContractResponse>> ReadMethodAsync<T>(ContractInfo contractInfo, T body)
         {
-            if(!await SwitchChain(contractInfo))
-                return new ServiceResponse<ReadContractResponse>(false);
             if (!await AttemptToLoadContract(contractInfo)) 
                 return new ServiceResponse<ReadContractResponse>(false);
             
