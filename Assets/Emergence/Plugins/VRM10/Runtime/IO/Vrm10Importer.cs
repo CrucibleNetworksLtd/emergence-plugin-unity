@@ -6,6 +6,71 @@ using UniGLTF;
 using UniGLTF.Utils;
 using UnityEngine;
 using VRMShaders;
+using UnityEngine.Rendering;
+using UniVRM10;
+
+public static class RenderPipelineUtility
+{
+    public enum RenderPipelineType
+    {
+        Unknown,
+        BuiltIn,
+        Universal,
+        HighDefinition
+    }
+
+    public static RenderPipelineType GetRenderPipelineType()
+    {
+        RenderPipeline currentPipeline = RenderPipelineManager.currentPipeline;
+
+        if (currentPipeline == null)
+        {
+            return RenderPipelineType.Unknown;
+        }
+        else if (currentPipeline.GetType().Name.Contains("HDRenderPipeline"))
+        {
+            return RenderPipelineType.HighDefinition;
+        }
+        else if (currentPipeline.GetType().Name.Contains("UniversalRenderPipeline"))
+        {
+            return RenderPipelineType.Universal;
+        }
+        else if (currentPipeline.GetType().Name.Contains("RenderPipeline"))
+        {
+            return RenderPipelineType.BuiltIn;
+        }
+        else
+        {
+            return RenderPipelineType.Unknown;
+        }
+    }
+
+    public static IMaterialDescriptorGenerator GetValidVrm10MaterialDescriptorGenerator()
+    {
+        switch (GetRenderPipelineType())
+        {
+            case RenderPipelineType.Universal:
+                return new UrpVrm10MaterialDescriptorGenerator();
+            case RenderPipelineType.BuiltIn:
+                return new BuiltInVrm10MaterialDescriptorGenerator();
+        }
+
+        return null;
+    }
+    
+    public static IMaterialDescriptorGenerator GetValidGLTFMaterialDescriptorGenerator()
+    {
+        switch (GetRenderPipelineType())
+        {
+            case RenderPipelineType.Universal:
+                return new UrpGltfMaterialDescriptorGenerator();
+            case RenderPipelineType.BuiltIn:
+                return new BuiltInGltfMaterialDescriptorGenerator();
+        }
+
+        return null;
+    }
+}
 
 
 namespace UniVRM10
@@ -43,7 +108,7 @@ namespace UniVRM10
             m_useControlRig = useControlRig;
 
             TextureDescriptorGenerator = new Vrm10TextureDescriptorGenerator(Data);
-            MaterialDescriptorGenerator = materialGenerator ?? new BuiltInVrm10MaterialDescriptorGenerator();
+            MaterialDescriptorGenerator = materialGenerator ?? RenderPipelineUtility.GetValidVrm10MaterialDescriptorGenerator();
 
             m_externalMap = externalObjectMap;
             if (m_externalMap == null)

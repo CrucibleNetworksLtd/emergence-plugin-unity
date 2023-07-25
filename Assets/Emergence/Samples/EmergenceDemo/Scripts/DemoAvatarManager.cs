@@ -31,9 +31,9 @@ namespace EmergenceSDK.EmergenceDemo
             vrm10.transform.parent = playerArmature.transform;
             vrm10.name = "VRMAvatar";
             
-            await UniTask.DelayFrame(1); 
+            await UniTask.DelayFrame(1);
             
-            UnityEngine.Avatar vrmAvatar = vrm10.GetComponent<Animator>().avatar;
+            Avatar vrmAvatar = vrm10.GetComponent<Animator>().avatar;
             playerArmature.GetComponent<Animator>().avatar = vrmAvatar;
 
             vrm10.gameObject.GetComponent<Animator>().enabled = false;
