@@ -41,8 +41,12 @@ namespace EmergenceSDK.Internal.UI.Inventory
             }
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, imageUrl, "");
+            int maxFrameSizeBytes = 16778020; // 16MB
+            //Note that if you want to load a gif larger than 16MB, you will need to increase this value,
+            //this is designed to only download enough for the first frame, so animated gifs will be much larger
+            request.SetRequestHeader("Range", $"bytes=0-{maxFrameSizeBytes - 1}");
+            
             await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-
             if (request.result != UnityWebRequest.Result.Success)
             {
                 EmergenceLogger.LogWarning("File load error.\n" + request.error);
@@ -65,7 +69,7 @@ namespace EmergenceSDK.Internal.UI.Inventory
                     return;
                 }
 
-                //EXPERIMENTAL: This code does enable gif playback, but it is ver resource intensive and causes a lot of lag.
+                //EXPERIMENTAL: This code does enable gif playback, but it is very resource intensive and causes a lot of lag.
                 //Comment back in to try it out!
                 /*
                 while (img != null)
