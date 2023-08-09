@@ -77,7 +77,6 @@ namespace EmergenceSDK
                 if (!ScreenManager.Instance.IsVisible)
                 {
                     ScreenManager.Instance.gameObject.SetActive(true);
-                    ScreenManager.Instance.ShowWelcome().Forget();
                     CursorHandler.SaveCursor();
                     CursorHandler.UpdateCursor();
                     EmergenceUIOpened.Invoke();
