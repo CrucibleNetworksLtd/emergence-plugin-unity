@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
@@ -21,59 +22,65 @@ namespace EmergenceSDK.Internal.Utils
 
         private async UniTask MakeRequest()
         {
-            await request.SendWebRequest();
-
-            if (request.responseCode == 200)
+            try
             {
-                Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, 0, false);
-                bool error = false;
+                await request.SendWebRequest();
+            }
+            catch (Exception e)
+            {
+                failedCallback?.Invoke(request.url, e.Message, e.HResult);
+                return;
+            }
 
-                if (request.downloadedBytes > 0)
+            if (request.responseCode != 200)
+            {
+                
+                failedCallback?.Invoke(request.url, request.error, request.responseCode);
+                EmergenceLogger.LogWarning("Failed to download image at " + request.url);
+                return;
+            }
+
+            Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, 0, false);
+            bool error = false;
+
+            if (request.downloadedBytes > 0)
+            {
+                try
                 {
-                    try
-                    {
-                        texture = DownloadHandlerTexture.GetContent(request);
-                    }
-                    catch (System.Exception e)
-                    {
-                        EmergenceLogger.LogError(e.Message);
-                        error = true;
-                    }
-
-                    if (texture == null)
-                    {
-                        EmergenceLogger.LogWarning("Couldn't convert downloaded image at " + request.url);
-                        failedCallback?.Invoke(request.url, "Couldn't convert downloaded image", 0);
-                    }
+                    texture = DownloadHandlerTexture.GetContent(request);
                 }
-                else
+                catch (System.Exception e)
                 {
+                    EmergenceLogger.LogError(e.Message);
                     error = true;
                 }
 
-                if (error)
+                if (texture == null)
                 {
-                    // Transparent texture
-                    texture.SetPixels(new Color[]
-                    {
-                        new Color(0,0,0,0),
-                        new Color(0,0,0,0),
-                        new Color(0,0,0,0),
-                        new Color(0,0,0,0),
-                    });
-
-                    texture.Apply();
+                    EmergenceLogger.LogWarning("Couldn't convert downloaded image at " + request.url);
+                    failedCallback?.Invoke(request.url, "Couldn't convert downloaded image", 0);
                 }
-
-                successCallback?.Invoke(request.url, texture, this);
             }
             else
             {
-                failedCallback?.Invoke(request.url, request.error, request.responseCode);
-                EmergenceLogger.LogWarning("Failed to download image at " + request.url);
+                error = true;
             }
 
-            request = null;
+            if (error)
+            {
+                // Transparent texture
+                texture.SetPixels(new Color[]
+                {
+                    new Color(0,0,0,0),
+                    new Color(0,0,0,0),
+                    new Color(0,0,0,0),
+                    new Color(0,0,0,0),
+                });
+
+                texture.Apply();
+            }
+
+            successCallback?.Invoke(request.url, texture, this);
         }
     }
 }

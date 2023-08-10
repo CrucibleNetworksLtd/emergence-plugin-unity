@@ -122,12 +122,6 @@ namespace EmergenceSDK.Internal.Utils
                 if (urlQueue.Count > 0)
                 {
                     string currentUrl = urlQueue.Dequeue();
-                    var websiteAlive = await Helpers.IsWebsiteAlive(currentUrl);
-                    if (!websiteAlive)
-                    {
-                        HandleImageDownloadFailure(currentUrl, "Website is not alive", 0);
-                        continue;
-                    }
 
                     if (!cachedTextures.ContainsKey(currentUrl))
                     {

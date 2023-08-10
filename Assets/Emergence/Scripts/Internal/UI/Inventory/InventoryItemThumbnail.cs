@@ -26,20 +26,13 @@ namespace EmergenceSDK.Internal.UI.Inventory
             itemImage.texture = texture;
         }
 
-        public async void LoadGif(string url, bool autoPlay = true)
+        public async void LoadGif(string url)
         {
-            await SetGifFromUrl(url, autoPlay);
+            await SetGifFromUrl(url);
         }
 
-        private async UniTask SetGifFromUrl(string imageUrl, bool autoPlay = true)
+        private async UniTask SetGifFromUrl(string imageUrl)
         {
-            bool isWebsiteAlive = await Helpers.IsWebsiteAlive(imageUrl);
-            if (string.IsNullOrEmpty(imageUrl) || !isWebsiteAlive)
-            {
-                EmergenceLogger.LogWarning("URL is invalid.");
-                return;
-            }
-
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, imageUrl, "");
             int maxFrameSizeBytes = 16778020; // 16MB
             //Note that if you want to load a gif larger than 16MB, you will need to increase this value,

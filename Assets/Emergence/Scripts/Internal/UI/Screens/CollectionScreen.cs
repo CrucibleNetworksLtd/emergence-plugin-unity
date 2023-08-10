@@ -68,9 +68,10 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             var inventoryService = EmergenceServices.GetService<IInventoryService>();
             var updatedInventory = await inventoryService.InventoryByOwnerAsync(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible);
+            inventoryItemStore.SetItems(updatedInventory.Result);
             if (updatedInventory.Success)
             {
-                UpdateInventory(updatedInventory.Result);
+                UpdateInventoryItemListeners();
             }
             Modal.Instance.Hide();
             
@@ -83,12 +84,9 @@ namespace EmergenceSDK.Internal.UI.Screens
             Modal.Instance.Hide();
         }
         
-        private void UpdateInventory(List<InventoryItem> inventoryItems)
+        private void UpdateInventoryItemListeners()
         {
-            EmergenceLogger.LogInfo("Received items: " + inventoryItems.Count);
             Modal.Instance.Show("Retrieving inventory items...");
-            
-            inventoryItemStore.SetItems(inventoryItems);
 
             foreach (var entry in inventoryItemStore.GetAllEntries())
             {
