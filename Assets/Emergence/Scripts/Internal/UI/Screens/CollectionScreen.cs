@@ -43,8 +43,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         public event Action<InventoryItem> OnItemClicked;
         
         private InventoryItemStore inventoryItemStore;
-        
-        public InventoryItem GetItemDetails(InventoryItem item) => inventoryItemStore.GetEntry(item.ID).Item;
+        private InventoryItemUIManager inventoryItemUIManager;
 
         private void Awake()
         {
@@ -59,7 +58,8 @@ namespace EmergenceSDK.Internal.UI.Screens
             
             blockchainDropdown.onValueChanged.AddListener(OnBlockchainDropdownValueChanged);
             
-            inventoryItemStore = new InventoryItemStore(InstantiateItemEntry);
+            inventoryItemStore = new InventoryItemStore();
+            inventoryItemUIManager = new InventoryItemUIManager(InstantiateItemEntry, inventoryItemStore);
         }
 
         private GameObject InstantiateItemEntry() => Instantiate(itemEntryPrefab, contentGO.transform, false);
@@ -74,7 +74,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 UpdateInventoryItemListeners();
             }
             Modal.Instance.Hide();
-            
+             
             var avatarService = EmergenceServices.GetService<IAvatarService>();
             var updatedAvatars = await avatarService.AvatarsByOwnerAsync(EmergenceSingleton.Instance.GetCachedAddress());
             if (updatedAvatars.Success)
@@ -87,8 +87,10 @@ namespace EmergenceSDK.Internal.UI.Screens
         private void UpdateInventoryItemListeners()
         {
             Modal.Instance.Show("Retrieving inventory items...");
+            
+            inventoryItemUIManager.UpdateDisplayItems();
 
-            foreach (var entry in inventoryItemStore.GetAllEntries())
+            foreach (var entry in inventoryItemUIManager.GetAllEntries())
             {
                 Button entryButton = entry.GetComponent<Button>();
                 InventoryItem item = entry.Item;
@@ -100,7 +102,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void RefreshFilteredResults()
         {
-            foreach (var itemEntry in inventoryItemStore.GetAllEntries())
+            foreach (var itemEntry in inventoryItemUIManager.GetAllEntries())
             {
                 var item = itemEntry.Item;
                 // Search string filter

@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
+    //TODO: fix this!
     public class InventoryDemo : DemoStation<InventoryDemo>, IDemoStation
     {
         [SerializeField] private GameObject itemEntryPrefab;
@@ -33,7 +34,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void Start()
         {
             inventoryService = EmergenceServices.GetService<IInventoryService>();
-            inventoryItemStore = new InventoryItemStore(CreateEntry);
+            inventoryItemStore = new InventoryItemStore();
             
             instructionsGO.SetActive(false);
             IsReady = false;
