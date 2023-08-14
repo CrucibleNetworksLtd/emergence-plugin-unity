@@ -32,6 +32,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         public Toggle clothingToggle;
         public Toggle weaponsToggle;
         public TMP_Dropdown blockchainDropdown;
+        public Button PreviousPageButton;
+        public Button NextPageButton;
 
         private bool isItemSelected = false;
         private InventoryItem selectedItem;
@@ -58,8 +60,25 @@ namespace EmergenceSDK.Internal.UI.Screens
             
             blockchainDropdown.onValueChanged.AddListener(OnBlockchainDropdownValueChanged);
             
+            PreviousPageButton.onClick.AddListener(OnPreviousPageButtonPressed);
+            PreviousPageButton.interactable = false;
+            NextPageButton.onClick.AddListener(OnNextPageButtonPressed);
+            NextPageButton.interactable = false;
+            
             inventoryItemStore = new InventoryItemStore();
             inventoryItemUIManager = new InventoryItemUIManager(InstantiateItemEntry, inventoryItemStore);
+        }
+
+        private void OnNextPageButtonPressed()
+        {
+            inventoryItemUIManager.NextPage();
+            Refresh().Forget();
+        }
+
+        private void OnPreviousPageButtonPressed()
+        {
+            inventoryItemUIManager.PreviousPage();
+            Refresh().Forget();
         }
 
         private GameObject InstantiateItemEntry() => Instantiate(itemEntryPrefab, contentGO.transform, false);
@@ -82,6 +101,9 @@ namespace EmergenceSDK.Internal.UI.Screens
                 avatars = updatedAvatars.Result;
             }
             Modal.Instance.Hide();
+            
+            NextPageButton.interactable = inventoryItemUIManager.IsNextPageAvailable;
+            PreviousPageButton.interactable = inventoryItemUIManager.IsPreviousPageAvailable;
         }
         
         private void UpdateInventoryItemListeners()

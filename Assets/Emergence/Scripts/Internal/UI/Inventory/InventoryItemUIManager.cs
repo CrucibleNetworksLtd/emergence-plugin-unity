@@ -8,9 +8,9 @@ namespace EmergenceSDK.Internal.UI.Inventory
 {
     public class InventoryItemUIManager
     {
-        private const int MaxDisplayedEntries = 5;
-        public bool IsNextPageAvailable => (page + 1) * MaxDisplayedEntries < entryDictionary.Count;
-        public bool IsPreviousPageAvailable => page > 0;
+        private const int MaxDisplayedEntries = 15;
+        public bool IsNextPageAvailable => (page + 1) * MaxDisplayedEntries < displayableItems.Count;
+        public bool IsPreviousPageAvailable => page > 0 && displayableItems.Count > MaxDisplayedEntries;
         
         private readonly Func<GameObject> instantiateItemEntry;
         private InventoryItemStore itemStore;
