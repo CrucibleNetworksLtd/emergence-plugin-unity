@@ -1,7 +1,10 @@
+using System.IO;
+using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
@@ -52,10 +55,11 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             Debug.Log("Changing avatar");
             if (persona != null && !string.IsNullOrEmpty(persona.avatarId))
             {
-                avatarService.AvatarById(persona.avatarId, (avatar =>
+                avatarService.AvatarById(persona.avatarId, (async avatar =>
                 {
-                    if(avatar.meta != null && avatar.meta.content != null && avatar.meta.content.Count > 1)
-                        DemoAvatarManager.Instance.SwapAvatars(avatar.meta.content[1].url);
+                    var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, Helpers.InternalIPFSURLToHTTP(avatar.tokenURI), EmergenceLogger.LogError);
+                    var token = Newtonsoft.Json.JsonConvert.DeserializeObject<EASMetadata[]>(response.Response);
+                    DemoAvatarManager.Instance.SwapAvatars(Helpers.InternalIPFSURLToHTTP(token[0].UriBase));
                 
                 }), EmergenceLogger.LogError);
             }
