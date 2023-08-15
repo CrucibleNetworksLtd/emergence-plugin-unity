@@ -62,7 +62,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     string result = splitted[0];
                     if (splitted.Length == 2)
                     {
-                        result += "." + splitted[1].Substring(0, UnitConverter.SIGNIFICANT_DIGITS);
+                        result += "." + splitted[1].Substring(0, Mathf.Min(UnitConverter.SIGNIFICANT_DIGITS, splitted.Length));
                     }
                     walletBalance.text = result;// + " " + Emergence.Instance.TokenSymbol;
                 }
