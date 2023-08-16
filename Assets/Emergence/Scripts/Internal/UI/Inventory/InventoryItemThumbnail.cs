@@ -60,6 +60,11 @@ namespace EmergenceSDK.Internal.UI.Inventory
                     try
                     {
                         var img = decoder.NextImage();
+                        if(img == null)
+                        {
+                            itemImage.texture = RequestImage.Instance.DefaultThumbnail;
+                            return;
+                        }
                         LoadStaticImage(img.CreateTexture());
                     }
                     catch (UnsupportedGifException)
