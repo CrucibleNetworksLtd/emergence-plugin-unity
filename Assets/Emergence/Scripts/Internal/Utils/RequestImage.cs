@@ -8,6 +8,7 @@ namespace EmergenceSDK.Internal.Utils
     public class RequestImage : MonoBehaviour
     {
         public Texture2D DefaultThumbnail;
+        public Texture2D DownloadingThumbnail;
         
         public static RequestImage Instance { get; private set; }
 

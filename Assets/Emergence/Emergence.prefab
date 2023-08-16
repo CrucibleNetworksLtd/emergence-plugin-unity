@@ -28,6 +28,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 673468891862945765}
   m_RootOrder: 1
@@ -164,6 +165,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5503907260583193857}
   m_Father: {fileID: 3122056887335212770}
@@ -264,6 +266,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 673468891862945765}
   m_RootOrder: 0
@@ -351,6 +354,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8378229982546076139}
   - {fileID: 5973671843472310214}
@@ -370,22 +374,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Configuration: {fileID: 11400000, guid: 59ea788f73e88824c8d4aa8afe83df38, type: 2}
-  _environment: 0
-  key: 9
-  shift: 1
-  ctrl: 0
-  OnEmergenceUIOpened:
+  Environment: 0
+  Key: 9
+  Shift: 1
+  Ctrl: 0
+  EmergenceUIOpened:
     m_PersistentCalls:
       m_Calls: []
-  OnEmergenceUIClosed:
+  EmergenceUIClosed:
     m_PersistentCalls:
       m_Calls: []
-  CachedPersonaUpdated:
+  EmergenceUIVisibilityChanged:
     m_PersistentCalls:
       m_Calls: []
-  OnEmergenceUIVisibilityChanged:
-    m_PersistentCalls:
-      m_Calls: []
+  LogLevel: 0
 --- !u!1 &7213555249606172953
 GameObject:
   m_ObjectHideFlags: 0
@@ -414,6 +416,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 673468891862945765}
   m_Father: {fileID: 8378229982546076139}
@@ -490,6 +493,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3122056887335212770}
   m_RootOrder: 1
@@ -507,6 +511,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DefaultThumbnail: {fileID: 2800000, guid: 88478abd98d6b4d9ca77f729ac5fd523, type: 3}
+  DownloadingThumbnail: {fileID: 2800000, guid: 694c9932a2b824d01814904b482d22e6,
+    type: 3}
 --- !u!114 &1814599757418968499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -547,6 +553,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4004312103586897994}
   - {fileID: 7532352296011285854}

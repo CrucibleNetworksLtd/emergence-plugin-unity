@@ -27,6 +27,11 @@ namespace EmergenceSDK.Internal.UI.Inventory
         public InventoryItem Item => new InventoryItem(item);
         private InventoryItem item;
 
+        public void Start()
+        {
+            ItemThumbnail.LoadStaticImage(RequestImage.Instance.DownloadingThumbnail);
+        }
+
         public void SetItem(InventoryItem item)
         {
             this.item = item;

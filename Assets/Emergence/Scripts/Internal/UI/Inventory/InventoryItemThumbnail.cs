@@ -59,45 +59,7 @@ namespace EmergenceSDK.Internal.UI.Inventory
                 {
                     EmergenceLogger.LogInfo("Invalid gif.");
                     itemImage.texture = RequestImage.Instance.DefaultThumbnail;
-                    return;
                 }
-
-                //EXPERIMENTAL: This code does enable gif playback, but it is very resource intensive and causes a lot of lag.
-                //Comment back in to try it out!
-                /*
-                while (img != null)
-                {
-                    frames.Add(img.CreateTexture());
-                    frameDelays.Add(img.Delay / 1000.0f);
-                    img = decoder.NextImage();
-
-                    await UniTask.Delay(1000 / 60);
-                }
-            }
-
-            if (autoPlay)
-            {
-                _ = PlayGif();
-            }
-            else
-            {
-                itemImage.texture = frames[0];
-            }
-            */
-            }
-        }
-
-        private async UniTask PlayGif()
-        {
-            isPlaying = true;
-            curFrame = 0;
-
-            while (isPlaying && itemImage != null)
-            {
-                itemImage.texture = frames[curFrame];
-                float delay = frameDelays[curFrame];
-                await UniTask.Delay((int)(delay * 1000));
-                curFrame = (curFrame + 1) % frames.Count;
             }
         }
     }

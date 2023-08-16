@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.UI.Inventory;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
 using TMPro;
 using UnityEngine;
