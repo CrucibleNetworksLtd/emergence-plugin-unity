@@ -11,6 +11,11 @@ namespace EmergenceSDK.Services
     public interface IContractService : IEmergenceService
     {
         /// <summary>
+        /// Event fired when a contract write is successful.
+        /// </summary>
+        event WriteMethodSuccess WriteMethodConfirmed;
+        
+        /// <summary>
         /// Calls a "read" method on the given contract.
         /// </summary>
         UniTask ReadMethod<T>(ContractInfo contractInfo, T body, ReadMethodSuccess success, ErrorCallback errorCallback);

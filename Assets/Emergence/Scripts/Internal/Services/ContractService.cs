@@ -13,6 +13,8 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class ContractService : IContractService
     {
+        public event WriteMethodSuccess WriteMethodConfirmed;
+        
         private readonly List<string> loadedContractAddresses = new(); 
         private bool CheckForNewContract(ContractInfo contractInfo) => !loadedContractAddresses.Contains(contractInfo.ContractAddress);
         
@@ -73,6 +75,7 @@ namespace EmergenceSDK.Internal.Services
             return new ServiceResponse<ReadContractResponse>(true, readContractResponse.message);
         }
 
+
         public async UniTask ReadMethod<T>(ContractInfo contractInfo, T body, ReadMethodSuccess success, ErrorCallback errorCallback)
         {
             var response = await ReadMethodAsync(contractInfo, body);
@@ -106,8 +109,29 @@ namespace EmergenceSDK.Internal.Services
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString, headers);
             if(response.IsSuccess == false)
                 return new ServiceResponse<WriteContractResponse>(false);
+            
             var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response.Response);
+            CheckForTransactionSuccess(contractInfo, writeContractResponse.message.transactionHash).Forget();
             return new ServiceResponse<WriteContractResponse>(true, writeContractResponse.message);
+        }
+        
+        private async UniTask CheckForTransactionSuccess(ContractInfo contractInfo, string transactionHash, int maxAttempts = 15)
+        {
+            int attempts = 0;
+            int timeOut = 5000;
+            while (attempts < maxAttempts)
+            {
+                await UniTask.Delay(timeOut);
+
+                var transactionStatus = await EmergenceServices.GetService<IChainService>().GetTransactionStatusAsync(transactionHash, contractInfo.NodeUrl);
+                if(transactionStatus.Result?.transaction?.Confirmations >= 3)
+                {
+                    WriteMethodConfirmed.Invoke(new WriteContractResponse(transactionHash));
+                    return;
+                }
+                attempts++;
+            }
+            EmergenceLogger.LogError("Transaction failed");
         }
 
         public async UniTask WriteMethod<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, WriteMethodSuccess success, ErrorCallback errorCallback)
