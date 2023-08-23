@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using EmergenceSDK.EmergenceDemo;
+using EmergenceSDK.Internal.Utils;
 using UnityEngine;
 
 namespace EmergenceSDK
@@ -12,7 +13,7 @@ namespace EmergenceSDK
         // Start is called before the first frame update
         void Start()
         {
-            DemoAvatarManager.Instance.SwapAvatars(VRMUrl);
+            DemoAvatarManager.Instance.SwapAvatars(Helpers.InternalIPFSURLToHTTP(VRMUrl, "http://ipfs.openmeta.xyz/ipfs/"));
         }
     }
 }
