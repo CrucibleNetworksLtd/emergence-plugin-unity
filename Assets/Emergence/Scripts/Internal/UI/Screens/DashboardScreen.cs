@@ -149,6 +149,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 imagesRefreshing.Clear();
 
                 selectedPersonaIndex = personas.IndexOf(currentPersona);
+                selectedPersonaIndex = personas.FindIndex(p => p.id == currentPersona.id);
                 personasList = personas;
             
                 //Update scroll items
