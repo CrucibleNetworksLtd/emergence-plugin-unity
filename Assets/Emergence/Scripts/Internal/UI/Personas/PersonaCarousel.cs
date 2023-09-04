@@ -3,7 +3,7 @@ using EmergenceSDK.Types;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace EmergenceSDK.Internal.UI
+namespace EmergenceSDK.Internal.UI.Personas
 {
     public class PersonaCarousel : MonoBehaviour
     {
@@ -18,7 +18,7 @@ namespace EmergenceSDK.Internal.UI
 
         public static PersonaCarousel Instance;
 
-        private PersonaScrollItem[] items;
+        private PersonaScrollItemStore items;
         private Material[] itemMaterials;
 
         private float timeCounter = 0.0f;

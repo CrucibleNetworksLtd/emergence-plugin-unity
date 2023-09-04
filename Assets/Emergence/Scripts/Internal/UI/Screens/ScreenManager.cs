@@ -139,7 +139,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 case ScreenStates.Dashboard:
                     ScreensRoot.SetActive(true);
                     DashboardScreen.SetActive(true);
-                    await Screens.DashboardScreen.Instance.Refresh();
+                    await Personas.DashboardScreen.Instance.Refresh();
                     break;
                 case ScreenStates.EditPersona:
                     EditPersonaScreen.SetActive(true);

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -10,7 +11,7 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Avatar = EmergenceSDK.Types.Avatar;
 
-namespace EmergenceSDK.Internal.UI.Screens
+namespace EmergenceSDK.Internal.UI.Personas
 {
     public class DashboardScreen : MonoBehaviour
     {

@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace EmergenceSDK.Internal.UI
+namespace EmergenceSDK.Internal.UI.Personas
 {
     public class PersonaScrollItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
