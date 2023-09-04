@@ -18,7 +18,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         public static PersonaCarousel Instance;
 
-        private PersonaScrollItemStore items;
+        private PersonaScrollItemStore items = new PersonaScrollItemStore();
         private Material[] itemMaterials;
 
         private float timeCounter = 0.0f;
@@ -158,8 +158,9 @@ namespace EmergenceSDK.Internal.UI.Personas
                 originalItemWidth = scrollItemsRoot.GetChild(0).GetComponent<RectTransform>().rect.width;
             }
 
-            items = new PersonaScrollItem[scrollItemsRoot.childCount];
-            itemMaterials = new Material[scrollItemsRoot.childCount];
+            var childCount = scrollItemsRoot.childCount;
+            items.SetPersonas(new PersonaScrollItem[childCount]);
+            itemMaterials = new Material[childCount];
             for (int i = 0; i < scrollItemsRoot.childCount; i++)
             {
                 items[i] = scrollItemsRoot.GetChild(i).GetComponent<PersonaScrollItem>();

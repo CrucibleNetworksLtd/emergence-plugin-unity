@@ -9,7 +9,20 @@ namespace EmergenceSDK.Internal.UI.Personas
         private List<PersonaScrollItem> items = new List<PersonaScrollItem>();
         private PersonaScrollItem currentPersonaItem;
 
+        public PersonaScrollItem this[int index]
+        {
+            get
+            {
+                return items[index];
+            }
+            set
+            {
+                items[index] = value;
+            }
+        }
+        
         public void SetPersonas(List<PersonaScrollItem> itemsIn) => items = itemsIn;
+        public void SetPersonas(PersonaScrollItem[] itemsIn) => items = itemsIn.ToList();
 
         public PersonaScrollItem GetCurrentPersonaScrollItem()
         {
