@@ -197,12 +197,12 @@ namespace EmergenceSDK.Internal.UI
             if (refreshing)
             {
                 // Spreading effect
-                itemTransform.localPosition = Vector2.right * t * (diff + position - selected) * separation;
+                itemTransform.localPosition = Vector2.right * (t * (diff + position - selected) * separation);
             }
             else
             {
                 // Carousel
-                itemTransform.localPosition = Vector2.right * Mathf.Lerp(startPosition, endPosition, t) * separation;
+                itemTransform.localPosition = Vector2.right * (Mathf.Lerp(startPosition, endPosition, t) * separation);
             }
 
             itemTransform.localScale = Vector3.one * scale;
