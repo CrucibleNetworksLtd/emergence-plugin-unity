@@ -1,4 +1,5 @@
-﻿using EmergenceSDK.Types;
+﻿using Cysharp.Threading.Tasks;
+using EmergenceSDK.Types;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,7 @@ namespace EmergenceSDK.Internal.UI
     public class PersonaCarousel : MonoBehaviour
     {
         [Header("Configuration")]
+        [Range(0.05f,10f)]
         public float duration = 0.5f;
 
         [Header("UI References")]
@@ -20,7 +22,6 @@ namespace EmergenceSDK.Internal.UI
         private Material[] itemMaterials;
 
         private float timeCounter = 0.0f;
-        private bool started = false;
         private int count = 0; // Total items
         private int selected = 0; // Target item
         private int previousSelected; // Previous target item
@@ -50,39 +51,42 @@ namespace EmergenceSDK.Internal.UI
             PersonaScrollItem.OnSelected -= PersonaScrollItem_OnSelected;
         }
 
-        private void Update()
+ 
+        private async UniTaskVoid StartAnimationAsync()
         {
-            if (!started)
-            {
-                return;
-            }
+            float t = 0.0f;
 
-            if (refreshing)
+            while (t < 1.0f)
             {
-                timeCounter += Time.deltaTime / 1.0f;
-            }
-            else
-            {
-                timeCounter += Time.deltaTime / duration;
-            }
+                if (refreshing)
+                {
+                    timeCounter += Time.deltaTime;
+                }
+                else
+                {
+                    timeCounter += Time.deltaTime / duration;
+                }
 
-            if (timeCounter >= 1.0f)
-            {
-                timeCounter = 1.0f;
-                started = false;
-            }
+                if (timeCounter >= 1.0f)
+                {
+                    timeCounter = 1.0f;
+                }
 
-            float t = Mathf.SmoothStep(0.0f, 1.0f, timeCounter);
+                t = Mathf.SmoothStep(0.0f, 1.0f, timeCounter);
 
-            for (int i = 0; i < count; i++)
-            {
-                PositionAndScaleItem(i, t);
-            }
+                for (int i = 0; i < count; i++)
+                {
+                    PositionAndScaleItem(i, t);
+                }
 
-            if (!started)
-            {
-                refreshing = false;
-                timeCounter = 0.0f;
+                if (timeCounter >= 1.0f)
+                {
+                    refreshing = false;
+                    timeCounter = 0.0f;
+                    break;
+                }
+
+                await UniTask.Yield(PlayerLoopTiming.Update);
             }
         }
 
@@ -113,7 +117,6 @@ namespace EmergenceSDK.Internal.UI
 
         private void GoToPosition(int position, bool instant = false)
         {
-            started = true;
             previousSelected = selected;
             diff = selected - position;
             selected = position;
@@ -135,6 +138,7 @@ namespace EmergenceSDK.Internal.UI
             SetZOrder(selected - 2, count - 5);
             SetZOrder(selected + 3, count - 6);
             SetZOrder(selected - 3, count - 7);
+            StartAnimationAsync().Forget();
         }
 
         private void SetZOrder(int index, int order)
@@ -167,6 +171,7 @@ namespace EmergenceSDK.Internal.UI
             activePersonaIndex = selected;
             refreshing = true;
             GoToPosition(activePersonaIndex);
+            StartAnimationAsync().Forget();
         }
 
         public void GoToActivePersona()
