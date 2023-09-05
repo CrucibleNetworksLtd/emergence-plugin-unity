@@ -11,46 +11,47 @@ namespace EmergenceSDK.Internal.UI.Personas
 {
     public class PersonaScrollItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
+        // Fields and Properties
         [Header("UI References")]
         [SerializeField]
         private RawImage photo;
-
         [SerializeField]
         private Mask mask;
-
         [SerializeField]
         private TextMeshProUGUI nameText;
-
         [SerializeField]
         private GameObject unselectedBorder;
-
         [SerializeField]
         private GameObject selectedBorder;
-
         [SerializeField]
         private Button selectButton;
 
-        public Persona Persona
-        {
-            get;
-            private set;
-        }
+        public Persona Persona { get; private set; }
+        public int Index { get; private set; }
+        internal bool IsActive;
+
+        private bool waitingForImageRequest;
+        private Material clonedMaterial;
+        private IAvatarService avatarService;
 
         public delegate void ImageCompleted(Persona persona, bool success);
         public static event ImageCompleted OnImageCompleted;
 
-        private bool waitingForImageRequest = false;
-        public int Index
+        public delegate void Selected(Persona persona, int childIndex);
+        public static event Selected OnSelected;
+
+        // Unity Lifecycle Methods
+        private void Awake()
         {
-            get;
-            private set;
+            RegisterEventListeners();
         }
 
-        internal bool IsActive;
-        
-        private Material clonedMaterial;
-        private IAvatarService avatarService;
+        private void OnDestroy()
+        {
+            UnregisterEventListeners();
+        }
 
+        // Public Methods
         public Material Material
         {
             get
@@ -68,47 +69,61 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         public void FixUnityStencilBug()
         {
-            // https://forum.unity.com/threads/masked-ui-elements-shader-not-updating.371542/
             MaskUtilities.NotifyStencilStateChanged(mask);
         }
 
-        private void Awake()
+        public void Refresh(Texture2D texture, Persona persona)
+        {
+            InitialiseServicesAndProperties(texture, persona);
+            UpdateUI(texture, persona);
+            FetchAvatar(persona);
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            ToggleNameTextVisibility(true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            ToggleNameTextVisibility(false);
+        }
+
+        // Private Methods
+        private void RegisterEventListeners()
         {
             selectButton.onClick.AddListener(OnSelectClicked);
-
             RequestImage.Instance.OnImageReady += Instance_OnImageReady;
         }
 
-        private void OnDestroy()
+        private void UnregisterEventListeners()
         {
             selectButton.onClick.RemoveListener(OnSelectClicked);
-
             RequestImage.Instance.OnImageReady -= Instance_OnImageReady;
         }
 
-        public delegate void Selected(Persona persona, int childIndex);
-        public static event Selected OnSelected;
         private void OnSelectClicked()
         {
             OnSelected?.Invoke(Persona, Index);
         }
 
-        public void Refresh(Texture2D texture, Persona persona)
+        private void InitialiseServicesAndProperties(Texture2D texture, Persona persona)
         {
             avatarService = EmergenceServices.GetService<IAvatarService>();
-            
             Persona = persona;
             Index = transform.GetSiblingIndex();
+        }
+
+        private void UpdateUI(Texture2D texture, Persona persona)
+        {
             nameText.transform.parent.gameObject.SetActive(false);
             nameText.text = persona.name;
+            photo.texture = persona.AvatarImage ? persona.AvatarImage : texture;
+            UpdateBorder();
+        }
 
-            if (persona.AvatarImage == null)
-            {
-                persona.AvatarImage = texture;
-            }
-
-            photo.texture = persona.AvatarImage;
-
+        private void UpdateBorder()
+        {
             var personaService = EmergenceServices.GetService<IPersonaService>();
             if (personaService.GetCurrentPersona(out var currentPersona))
             {
@@ -116,22 +131,13 @@ namespace EmergenceSDK.Internal.UI.Personas
                 unselectedBorder.SetActive(!isCurrentPersona);
                 selectedBorder.SetActive(isCurrentPersona);
             }
+        }
 
+        private void FetchAvatar(Persona persona)
+        {
             if (!string.IsNullOrEmpty(persona.avatarId))
             {
-                avatarService.AvatarById(persona.avatarId, avatar =>
-                {
-                    
-                    // Add fetched avatar to persona
-                    Persona.avatar = avatar;
-                    waitingForImageRequest = true;
-
-                    if (!RequestImage.Instance.AskForImage(avatar.meta?.content?.First()?.url))
-                    {
-                        waitingForImageRequest = false;
-                        OnImageCompleted?.Invoke(persona, false);
-                    }
-                }, EmergenceLogger.LogError);
+                RequestAvatar(persona);
             }
             else
             {
@@ -139,25 +145,45 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
         }
 
-        public void OnPointerEnter(PointerEventData eventData)
+        private void RequestAvatar(Persona persona)
         {
-            nameText.transform.parent.gameObject.SetActive(true);
+            avatarService.AvatarById(persona.avatarId, avatar =>
+            {
+                Persona.avatar = avatar;
+                waitingForImageRequest = true;
+
+                if (!RequestImage.Instance.AskForImage(avatar.meta?.content?.First()?.url))
+                {
+                    waitingForImageRequest = false;
+                    OnImageCompleted?.Invoke(persona, false);
+                }
+            }, EmergenceLogger.LogError);
         }
 
-        public void OnPointerExit(PointerEventData eventData)
+        private void ToggleNameTextVisibility(bool isVisible)
         {
-            nameText.transform.parent.gameObject.SetActive(false);
+            nameText.transform.parent.gameObject.SetActive(isVisible);
         }
 
         private void Instance_OnImageReady(string url, Texture2D texture)
         {
-            if (waitingForImageRequest && url == Persona.avatar.meta.content.First().url)
+            if (IsImageRequestMatching(url))
             {
-                Persona.AvatarImage = texture;
-                photo.texture = Persona.AvatarImage;
-                waitingForImageRequest = false;
-                OnImageCompleted?.Invoke(Persona, true);
+                UpdateAvatarImage(texture);
             }
+        }
+
+        private bool IsImageRequestMatching(string url)
+        {
+            return waitingForImageRequest && url == Persona.avatar.meta.content.First().url;
+        }
+
+        private void UpdateAvatarImage(Texture2D texture)
+        {
+            Persona.AvatarImage = texture;
+            photo.texture = Persona.AvatarImage;
+            waitingForImageRequest = false;
+            OnImageCompleted?.Invoke(Persona, true);
         }
     }
 }

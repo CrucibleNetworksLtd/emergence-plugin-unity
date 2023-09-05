@@ -48,17 +48,15 @@ namespace EmergenceSDK.Internal.UI.Personas
         [SerializeField]
         private Pool PersonaButtonPool;
 
-        private Persona activePersona;
-        private Persona selectedPersona;
-        private int selectedPersonaIndex = 0;
-        private List<Persona> personasList = new List<Persona>();
-
         public static DashboardScreen Instance;
 
         private HashSet<string> imagesRefreshing = new HashSet<string>();
         private bool requestingInProgress = false;
 
         private IPersonaService personaService;
+        internal readonly PersonaScrollItemStore PersonaScrollItemStore = new PersonaScrollItemStore();
+        private Persona selectedPersona => PersonaScrollItemStore[PersonaCarousel.Instance.SelectedIndex].Persona;
+        private Persona activePersona => PersonaScrollItemStore.GetCurrentPersonaScrollItem().Persona;
 
         private void Awake()
         {
@@ -92,7 +90,6 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void PersonaCarousel_OnArrowClicked(int index)
         {
-            selectedPersona = personasList[index];
             PersonaScrollItem_OnSelected(selectedPersona, -1);
         }
 
@@ -109,6 +106,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void Start()
         {
+            
             HideUI();
         }
 
@@ -144,21 +142,18 @@ namespace EmergenceSDK.Internal.UI.Personas
 
             try
             {
-                activePersona = currentPersona;
-
                 requestingInProgress = true;
                 imagesRefreshing.Clear();
 
-                selectedPersonaIndex = personas.IndexOf(currentPersona);
-                selectedPersonaIndex = personas.FindIndex(p => p.id == currentPersona.id);
-                personasList = personas;
-            
                 //Update scroll items
                 List<PersonaScrollItem> scrollItems = CreateScrollItems(personas, currentPersona);
                 if(scrollItems.Count > 0)
+                {
+                    PersonaScrollItemStore.SetPersonas(scrollItems);
                     RefreshScrollItems(personas, scrollItems);
+                }
 
-                PersonaCarousel.Instance.Refresh(Mathf.FloorToInt((float)personas.Count / 2));
+                PersonaCarousel.Instance.Refresh(personas.FindIndex(p => p.id == currentPersona.id));
                 ShowUI();
                 PersonaScrollItem_OnSelected(activePersona, -1);
                 requestingInProgress = false;
@@ -172,7 +167,6 @@ namespace EmergenceSDK.Internal.UI.Personas
         private List<PersonaScrollItem> CreateScrollItems(List<Persona> personas, Persona currentPersona)
         {
             List<PersonaScrollItem> scrollItems = new List<PersonaScrollItem>();
-            selectedPersonaIndex = 0;
 
             for (int i = 0; i < personas.Count; i++)
             {
@@ -200,7 +194,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void RefreshScrollItems(List<Persona> personas, List<PersonaScrollItem> scrollItems)
         {
-            scrollItems[selectedPersonaIndex].transform.SetSiblingIndex(Mathf.FloorToInt((float)scrollItems.Count / 2));
+            scrollItems[PersonaCarousel.Instance.SelectedIndex].transform.SetSiblingIndex(Mathf.FloorToInt((float)scrollItems.Count / 2));
             for (int i = 0; i < personas.Count; i++)
             {
                 Persona persona = personas[i];
@@ -235,8 +229,6 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
 
             DetailsPanel.SetActive(true);
-
-            selectedPersona = persona;
 
             bool active = activePersona != null && persona.id == activePersona.id;
 
@@ -303,7 +295,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void ShowUI()
         {
-            var personaListEmpty = personasList.Count == 0;
+            var personaListEmpty = PersonaScrollItemStore.Count == 0;
             AddPersonaButton.transform.parent.gameObject.SetActive(personaListEmpty);
             AddPersonaSidebarButton1.gameObject.SetActive(personaListEmpty);
             SidebarWithPersonas.SetActive(!personaListEmpty);

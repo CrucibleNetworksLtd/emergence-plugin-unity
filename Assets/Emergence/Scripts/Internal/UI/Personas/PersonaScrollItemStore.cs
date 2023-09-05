@@ -14,7 +14,9 @@ namespace EmergenceSDK.Internal.UI.Personas
             get => items[index];
             set => items[index] = value;
         }
-        
+
+        public int Count => items.Count;
+
         public int GetCurrentPersonaIndex()
         {
             RefreshCurrentPersona();
@@ -22,6 +24,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         }
         
         public void SetPersonas(PersonaScrollItem[] itemsIn) => items = itemsIn.ToList();
+        public void SetPersonas(List<PersonaScrollItem> itemsIn) => items = itemsIn;
 
         public PersonaScrollItem GetCurrentPersonaScrollItem()
         {

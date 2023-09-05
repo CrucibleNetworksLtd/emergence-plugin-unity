@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Types;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,8 +18,8 @@ namespace EmergenceSDK.Internal.UI.Personas
         public Transform scrollItemsRoot;
 
         public static PersonaCarousel Instance;
+        internal int SelectedIndex => selected;
 
-        private PersonaScrollItemStore items = new PersonaScrollItemStore();
         private Material[] itemMaterials;
 
         private float timeCounter = 0.0f;
@@ -31,6 +32,8 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private const float MAX_BLUR = 30.0f;
         private const float MAX_SIZE = 4.0f;
+        
+        private PersonaScrollItemStore items;
 
         public delegate void ArrowClicked(int index);
         public static event ArrowClicked OnArrowClicked;
@@ -41,6 +44,11 @@ namespace EmergenceSDK.Internal.UI.Personas
             arrowLeftButton.onClick.AddListener(OnArrowLeftClicked);
             arrowRightButton.onClick.AddListener(OnArrowRightClicked);
             PersonaScrollItem.OnSelected += PersonaScrollItem_OnSelected;
+        }
+
+        private void Start()
+        {
+            items = DashboardScreen.Instance.PersonaScrollItemStore;
         }
 
         private void OnDestroy()
@@ -217,51 +225,27 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private float GetScalePerPosition(int position)
         {
-            // These values were picked to match the reference design, can be replaced by a proper formula
-            // to be used for an infinite number of items, instead of 5
-            float result = 0.0f;
+            // These values were picked to match the reference design
             switch (Mathf.Abs(position))
             {
-                case 0:
-                    result = 1.0f;
-                    break;
-                case 1:
-                    result = 0.75f;
-                    break;
-                case 2:
-                    result = 0.5f;
-                    break;
-                case 3:
-                    result = 0.0f;
-                    break;
+                case 0: return 1.0f;
+                case 1: return 0.75f;
+                case 2: return 0.5f;
+                default: return 0.45f;
             }
-            return result;
         }
 
         private float GetDistancePerPosition(int position)
         {
-            // These values were picked to match the reference design, can be replaced by a proper formula
-            // to be used for an infinite number of items, instead of 5
-            float result = 0.0f;
+            // These values were picked to match the reference design
             switch (Mathf.Abs(position))
             {
-                case 0:
-                    result = 1.0f;
-                    break;
-                case 1:
-                    result = 0.85f;
-                    break;
-                case 2:
-                    result = 0.75f;
-                    break;
-                case 3:
-                    result = 0.45f;
-                    break;
-                default:
-                    result = 0.45f;
-                    break;
+                case 0: return 1.0f;
+                case 1: return 0.85f;
+                case 2: return 0.75f;
+                default: return 0.45f;
             }
-            return result;
         }
+
     }
 }
