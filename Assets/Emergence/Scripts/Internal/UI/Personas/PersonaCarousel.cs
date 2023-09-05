@@ -28,7 +28,6 @@ namespace EmergenceSDK.Internal.UI.Personas
         private float originalItemWidth = 0; // To avoid hardcoding the item width
         private bool refreshing = true; // For spreading FX
         private int diff; // Cached movement amount
-        private int activePersonaIndex = 0;
 
         private const float MAX_BLUR = 30.0f;
         private const float MAX_SIZE = 4.0f;
@@ -169,9 +168,8 @@ namespace EmergenceSDK.Internal.UI.Personas
 
             selected = selectedIndex;
             previousSelected = selected;
-            activePersonaIndex = selected;
             refreshing = true;
-            GoToPosition(activePersonaIndex);
+            GoToPosition(selected);
             StartAnimationAsync().Forget();
         }
 
@@ -182,7 +180,7 @@ namespace EmergenceSDK.Internal.UI.Personas
                 return;
             }
 
-            GoToPosition(activePersonaIndex);
+            GoToPosition(items.GetCurrentPersonaIndex());
         }
 
         private void PositionAndScaleItem(int position, float t)

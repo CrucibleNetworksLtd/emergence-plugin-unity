@@ -205,7 +205,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             {
                 Persona persona = personas[i];
                 imagesRefreshing.Add(persona.id);
-                scrollItems[i].Refresh(DefaultTexture, persona, i == selectedPersonaIndex);
+                scrollItems[i].Refresh(DefaultTexture, persona);
             }
         }
 

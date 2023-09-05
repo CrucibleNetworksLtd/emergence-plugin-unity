@@ -46,6 +46,8 @@ namespace EmergenceSDK.Internal.UI.Personas
             private set;
         }
 
+        internal bool IsActive;
+        
         private Material clonedMaterial;
         private IAvatarService avatarService;
 
@@ -91,7 +93,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             OnSelected?.Invoke(Persona, Index);
         }
 
-        public void Refresh(Texture2D texture, Persona persona, bool selected)
+        public void Refresh(Texture2D texture, Persona persona)
         {
             avatarService = EmergenceServices.GetService<IAvatarService>();
             
@@ -107,8 +109,13 @@ namespace EmergenceSDK.Internal.UI.Personas
 
             photo.texture = persona.AvatarImage;
 
-            unselectedBorder.SetActive(!selected);
-            selectedBorder.SetActive(selected);
+            var personaService = EmergenceServices.GetService<IPersonaService>();
+            if (personaService.GetCurrentPersona(out var currentPersona))
+            {
+                var isCurrentPersona = Persona.id == currentPersona.id;
+                unselectedBorder.SetActive(!isCurrentPersona);
+                selectedBorder.SetActive(isCurrentPersona);
+            }
 
             if (!string.IsNullOrEmpty(persona.avatarId))
             {

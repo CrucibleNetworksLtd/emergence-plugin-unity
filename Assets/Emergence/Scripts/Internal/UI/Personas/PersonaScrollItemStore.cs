@@ -11,27 +11,31 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         public PersonaScrollItem this[int index]
         {
-            get
-            {
-                return items[index];
-            }
-            set
-            {
-                items[index] = value;
-            }
+            get => items[index];
+            set => items[index] = value;
         }
         
-        public void SetPersonas(List<PersonaScrollItem> itemsIn) => items = itemsIn;
+        public int GetCurrentPersonaIndex()
+        {
+            RefreshCurrentPersona();
+            return items.FindIndex(p => p.Persona.id == currentPersonaItem.Persona.id);
+        }
+        
         public void SetPersonas(PersonaScrollItem[] itemsIn) => items = itemsIn.ToList();
 
         public PersonaScrollItem GetCurrentPersonaScrollItem()
         {
+            RefreshCurrentPersona();
+            return currentPersonaItem;
+        }
+
+        private void RefreshCurrentPersona()
+        {
             var personaService = EmergenceServices.GetService<IPersonaService>();
-            if(personaService.GetCurrentPersona(out var currentPersona))
+            if (personaService.GetCurrentPersona(out var currentPersona))
             {
                 currentPersonaItem = items.FirstOrDefault(item => item.Persona.id == currentPersona.id);
             }
-            return currentPersonaItem;
         }
 
         public List<PersonaScrollItem> GetAllItems() => new List<PersonaScrollItem>(items);
