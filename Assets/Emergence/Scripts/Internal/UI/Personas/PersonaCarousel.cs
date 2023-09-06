@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Types;
 using UnityEngine;
@@ -33,10 +34,9 @@ namespace EmergenceSDK.Internal.UI.Personas
         private const float MAX_BLUR = 30.0f;
         private const float MAX_SIZE = 4.0f;
         
-        private PersonaScrollItemStore items;
+        public Action<int> OnArrowClicked;
 
-        public delegate void ArrowClicked(int index);
-        public static event ArrowClicked OnArrowClicked;
+        internal PersonaScrollItemStore items;
 
         private void Awake()
         {
@@ -44,11 +44,6 @@ namespace EmergenceSDK.Internal.UI.Personas
             arrowLeftButton.onClick.AddListener(OnArrowLeftClicked);
             arrowRightButton.onClick.AddListener(OnArrowRightClicked);
             PersonaScrollItem.OnSelected += PersonaScrollItem_OnSelected;
-        }
-
-        private void Start()
-        {
-            items = DashboardScreen.Instance.PersonaScrollItemStore;
         }
 
         private void OnDestroy()
@@ -122,7 +117,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             GoToPosition(index);
         }
 
-        private void GoToPosition(int position, bool instant = false)
+        internal void GoToPosition(int position)
         {
             previousSelected = selected;
             diff = selected - position;
@@ -246,6 +241,5 @@ namespace EmergenceSDK.Internal.UI.Personas
                 default: return 0.45f;
             }
         }
-
     }
 }
