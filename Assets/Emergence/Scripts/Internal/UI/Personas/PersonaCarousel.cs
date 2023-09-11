@@ -24,17 +24,18 @@ namespace EmergenceSDK.Internal.UI.Personas
         private Material[] itemMaterials;
 
         private float timeCounter = 0.0f;
-        private int count = 0; // Total items
+        private int count => items.Count; // Total items
         private int selected = 0; // Target item
         private int previousSelected; // Previous target item
-        private float originalItemWidth = 0; // To avoid hardcoding the item width
+        private float originalItemWidth = 0;
+        
         private bool refreshing = true; // For spreading FX
         private int diff; // Cached movement amount
 
         private const float MAX_BLUR = 30.0f;
         private const float MAX_SIZE = 4.0f;
         
-        public Action<int> OnArrowClicked;
+        public Action<int> ArrowClicked;
 
         internal PersonaScrollItemStore items;
 
@@ -43,17 +44,14 @@ namespace EmergenceSDK.Internal.UI.Personas
             Instance = this;
             arrowLeftButton.onClick.AddListener(OnArrowLeftClicked);
             arrowRightButton.onClick.AddListener(OnArrowRightClicked);
-            PersonaScrollItem.OnSelected += PersonaScrollItem_OnSelected;
         }
 
         private void OnDestroy()
         {
             arrowLeftButton.onClick.RemoveListener(OnArrowLeftClicked);
             arrowRightButton.onClick.RemoveListener(OnArrowRightClicked);
-            PersonaScrollItem.OnSelected -= PersonaScrollItem_OnSelected;
         }
-
- 
+        
         private async UniTaskVoid StartAnimationAsync()
         {
             float t = 0.0f;
@@ -97,8 +95,8 @@ namespace EmergenceSDK.Internal.UI.Personas
             int position = selected + 1;
             if (position < count)
             {
-                GoToPosition(position);
-                OnArrowClicked?.Invoke(position);
+                selected = position;
+                ArrowClicked?.Invoke(position);
             }
         }
 
@@ -107,18 +105,13 @@ namespace EmergenceSDK.Internal.UI.Personas
             int position = selected - 1;
             if (position >= 0)
             {
-                GoToPosition(position);
-                OnArrowClicked?.Invoke(position);
+                selected = position;
+                ArrowClicked?.Invoke(position);
             }
         }
 
-        private void PersonaScrollItem_OnSelected(Persona persona, int index)
-        {
-            GoToPosition(index);
-        }
-
         internal void GoToPosition(int position)
-        {
+        { 
             previousSelected = selected;
             diff = selected - position;
             selected = position;
@@ -151,10 +144,8 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
         }
 
-        public void Refresh(int selectedIndex)
+        public void Refresh()
         {
-            count = scrollItemsRoot.childCount;
-
             if (originalItemWidth == 0 && count > 0)
             {
                 originalItemWidth = scrollItemsRoot.GetChild(0).GetComponent<RectTransform>().rect.width;
@@ -169,10 +160,8 @@ namespace EmergenceSDK.Internal.UI.Personas
                 itemMaterials[i] = items[i].Material;
             }
 
-            selected = selectedIndex;
-            previousSelected = selected;
             refreshing = true;
-            GoToPosition(selected);
+            GoToActivePersona();
             StartAnimationAsync().Forget();
         }
 
