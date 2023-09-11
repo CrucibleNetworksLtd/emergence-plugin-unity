@@ -67,7 +67,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
         }
 
-        public void FixUnityStencilBug()
+        public void RecalculateMasking()
         {
             MaskUtilities.NotifyStencilStateChanged(mask);
         }

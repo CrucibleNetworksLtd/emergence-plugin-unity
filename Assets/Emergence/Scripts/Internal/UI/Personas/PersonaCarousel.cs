@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Types;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,7 +32,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private const float MAX_BLUR = 30.0f;
         private const float MAX_SIZE = 4.0f;
-        
+
         public Action<int> ArrowClicked;
 
         internal PersonaScrollItemStore items;
@@ -135,7 +133,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             SetZOrder(selected - 3, count - 7);
             StartAnimationAsync().Forget();
         }
-
+        
         private void SetZOrder(int index, int order)
         {
             if (index < count && index > 0)
@@ -204,7 +202,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             itemTransform.localScale = Vector3.one * scale;
             itemMaterials[position].SetFloat("_BlurAmount", MAX_BLUR - MAX_BLUR * scale);
             itemMaterials[position].SetFloat("_Size", 1.0f + (MAX_SIZE - MAX_SIZE * scale));
-            items[position].FixUnityStencilBug();
+            items[position].RecalculateMasking();
         }
 
         private float GetScalePerPosition(int position)
