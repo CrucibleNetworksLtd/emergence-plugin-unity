@@ -21,8 +21,8 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private HashSet<string> imagesRefreshing = new HashSet<string>();
         
-        private Persona selectedPersona => PersonaScrollItemStore[PersonaCarousel.Instance.SelectedIndex].Persona;
-        private Persona activePersona => PersonaScrollItemStore.GetCurrentPersonaScrollItem().Persona;
+        private Persona SelectedPersona => PersonaScrollItemStore[PersonaCarousel.Instance.SelectedIndex].Persona;
+        private Persona ActivePersona => PersonaScrollItemStore.GetCurrentPersonaScrollItem().Persona;
         
         private bool requestingInProgress = false;
         
@@ -47,13 +47,10 @@ namespace EmergenceSDK.Internal.UI.Personas
             PersonaScrollItem.OnSelected += PersonaScrollItem_OnSelected;
             PersonaScrollItem.OnImageCompleted += PersonaScrollItem_OnImageCompleted;
             
-            personaCarousel.OnArrowClicked += PersonaCarousel_OnArrowClicked;
+            personaCarousel.ArrowClicked += PersonaCarousel_OnArrowClicked;
         }
-
-        private void PersonaCarousel_OnArrowClicked(int index)
-        {
-            PersonaScrollItem_OnSelected(selectedPersona, -1);
-        }
+        
+        private void PersonaCarousel_OnArrowClicked(int index) => PersonaScrollItem_OnSelected(SelectedPersona, index);
         
         private void OnCreatePersona()
         {
@@ -73,22 +70,21 @@ namespace EmergenceSDK.Internal.UI.Personas
             ScreenManager.Instance.ShowEditPersona();
         }
         
-        
         private void OnActivePersonaClicked()
         {
-            if (activePersona == null)
+            if (ActivePersona == null)
             {
                 return;
             }
 
-            PersonaScrollItem_OnSelected(activePersona, -1);
+            PersonaScrollItem_OnSelected(ActivePersona, -1);
             PersonaCarousel.Instance.GoToActivePersona();
         }
         
         private async void OnUsePersonaAsCurrent()
         {
             Modal.Instance.Show("Loading Personas...");
-            var setPersonaResponse = await personaService.SetCurrentPersonaAsync(selectedPersona);
+            var setPersonaResponse = await personaService.SetCurrentPersonaAsync(SelectedPersona);
             if (setPersonaResponse.Success)
             {
                 Refresh().Forget();
@@ -102,16 +98,16 @@ namespace EmergenceSDK.Internal.UI.Personas
         
         private void OnEditPersona()
         {
-            EditPersonaScreen.Instance.Refresh(selectedPersona, activePersona.id == selectedPersona.id);
+            EditPersonaScreen.Instance.Refresh(SelectedPersona, ActivePersona.id == SelectedPersona.id);
             ScreenManager.Instance.ShowEditPersona();
         }
 
-        private void OnDeletePersona() => ModalPromptYESNO.Instance.Show($"Deleting persona: {selectedPersona.name}", "Are you sure?", DeleteSelectedPersona);
+        private void OnDeletePersona() => ModalPromptYESNO.Instance.Show($"Deleting persona: {SelectedPersona.name}", "Are you sure?", DeleteSelectedPersona);
 
         private async void DeleteSelectedPersona()
         {
             Modal.Instance.Show("Deleting Persona...");
-            var personaServiceResult = await personaService.DeletePersonaAsync(selectedPersona);
+            var personaServiceResult = await personaService.DeletePersonaAsync(SelectedPersona);
             if (personaServiceResult.Success)
             {
                 Refresh().Forget();
@@ -132,7 +128,6 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
 
             Modal.Instance.Show("Loading Personas...");
-
             
             var personas = await personaService.GetPersonasAsync();
             if (personas.Success)
@@ -149,7 +144,6 @@ namespace EmergenceSDK.Internal.UI.Personas
         private void GetPersonasSuccess(List<Persona> personas, Persona currentPersona)
         {
             Modal.Instance.Show("Retrieving avatars...");
-
             try
             {
                 requestingInProgress = true;
@@ -163,9 +157,9 @@ namespace EmergenceSDK.Internal.UI.Personas
                     RefreshScrollItems(personas, scrollItems);
                 }
 
-                PersonaCarousel.Instance.Refresh(personas.FindIndex(p => p.id == currentPersona.id));
+                PersonaCarousel.Instance.Refresh();
                 dashboardScreen.ShowUI(PersonaScrollItemStore.Count == 0);
-                PersonaScrollItem_OnSelected(activePersona, -1);
+                PersonaScrollItem_OnSelected(ActivePersona, PersonaScrollItemStore.GetCurrentPersonaIndex());
                 requestingInProgress = false;
             }
             finally
@@ -201,7 +195,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
             return scrollItems;
         }
-
+        
         private void RefreshScrollItems(List<Persona> personas, List<PersonaScrollItem> scrollItems)
         {
             scrollItems[PersonaCarousel.Instance.SelectedIndex].transform.SetSiblingIndex(Mathf.FloorToInt((float)scrollItems.Count / 2));
@@ -220,16 +214,17 @@ namespace EmergenceSDK.Internal.UI.Personas
                 return;
             }
 
-            bool active = activePersona != null && persona.id == activePersona.id;
+            bool active = ActivePersona != null && persona.id == ActivePersona.id;
             
             dashboardScreen.ShowDetailsPanel(persona, active);
+            personaCarousel.GoToPosition(position);
         }
-
+        
         private void PersonaScrollItem_OnImageCompleted(Persona persona, bool success)
         {
-            if (activePersona != null)
+            if (ActivePersona != null)
             {
-                if (activePersona.id.Equals(persona.id))
+                if (ActivePersona.id.Equals(persona.id))
                 {
                      dashboardScreen.ShowAvatar(persona.AvatarImage);
                 }
