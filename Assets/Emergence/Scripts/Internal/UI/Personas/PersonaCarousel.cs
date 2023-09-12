@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Tweens;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,6 +38,8 @@ namespace EmergenceSDK.Internal.UI.Personas
         public Action<int> ArrowClicked;
 
         internal PersonaScrollItemStore items;
+        
+        private List<TweenInstance> tweens = new List<TweenInstance>();
 
         private void Awake()
         {
@@ -48,44 +52,6 @@ namespace EmergenceSDK.Internal.UI.Personas
         {
             arrowLeftButton.onClick.RemoveListener(OnArrowLeftClicked);
             arrowRightButton.onClick.RemoveListener(OnArrowRightClicked);
-        }
-        
-        private async UniTaskVoid StartAnimationAsync()
-        {
-            float t = 0.0f;
-
-            while (t < 1.0f)
-            {
-                if (refreshing)
-                {
-                    timeCounter += Time.deltaTime;
-                }
-                else
-                {
-                    timeCounter += Time.deltaTime / duration;
-                }
-
-                if (timeCounter >= 1.0f)
-                {
-                    timeCounter = 1.0f;
-                }
-
-                t = Mathf.SmoothStep(0.0f, 1.0f, timeCounter);
-
-                for (int i = 0; i < count; i++)
-                {
-                    PositionAndScaleItem(i, t);
-                }
-
-                if (timeCounter >= 1.0f)
-                {
-                    refreshing = false;
-                    timeCounter = 0.0f;
-                    break;
-                }
-
-                await UniTask.Yield(PlayerLoopTiming.Update);
-            }
         }
 
         private void OnArrowRightClicked()
@@ -125,15 +91,20 @@ namespace EmergenceSDK.Internal.UI.Personas
                 items[selected].transform.SetAsLastSibling();
             }
 
+            SetAllZOrders();
+            //StartAnimationAsync().Forget();
+        }
+
+        private void SetAllZOrders()
+        {
             SetZOrder(selected + 1, count - 2);
             SetZOrder(selected - 1, count - 3);
             SetZOrder(selected + 2, count - 4);
             SetZOrder(selected - 2, count - 5);
             SetZOrder(selected + 3, count - 6);
             SetZOrder(selected - 3, count - 7);
-            StartAnimationAsync().Forget();
         }
-        
+
         private void SetZOrder(int index, int order)
         {
             if (index < count && index > 0)
@@ -160,7 +131,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
             refreshing = true;
             GoToActivePersona();
-            StartAnimationAsync().Forget();
+            PlayRefreshAnimation();
         }
 
         public void GoToActivePersona()
@@ -172,40 +143,69 @@ namespace EmergenceSDK.Internal.UI.Personas
 
             GoToPosition(items.GetCurrentPersonaIndex());
         }
-
-        private void PositionAndScaleItem(int position, float t)
+        
+        private void PlayRefreshAnimation()
         {
-            Transform itemTransform = items[position].transform;
-
-            int startPosition = position - previousSelected;
-            int endPosition = position - selected;
-
-            float startScale = GetScalePerPosition(startPosition);
-            float endScale = GetScalePerPosition(endPosition);
-            float scale = Mathf.Lerp(startScale, endScale, t);
-
-            float startSeparation = GetDistancePerPosition(startPosition);
-            float endSeparation = GetDistancePerPosition(endPosition);
-            float separation = Mathf.Lerp(startSeparation, endSeparation, t) * originalItemWidth;
-
-            if (refreshing)
+            SetAllZOrders();
+            var otherItems = items.GetNonActiveItems();
+            foreach (var scrollItem in otherItems)
             {
-                // Spreading effect
-                itemTransform.localPosition = Vector2.right * (t * (diff + position - selected) * separation);
+                //Get the distance between the current persona and the scroll item based on preset values using the indices
+                var dist = GetDistancePerPosition(Math.Abs(items.GetCurrentPersonaIndex()-items.GetIndex(scrollItem))) //Get dist multiplier
+                            * items.GetCurrentPersonaIndex() - items.GetIndex(scrollItem) > 0 ? 1 : -1 //Get direction
+                            * originalItemWidth; //Get the distance in pixels
+                var refreshPosTween = new AnchoredPositionXTween()
+                {
+                    from = scrollItem.transform.localPosition.x,
+                    to = dist,
+                    duration = duration,
+                };
+                
+                //Get the scale based on preset values using the indices
+                var scale = GetScalePerPosition(Math.Abs(items.GetCurrentPersonaIndex() - items.GetIndex(scrollItem)));
+                var refreshScaleTween = new LocalScaleTween()
+                {
+                    from = Vector3.one * GetScalePerPosition(),
+                    to = new Vector3(scale, scale, scale),
+                    duration = duration,
+                };
+                
+                var refreshBlurTween = new FloatTween()
+                {
+                    to = MAX_BLUR - MAX_BLUR * scale,
+                    duration = duration,
+                    onUpdate = (_, value) => { scrollItem.Material.SetFloat("_BlurAmount", value); }
+                };
+                
+                var refreshSizeTween = new FloatTween()
+                {
+                    to = 1.0f + (MAX_SIZE - MAX_SIZE * scale),
+                    duration = duration,
+                    onUpdate = (_, value) => { scrollItem.Material.SetFloat("_Size", value); }
+                };
+                
+                var recalculateMaskingTween = new FloatTween()
+                {
+                    duration = duration,
+                    onUpdate = (_, __) => { scrollItem.RecalculateMasking(); }
+                };
+                
+                //Add the tweens to the scroll items
+                tweens.Add(scrollItem.gameObject.AddTween(refreshPosTween));
+                tweens.Add(scrollItem.gameObject.AddTween(refreshScaleTween));
+                tweens.Add(scrollItem.gameObject.AddTween(refreshBlurTween));
+                tweens.Add(scrollItem.gameObject.AddTween(refreshSizeTween));
+                tweens.Add(scrollItem.gameObject.AddTween(recalculateMaskingTween));
             }
-            else
-            {
-                // Carousel
-                itemTransform.localPosition = Vector2.right * (Mathf.Lerp(startPosition, endPosition, t) * separation);
-            }
-
-            itemTransform.localScale = Vector3.one * scale;
-            itemMaterials[position].SetFloat("_BlurAmount", MAX_BLUR - MAX_BLUR * scale);
-            itemMaterials[position].SetFloat("_Size", 1.0f + (MAX_SIZE - MAX_SIZE * scale));
-            items[position].RecalculateMasking();
         }
 
-        private float GetScalePerPosition(int position)
+        private void PlayGoToAnimation()
+        {
+            
+        }
+        
+        //Default values should guarantee that the smallest value is returns
+        private float GetScalePerPosition(int position = -1)
         {
             // These values were picked to match the reference design
             switch (Mathf.Abs(position))

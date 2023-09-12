@@ -1,10 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using EmergenceSDK.Services;
 
 namespace EmergenceSDK.Internal.UI.Personas
 {
-    public class PersonaScrollItemStore
+    public class PersonaScrollItemStore : IEnumerable<PersonaScrollItem>
     {
         private List<PersonaScrollItem> items = new List<PersonaScrollItem>();
         private PersonaScrollItem currentPersonaItem;
@@ -42,7 +43,21 @@ namespace EmergenceSDK.Internal.UI.Personas
         }
 
         public List<PersonaScrollItem> GetAllItems() => new List<PersonaScrollItem>(items);
+        public List<PersonaScrollItem> GetNonActiveItems() => items.FindAll(item => item.Persona.id != currentPersonaItem.Persona.id);
+        
+        public int GetIndex(PersonaScrollItem item) => items.FindIndex(i => i.Persona.id == item.Persona.id);
 
         public void RemoveItem(string itemId) => items.RemoveAll(item => item.Persona.id == itemId);
+
+
+        public IEnumerator<PersonaScrollItem> GetEnumerator()
+        {
+            return items.GetEnumerator();
+        }
+        
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }
