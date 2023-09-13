@@ -225,7 +225,24 @@ namespace EmergenceSDK.Internal.Services
             var response = await WebRequestService.PerformAsyncWebRequest(tokenUriRequest, EmergenceLogger.LogError);
             if(response.IsSuccess == false)
                 return new ServiceResponse(false);
-            TokenURIResponse res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenUriRequest.downloadHandler.text)[0];
+            TokenURIResponse res;
+            try
+            {
+                res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenUriRequest.downloadHandler.text)[0];
+            }
+            catch (Exception e)
+            {
+                try
+                {
+
+                    res = SerializationHelper.Deserialize<TokenURIResponse>(tokenUriRequest.downloadHandler.text);
+                }
+                catch (Exception exception)
+                {
+                    EmergenceLogger.LogError(exception.Message);
+                    throw;
+                }
+            }
             WebRequestService.CleanupRequest(tokenUriRequest);
             // rebuild the avatarId field with the GUID
             persona.avatarId = persona.avatar.chain + ":" + persona.avatar.contractAddress + ":" + persona.avatar.tokenId + ":" + res.GUID;
