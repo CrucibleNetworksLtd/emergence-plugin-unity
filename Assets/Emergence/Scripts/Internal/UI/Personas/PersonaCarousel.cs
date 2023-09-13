@@ -92,7 +92,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
 
             SetAllZOrders();
-            PlayGoToAnimation(position);
+            PlayGoToAnimation(previousSelected, position);
         }
 
         private void SetAllZOrders()
@@ -146,13 +146,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         
         private void PlayRefreshAnimation()
         {
-            SetAllZOrders();
-            foreach (var item in items)
-            {
-                var t = item.transform;
-                t.localScale = Vector3.one;
-                t.localPosition = Vector3.zero;
-            }
+            ResetAllItems();
             var otherItems = items.GetNonActiveItems();
             foreach (var scrollItem in otherItems)
             {
@@ -176,80 +170,85 @@ namespace EmergenceSDK.Internal.UI.Personas
                     duration = duration,
                 };
                 
-                var refreshBlurTween = new FloatTween()
-                {
-                    to = MAX_BLUR - MAX_BLUR * scale,
-                    duration = duration,
-                    onUpdate = (_, value) => { scrollItem.Material.SetFloat("_BlurAmount", value); }
-                };
-                
-                var refreshSizeTween = new FloatTween()
-                {
-                    to = 1.0f + (MAX_SIZE - MAX_SIZE * scale),
-                    duration = duration,
-                    onUpdate = (_, value) => { scrollItem.Material.SetFloat("_Size", value); }
-                };
-                
-                var recalculateMaskingTween = new FloatTween()
-                {
-                    duration = duration,
-                    onUpdate = (_, __) => { scrollItem.RecalculateMasking(); }
-                };
-                recalculateMaskingTween.onEnd += (_) => refreshing = false;
-                recalculateMaskingTween.onCancel += (_) => refreshing = false;
-
                 //Add the tweens to the scroll items
-                tweens.Add(scrollItem.gameObject.AddTween(refreshPosTween));
-                tweens.Add(scrollItem.gameObject.AddTween(refreshScaleTween));
-                tweens.Add(scrollItem.gameObject.AddTween(refreshBlurTween));
-                tweens.Add(scrollItem.gameObject.AddTween(refreshSizeTween));
-                tweens.Add(scrollItem.gameObject.AddTween(recalculateMaskingTween));
+                scrollItem.gameObject.AddTween(refreshPosTween);
+                scrollItem.gameObject.AddTween(refreshScaleTween);
+                
+                ApplyVisualTweens(scale, scrollItem);
             }
         }
 
-        private void PlayGoToAnimation(int position)
+        private void PlayGoToAnimation(int oldPos, int newPos)
         {
-            SetAllZOrders();
+            ResetAllItems();
+            var spotsToMove = oldPos - newPos;
             foreach (var scrollItem in items)
             {
-                var t = scrollItem.transform;
-                t.localScale = Vector3.one;
-                t.localPosition = Vector3.zero;
-            }
-            var otherItems = items.GetNonActiveItems();
-            foreach (var scrollItem in otherItems)
-            {
-                //Get the distance between the current persona and the scroll item based on preset values using the indices
-                var dist = GetDistancePerPosition(Math.Abs(position - items.GetIndex(scrollItem))) //Get dist multiplier
-                                * items.GetCurrentPersonaIndex() - items.GetIndex(scrollItem) > 0 ? 1 : -1 //Get direction
-                                * originalItemWidth; //Get the distance in pixels
-                var refreshPosTween = new AnchoredPositionXTween()
+                //Calculate the distance to move the scroll item based on the number of spots to move
+                var dist = spotsToMove * originalItemWidth * GetDistancePerPosition(Math.Abs(items.GetCurrentPersonaIndex() - items.GetIndex(scrollItem)));
+                var localPosition = scrollItem.transform.localPosition;
+                var goToPosTween = new AnchoredPositionXTween()
                 {
-                    from = scrollItem.transform.localPosition.x,
-                    to = dist,
+                    from = localPosition.x,
+                    to = localPosition.x + dist,
                     duration = duration,
                 };
-
-                //Get the scale based on preset values using the indices
+                
+                //Calculate the scale to move the scroll item based on the number of spots to move
                 var scale = GetScalePerPosition(Math.Abs(items.GetCurrentPersonaIndex() - items.GetIndex(scrollItem)));
-                var refreshScaleTween = new LocalScaleTween()
+                var goToScaleTween = new LocalScaleTween()
                 {
-                    from = Vector3.one * GetScalePerPosition(),
+                    from = scrollItem.transform.localScale,
                     to = new Vector3(scale, scale, scale),
                     duration = duration,
                 };
-
-                var recalculateMaskingTween = new FloatTween()
-                {
-                    duration = duration,
-                    onUpdate = (_, __) => { scrollItem.RecalculateMasking(); }
-                };
-
+                
                 //Add the tweens to the scroll items
-                tweens.Add(scrollItem.gameObject.AddTween(refreshPosTween));
-                tweens.Add(scrollItem.gameObject.AddTween(refreshScaleTween));
-                tweens.Add(scrollItem.gameObject.AddTween(recalculateMaskingTween));
+                scrollItem.gameObject.AddTween(goToPosTween);
+                scrollItem.gameObject.AddTween(goToScaleTween);
+                
+                
+                ApplyVisualTweens(scale, scrollItem);
             }
+        }
+
+        private void ResetAllItems()
+        {
+            SetAllZOrders();
+            foreach (var item in items)
+            {
+                var t = item.transform;
+                t.localScale = Vector3.one;
+                t.localPosition = Vector3.zero;
+            }
+        }
+
+        private void ApplyVisualTweens(float scale, PersonaScrollItem scrollItem)
+        {
+            var blurTween = new FloatTween()
+            {
+                to = MAX_BLUR - MAX_BLUR * scale,
+                duration = duration,
+                onUpdate = (_, value) => { scrollItem.Material.SetFloat("_BlurAmount", value); }
+            };
+
+            var sizeTween = new FloatTween()
+            {
+                to = 1.0f + (MAX_SIZE - MAX_SIZE * scale),
+                duration = duration,
+                onUpdate = (_, value) => { scrollItem.Material.SetFloat("_Size", value); }
+            };
+
+            var recalculateMaskingTween = new FloatTween()
+            {
+                duration = duration,
+                onUpdate = (_, __) => { scrollItem.RecalculateMasking(); }
+            };
+            recalculateMaskingTween.onEnd += (_) => refreshing = false;
+            recalculateMaskingTween.onCancel += (_) => refreshing = false;
+            scrollItem.gameObject.AddTween(blurTween);
+            scrollItem.gameObject.AddTween(sizeTween);
+            scrollItem.gameObject.AddTween(recalculateMaskingTween);
         }
         
         //Default values should guarantee that the smallest value is returns
