@@ -9389,7 +9389,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 954e73b6e322f0842b604df441b875d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 0.1
+  duration: 0.3
   arrowLeftButton: {fileID: 509603388573913124}
   arrowRightButton: {fileID: 1752538919779740752}
   scrollItemsRoot: {fileID: 5832855822545091003}
@@ -15717,8 +15717,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5832855824203081860}
   m_HandleRect: {fileID: 5832855824203081859}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.9999998
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -17225,7 +17225,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5832855823803862094}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999997
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
