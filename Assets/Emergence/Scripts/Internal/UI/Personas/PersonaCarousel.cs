@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Types;
 using Tweens;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,26 +21,26 @@ namespace EmergenceSDK.Internal.UI.Personas
         public Transform scrollItemsRoot;
 
         public static PersonaCarousel Instance;
-        internal int SelectedIndex => selected;
+        internal Persona SelectedPersona => itemPositions.First(pair => pair.Value == 0).Key.Persona;
 
         private Material[] itemMaterials;
-
-        private float timeCounter = 0.0f;
-        private int count => items.Count; // Total items
+        
+        private int count => Items.Count; // Total items
         private int selected = 0; // Target item
-        private int previousSelected; // Previous target item
+        private const int previousSelected = 0; // Previous target item
         private float originalItemWidth = 0;
         
         private bool refreshing = true; // For spreading FX
-        private int diff; // Cached movement amount
 
         private const float MAX_BLUR = 30.0f;
         private const float MAX_SIZE = 4.0f;
 
-        public Action<int> ArrowClicked;
+        public Action<Persona> ArrowClicked;
 
-        internal PersonaScrollItemStore items;
-        
+        internal PersonaScrollItemStore Items;
+
+        private Dictionary<PersonaScrollItem, int> itemPositions = new();
+
         private List<TweenInstance> tweens = new List<TweenInstance>();
 
         private void Awake()
@@ -47,52 +49,73 @@ namespace EmergenceSDK.Internal.UI.Personas
             arrowLeftButton.onClick.AddListener(OnArrowLeftClicked);
             arrowRightButton.onClick.AddListener(OnArrowRightClicked);
         }
-
+        
         private void OnDestroy()
         {
             arrowLeftButton.onClick.RemoveListener(OnArrowLeftClicked);
             arrowRightButton.onClick.RemoveListener(OnArrowRightClicked);
         }
 
-        private void OnArrowRightClicked()
+        private void OnArrowRightClicked() => HandleArrowClick(1);
+        private void OnArrowLeftClicked() => HandleArrowClick(-1);
+        
+        private void HandleArrowClick(int position)
         {
-            int position = selected + 1;
-            if (position < count)
+            if (itemPositions.Values.Contains(position))
             {
-                selected = position;
-                ArrowClicked?.Invoke(position);
+                var keyPersona = itemPositions.First(pair => pair.Value == position).Key.Persona;
+                ArrowClicked?.Invoke(keyPersona);
+                GoToPosition(position);
             }
         }
 
-        private void OnArrowLeftClicked()
-        {
-            int position = selected - 1;
-            if (position >= 0)
-            {
-                selected = position;
-                ArrowClicked?.Invoke(position);
-            }
-        }
 
+        public void GoToPosition(Persona persona)
+        {
+            if(Items == null)
+            {
+                GoToPosition(0);
+                return;
+            }
+
+            var personaItem = Items.FirstOrDefault(item => item.Persona.id == persona.id);
+            var position = itemPositions[personaItem];
+            GoToPosition(position);
+        }
+        
         internal void GoToPosition(int position)
-        { 
-            previousSelected = selected;
-            diff = selected - position;
+        {
             selected = position;
-            timeCounter = 0.0f;
-
-            for (int i = 0; i < count; i++)
-            {
-                items[i].transform.SetAsFirstSibling();
-            }
-
-            if (count > 0)
-            {
-                items[selected].transform.SetAsLastSibling();
-            }
-
             SetAllZOrders();
-            PlayGoToAnimation(previousSelected, position);
+
+            var spacesToMove = -selected;
+            itemPositions = UpdatedDesiredPositions(spacesToMove);
+
+            foreach (var item in Items)
+            {
+                var newX = itemPositions[item]//The index in the list
+                                * originalItemWidth //The width of the item
+                                * GetDistancePerPosition(Math.Abs(itemPositions[item])); //Distance scaling here
+
+                // Create the new anchored position tween
+                var goToPosTween = new AnchoredPositionXTween()
+                {
+                    to = newX,
+                    duration = duration // Assuming 'duration' is a predefined animation duration
+                };
+                var scale = GetScalePerPosition(Math.Abs(itemPositions[item]));
+                var refreshScaleTween = new LocalScaleTween()
+                {
+                    from = Vector3.one * GetScalePerPosition(),
+                    to = new Vector3(scale, scale, scale),
+                    duration = duration,
+                };
+
+                // Add the tween to the item
+                item.gameObject.AddTween(goToPosTween);
+                item.gameObject.AddTween(refreshScaleTween);
+                ApplyVisualTweens(scale, item);
+            }
         }
 
         private void SetAllZOrders()
@@ -109,7 +132,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         {
             if (index < count && index > 0)
             {
-                items[index].transform.SetSiblingIndex(order);
+                Items[index].transform.SetSiblingIndex(order);
             }
         }
 
@@ -121,12 +144,14 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
 
             var childCount = scrollItemsRoot.childCount;
-            items.SetPersonas(new PersonaScrollItem[childCount]);
+            Items.SetPersonas(new PersonaScrollItem[childCount]);
+            itemPositions.Clear();
             itemMaterials = new Material[childCount];
             for (int i = 0; i < scrollItemsRoot.childCount; i++)
             {
-                items[i] = scrollItemsRoot.GetChild(i).GetComponent<PersonaScrollItem>();
-                itemMaterials[i] = items[i].Material;
+                Items[i] = scrollItemsRoot.GetChild(i).GetComponent<PersonaScrollItem>();
+                itemMaterials[i] = Items[i].Material;
+                itemPositions.Add(Items[i], i);
             }
 
             refreshing = true;
@@ -141,18 +166,54 @@ namespace EmergenceSDK.Internal.UI.Personas
                 return;
             }
 
-            GoToPosition(items.GetCurrentPersonaIndex());
+            GoToPosition(Items.GetCurrentPersonaIndex());
         }
         
+        public Dictionary<PersonaScrollItem, int> UpdatedDesiredPositions(PersonaScrollItem targetItem)
+        {
+            // Make a copy of the original dictionary if you don't want to modify it directly.
+            Dictionary<PersonaScrollItem, int> updatedItemPositions = new Dictionary<PersonaScrollItem, int>(itemPositions);
+
+            int targetIndex = updatedItemPositions[targetItem];
+            int offset = -targetIndex;
+
+            // Create a list of keys because we can't directly modify keys while iterating the dictionary.
+            List<PersonaScrollItem> keys = new List<PersonaScrollItem>(updatedItemPositions.Keys);
+
+            foreach (var key in keys)
+            {
+                updatedItemPositions[key] += offset;
+            }
+            return updatedItemPositions;
+        }
+        
+        public Dictionary<PersonaScrollItem, int> UpdatedDesiredPositions(int shiftAmount)
+        {
+            // Make a copy of the original dictionary if you don't want to modify it directly.
+            Dictionary<PersonaScrollItem, int> updatedItemPositions = new Dictionary<PersonaScrollItem, int>(itemPositions);
+
+            // Create a list of keys because we can't directly modify keys while iterating the dictionary.
+            List<PersonaScrollItem> keys = new List<PersonaScrollItem>(updatedItemPositions.Keys);
+
+            foreach (var key in keys)
+            {
+                updatedItemPositions[key] += shiftAmount;
+            }
+    
+            return updatedItemPositions;
+        }
+
         private void PlayRefreshAnimation()
         {
             ResetAllItems();
-            var otherItems = items.GetNonActiveItems();
+            var otherItems = Items.GetNonActiveItems();
+            var newPos = UpdatedDesiredPositions(Items.GetCurrentPersonaScrollItem());
             foreach (var scrollItem in otherItems)
             {
                 //Get the distance between the current persona and the scroll item based on preset values using the indices
-                var dist = GetDistancePerPosition(Math.Abs(items.GetCurrentPersonaIndex()-items.GetIndex(scrollItem))) //Get dist multiplier
-                            * items.GetCurrentPersonaIndex() - items.GetIndex(scrollItem) > 0 ? 1 : -1 //Get direction
+                var positionsFromCentre = newPos[scrollItem] - itemPositions[scrollItem];
+                var dist = GetDistancePerPosition(Math.Abs(positionsFromCentre)) //Get dist multiplier
+                            * positionsFromCentre //Get positions to move
                             * originalItemWidth; //Get the distance in pixels
                 var refreshPosTween = new AnchoredPositionXTween()
                 {
@@ -162,7 +223,7 @@ namespace EmergenceSDK.Internal.UI.Personas
                 };
                 
                 //Get the scale based on preset values using the indices
-                var scale = GetScalePerPosition(Math.Abs(items.GetCurrentPersonaIndex() - items.GetIndex(scrollItem)));
+                var scale = GetScalePerPosition(Math.Abs(Items.GetCurrentPersonaIndex() - Items.GetIndex(scrollItem)));
                 var refreshScaleTween = new LocalScaleTween()
                 {
                     from = Vector3.one * GetScalePerPosition(),
@@ -175,47 +236,14 @@ namespace EmergenceSDK.Internal.UI.Personas
                 scrollItem.gameObject.AddTween(refreshScaleTween);
                 
                 ApplyVisualTweens(scale, scrollItem);
-            }
-        }
-
-        private void PlayGoToAnimation(int oldPos, int newPos)
-        {
-            ResetAllItems();
-            var spotsToMove = oldPos - newPos;
-            foreach (var scrollItem in items)
-            {
-                //Calculate the distance to move the scroll item based on the number of spots to move
-                var dist = spotsToMove * originalItemWidth * GetDistancePerPosition(Math.Abs(items.GetCurrentPersonaIndex() - items.GetIndex(scrollItem)));
-                var localPosition = scrollItem.transform.localPosition;
-                var goToPosTween = new AnchoredPositionXTween()
-                {
-                    from = localPosition.x,
-                    to = localPosition.x + dist,
-                    duration = duration,
-                };
-                
-                //Calculate the scale to move the scroll item based on the number of spots to move
-                var scale = GetScalePerPosition(Math.Abs(items.GetCurrentPersonaIndex() - items.GetIndex(scrollItem)));
-                var goToScaleTween = new LocalScaleTween()
-                {
-                    from = scrollItem.transform.localScale,
-                    to = new Vector3(scale, scale, scale),
-                    duration = duration,
-                };
-                
-                //Add the tweens to the scroll items
-                scrollItem.gameObject.AddTween(goToPosTween);
-                scrollItem.gameObject.AddTween(goToScaleTween);
-                
-                
-                ApplyVisualTweens(scale, scrollItem);
+                itemPositions = newPos;
             }
         }
 
         private void ResetAllItems()
         {
             SetAllZOrders();
-            foreach (var item in items)
+            foreach (var item in Items)
             {
                 var t = item.transform;
                 t.localScale = Vector3.one;
@@ -275,5 +303,6 @@ namespace EmergenceSDK.Internal.UI.Personas
                 default: return 0.45f;
             }
         }
+
     }
 }

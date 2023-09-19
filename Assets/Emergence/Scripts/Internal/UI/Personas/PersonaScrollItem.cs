@@ -26,6 +26,8 @@ namespace EmergenceSDK.Internal.UI.Personas
         private GameObject selectedBorder;
         [SerializeField]
         private Button selectButton;
+        [SerializeField]
+        private TextMeshProUGUI debugText;
 
         public Persona Persona { get; private set; }
         public int Index { get; private set; }
@@ -90,6 +92,11 @@ namespace EmergenceSDK.Internal.UI.Personas
             ToggleNameTextVisibility(false);
         }
 
+        public void DisplayDebugText(string text)
+        {
+            debugText.text = text;
+        }
+        
         // Private Methods
         private void RegisterEventListeners()
         {

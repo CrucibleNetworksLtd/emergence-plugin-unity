@@ -38,13 +38,20 @@ namespace EmergenceSDK.Internal.UI.Personas
             var personaService = EmergenceServices.GetService<IPersonaService>();
             if (personaService.GetCurrentPersona(out var currentPersona))
             {
-                currentPersonaItem = items.FirstOrDefault(item => item.Persona.id == currentPersona.id);
+                currentPersonaItem = items.FirstOrDefault(item => item.Persona?.id == currentPersona.id);
             }
         }
 
         public List<PersonaScrollItem> GetAllItems() => new List<PersonaScrollItem>(items);
-        public List<PersonaScrollItem> GetNonActiveItems() => items.FindAll(item => item.Persona.id != currentPersonaItem.Persona.id);
-        
+        public List<PersonaScrollItem> GetNonActiveItems()
+        {
+            return items.FindAll(item =>
+            {
+                RefreshCurrentPersona();
+                return item.Persona.id != currentPersonaItem?.Persona.id;
+            });
+        }
+
         public int GetIndex(PersonaScrollItem item) => items.FindIndex(i => i.Persona.id == item.Persona.id);
 
         public void RemoveItem(string itemId) => items.RemoveAll(item => item.Persona.id == itemId);

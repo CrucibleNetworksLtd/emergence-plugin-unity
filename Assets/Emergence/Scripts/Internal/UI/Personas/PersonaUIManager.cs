@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -21,8 +22,8 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private HashSet<string> imagesRefreshing = new HashSet<string>();
         
-        private Persona SelectedPersona => PersonaScrollItemStore[PersonaCarousel.Instance.SelectedIndex].Persona;
-        private Persona ActivePersona => PersonaScrollItemStore.GetCurrentPersonaScrollItem().Persona;
+        private Persona SelectedPersona => PersonaCarousel.Instance.SelectedPersona;
+        private Persona ActivePersona => PersonaScrollItemStore.GetCurrentPersonaScrollItem()?.Persona;
         
         private bool requestingInProgress = false;
         
@@ -35,7 +36,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             this.dashboardScreen = dashboardScreen;
             this.personaButtonPool = personaButtonPool;
             this.personaCarousel = personaCarousel;
-            personaCarousel.items = PersonaScrollItemStore;
+            personaCarousel.Items = PersonaScrollItemStore;
             this.personaScrollContents = personaScrollContents;
 
             dashboardScreen.CreatePersonaClicked += OnCreatePersona;
@@ -50,7 +51,6 @@ namespace EmergenceSDK.Internal.UI.Personas
             personaCarousel.ArrowClicked += PersonaCarousel_OnArrowClicked;
         }
         
-        private void PersonaCarousel_OnArrowClicked(int index) => PersonaScrollItem_OnSelected(SelectedPersona, index);
         
         private void OnCreatePersona()
         {
@@ -162,6 +162,10 @@ namespace EmergenceSDK.Internal.UI.Personas
                 PersonaScrollItem_OnSelected(ActivePersona, PersonaScrollItemStore.GetCurrentPersonaIndex());
                 requestingInProgress = false;
             }
+            catch (Exception e)
+            {
+                EmergenceLogger.LogError(e.Message);
+            }
             finally
             {
                 Modal.Instance.Hide();
@@ -198,7 +202,6 @@ namespace EmergenceSDK.Internal.UI.Personas
         
         private void RefreshScrollItems(List<Persona> personas, List<PersonaScrollItem> scrollItems)
         {
-            scrollItems[PersonaCarousel.Instance.SelectedIndex].transform.SetSiblingIndex(Mathf.FloorToInt((float)scrollItems.Count / 2));
             for (int i = 0; i < personas.Count; i++)
             {
                 Persona persona = personas[i];
@@ -207,19 +210,32 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
         }
         
+        
+        private void PersonaCarousel_OnArrowClicked(Persona persona)
+        {
+            OnNewItemSelected(persona);
+        }
+
         private void PersonaScrollItem_OnSelected(Persona persona, int position)
+        {
+            if (OnNewItemSelected(persona)) 
+                return;
+            personaCarousel.GoToPosition(persona);
+        }
+
+        private bool OnNewItemSelected(Persona persona)
         {
             if (persona == null)
             {
-                return;
+                return true;
             }
 
             bool active = ActivePersona != null && persona.id == ActivePersona.id;
-            
+
             dashboardScreen.ShowDetailsPanel(persona, active);
-            personaCarousel.GoToPosition(position);
+            return false;
         }
-        
+
         private void PersonaScrollItem_OnImageCompleted(Persona persona, bool success)
         {
             if (ActivePersona != null)
