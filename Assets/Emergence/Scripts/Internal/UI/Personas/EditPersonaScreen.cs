@@ -6,6 +6,7 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Avatar = EmergenceSDK.Types.Avatar;
 
@@ -16,31 +17,31 @@ namespace EmergenceSDK.Internal.UI.Personas
         public static EditPersonaScreen Instance;
 
         [Header("UI References Footer")]
-        public GameObject panelInformation;
-        public GameObject panelAvatar;
-        public Button backButton;
-        public Button nextButton;
-        public TextMeshProUGUI nextButtonText;
-        public TextMeshProUGUI backButtonText;
+        public GameObject PanelInformation;
+        public GameObject PanelAvatar;
+        public Button BackButton;
+        public Button NextButton;
+        public TextMeshProUGUI NextButtonText;
+        public TextMeshProUGUI BackButtonText;
 
-        public Button replaceAvatarButton;
-        public RawImage personaAvatarBackground;
-        public RawImage personaAvatar;
+        public Button ReplaceAvatarButton;
+        public RawImage PersonaAvatarBackground;
+        public RawImage PersonaAvatar;
 
         [Header("UI References Avatar Panel")]
-        public Transform avatarScrollRoot;
-        public Pool avatarScrollItemsPool;
+        public Transform AvatarScrollRoot;
+        public Pool AvatarScrollItemsPool;
 
-        [Header("UI References Information Panel")]
-        public TMP_InputField nameIF;
-        public TMP_InputField bioIF;
-        public Button deleteButton;
+        [FormerlySerializedAs("nameIF")] 
+        public TMP_InputField NameInputField;
+        public TMP_InputField BioIf;
+        public Button DeleteButton;
 
         [Header("UI References Edit / Create")]
-        public GameObject[] editGOs;
-        public GameObject[] createGOs;
+        public GameObject[] EditGOs;
+        public GameObject[] CreateGOs;
 
-        public Texture2D defaultImage;
+        public Texture2D DefaultImage;
 
         private Persona currentPersona;
 
@@ -63,20 +64,20 @@ namespace EmergenceSDK.Internal.UI.Personas
         private void Awake()
         {
             Instance = this;
-            nextButton.onClick.AddListener(OnNextClicked);
-            backButton.onClick.AddListener(OnBackClicked);
-            deleteButton.onClick.AddListener(OnDeleteClicked);
-            replaceAvatarButton.onClick.AddListener(OnReplaceAvatarClicked);
+            NextButton.onClick.AddListener(OnNextClicked);
+            BackButton.onClick.AddListener(OnBackClicked);
+            DeleteButton.onClick.AddListener(OnDeleteClicked);
+            ReplaceAvatarButton.onClick.AddListener(OnReplaceAvatarClicked);
             AvatarScrollItem.OnAvatarSelected += AvatarScrollItem_OnAvatarSelected;
             AvatarScrollItem.OnImageCompleted += AvatarScrollItem_OnImageCompleted;
         }
 
         private void OnDestroy()
         {
-            nextButton.onClick.RemoveListener(OnNextClicked);
-            backButton.onClick.RemoveListener(OnBackClicked);
-            deleteButton.onClick.RemoveListener(OnDeleteClicked);
-            replaceAvatarButton.onClick.RemoveListener(OnReplaceAvatarClicked);
+            NextButton.onClick.RemoveListener(OnNextClicked);
+            BackButton.onClick.RemoveListener(OnBackClicked);
+            DeleteButton.onClick.RemoveListener(OnDeleteClicked);
+            ReplaceAvatarButton.onClick.RemoveListener(OnReplaceAvatarClicked);
             AvatarScrollItem.OnAvatarSelected -= AvatarScrollItem_OnAvatarSelected;
             AvatarScrollItem.OnImageCompleted -= AvatarScrollItem_OnImageCompleted;
         }
@@ -86,16 +87,16 @@ namespace EmergenceSDK.Internal.UI.Personas
             switch (state)
             {
                 case States.CreateAvatar:
-                    nextButton.interactable = true;
+                    NextButton.interactable = true;
                     break;
                 case States.CreateInformation:
-                    nextButton.interactable = nameIF.text.Length >= 3;
+                    NextButton.interactable = NameInputField.text.Length >= 3;
                     break;
                 case States.EditInformation:
-                    nextButton.interactable = nameIF.text.Length >= 3;
+                    NextButton.interactable = NameInputField.text.Length >= 3;
                     break;
                 case States.EditAvatar:
-                    nextButton.interactable = true;
+                    NextButton.interactable = true;
                     break;
             }
         }
@@ -109,8 +110,8 @@ namespace EmergenceSDK.Internal.UI.Personas
 
             if (currentAvatar == null)
             {
-                personaAvatar.texture = defaultImage;
-                personaAvatarBackground.texture = defaultImage;
+                PersonaAvatar.texture = DefaultImage;
+                PersonaAvatarBackground.texture = DefaultImage;
                 return;
             }
 
@@ -118,8 +119,8 @@ namespace EmergenceSDK.Internal.UI.Personas
             // Assuming image is the first in the list - TODO: need to check for MimeType
             RequestImage.Instance.AskForImage(avatar.meta.content.First().url, (url, texture) =>
             {
-                personaAvatar.texture = texture;
-                personaAvatarBackground.texture = texture;
+                PersonaAvatar.texture = texture;
+                PersonaAvatarBackground.texture = texture;
             },
             (url, error, errorCode) =>
             {
@@ -135,57 +136,57 @@ namespace EmergenceSDK.Internal.UI.Personas
             // Redesigned flow state
             state = isNew ? States.CreateAvatar : States.EditInformation;
 
-            for (int i = 0; i < createGOs.Length; i++)
+            for (int i = 0; i < CreateGOs.Length; i++)
             {
-                createGOs[i].SetActive(isNew);
+                CreateGOs[i].SetActive(isNew);
             }
 
-            for (int i = 0; i < editGOs.Length; i++)
+            for (int i = 0; i < EditGOs.Length; i++)
             {
-                editGOs[i].SetActive(!isNew);
+                EditGOs[i].SetActive(!isNew);
             }
 
 
             // If creating, first show avatar selection
-            panelAvatar.SetActive(isNew);
-            panelInformation.SetActive(!isNew);
+            PanelAvatar.SetActive(isNew);
+            PanelInformation.SetActive(!isNew);
 
-            nextButtonText.text = isNew ? "Persona Information" : "Save Changes";
-            backButtonText.text = isNew ? "Back" : "Cancel";
-            deleteButton.gameObject.SetActive(!isNew && !isDefault);
+            NextButtonText.text = isNew ? "Persona Information" : "Save Changes";
+            BackButtonText.text = isNew ? "Back" : "Cancel";
+            DeleteButton.gameObject.SetActive(!isNew && !isDefault);
 
             currentPersona = persona;
             currentAvatar = currentPersona.avatar;
             existingAvatar = persona.avatar;
-            nameIF.text = persona.name;
-            bioIF.text = persona.bio;
+            NameInputField.text = persona.name;
+            BioIf.text = persona.bio;
 
             if (persona.AvatarImage)
             {
-                personaAvatar.texture = persona.AvatarImage;
-                personaAvatarBackground.texture = persona.AvatarImage;
+                PersonaAvatar.texture = persona.AvatarImage;
+                PersonaAvatarBackground.texture = persona.AvatarImage;
             }
             else
             {
-                personaAvatar.texture = defaultImage;
-                personaAvatarBackground.texture = defaultImage;
+                PersonaAvatar.texture = DefaultImage;
+                PersonaAvatarBackground.texture = DefaultImage;
             }
 
             // Clear scroll area
-            while (avatarScrollRoot.childCount > 0)
+            while (AvatarScrollRoot.childCount > 0)
             {
-                GameObject child = avatarScrollRoot.GetChild(0).gameObject;
-                avatarScrollItemsPool.ReturnUsedObject(child);
+                GameObject child = AvatarScrollRoot.GetChild(0).gameObject;
+                AvatarScrollItemsPool.ReturnUsedObject(child);
             }
 
             Modal.Instance.Show("Retrieving avatar data...");
 
             // Default avatar
-            GameObject go = avatarScrollItemsPool.GetNewObject();
-            go.transform.SetParent(avatarScrollRoot);
+            GameObject go = AvatarScrollItemsPool.GetNewObject();
+            go.transform.SetParent(AvatarScrollRoot);
             go.transform.localScale = Vector3.one;
 
-            go.GetComponent<AvatarScrollItem>().Refresh(defaultImage, null);
+            go.GetComponent<AvatarScrollItem>().Refresh(DefaultImage, null);
 
             avatarService.AvatarsByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
             {
@@ -194,12 +195,12 @@ namespace EmergenceSDK.Internal.UI.Personas
                 imagesRefreshing.Clear();
                 for (int i = 0; i < avatars.Count; i++)
                 {
-                    go = avatarScrollItemsPool.GetNewObject();
-                    go.transform.SetParent(avatarScrollRoot);
+                    go = AvatarScrollItemsPool.GetNewObject();
+                    go.transform.SetParent(AvatarScrollRoot);
                     go.transform.localScale = Vector3.one;
 
                     imagesRefreshing.Add(avatars[i].avatarId);
-                    go.GetComponent<AvatarScrollItem>().Refresh(defaultImage, avatars[i]);
+                    go.GetComponent<AvatarScrollItem>().Refresh(DefaultImage, avatars[i]);
                 }
                 requestingInProgress = false;
                 if (imagesRefreshing.Count <= 0)
@@ -239,24 +240,24 @@ namespace EmergenceSDK.Internal.UI.Personas
             {
                 case States.CreateInformation:
                 case States.EditInformation:
-                    if (string.IsNullOrEmpty(nameIF.text))
+                    if (string.IsNullOrEmpty(NameInputField.text))
                     {
                         return;
                     }
                     break;
             }
 
-            currentPersona.name = nameIF.text;
-            currentPersona.bio = bioIF.text;
+            currentPersona.name = NameInputField.text;
+            currentPersona.bio = BioIf.text;
 
             switch (state)
             {
                 case States.CreateAvatar:
-                    backButtonText.text = "Select Avatar";
-                    nextButtonText.text = "Create Persona";
+                    BackButtonText.text = "Select Avatar";
+                    NextButtonText.text = "Create Persona";
                     currentPersona.avatar = currentAvatar;
-                    panelAvatar.SetActive(false);
-                    panelInformation.SetActive(true);
+                    PanelAvatar.SetActive(false);
+                    PanelInformation.SetActive(true);
                     state = States.CreateInformation;
                     break;
                 case States.CreateInformation:
@@ -302,11 +303,11 @@ namespace EmergenceSDK.Internal.UI.Personas
                     break;
                 case States.EditAvatar:
                     currentPersona.avatar = currentAvatar;
-                    panelAvatar.SetActive(false);
-                    panelInformation.SetActive(true);
-                    replaceAvatarButton.gameObject.SetActive(true);
-                    backButtonText.text = "Back";
-                    nextButtonText.text = "Save Changes";
+                    PanelAvatar.SetActive(false);
+                    PanelInformation.SetActive(true);
+                    ReplaceAvatarButton.gameObject.SetActive(true);
+                    BackButtonText.text = "Back";
+                    NextButtonText.text = "Save Changes";
                     state = States.EditInformation;
                     break;
             }
@@ -321,10 +322,10 @@ namespace EmergenceSDK.Internal.UI.Personas
                     ScreenManager.Instance.ShowDashboard();
                     break;
                 case States.CreateInformation:
-                    backButtonText.text = "Back";
-                    nextButtonText.text = "Persona Information";
-                    panelAvatar.SetActive(true);
-                    panelInformation.SetActive(false);
+                    BackButtonText.text = "Back";
+                    NextButtonText.text = "Persona Information";
+                    PanelAvatar.SetActive(true);
+                    PanelInformation.SetActive(false);
                     state = States.CreateAvatar;
                     break;
                 case States.EditInformation:
@@ -334,11 +335,11 @@ namespace EmergenceSDK.Internal.UI.Personas
                 case States.EditAvatar:
                     currentPersona.avatar = existingAvatar;
                     AvatarScrollItem_OnAvatarSelected(existingAvatar);
-                    replaceAvatarButton.gameObject.SetActive(true);
-                    backButtonText.text = "Cancel";
-                    nextButtonText.text = "Save Changes";
-                    panelAvatar.SetActive(false);
-                    panelInformation.SetActive(true);
+                    ReplaceAvatarButton.gameObject.SetActive(true);
+                    BackButtonText.text = "Cancel";
+                    NextButtonText.text = "Save Changes";
+                    PanelAvatar.SetActive(false);
+                    PanelInformation.SetActive(true);
                     state = States.EditInformation;
                     break;
             }
@@ -346,11 +347,11 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void OnReplaceAvatarClicked()
         {
-            replaceAvatarButton.gameObject.SetActive(false);
-            backButtonText.text = "Cancel";
-            nextButtonText.text = "Confirm Avatar";
-            panelAvatar.SetActive(true);
-            panelInformation.SetActive(false);
+            ReplaceAvatarButton.gameObject.SetActive(false);
+            BackButtonText.text = "Cancel";
+            NextButtonText.text = "Confirm Avatar";
+            PanelAvatar.SetActive(true);
+            PanelInformation.SetActive(false);
             state = States.EditAvatar;
         }
 

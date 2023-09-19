@@ -14453,7 +14453,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5832855822627826034}
   m_HandleRect: {fileID: 5832855822627826033}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -16584,28 +16584,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2275db32792b56428664d4dc4fae2f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panelInformation: {fileID: 5832855822558417093}
-  panelAvatar: {fileID: 5832855824454923248}
-  backButton: {fileID: 6234090903034012260}
-  nextButton: {fileID: 563752545648888312}
-  nextButtonText: {fileID: 5214213910762851065}
-  backButtonText: {fileID: 1805295552102031717}
-  replaceAvatarButton: {fileID: 703048670092808003}
-  personaAvatarBackground: {fileID: 6170179446639887871}
-  personaAvatar: {fileID: 2303667710717406142}
-  avatarScrollRoot: {fileID: 5832855823541903982}
-  avatarScrollItemsPool: {fileID: 5832855823694895959}
-  nameIF: {fileID: 5832855823760313409}
-  bioIF: {fileID: 710174428795851567}
-  deleteButton: {fileID: 1428865393667144393}
-  editGOs:
+  PanelInformation: {fileID: 5832855822558417093}
+  PanelAvatar: {fileID: 5832855824454923248}
+  BackButton: {fileID: 6234090903034012260}
+  NextButton: {fileID: 563752545648888312}
+  NextButtonText: {fileID: 5214213910762851065}
+  BackButtonText: {fileID: 1805295552102031717}
+  ReplaceAvatarButton: {fileID: 703048670092808003}
+  PersonaAvatarBackground: {fileID: 6170179446639887871}
+  PersonaAvatar: {fileID: 2303667710717406142}
+  AvatarScrollRoot: {fileID: 5832855823541903982}
+  AvatarScrollItemsPool: {fileID: 5832855823694895959}
+  NameInputField: {fileID: 5832855823760313409}
+  BioIf: {fileID: 710174428795851567}
+  DeleteButton: {fileID: 1428865393667144393}
+  EditGOs:
   - {fileID: 5955506983738700488}
   - {fileID: 29980584523433877}
   - {fileID: 5897674280182853718}
-  createGOs:
+  CreateGOs:
   - {fileID: 4659066317506878145}
   - {fileID: 5462817544395062917}
-  defaultImage: {fileID: 2800000, guid: bfc305db338beaa498c338b0c5c11a12, type: 3}
+  DefaultImage: {fileID: 2800000, guid: bfc305db338beaa498c338b0c5c11a12, type: 3}
 --- !u!1 &5832855823985710509
 GameObject:
   m_ObjectHideFlags: 0
