@@ -76,9 +76,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             {
                 return;
             }
-
             PersonaScrollItem_OnSelected(ActivePersona, -1);
-            PersonaCarousel.Instance.GoToActivePersona();
         }
         
         private async void OnUsePersonaAsCurrent()
