@@ -15,6 +15,7 @@ namespace EmergenceSDK.Internal.UI.Personas
     public class EditPersonaScreen : MonoBehaviour
     {
         public static EditPersonaScreen Instance;
+        public Texture2D DefaultImage;
 
         [Header("UI References Footer")]
         public GameObject PanelInformation;
@@ -40,14 +41,12 @@ namespace EmergenceSDK.Internal.UI.Personas
         [Header("UI References Edit / Create")]
         public GameObject[] EditGOs;
         public GameObject[] CreateGOs;
-
-        public Texture2D DefaultImage;
-
+        
+        private Avatar currentAvatar = null;
+        private Avatar existingAvatar;
         private Persona currentPersona;
-
         private HashSet<string> imagesRefreshing = new HashSet<string>();
         private bool requestingInProgress = false;
-
         private IPersonaService personaService;
         private IAvatarService avatarService;
 
@@ -59,6 +58,15 @@ namespace EmergenceSDK.Internal.UI.Personas
             EditAvatar,
         }
 
+        private States State
+        {
+            get => state;
+            set
+            {
+                OnStateUpdated();
+                state = value;
+            }
+        }
         private States state;
 
         private void Awake()
@@ -82,9 +90,9 @@ namespace EmergenceSDK.Internal.UI.Personas
             AvatarScrollItem.OnImageCompleted -= AvatarScrollItem_OnImageCompleted;
         }
 
-        private void Update()
+        private void OnStateUpdated()
         {
-            switch (state)
+            switch (State)
             {
                 case States.CreateAvatar:
                     NextButton.interactable = true;
@@ -101,12 +109,9 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
         }
 
-        private Avatar currentAvatar = null;
-        private Avatar existingAvatar;
         private void AvatarScrollItem_OnAvatarSelected(Avatar avatar)
         {
             currentAvatar = avatar;
-            // EmergenceLogger.LogInfo("Avatar selected: " + avatar.meta.name);
 
             if (currentAvatar == null)
             {
@@ -133,8 +138,8 @@ namespace EmergenceSDK.Internal.UI.Personas
             personaService = EmergenceServices.GetService<IPersonaService>();
             avatarService = EmergenceServices.GetService<IAvatarService>();
             
-            // Redesigned flow state
-            state = isNew ? States.CreateAvatar : States.EditInformation;
+            // Redesigned flow State
+            State = isNew ? States.CreateAvatar : States.EditInformation;
 
             for (int i = 0; i < CreateGOs.Length; i++)
             {
@@ -236,7 +241,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void OnNextClicked()
         {
-            switch (state)
+            switch (State)
             {
                 case States.CreateInformation:
                 case States.EditInformation:
@@ -250,7 +255,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             currentPersona.name = NameInputField.text;
             currentPersona.bio = BioIf.text;
 
-            switch (state)
+            switch (State)
             {
                 case States.CreateAvatar:
                     BackButtonText.text = "Select Avatar";
@@ -258,7 +263,7 @@ namespace EmergenceSDK.Internal.UI.Personas
                     currentPersona.avatar = currentAvatar;
                     PanelAvatar.SetActive(false);
                     PanelInformation.SetActive(true);
-                    state = States.CreateInformation;
+                    State = States.CreateInformation;
                     break;
                 case States.CreateInformation:
                     ModalPromptYESNO.Instance.Show("", "Are you sure?", () =>
@@ -308,14 +313,14 @@ namespace EmergenceSDK.Internal.UI.Personas
                     ReplaceAvatarButton.gameObject.SetActive(true);
                     BackButtonText.text = "Back";
                     NextButtonText.text = "Save Changes";
-                    state = States.EditInformation;
+                    State = States.EditInformation;
                     break;
             }
         }
         
         private void OnBackClicked()
         {
-            switch (state)
+            switch (State)
             {
                 case States.CreateAvatar:
                     ClearCurrentPersona();
@@ -326,7 +331,7 @@ namespace EmergenceSDK.Internal.UI.Personas
                     NextButtonText.text = "Persona Information";
                     PanelAvatar.SetActive(true);
                     PanelInformation.SetActive(false);
-                    state = States.CreateAvatar;
+                    State = States.CreateAvatar;
                     break;
                 case States.EditInformation:
                     ClearCurrentPersona();
@@ -340,7 +345,7 @@ namespace EmergenceSDK.Internal.UI.Personas
                     NextButtonText.text = "Save Changes";
                     PanelAvatar.SetActive(false);
                     PanelInformation.SetActive(true);
-                    state = States.EditInformation;
+                    State = States.EditInformation;
                     break;
             }
         }
@@ -352,7 +357,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             NextButtonText.text = "Confirm Avatar";
             PanelAvatar.SetActive(true);
             PanelInformation.SetActive(false);
-            state = States.EditAvatar;
+            State = States.EditAvatar;
         }
 
         private void ClearCurrentPersona()
