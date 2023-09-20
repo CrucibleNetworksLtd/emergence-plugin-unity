@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -8,7 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Avatar = EmergenceSDK.Types.Avatar;
 
-namespace EmergenceSDK.Internal.UI.Screens
+namespace EmergenceSDK.Internal.UI.Personas
 {
     public class EditPersonaScreen : MonoBehaviour
     {

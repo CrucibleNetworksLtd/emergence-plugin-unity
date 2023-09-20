@@ -784,7 +784,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 45, y: 20}
-  m_SizeDelta: {x: 121.04, y: 64}
+  m_SizeDelta: {x: 0, y: 64}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &2538973580807787285
 CanvasRenderer:
@@ -9389,7 +9389,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 954e73b6e322f0842b604df441b875d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  duration: 0.1
+  duration: 0.3
   arrowLeftButton: {fileID: 509603388573913124}
   arrowRightButton: {fileID: 1752538919779740752}
   scrollItemsRoot: {fileID: 5832855822545091003}
@@ -9619,6 +9619,9 @@ MonoBehaviour:
   CollectionButton: {fileID: 5832855823323073235}
   PersonasToggle: {fileID: 5832855823827139460}
   CollectionToggle: {fileID: 5832855824242431352}
+  PersonaScrollContents: {fileID: 5832855822545091003}
+  PersonaButtonPool: {fileID: 5832855824387788930}
+  PersonaCarousel: {fileID: 7344532851793679365}
   DisconnectModal: {fileID: 5832855824276402860}
 --- !u!1 &5832855822670398278
 GameObject:
@@ -13500,7 +13503,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PersonasScrollPanel: {fileID: 5832855822626632289}
-  PersonaScrollContents: {fileID: 5832855822545091003}
   AddPersonaButton: {fileID: 1771444319182145492}
   AddPersonaSidebarButton1: {fileID: 3629389401254464593}
   ActivePersonaButton: {fileID: 996874385365272550}
@@ -13515,7 +13517,6 @@ MonoBehaviour:
   DetailsEditButton: {fileID: 5269217973559732088}
   DetailsDeleteButton: {fileID: 153773067917804796}
   DefaultTexture: {fileID: 2800000, guid: bfc305db338beaa498c338b0c5c11a12, type: 3}
-  PersonaButtonPool: {fileID: 5832855824387788930}
 --- !u!1 &5832855823541903981
 GameObject:
   m_ObjectHideFlags: 0
@@ -14453,7 +14454,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5832855822627826033}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15717,7 +15718,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5832855824203081859}
   m_Direction: 0
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.9999998
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -17224,7 +17225,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5832855823803862094}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999997
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

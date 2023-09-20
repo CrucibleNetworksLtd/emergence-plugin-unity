@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.UI.Personas;
 using EmergenceSDK.Internal.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,36 +11,45 @@ namespace EmergenceSDK.Internal.UI.Screens
 {
     public class ScreenManager : MonoBehaviour
     {
-        [FormerlySerializedAs("welcomeScreen")]
         [Header("Screen references")]
         [SerializeField]
         private GameObject WelcomeScreen;
 
-        [FormerlySerializedAs("screensRoot")] [SerializeField]
+        [SerializeField]
         private GameObject ScreensRoot;
 
-        [FormerlySerializedAs("logInScreen")] [SerializeField]
+        [SerializeField]
         private GameObject LOGInScreen;
 
-        [FormerlySerializedAs("dashboardScreen")] [SerializeField]
+        [SerializeField]
         private GameObject DashboardScreen;
 
-        [FormerlySerializedAs("editPersonaScreen")] [SerializeField]
+        [SerializeField]
         private GameObject EditPersonaScreen;
         
-        [FormerlySerializedAs("myCollectionScreen")] [SerializeField]
+        [SerializeField]
         private GameObject MyCollectionScreen;
 
-        [FormerlySerializedAs("escButton")] [Header("UI Reference")]
+        [Header("UI Reference")]
         public Button EscButton;
-        [FormerlySerializedAs("escButtonOnboarding")] public Button EscButtonOnboarding;
-        [FormerlySerializedAs("escButtonLogin")] public Button EscButtonLogin;
-        [FormerlySerializedAs("personasButton")] public Button PersonasButton;
-        [FormerlySerializedAs("collectionButton")] public Button CollectionButton;
-        [FormerlySerializedAs("personasToggle")] public Toggle PersonasToggle;
-        [FormerlySerializedAs("collectionToggle")] public Toggle CollectionToggle;
+        public Button EscButtonOnboarding;
+        public Button EscButtonLogin;
+        public Button PersonasButton;
+        public Button CollectionButton;
+        public Toggle PersonasToggle;
+        public Toggle CollectionToggle;
 
-        [FormerlySerializedAs("disconnectModal")] [SerializeField]
+        
+        [Header("PersonaUI")]
+        [SerializeField]
+        private Transform PersonaScrollContents;
+        [SerializeField]
+        private Pool PersonaButtonPool;
+        [SerializeField]
+        private PersonaCarousel PersonaCarousel;
+        private PersonaUIManager personaUIManager;
+        
+        [SerializeField]
         public GameObject DisconnectModal;
 
         public static Action ClosingUI;
@@ -107,6 +117,8 @@ namespace EmergenceSDK.Internal.UI.Screens
             {
                 fitter.enabled = true;
             }
+            
+            personaUIManager = new PersonaUIManager(DashboardScreen.GetComponent<DashboardScreen>(), PersonaButtonPool, PersonaCarousel, PersonaScrollContents);
 
             await ChangeState(state);
         }
@@ -139,7 +151,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 case ScreenStates.Dashboard:
                     ScreensRoot.SetActive(true);
                     DashboardScreen.SetActive(true);
-                    await Screens.DashboardScreen.Instance.Refresh();
+                    personaUIManager.Refresh().Forget();
                     break;
                 case ScreenStates.EditPersona:
                     EditPersonaScreen.SetActive(true);
