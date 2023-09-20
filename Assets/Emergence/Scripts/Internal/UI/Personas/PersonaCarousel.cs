@@ -174,16 +174,9 @@ namespace EmergenceSDK.Internal.UI.Personas
             // Make a copy of the original dictionary if you don't want to modify it directly.
             Dictionary<PersonaScrollItem, int> updatedItemPositions = new Dictionary<PersonaScrollItem, int>(itemPositions);
 
-            int targetIndex = updatedItemPositions[targetItem];
-            int offset = -targetIndex;
+            int offset = -updatedItemPositions[targetItem];
 
-            // Create a list of keys because we can't directly modify keys while iterating the dictionary.
-            List<PersonaScrollItem> keys = new List<PersonaScrollItem>(updatedItemPositions.Keys);
-
-            foreach (var key in keys)
-            {
-                updatedItemPositions[key] += offset;
-            }
+            ShiftDesiredPositions(offset, updatedItemPositions);
             return updatedItemPositions;
         }
         
@@ -192,15 +185,23 @@ namespace EmergenceSDK.Internal.UI.Personas
             // Make a copy of the original dictionary if you don't want to modify it directly.
             Dictionary<PersonaScrollItem, int> updatedItemPositions = new Dictionary<PersonaScrollItem, int>(itemPositions);
 
+            ShiftDesiredPositions(shiftAmount, updatedItemPositions);
+
+            return updatedItemPositions;
+        }
+
+        private static void ShiftDesiredPositions(int shiftAmount, Dictionary<PersonaScrollItem, int> updatedItemPositions)
+        {
             // Create a list of keys because we can't directly modify keys while iterating the dictionary.
             List<PersonaScrollItem> keys = new List<PersonaScrollItem>(updatedItemPositions.Keys);
 
             foreach (var key in keys)
             {
                 updatedItemPositions[key] += shiftAmount;
+                var updatedItemPosition = updatedItemPositions[key];
+                var isInBounds = updatedItemPosition is > 2 or < -2;
+                key.gameObject.SetActive(!isInBounds);
             }
-    
-            return updatedItemPositions;
         }
 
         private void PlayRefreshAnimation()
