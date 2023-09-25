@@ -337,6 +337,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3122056887335212770}
   - component: {fileID: 51037822}
+  - component: {fileID: -5375889755013993003}
   m_Layer: 0
   m_Name: Emergence
   m_TagString: Untagged
@@ -388,6 +389,18 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   LogLevel: 0
+--- !u!114 &-5375889755013993003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7199307401433611008}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 184a2c55f1ef47cc92a537c35a81dec1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7213555249606172953
 GameObject:
   m_ObjectHideFlags: 0

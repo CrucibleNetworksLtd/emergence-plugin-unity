@@ -28,36 +28,37 @@ namespace EmergenceSDK.Internal.Utils
         private static readonly LogLevel logLevel = EmergenceSingleton.Instance.LogLevel;
         
 
-        public static void LogWarning(string message)
+        public static void LogWarning(string message, bool alsoLogToScreen = false)
         {
             if (IsEnabledFor(LogLevel.Warning))
             {
-                LogWithoutCode(message, LogLevel.Warning);
+                LogWithoutCode(message, LogLevel.Warning, alsoLogToScreen);
             }
         }
         
-        /// <remarks>This may log a warning depending on the code.</remarks>
-        public static void LogError(string error, long errorCode)
+        
+        public static void LogError(string error, long errorCode) => LogError(error, errorCode, false);
+        public static void LogError(string error, long errorCode, bool alsoLogToScreen)
         {
             if (IsEnabledFor(LogLevel.Error))
             {
-                LogWithCode(error, errorCode, LogLevel.Error);
+                LogWithCode(error, errorCode, LogLevel.Error, alsoLogToScreen);
             }
         }
 
-        public static void LogError(string message)
+        public static void LogError(string message, bool alsoLogToScreen = false)
         {
             if (IsEnabledFor(LogLevel.Error))
             {
-                LogWithoutCode(message, LogLevel.Error);
+                LogWithoutCode(message, LogLevel.Error, alsoLogToScreen);
             }
         }
         
-        public static void LogInfo(string message)
+        public static void LogInfo(string message, bool alsoLogToScreen = false)
         {
             if (IsEnabledFor(LogLevel.Info))
             {
-                LogWithoutCode(message, LogLevel.Info);
+                LogWithoutCode(message, LogLevel.Info, alsoLogToScreen);
             }
         }
 
@@ -66,33 +67,25 @@ namespace EmergenceSDK.Internal.Utils
             return logLevelIn <= logLevel;
         }
 
-        private static void LogWithCode(string message, long errorCode, LogLevel logLevelIn) 
+        private static void LogWithCode(string message, long errorCode, LogLevel logLevelIn, bool alsoLogToScreen) 
         {
 #if DISABLE_EMERGENCE_LOGS
             return;
 #endif
-            string callingClass = "";
-            StackTrace trace = new StackTrace();
-            StackFrame[] frames = trace.GetFrames();
-            if (frames != null && frames.Length >= 3) // Get the class name from the caller's caller
-            {
-                callingClass = frames[2].GetMethod().DeclaringType?.FullName;
-            }
+            var callingClass = CallingClass();
             Debug.LogWarning($"{errorCode} Warning in {callingClass}: {message}");
+            if(alsoLogToScreen)
+                OnScreenLogger.Instance.HandleLog(message, callingClass, logLevelIn);
         }
 
-        private static void LogWithoutCode(string message, LogLevel logLevelIn)
+
+        private static void LogWithoutCode(string message, LogLevel logLevelIn, bool alsoLogToScreen)
         {
 #if DISABLE_EMERGENCE_LOGS
             return;
 #endif
-            string callingClass = "";
-            StackTrace trace = new StackTrace();
-            StackFrame[] frames = trace.GetFrames();
-            if (frames != null && frames.Length >= 3) // Get the class name from the caller's caller
-            {
-                callingClass = frames[2].GetMethod().DeclaringType?.FullName;
-            }
+            
+            var callingClass = CallingClass();
 
             switch (logLevelIn)
             {
@@ -106,6 +99,22 @@ namespace EmergenceSDK.Internal.Utils
                     Debug.LogWarning($"{callingClass}: {message}");
                     break;
             }
+            
+            if(alsoLogToScreen)
+                OnScreenLogger.Instance.HandleLog(message, callingClass, logLevelIn);
+        }
+        private static string CallingClass()
+        {
+            string callingClass = "";
+            StackTrace trace = new StackTrace();
+            StackFrame[] frames = trace.GetFrames();
+            if (frames != null && frames.Length >= 4) // Get the class name from the caller's caller
+            {
+                callingClass = frames[3].GetMethod().DeclaringType?.FullName;
+            }
+
+            return callingClass;
         }
     }
+        
 }
