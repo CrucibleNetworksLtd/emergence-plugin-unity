@@ -52,7 +52,7 @@ namespace EmergenceSDK.Internal.Utils
 
             byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
             var texture = GetTextureFromImageBytes(imageBytes);
-            successCallback?.Invoke(url, texture, this);
+            //successCallback?.Invoke(url, texture, this);
         }
         
         public Texture2D GetTextureFromImageBytes(byte[] imageBytes)
@@ -67,22 +67,14 @@ namespace EmergenceSDK.Internal.Utils
                     texture.LoadImage(imageBytes);
                     break;
                 case ImageFormat.GIF:
-                    using (var decoder = new Decoder(imageBytes))
+                    try
                     {
-                        try
-                        {
-                            var img = decoder.NextImage();
-                            if(img == null)
-                            {
-                                texture = Resources.Load<Texture2D>("NoPreviewImage");
-                                break;
-                            }
-                            texture = img.CreateTexture();
-                        }
-                        catch (UnsupportedGifException)
-                        {
-                            texture = Resources.Load<Texture2D>("NoPreviewImage");
-                        }
+                        texture = Resources.Load<Texture2D>("NoPreviewImage");
+                        break;
+                    }
+                    catch (UnsupportedGifException)
+                    {
+                        texture = Resources.Load<Texture2D>("NoPreviewImage");
                     }
                     break;
                 case ImageFormat.Unknown:
@@ -92,7 +84,21 @@ namespace EmergenceSDK.Internal.Utils
             }
             return texture;
         }
-        
+
+        private async UniTask GifLoop(byte[] imageBytes)
+        {
+            using var decoder = new Decoder(imageBytes);
+            var img = decoder.NextImage();
+            while (img != null)
+            {
+                var texture = img.CreateTexture();
+                successCallback?.Invoke("", texture, this);
+                img = decoder.NextImage();
+                await UniTask.Delay(img?.Delay ?? 0);
+            }
+            GifLoop(imageBytes).Forget();
+        }
+
         static ImageFormat DetectImageFormat(byte[] byteArray)
         {
             if (byteArray == null || byteArray.Length < 4)
