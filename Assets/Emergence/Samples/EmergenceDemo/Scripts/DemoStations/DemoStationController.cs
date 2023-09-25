@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEngine;
 
@@ -47,7 +48,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void ActivateStations()
         {
-            Debug.Log("Activating stations");
+            EmergenceLogger.LogInfo("Activating stations", true);
             foreach (var station in stationsRequiringLogin)
             {
                 station.IsReady = true;

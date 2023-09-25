@@ -68,7 +68,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         
         private void ReadMethodSuccess(ReadContractResponse response)
         {
-            Debug.Log($"ReadContract finished: {response.response.First()}");
+            EmergenceLogger.LogInfo($"ReadContract finished: {response.response.First()}", true);
         }
     }
 }

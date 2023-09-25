@@ -65,7 +65,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         
         private void UpdateDynamicMetadata(InventoryItem item)
         {
-            EmergenceLogger.LogInfo("Updating Dynamic metadata");
+            EmergenceLogger.LogInfo("Updating Dynamic metadata", true);
             if (string.IsNullOrEmpty(item.Meta.DynamicMetadata)) 
                 return;
             
@@ -78,7 +78,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             void UpdateDynamicMetadataSuccess(string response)
             {
                 var dynamicMetaData = JsonUtility.FromJson<DynamicMetaData>(response);
-                EmergenceLogger.LogInfo($"Dynamic metadata updated: {dynamicMetaData?.message}");
+                EmergenceLogger.LogInfo($"Dynamic metadata updated: {dynamicMetaData?.message}", true);
                 if (dynamicMetaData.statusCode == 0)
                 {
                     CollectionScreen.Instance.Refresh().Forget();

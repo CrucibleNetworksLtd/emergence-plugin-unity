@@ -46,12 +46,12 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void SignErrorCallback(string message, long code)
         {
-            EmergenceLogger.LogError("Error signing message: " + message);
+            EmergenceLogger.LogError("Error signing message: " + message, true);
         }
 
         private void SignSuccess(string message)
         {
-            EmergenceLogger.LogInfo("Message signed succesfully: " + message);
+            EmergenceLogger.LogInfo("Message signed succesfully: " + message, true);
         }
     }
 }

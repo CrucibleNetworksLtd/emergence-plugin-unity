@@ -51,7 +51,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         
         private void OnWriteSuccess(BaseResponse<string> response)
         {
-            Debug.Log("Mint response: " + response.message);
+            EmergenceLogger.LogInfo("Mint response: " + response.message, true);
         }
     }
 }
