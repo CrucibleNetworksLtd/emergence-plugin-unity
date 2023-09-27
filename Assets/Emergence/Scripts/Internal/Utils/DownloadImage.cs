@@ -51,11 +51,11 @@ namespace EmergenceSDK.Internal.Utils
             }
 
             byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
-            var texture = GetTextureFromImageBytes(imageBytes);
-            //successCallback?.Invoke(url, texture, this);
+            var texture = await GetTextureFromImageBytes(imageBytes, url);
+            successCallback?.Invoke(url, texture, this);
         }
         
-        public Texture2D GetTextureFromImageBytes(byte[] imageBytes)
+        public async UniTask<Texture2D> GetTextureFromImageBytes(byte[] imageBytes, string url)
         {
             Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, 0, false);
             switch (DetectImageFormat(imageBytes))
@@ -69,7 +69,7 @@ namespace EmergenceSDK.Internal.Utils
                 case ImageFormat.GIF:
                     try
                     {
-                        texture = Resources.Load<Texture2D>("NoPreviewImage");
+                        texture = await GifToJpegConverter.ConvertGifToJpegFromUrl(url);
                         break;
                     }
                     catch (UnsupportedGifException)
@@ -84,21 +84,7 @@ namespace EmergenceSDK.Internal.Utils
             }
             return texture;
         }
-
-        private async UniTask GifLoop(byte[] imageBytes)
-        {
-            using var decoder = new Decoder(imageBytes);
-            var img = decoder.NextImage();
-            while (img != null)
-            {
-                var texture = img.CreateTexture();
-                successCallback?.Invoke("", texture, this);
-                img = decoder.NextImage();
-                await UniTask.Delay(img?.Delay ?? 0);
-            }
-            GifLoop(imageBytes).Forget();
-        }
-
+        
         static ImageFormat DetectImageFormat(byte[] byteArray)
         {
             if (byteArray == null || byteArray.Length < 4)
