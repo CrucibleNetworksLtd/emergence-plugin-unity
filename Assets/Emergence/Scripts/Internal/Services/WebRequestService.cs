@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
+using UnityEngine;
 using UnityEngine.Networking;
+using WebResponse = EmergenceSDK.Types.WebResponse;
 
 namespace EmergenceSDK.Internal.Services
 {
@@ -147,8 +150,20 @@ namespace EmergenceSDK.Internal.Services
                     request.Abort(); // Abort the request
 
                     errorCallback?.Invoke("Request timed out.", 0);
-                    return new WebResponse(false,"Request timed out.");
+                    return new WebResponse(false, "Request timed out.");
                 }
+            }
+            catch (WebException e)
+            {
+                if (e.Response is HttpWebResponse errorResponse)
+                {
+                    using (StreamReader reader = new StreamReader(errorResponse.GetResponseStream()))
+                    {
+                        string serverMessage = reader.ReadToEnd();
+                        return new WebResponse(false, serverMessage);
+                    }
+                }
+                return new WebResponse(false, e.Message);
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
