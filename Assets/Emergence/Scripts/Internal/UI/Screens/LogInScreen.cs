@@ -15,9 +15,10 @@ namespace EmergenceSDK.Internal.UI.Screens
         public RawImage rawQRImage;
         public Button backButton;
         public TextMeshProUGUI refreshCounterText;
-        public void SetTimeRemainingText() =>  refreshCounterText.text = refreshCounterText.text = timeRemaining.ToString("0");
 
-        private readonly int qrRefreshTimeOut = 10;
+        public void SetTimeRemainingText() => refreshCounterText.text = timeRemaining.ToString("0");
+
+        private readonly int qrRefreshTimeOut = 60;
         private int timeRemaining;
         
         public static LogInScreen Instance;
@@ -27,6 +28,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private ISessionService sessionService => EmergenceServices.GetService<ISessionService>();
         
         private CancellationTokenSource qrCancellationToken = new CancellationTokenSource();
+        private bool hasStarted = false;
 
         private void Awake()
         {
@@ -35,54 +37,78 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void OnEnable()
         {
-            timeRemaining = qrRefreshTimeOut;
-            refreshCounterText.text = "";
-            HandleQR(qrCancellationToken).Forget();
-        }
-
-        private void OnDisable()
-        {
+            if (!hasStarted)
+            {
+                timeRemaining = qrRefreshTimeOut;
+                refreshCounterText.text = "";
+                HandleQR(qrCancellationToken).Forget();
+                hasStarted = true;
+            }
         }
 
         private async UniTask HandleQR(CancellationTokenSource cts)
         {
-            var refreshQR = await RefreshQR();
-            if(refreshQR == false)
+            try
             {
-                HandleQR(qrCancellationToken).Forget();
-                UniTask.WaitForEndOfFrame(this);
-                return;
+                var token = cts.Token;
+
+                var refreshQR = await RefreshQR();
+                if (!refreshQR)
+                {
+                    token.ThrowIfCancellationRequested();
+                    Restart();
+                    return;
+                }
+                
+                StartCountdown(token).Forget();
+                
+                var handshake = await Handshake();
+                if (string.IsNullOrEmpty(handshake))
+                {
+                    token.ThrowIfCancellationRequested();
+                    Restart();
+                    return;
+                }
+
+                HeaderScreen.Instance.Refresh(handshake);
+                
+                var refreshAccessToken = await HandleRefreshAccessToken();
+                if (!refreshAccessToken)
+                {
+                    token.ThrowIfCancellationRequested();
+                    Restart();
+                    return;
+                }
             }
-            StartCountdown().Forget();
-            var handshake = await Handshake();
-            if(handshake == String.Empty)
+            catch (OperationCanceledException)
             {
-                HandleQR(qrCancellationToken).Forget();
-                UniTask.WaitForEndOfFrame(this);
-                return;
-            }
-            HeaderScreen.Instance.Refresh(handshake);
-            var refreshAccessToken = await HandleRefreshAccessToken();
-            if(refreshAccessToken == false)
-            {
-                HandleQR(qrCancellationToken).Forget();
-                UniTask.WaitForEndOfFrame(this);
+                // If here, it means one of the awaited operations has timed out.
+                Restart();
             }
         }
 
-        private async UniTask StartCountdown()
+        private async UniTask StartCountdown(CancellationToken cancellationToken)
         {
-            while (timeRemaining > 0)
+            try
             {
-                SetTimeRemainingText();
-                await UniTask.Delay(TimeSpan.FromSeconds(1));
-                timeRemaining--;
+                while (timeRemaining > 0)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    SetTimeRemainingText();
+                    await UniTask.Delay(TimeSpan.FromSeconds(1));
+                    timeRemaining--;
+                }
             }
-            qrCancellationToken.Cancel();
-            qrCancellationToken = new CancellationTokenSource();
-            HandleQR(qrCancellationToken).Forget();
+            catch (Exception e)
+            {
+                EmergenceLogger.LogError(e.Message, e.HResult);
+            }
+            finally
+            {
+                Restart();
+            }
         }
-
+        
         private async UniTask<bool> RefreshQR()
         {
             var qrResponse = await sessionService.GetQRCodeAsync();
@@ -101,7 +127,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             var handshakeResponse = await walletService.HandshakeAsync();
             if (!handshakeResponse.Success)
             {
-                EmergenceLogger.LogError("Error retrieving QR code.");
+                EmergenceLogger.LogError("Error during handshake.");
                 return "";
             }
             return handshakeResponse.Result;
@@ -115,6 +141,14 @@ namespace EmergenceSDK.Internal.UI.Screens
             PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
             ScreenManager.Instance.ShowDashboard();
             return true;
+        }
+
+        public void Restart()
+        {
+            timeRemaining = qrRefreshTimeOut;
+            qrCancellationToken.Cancel();
+            qrCancellationToken = new CancellationTokenSource();
+            HandleQR(qrCancellationToken).Forget();
         }
     }
 }
