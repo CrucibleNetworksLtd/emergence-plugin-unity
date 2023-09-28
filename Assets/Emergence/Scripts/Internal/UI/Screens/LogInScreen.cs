@@ -30,6 +30,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private CancellationTokenSource qrCancellationToken = new CancellationTokenSource();
         private bool hasStarted = false;
         private bool loginComplete = false;
+        private bool timerIsRunning = false;
 
         private void Awake()
         {
@@ -56,7 +57,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                 var refreshQR = await RefreshQR();
                 if (!refreshQR)
                 {
-                    token.ThrowIfCancellationRequested();
                     Restart();
                     return;
                 }
@@ -66,7 +66,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                 var handshake = await Handshake();
                 if (string.IsNullOrEmpty(handshake))
                 {
-                    token.ThrowIfCancellationRequested();
                     Restart();
                     return;
                 }
@@ -76,12 +75,13 @@ namespace EmergenceSDK.Internal.UI.Screens
                 var refreshAccessToken = await HandleRefreshAccessToken();
                 if (!refreshAccessToken)
                 {
-                    token.ThrowIfCancellationRequested();
                     Restart();
+                    return;
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
+                EmergenceLogger.LogError(e.Message, e.HResult);
                 Restart();
             }
             loginComplete = true;
@@ -89,11 +89,13 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private async UniTask StartCountdown(CancellationToken cancellationToken)
         {
+            if (timerIsRunning)
+                return;
             try
             {
+                timerIsRunning = true;
                 while (timeRemaining > 0 && !loginComplete)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
                     SetTimeRemainingText();
                     await UniTask.Delay(TimeSpan.FromSeconds(1));
                     timeRemaining--;
@@ -102,11 +104,11 @@ namespace EmergenceSDK.Internal.UI.Screens
             catch (Exception e)
             {
                 EmergenceLogger.LogError(e.Message, e.HResult);
+                timerIsRunning = false;
+                return;
             }
-            finally
-            {
-                Restart();
-            }
+            Restart();
+            timerIsRunning = false;
         }
         
         private async UniTask<bool> RefreshQR()
@@ -150,6 +152,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             timeRemaining = qrRefreshTimeOut;
             qrCancellationToken.Cancel();
             qrCancellationToken = new CancellationTokenSource();
+            qrCancellationToken.Token.ThrowIfCancellationRequested();
             HandleQR(qrCancellationToken).Forget();
         }
     }
