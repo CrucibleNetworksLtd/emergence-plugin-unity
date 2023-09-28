@@ -29,6 +29,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         private CancellationTokenSource qrCancellationToken = new CancellationTokenSource();
         private bool hasStarted = false;
+        private bool loginComplete = false;
 
         private void Awake()
         {
@@ -77,21 +78,20 @@ namespace EmergenceSDK.Internal.UI.Screens
                 {
                     token.ThrowIfCancellationRequested();
                     Restart();
-                    return;
                 }
             }
             catch (OperationCanceledException)
             {
-                // If here, it means one of the awaited operations has timed out.
                 Restart();
             }
+            loginComplete = true;
         }
 
         private async UniTask StartCountdown(CancellationToken cancellationToken)
         {
             try
             {
-                while (timeRemaining > 0)
+                while (timeRemaining > 0 && !loginComplete)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     SetTimeRemainingText();
@@ -145,6 +145,8 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public void Restart()
         {
+            if(loginComplete)
+                return;
             timeRemaining = qrRefreshTimeOut;
             qrCancellationToken.Cancel();
             qrCancellationToken = new CancellationTokenSource();
