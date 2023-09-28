@@ -88,7 +88,26 @@ Making sure that the UI is displaying the correct persona information.
 
 ---
 
+## Featureset 2 Wallet System
 
+### Feature 2.1 Login Screen
+
+This is the screen that the user sees when they first open the app. It allows them to login to their Emergence account by scanning a QR code with their wallet app.
+
+#### Unit 2.1.1: Basic functionality of the login screen.
+
+**Priority**: High
+
+**Test Description**:
+Making sure that the UI is displayed correctly and that the user can login to their Emergence account.
+
+**Expected Output**:
+- [ ] The user can see a QR code on the screen when they open the overlay.
+- [ ] The user can scan the QR code with their wallet app and get a sign in request.
+- [ ] The user can sign the request and be logged in to their Emergence account.
+- [ ] If the user declines the sign in request the QR code is refreshed.
+- [ ] The QR code is refreshed every 60 seconds.
+- [ ] The QR code time to refresh is displayed on the screen under the QR code.
 
 
 ---

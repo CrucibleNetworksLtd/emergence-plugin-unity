@@ -16,24 +16,21 @@ namespace EmergenceSDK.Internal.UI.Screens
         public Button backButton;
         public TextMeshProUGUI refreshCounterText;
 
-        private readonly float QRRefreshTimeOut = 60.0f;
+        public void SetTimeRemainingText() => refreshCounterText.text = timeRemaining.ToString("0");
+
+        private readonly int qrRefreshTimeOut = 60;
+        private int timeRemaining;
+        
         public static LogInScreen Instance;
         
         private IPersonaService personaService => EmergenceServices.GetService<IPersonaService>();
         private IWalletService walletService => EmergenceServices.GetService<IWalletService>();
         private ISessionService sessionService => EmergenceServices.GetService<ISessionService>();
-
-        private enum States
-        {
-            QR,
-            RefreshAccessToken,
-            RefreshingAccessToken,
-            LoginFinished,
-        }
-
-        private States state = States.QR;
-
-        private CancellationTokenSource cts;
+        
+        private CancellationTokenSource qrCancellationToken = new CancellationTokenSource();
+        private bool hasStarted = false;
+        private bool loginComplete = false;
+        private bool timerIsRunning = false;
 
         private void Awake()
         {
@@ -42,119 +39,121 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void OnEnable()
         {
-            cts = new CancellationTokenSource();
-            HandleStates().Forget();
+            if (!hasStarted)
+            {
+                timeRemaining = qrRefreshTimeOut;
+                refreshCounterText.text = "";
+                HandleQR(qrCancellationToken).Forget();
+                hasStarted = true;
+            }
         }
 
-        private void OnDisable()
-        {
-            cts.Cancel();
-        }
-
-        private async UniTask HandleStates()
+        private async UniTask HandleQR(CancellationTokenSource cts)
         {
             try
             {
-                while (!cts.Token.IsCancellationRequested)
+                var token = cts.Token;
+
+                var refreshQR = await RefreshQR();
+                if (!refreshQR)
                 {
-                    switch (state)
-                    {
-                        case States.QR:
-                            await HandleQR();
-                            break;
-                        case States.RefreshAccessToken:
-                            await HandleRefreshAccessToken();
-                            break;
-                        case States.RefreshingAccessToken:
-                            await UniTask.WaitForEndOfFrame(this);
-                            break;
-                        case States.LoginFinished:
-                            cts.Cancel();
-                            break;
-                    }
+                    Restart();
+                    return;
+                }
+                
+                StartCountdown(token).Forget();
+                
+                var handshake = await Handshake();
+                if (string.IsNullOrEmpty(handshake))
+                {
+                    Restart();
+                    return;
+                }
+
+                HeaderScreen.Instance.Refresh(handshake);
+                
+                var refreshAccessToken = await HandleRefreshAccessToken();
+                if (!refreshAccessToken)
+                {
+                    Restart();
+                    return;
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException e)
             {
-                // Ignore the exception caused by cancellation
+                EmergenceLogger.LogError(e.Message, e.HResult);
+                Restart();
             }
+            loginComplete = true;
         }
 
-        private async UniTask HandleQR()
+        private async UniTask StartCountdown(CancellationToken cancellationToken)
         {
-            float timeRemaining = QRRefreshTimeOut;
-
-            await RefreshQRCodeAndHandshake();
-            
-            while (state == States.QR && timeRemaining > 0)
+            if (timerIsRunning)
+                return;
+            try
             {
-                await UniTask.Delay(1000); // update every second
-                timeRemaining -= 1.0f;
-                refreshCounterText.text = timeRemaining.ToString("0");
+                timerIsRunning = true;
+                while (timeRemaining > 0 && !loginComplete)
+                {
+                    SetTimeRemainingText();
+                    await UniTask.Delay(TimeSpan.FromSeconds(1));
+                    timeRemaining--;
+                }
             }
-
-            if (state == States.QR)
+            catch (Exception e)
             {
-                state = States.RefreshAccessToken;
-                await RefreshQRCodeAndHandshake();
+                EmergenceLogger.LogError(e.Message, e.HResult);
+                timerIsRunning = false;
+                return;
             }
+            Restart();
+            timerIsRunning = false;
         }
-
-        private async UniTask RefreshQRCodeAndHandshake()
+        
+        private async UniTask<bool> RefreshQR()
         {
-            state = States.RefreshingAccessToken;
             var qrResponse = await sessionService.GetQRCodeAsync();
             if (!qrResponse.Success)
             {
                 EmergenceLogger.LogError("Error retrieving QR code.");
-                Reinitialize();
-                return;
+                return false;
             }
 
             rawQRImage.texture = qrResponse.Result;
+            return true;
+        }
+        
+        private async UniTask<string> Handshake()
+        {
             var handshakeResponse = await walletService.HandshakeAsync();
             if (!handshakeResponse.Success)
             {
-                EmergenceLogger.LogError("Error retrieving QR code.");
-                Reinitialize();
-                return;
+                EmergenceLogger.LogError("Error during handshake.");
+                return "";
             }
-            state = States.RefreshAccessToken;
-            HeaderScreen.Instance.Refresh(handshakeResponse.Result);
+            return handshakeResponse.Result;
         }
 
-        private async UniTask HandleRefreshAccessToken()
+        private async UniTask<bool> HandleRefreshAccessToken()
         {
-            if (state == States.RefreshAccessToken)
-            {
-                state = States.RefreshingAccessToken;
-                await personaService.GetAccessToken((token) =>
-                    {
-                        state = States.LoginFinished;
-                        PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
-                        ScreenManager.Instance.ShowDashboard();
-                    },
-                    (error, code) =>
-                    {
-                        EmergenceLogger.LogError("[" + code + "] " + error);
-                        Reinitialize();
-                    });
-            }
+            var tokenResponse = await personaService.GetAccessTokenAsync();
+            if (!tokenResponse.Success)
+                return false;
+            PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
+            ScreenManager.Instance.ShowDashboard();
+            return true;
         }
 
         public void Restart()
         {
-            state = States.QR;
-            HandleStates().Forget();
-        }
-
-        private void Reinitialize()
-        {
-            ModalPromptOK.Instance.Show("Sorry, there was a problem with your request", () =>
-            {
-                state = States.QR;
-                HandleStates().Forget();
-            });
+            if(loginComplete)
+                return;
+            timeRemaining = qrRefreshTimeOut;
+            qrCancellationToken.Cancel();
+            qrCancellationToken = new CancellationTokenSource();
+            qrCancellationToken.Token.ThrowIfCancellationRequested();
+            HandleQR(qrCancellationToken).Forget();
         }
     }
 }
