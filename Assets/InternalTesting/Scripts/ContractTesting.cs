@@ -34,12 +34,12 @@ namespace EmergenceSDK.InternalTesting
             if (GUILayout.Button("ReadContractMethod")) 
                 ReadMethodPressed();
             readContract = (DeployedSmartContract)EditorGUILayout.ObjectField("ReadContract", readContract, typeof(DeployedSmartContract), true);
-            readContractMethodName = EditorGUILayout.TextField("Read Contract Method Name", readContractMethodName);
+            readContractMethodName = EditorGUILayout.TextField("Read Contract Method PersonaName", readContractMethodName);
             
             if (GUILayout.Button("WriteContractMethod")) 
                 WriteMethodPressed();
             writeContract = (DeployedSmartContract)EditorGUILayout.ObjectField("WriteContract", writeContract, typeof(DeployedSmartContract), true);
-            writeContractMethodName = EditorGUILayout.TextField("Write Contract Method Name", writeContractMethodName);
+            writeContractMethodName = EditorGUILayout.TextField("Write Contract Method PersonaName", writeContractMethodName);
         }
                 
         private void ReadMethodPressed()

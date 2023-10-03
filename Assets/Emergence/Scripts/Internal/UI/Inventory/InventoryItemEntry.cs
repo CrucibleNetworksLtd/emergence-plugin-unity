@@ -77,10 +77,10 @@ namespace EmergenceSDK.Internal.UI.Inventory
             ItemThumbnail.LoadStaticImage(texture);
         }
 
-        private void Instance_OnImageFailed(string imageUrl, string error, long errorCode)
+        private void Instance_OnImageFailed(string error, long errorCode)
         {
             ItemThumbnail.LoadStaticImage(RequestImage.Instance.DefaultThumbnail);
-            EmergenceLogger.LogWarning("[" + imageUrl + "] " + error + " " + errorCode);
+            EmergenceLogger.LogWarning(error + " " + errorCode);
         }
         
         public enum ThumbnailType

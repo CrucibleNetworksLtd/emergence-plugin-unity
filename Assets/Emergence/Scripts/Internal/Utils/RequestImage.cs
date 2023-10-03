@@ -20,7 +20,7 @@ namespace EmergenceSDK.Internal.Utils
         public delegate void DownloadFailed(string url, string error, long errorCode);
 
         public delegate void ImageReady(string url, Texture2D texture);
-        public delegate void ImageFailed(string url, string error, long errorCode);
+        public delegate void ImageFailed(string error, long errorCode);
         public event ImageReady OnImageReady;
 
         private Queue<string> urlQueue = new Queue<string>();
@@ -109,7 +109,7 @@ namespace EmergenceSDK.Internal.Utils
             cachedTextures[url] = DefaultThumbnail;
             if (callbackCache.ContainsKey(url))
             {
-                callbackCache[url].imageFailedCallback?.Invoke(url, error, errorCode);
+                callbackCache[url].imageFailedCallback?.Invoke(url + " : " + error, errorCode);
                 callbackCache.Remove(url);
             }
             // Supply DefaultThumbnail as the texture when there's a failure
