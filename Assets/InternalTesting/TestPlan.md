@@ -179,7 +179,7 @@ Making sure the station works by sending a message to be signed to the users wal
 - [ ] The button says what method they call on them at the bottom.
 - [ ] When the user looks at the button, the HUD displays "Press E" to interact.
 - [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
-- [ ] When the mint avatar button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
+- [ ] When the request signed message button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
 - [ ] If the user is logged in, when they press the button a request to sign message should be sent to the user's wallet. When this is signed, the returned message should be checked for validity using "ValidateSignedMessage" (this isn't technically required, but is to show the feature to new users). Then, the signed message is shown to the user.
 
 #### Unit 3.2.2: Reading and Writing To Smart Contracts Station
@@ -220,6 +220,7 @@ Making sure the station works correctly by allowing the user to mint an EAS avat
 - [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
 - [ ] When the mint avatar button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
 - [ ] If the user has logged in before pressing the mint avatar button, it calls the "mint" method via WriteMethod and displays "Calling Mint on 0x074534df6174759a5ae3ad81e3bcdfc0f940f6a6. Check your wallet for the transaction confirmation message!" to the user. If the user isn't on the Polygon network, they should recieve a message asking them to switch chain first, then the accept transaction message should show in their wallet.
+- [ ] If the user is already on the Polygon network, the accept transaction message should show in their wallet without a switch chain message / confirmation.
 - [ ] When the user signs the transaction in their wallet, "WalletConnect'd wallet confirmed!" is displayed to the user.
 - [ ] When the transaction has been confirmed, it displays "Transaction Hash: {hash}" to the user, where {hash} is the transaction hash.
 - [ ] Once the transaction has been confirmed, the user should have a new avatar in their wallet.
