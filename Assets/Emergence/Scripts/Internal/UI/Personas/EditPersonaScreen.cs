@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -18,89 +18,162 @@ namespace EmergenceSDK.Internal.UI.Personas
         public PersonaInfoPanel PersonaInfo;
         public PersonaCreationEditingStatusWidget StatusWidget;
         
-        private Avatar existingAvatar;
+        private Avatar currentAvatar;
         private Persona currentPersona;
-        private HashSet<string> imagesRefreshing = new HashSet<string>();
-        private IPersonaService personaService;
-
-        private enum States
-        {
-            CreateAvatar,
-            CreateInformation,
-            EditInformation,
-            EditAvatar,
-        }
-
-        private States State
-        {
-            get => state;
-            set
-            {
-                OnStateUpdated();
-                state = value;
-            }
-        }
-        private States state;
+        private IPersonaService PersonaService => EmergenceServices.GetService<IPersonaService>();
+        private bool isNew;
 
         private void Awake()
         {
             Instance = this;
-            Footer.OnNextClicked.AddListener(OnNextClicked);
+            Footer.OnNextClicked.AddListener(OnNextButtonClicked);
             Footer.OnBackClicked.AddListener(OnBackClicked);
             PersonaInfo.OnDeleteClicked.AddListener(OnDeleteClicked);
             AvatarDisplayScreen.OnReplaceAvatarClicked.AddListener(OnReplaceAvatarClicked);
         }
-
+        
         private void OnDestroy()
         {
-            Footer.OnNextClicked.RemoveListener(OnNextClicked);
+            Footer.OnNextClicked.RemoveListener(OnNextButtonClicked);
             Footer.OnBackClicked.RemoveListener(OnBackClicked);
             PersonaInfo.OnDeleteClicked.RemoveListener(OnDeleteClicked);
             AvatarDisplayScreen.OnReplaceAvatarClicked.RemoveListener(OnReplaceAvatarClicked);
         }
-
-        private void OnStateUpdated()
+        
+        public void OnCreatePersonaClicked()
         {
-            switch (State)
+            Persona persona = new Persona()
             {
-                case States.CreateAvatar:
-                    Footer.SetNextButtonInteractable(true);
-                    break;
-                case States.CreateInformation:
-                    Footer.SetNextButtonInteractable(PersonaInfo.PersonaName.Length >= 3);
-                    break;
-                case States.EditInformation:
-                    Footer.SetNextButtonInteractable(PersonaInfo.PersonaName.Length >= 3);
-                    break;
-                case States.EditAvatar:
-                    Footer.SetNextButtonInteractable(true);
-                    break;
-            }
+                id = string.Empty,
+                name = string.Empty,
+                bio = string.Empty,
+                avatar = new Avatar()
+                {
+                    avatarId = string.Empty,
+                },
+                AvatarImage = null,
+            };
+            Refresh(persona, true, true);
+            AvatarDisplayScreen.gameObject.SetActive(true);
+            AvatarDisplayScreen.SetButtonActive(false);
+            PersonaInfo.gameObject.SetActive(false);
+            StatusWidget.SetVisible(isNew);
+        }
+        
+        public void OnEditPersonaClicked(Persona persona, bool isDefault)
+        {
+            Refresh(persona, isDefault);
+            AvatarDisplayScreen.gameObject.SetActive(false);
+            AvatarDisplayScreen.SetButtonActive(true);
+            PersonaInfo.gameObject.SetActive(true);
+            StatusWidget.SetVisible(isNew);
+            Footer.SetBackButtonText("Back");
+            Footer.SetNextButtonText("Save Changes");
         }
 
-        public void Refresh(Persona persona, bool isDefault, bool isNew = false)
+        public void Refresh(Persona persona, bool isActivePersona, bool isNew = false)
         {
-            personaService = EmergenceServices.GetService<IPersonaService>();
-            
-            // Redesigned flow State
-            State = isNew ? States.CreateAvatar : States.EditInformation;
-
-            StatusWidget.SetVisible(isNew);
-
-            // If creating, first show avatar selection
-            Footer.TogglePanelInformation(isNew);
-
-            Footer.SetNextButtonText(isNew ? "Persona Information" : "Save Changes");
-            Footer.SetBackButtonText(isNew ? "Back" : "Cancel");
-            PersonaInfo.SetDeleteButtonActive(!isNew && !isDefault);
+            this.isNew = isNew;
+            PersonaInfo.SetDeleteButtonActive(!isNew && !isActivePersona);
 
             currentPersona = persona;
-            AvatarDisplayScreen.currentAvatar = currentPersona.avatar;
-            existingAvatar = persona.avatar;
+            AvatarDisplayScreen.currentAvatar = persona.avatar;
+            currentAvatar = persona.avatar;
             PersonaInfo.PersonaName = persona.name;
             PersonaInfo.PersonaBio = persona.bio;
             
             AvatarDisplayScreen.RefreshAvatarDisplay(persona.AvatarImage ?? DefaultImage);
+        }
+
+        private void OnNextButtonClicked()
+        {
+            if(PersonaInfo.isActiveAndEnabled)
+                OnSavePersona();
+            else
+                OnSaveAvatar();
+        }
+
+        private void OnSaveAvatar()
+        {
+            currentAvatar = AvatarDisplayScreen.currentAvatar;
+            BackFromAvatarSelection();
+        }
+        
+        private void OnSavePersona()
+        {
+            if (PersonaInfo.PersonaName.Length < 3)
+            {
+                ModalPromptOK.Instance.Show("Persona name must be at least 3 characters");
+                return;
+            }
+            UpdateSelectedPersona();
+            ScreenManager.Instance.ShowDashboard();
+            if (isNew)
+            {
+                CreateNewPersona().Forget();
+            }
+            else
+            {
+                EditPersona().Forget();
+            }
+        }
+
+        private void OnBackClicked()
+        {
+            if(PersonaInfo.isActiveAndEnabled)
+                BackFromPersonaInfo();
+            else
+                ToggleAvatarSelectionAndPersonaInfo(true);
+        }
+
+        private void BackFromPersonaInfo()
+        {
+            ClearCurrentPersona();
+            ScreenManager.Instance.ShowDashboard();
+        }
+        
+        private void ToggleAvatarSelectionAndPersonaInfo(bool displayPersonaInfo)
+        {
+            AvatarDisplayScreen.AvatarScrollRoot.gameObject.SetActive(!displayPersonaInfo);
+            AvatarDisplayScreen.SetButtonActive(displayPersonaInfo);
+            PersonaInfo.gameObject.SetActive(displayPersonaInfo);
+        }
+
+        private async UniTask CreateNewPersona()
+        {
+            var response = await PersonaService.CreatePersonaAsync(currentPersona);
+            if (response.Success)
+            {
+                EmergenceLogger.LogInfo($"New persona {currentPersona.name} created");
+                ClearCurrentPersona();
+            }
+            else
+            {
+                EmergenceLogger.LogError("Error creating persona");
+                ModalPromptOK.Instance.Show("Error creating persona");
+            }
+        }
+        
+        private async UniTask EditPersona()
+        {
+            var response = await PersonaService.EditPersonaAsync(currentPersona);
+            if (response.Success)
+            {
+                EmergenceLogger.LogInfo("Changes to Persona saved");
+                ClearCurrentPersona();
+            }
+            else
+            {
+                EmergenceLogger.LogError("Error editing persona");
+                ModalPromptOK.Instance.Show("Error editing persona");
+            }
+        }
+
+        private void UpdateSelectedPersona()
+        {
+            currentPersona.name = PersonaInfo.PersonaName;
+            currentPersona.bio = PersonaInfo.PersonaBio;
+            currentPersona.avatar = AvatarDisplayScreen.currentAvatar;
         }
 
         private void OnDeleteClicked()
@@ -108,7 +181,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () =>
             {
                 Modal.Instance.Show("Deleting Persona...");
-                personaService.DeletePersona(currentPersona, () =>
+                PersonaService.DeletePersona(currentPersona, () =>
                 {
                     EmergenceLogger.LogInfo("Deleting Persona");
                     Modal.Instance.Hide();
@@ -122,120 +195,12 @@ namespace EmergenceSDK.Internal.UI.Personas
             });
         }
 
-        private void OnNextClicked()
-        {
-            switch (State)
-            {
-                case States.CreateInformation:
-                case States.EditInformation:
-                    if (string.IsNullOrEmpty(PersonaInfo.PersonaName))
-                    {
-                        return;
-                    }
-                    break;
-            }
-
-            currentPersona.name = PersonaInfo.PersonaName;
-            currentPersona.bio = PersonaInfo.PersonaBio;
-
-            switch (State)
-            {
-                case States.CreateAvatar:
-                    Footer.SetBackButtonText("Select Avatar");
-                    Footer.SetNextButtonText("Create Persona");
-                    currentPersona.avatar = AvatarDisplayScreen.currentAvatar;
-                    Footer.TogglePanelInformation(true);
-                    State = States.CreateInformation;
-                    break;
-                case States.CreateInformation:
-                    ModalPromptYESNO.Instance.Show("", "Are you sure?", () =>
-                    {
-                        Modal.Instance.Show("Saving Changes...");
-
-                        personaService.CreatePersona(currentPersona, () =>
-                        {
-                            EmergenceLogger.LogInfo("New Persona saved");
-                            Modal.Instance.Hide();
-                            EmergenceLogger.LogInfo(currentPersona.ToString());
-                            ClearCurrentPersona();
-                            ScreenManager.Instance.ShowDashboard();
-                        },
-                        (error, code) =>
-                        {
-                            EmergenceLogger.LogError(error, code);
-                            Modal.Instance.Hide();
-                            ModalPromptOK.Instance.Show("Error creating persona");
-                        });
-                    });
-                    break;
-                case States.EditInformation:
-                    ModalPromptYESNO.Instance.Show("", "Are you sure?", () =>
-                    {
-                        Modal.Instance.Show("Saving Changes...");
-
-                        personaService.EditPersona(currentPersona, () =>
-                        {
-                            EmergenceLogger.LogInfo("Changes to Persona saved");
-                            Modal.Instance.Hide();
-                            ClearCurrentPersona();
-                            ScreenManager.Instance.ShowDashboard();
-                        },
-                        (error, code) =>
-                        {
-                            EmergenceLogger.LogError(error, code);
-                            Modal.Instance.Hide();
-                            ModalPromptOK.Instance.Show("Error editing persona");
-                        });
-                    });
-                    break;
-                case States.EditAvatar:
-                    currentPersona.avatar = AvatarDisplayScreen.currentAvatar;
-                    Footer.TogglePanelInformation(true);
-                    AvatarDisplayScreen.SetButtonActive(true);
-                    Footer.SetBackButtonText("Back");
-                    Footer.SetNextButtonText("Save Changes");
-                    State = States.EditInformation;
-                    break;
-            }
-        }
-        
-        private void OnBackClicked()
-        {
-            switch (State)
-            {
-                case States.CreateAvatar:
-                    ClearCurrentPersona();
-                    ScreenManager.Instance.ShowDashboard();
-                    break;
-                case States.CreateInformation:
-                    Footer.SetBackButtonText("Back");
-                    Footer.SetNextButtonText("Persona Information");
-                    Footer.TogglePanelInformation(false);
-                    State = States.CreateAvatar;
-                    break;
-                case States.EditInformation:
-                    ClearCurrentPersona();
-                    ScreenManager.Instance.ShowDashboard();
-                    break;
-                case States.EditAvatar:
-                    currentPersona.avatar = existingAvatar;
-                    AvatarDisplayScreen.OnAvatarSelected(existingAvatar);
-                    AvatarDisplayScreen.SetButtonActive(true);
-                    Footer.SetBackButtonText("Cancel");
-                    Footer.SetNextButtonText("Save Changes");
-                    Footer.TogglePanelInformation(true);
-                    State = States.EditInformation;
-                    break;
-            }
-        }
-
         private void OnReplaceAvatarClicked()
         {
             AvatarDisplayScreen.SetButtonActive(false);
             Footer.SetBackButtonText("Cancel");
             Footer.SetNextButtonText("Confirm Avatar");
             Footer.TogglePanelInformation(false);
-            State = States.EditAvatar;
         }
 
         private void ClearCurrentPersona()

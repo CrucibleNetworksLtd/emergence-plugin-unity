@@ -54,20 +54,8 @@ namespace EmergenceSDK.Internal.UI.Personas
         
         private void OnCreatePersona()
         {
-            Persona persona = new Persona()
-            {
-                id = string.Empty,
-                name = string.Empty,
-                bio = string.Empty,
-                avatar = new Avatar()
-                {
-                    avatarId = string.Empty,
-                },
-                AvatarImage = null,
-            };
-
-            EditPersonaScreen.Instance.Refresh(persona, true, true);
             ScreenManager.Instance.ShowEditPersona();
+            EditPersonaScreen.Instance.OnCreatePersonaClicked();
         }
         
         private void OnActivePersonaClicked()
@@ -96,8 +84,8 @@ namespace EmergenceSDK.Internal.UI.Personas
         
         private void OnEditPersona()
         {
-            EditPersonaScreen.Instance.Refresh(SelectedPersona, ActivePersona.id == SelectedPersona.id);
             ScreenManager.Instance.ShowEditPersona();
+            EditPersonaScreen.Instance.OnEditPersonaClicked(SelectedPersona, ActivePersona.id == SelectedPersona.id);
         }
 
         private void OnDeletePersona() => ModalPromptYESNO.Instance.Show($"Deleting persona: {SelectedPersona.name}", "Are you sure?", DeleteSelectedPersona);
