@@ -48,15 +48,6 @@ namespace EmergenceSDK.Internal.UI.Personas
         }
         
         public void SetButtonActive(bool active) => ReplaceAvatarButton.gameObject.SetActive(active);
-        
-        public void ClearAvatarScroll()
-        {
-            while (AvatarScrollRoot.childCount > 0)
-            {
-                GameObject child = AvatarScrollRoot.GetChild(0).gameObject;
-                AvatarScrollItemsPool.ReturnUsedObject(child);
-            }
-        }
 
         public void RefreshAvatarDisplay(Texture2D personaImage)
         {
@@ -109,29 +100,40 @@ namespace EmergenceSDK.Internal.UI.Personas
         {
             if (!success)
             {
-                if (avatar != null && imagesRefreshing.Contains(avatar.avatarId))
-                {
-                    imagesRefreshing.Remove(avatar.avatarId);
-                    if (imagesRefreshing.Count <= 1 && !requestingInProgress)
-                    {
-                        Modal.Instance.Hide();
-                    }
-                }
+                HandleImageFailure(avatar);
             }
             else
             {
-                if (imagesRefreshing.Contains(avatar.avatarId))
-                {
-                    imagesRefreshing.Remove(avatar.avatarId);
-                    if (imagesRefreshing.Count <= 1 && !requestingInProgress)
-                    {
-                        Modal.Instance.Hide();
-                    }
-                }
-                else if (imagesRefreshing.Count > 0)
-                {
-                    EmergenceLogger.LogWarning("Image completed but not accounted for: [" + avatar.avatarId + "][" + avatar.meta.content.First().url + "][" + success + "]");
-                }
+                HandleImageSuccess(avatar);
+            }
+        }
+
+        private void HandleImageFailure(Avatar avatar)
+        {
+            if (avatar != null && imagesRefreshing.Contains(avatar.avatarId))
+            {
+                RemoveAndCheckModal(avatar.avatarId);
+            }
+        }
+
+        private void HandleImageSuccess(Avatar avatar)
+        {
+            if (imagesRefreshing.Contains(avatar.avatarId))
+            {
+                RemoveAndCheckModal(avatar.avatarId);
+            }
+            else if (imagesRefreshing.Count > 0)
+            {
+                EmergenceLogger.LogWarning($"Image completed but not accounted for: [{avatar.avatarId}][{avatar.meta.content.First().url}][true]");
+            }
+        }
+
+        private void RemoveAndCheckModal(string avatarId)
+        {
+            imagesRefreshing.Remove(avatarId);
+            if (imagesRefreshing.Count <= 1 && !requestingInProgress)
+            {
+                Modal.Instance.Hide();
             }
         }
 
