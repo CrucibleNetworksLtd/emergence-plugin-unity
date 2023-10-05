@@ -3655,6 +3655,7 @@ MonoBehaviour:
   ReplaceAvatarButton: {fileID: 703048670092808003}
   PersonaAvatarBackground: {fileID: 6170179446639887871}
   PersonaAvatar: {fileID: 2303667710717406142}
+  DefaultImage: {fileID: 2800000, guid: 4eddab77796f04696899d341f22a41e5, type: 3}
 --- !u!1 &1952697061943916756
 GameObject:
   m_ObjectHideFlags: 0
@@ -15770,7 +15771,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5832855824203081860}
   m_HandleRect: {fileID: 5832855824203081859}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -16642,8 +16643,6 @@ MonoBehaviour:
   AvatarDisplayScreen: {fileID: 1578502445424549564}
   PersonaInfo: {fileID: 8870555163406570138}
   StatusWidget: {fileID: 4047563838417354488}
-  AvatarScrollRoot: {fileID: 5832855823541903982}
-  AvatarScrollItemsPool: {fileID: 5832855823694895959}
 --- !u!1 &5832855823985710509
 GameObject:
   m_ObjectHideFlags: 0
@@ -17262,8 +17261,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5832855823803862095}
   m_HandleRect: {fileID: 5832855823803862094}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.9999997
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
