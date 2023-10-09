@@ -17,8 +17,6 @@ namespace EmergenceSDK.Internal.UI.Personas
         public AvatarDisplayScreen AvatarDisplayScreen;        
         public PersonaInfoPanel PersonaInfo;
         public PersonaCreationEditingStatusWidget StatusWidget;
-        
-        private Avatar currentAvatar;
         private Persona currentPersona;
         private IPersonaService PersonaService => EmergenceServices.GetService<IPersonaService>();
         private bool isNew;
@@ -32,7 +30,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             AvatarDisplayScreen.OnReplaceAvatarClicked.AddListener(OnReplaceAvatarClicked);
         }
         
-        private void OnDestroy()
+        private void OnDestroy() 
         {
             Footer.OnNextClicked.RemoveListener(OnNextButtonClicked);
             Footer.OnBackClicked.RemoveListener(OnBackClicked);
@@ -77,8 +75,8 @@ namespace EmergenceSDK.Internal.UI.Personas
             PersonaInfo.SetDeleteButtonActive(!isNew && !isActivePersona);
 
             currentPersona = persona;
-            AvatarDisplayScreen.currentAvatar = persona.avatar;
-            currentAvatar = persona.avatar;
+            AvatarDisplayScreen.CurrentAvatar = persona.avatar;
+            AvatarDisplayScreen.CurrentAvatar = persona.avatar;
             PersonaInfo.PersonaName = persona.name;
             PersonaInfo.PersonaBio = persona.bio;
             
@@ -95,8 +93,8 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void OnSaveAvatar()
         {
-            currentAvatar = AvatarDisplayScreen.currentAvatar;
-            BackFromAvatarSelection();
+            AvatarDisplayScreen.CurrentAvatar = AvatarDisplayScreen.CurrentAvatar;
+            ToggleAvatarSelectionAndPersonaInfo(true);
         }
         
         private void OnSavePersona()
@@ -146,6 +144,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             {
                 EmergenceLogger.LogInfo($"New persona {currentPersona.name} created");
                 ClearCurrentPersona();
+                await PersonaUIManager.Instance.Refresh();
             }
             else
             {
@@ -161,6 +160,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             {
                 EmergenceLogger.LogInfo("Changes to Persona saved");
                 ClearCurrentPersona();
+                await PersonaUIManager.Instance.Refresh();
             }
             else
             {
@@ -173,7 +173,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         {
             currentPersona.name = PersonaInfo.PersonaName;
             currentPersona.bio = PersonaInfo.PersonaBio;
-            currentPersona.avatar = AvatarDisplayScreen.currentAvatar;
+            currentPersona.avatar = AvatarDisplayScreen.CurrentAvatar;
         }
 
         private void OnDeleteClicked()
@@ -205,7 +205,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void ClearCurrentPersona()
         {
-            AvatarDisplayScreen.currentAvatar = null;
+            AvatarDisplayScreen.CurrentAvatar = null;
         }
     }
 }

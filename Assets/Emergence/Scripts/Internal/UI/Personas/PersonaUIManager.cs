@@ -13,6 +13,8 @@ namespace EmergenceSDK.Internal.UI.Personas
 {
     public class PersonaUIManager
     {
+        public static PersonaUIManager Instance;
+
         private readonly DashboardScreen dashboardScreen;
         private readonly Pool personaButtonPool;
         private readonly PersonaCarousel personaCarousel;
@@ -49,6 +51,8 @@ namespace EmergenceSDK.Internal.UI.Personas
             PersonaScrollItem.OnImageCompleted += PersonaScrollItem_OnImageCompleted;
             
             personaCarousel.ArrowClicked += PersonaCarousel_OnArrowClicked;
+
+            Instance = this;
         }
         
         

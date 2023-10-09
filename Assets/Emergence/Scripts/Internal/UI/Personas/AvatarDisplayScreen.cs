@@ -27,7 +27,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         private IAvatarService AvatarService => EmergenceServices.GetService<IAvatarService>();
         private bool requestingInProgress = false;
         
-        public Avatar currentAvatar = null;
+        public Avatar CurrentAvatar = null;
         
         private void Awake()
         {
@@ -139,9 +139,9 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         public void OnAvatarSelected(Avatar avatar)
         {
-            currentAvatar = avatar;
+            CurrentAvatar = avatar;
 
-            if (currentAvatar == null)
+            if (CurrentAvatar == null)
             {
                 SetAvatarTexture(DefaultImage);
                 return;

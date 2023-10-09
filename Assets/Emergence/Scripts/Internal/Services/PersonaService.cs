@@ -145,8 +145,19 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> CreatePersonaAsync(Persona persona)
         {
-            if (persona.avatarId == null) 
+            if (persona.avatarId == null)
+            {
                 persona.avatarId = "";
+            }
+            else
+            {
+                if (persona.avatar != null)
+                {
+                    var avatarResponse = await UpdateAvatarOnPersonaEdit(persona);
+                    if(avatarResponse.Success == false)
+                        return new ServiceResponse(false);
+                }
+            }
             
             string jsonPersona = SerializationHelper.Serialize(persona);
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";

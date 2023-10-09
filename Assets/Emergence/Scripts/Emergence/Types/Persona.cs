@@ -22,6 +22,7 @@ namespace EmergenceSDK.Types
             set
             {
                 _avatar = value;
+                avatarId = value.avatarId;
             }
         }
 
