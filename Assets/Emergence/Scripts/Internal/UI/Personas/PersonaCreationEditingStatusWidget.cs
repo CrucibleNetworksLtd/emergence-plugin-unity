@@ -4,32 +4,46 @@ namespace EmergenceSDK.Internal.UI.Personas
 {
     public class PersonaCreationEditingStatusWidget : MonoBehaviour
     {
-        public GameObject[] EditGOs;
-        public GameObject[] CreateGOs;
+        [SerializeField]
+        private GameObject createStepOne;
+        [SerializeField]
+        private GameObject createStepTwo;
         
-        public void HideAll()
+        [SerializeField]
+        private GameObject editStepOne;
+        [SerializeField]
+        private GameObject editStepTwo;
+        
+        public void SetStepVisible(bool stepOne, bool creating)
         {
-            foreach (var go in EditGOs)
+            if (stepOne && creating)
             {
-                go.SetActive(false);
+                createStepOne.SetActive(true);
+                HideAllBut(createStepOne);
             }
-            
-            foreach (var go in CreateGOs)
+            else if (!stepOne && creating)
             {
-                go.SetActive(false);
+                createStepTwo.SetActive(true);
+                HideAllBut(createStepTwo);
+            }
+            else if (stepOne)
+            {
+                editStepOne.SetActive(true);
+                HideAllBut(editStepOne);
+            }
+            else
+            {
+                editStepTwo.SetActive(true);
+                HideAllBut(editStepTwo);
             }
         }
         
-        public void SetVisible(bool creating)
+        private void HideAllBut(GameObject obj)
         {
-            foreach (var go in CreateGOs)
-            {
-                go.SetActive(creating);
-            }
-            foreach (var go in EditGOs)
-            {
-                go.SetActive(!creating);
-            }
+            createStepOne.SetActive(createStepOne == obj);
+            createStepTwo.SetActive(createStepTwo == obj);
+            editStepOne.SetActive(editStepOne == obj);
+            editStepTwo.SetActive(editStepTwo == obj);
         }
     }
 }

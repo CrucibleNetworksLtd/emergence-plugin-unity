@@ -8,9 +8,9 @@ using Avatar = EmergenceSDK.Types.Avatar;
 
 namespace EmergenceSDK.Internal.UI.Personas
 {
-    public class AvatarDisplayScreen : MonoBehaviour
+    public class AvatarSelectionScreen : MonoBehaviour
     {
-        public Button.ButtonClickedEvent OnReplaceAvatarClicked => ReplaceAvatarButton.onClick;
+        public Button.ButtonClickedEvent ReplaceAvatarClicked => ReplaceAvatarButton.onClick;
         
         public Transform AvatarScrollRoot;
         public Pool AvatarScrollItemsPool;
@@ -33,8 +33,16 @@ namespace EmergenceSDK.Internal.UI.Personas
         {
             AvatarScrollItem.OnAvatarSelected += OnAvatarSelected;
             AvatarScrollItem.OnImageCompleted += OnImageCompleted;
+            
+            ReplaceAvatarButton.onClick.AddListener(OnReplaceClicked);
         }
-        
+
+        private void OnReplaceClicked()
+        {
+            SetButtonActive(false);
+            AvatarScrollRoot.gameObject.SetActive(true);
+        }
+
         private void OnDestroy()
         {
             AvatarScrollItem.OnAvatarSelected -= OnAvatarSelected;

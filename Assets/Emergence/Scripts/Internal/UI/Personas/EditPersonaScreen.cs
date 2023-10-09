@@ -4,6 +4,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Avatar = EmergenceSDK.Types.Avatar;
 
 namespace EmergenceSDK.Internal.UI.Personas
@@ -14,7 +15,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         public Texture2D DefaultImage;
 
         public PersonaCreationFooter Footer;
-        public AvatarDisplayScreen AvatarDisplayScreen;        
+        [FormerlySerializedAs("AvatarDisplayScreen")] public AvatarSelectionScreen AvatarSelectionScreen;        
         public PersonaInfoPanel PersonaInfo;
         public PersonaCreationEditingStatusWidget StatusWidget;
         private Persona currentPersona;
@@ -27,7 +28,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             Footer.OnNextClicked.AddListener(OnNextButtonClicked);
             Footer.OnBackClicked.AddListener(OnBackClicked);
             PersonaInfo.OnDeleteClicked.AddListener(OnDeleteClicked);
-            AvatarDisplayScreen.OnReplaceAvatarClicked.AddListener(OnReplaceAvatarClicked);
+            AvatarSelectionScreen.ReplaceAvatarClicked.AddListener(OnReplaceAvatarClicked);
         }
         
         private void OnDestroy() 
@@ -35,7 +36,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             Footer.OnNextClicked.RemoveListener(OnNextButtonClicked);
             Footer.OnBackClicked.RemoveListener(OnBackClicked);
             PersonaInfo.OnDeleteClicked.RemoveListener(OnDeleteClicked);
-            AvatarDisplayScreen.OnReplaceAvatarClicked.RemoveListener(OnReplaceAvatarClicked);
+            AvatarSelectionScreen.ReplaceAvatarClicked.RemoveListener(OnReplaceAvatarClicked);
         }
         
         public void OnCreatePersonaClicked()
@@ -52,19 +53,17 @@ namespace EmergenceSDK.Internal.UI.Personas
                 AvatarImage = null,
             };
             Refresh(persona, true, true);
-            AvatarDisplayScreen.gameObject.SetActive(true);
-            AvatarDisplayScreen.SetButtonActive(false);
+            AvatarSelectionScreen.gameObject.SetActive(true);
+            AvatarSelectionScreen.SetButtonActive(false);
             PersonaInfo.gameObject.SetActive(false);
-            StatusWidget.SetVisible(isNew);
+            StatusWidget.SetStepVisible(true, true);
         }
         
         public void OnEditPersonaClicked(Persona persona, bool isDefault)
         {
             Refresh(persona, isDefault);
-            AvatarDisplayScreen.gameObject.SetActive(false);
-            AvatarDisplayScreen.SetButtonActive(true);
-            PersonaInfo.gameObject.SetActive(true);
-            StatusWidget.SetVisible(isNew);
+            ToggleAvatarSelectionAndPersonaInfo(true);
+            StatusWidget.SetStepVisible(true, false);
             Footer.SetBackButtonText("Back");
             Footer.SetNextButtonText("Save Changes");
         }
@@ -75,25 +74,30 @@ namespace EmergenceSDK.Internal.UI.Personas
             PersonaInfo.SetDeleteButtonActive(!isNew && !isActivePersona);
 
             currentPersona = persona;
-            AvatarDisplayScreen.CurrentAvatar = persona.avatar;
-            AvatarDisplayScreen.CurrentAvatar = persona.avatar;
+            AvatarSelectionScreen.CurrentAvatar = persona.avatar;
+            AvatarSelectionScreen.CurrentAvatar = persona.avatar;
             PersonaInfo.PersonaName = persona.name;
             PersonaInfo.PersonaBio = persona.bio;
             
-            AvatarDisplayScreen.RefreshAvatarDisplay(persona.AvatarImage ?? DefaultImage);
+            AvatarSelectionScreen.RefreshAvatarDisplay(persona.AvatarImage ?? DefaultImage);
         }
 
         private void OnNextButtonClicked()
         {
+            StatusWidget.SetStepVisible(false, isNew);
             if(PersonaInfo.isActiveAndEnabled)
+            {
                 OnSavePersona();
+            }
             else
+            {
                 OnSaveAvatar();
+            }
         }
 
         private void OnSaveAvatar()
         {
-            AvatarDisplayScreen.CurrentAvatar = AvatarDisplayScreen.CurrentAvatar;
+            AvatarSelectionScreen.CurrentAvatar = AvatarSelectionScreen.CurrentAvatar;
             ToggleAvatarSelectionAndPersonaInfo(true);
         }
         
@@ -118,10 +122,13 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void OnBackClicked()
         {
-            if(PersonaInfo.isActiveAndEnabled)
+            StatusWidget.SetStepVisible(true, isNew);
+            if (PersonaInfo.isActiveAndEnabled && !isNew) //Go back to avatar selection if editing existing persona
                 BackFromPersonaInfo();
-            else
-                ToggleAvatarSelectionAndPersonaInfo(true);
+            else if (isNew && !PersonaInfo.isActiveAndEnabled) //Go back to dashboard if creating new persona and on avatar selection
+                ScreenManager.Instance.ShowDashboard();
+            else //Go back to avatar selection if creating new persona and on persona info
+                ToggleAvatarSelectionAndPersonaInfo(false);
         }
 
         private void BackFromPersonaInfo()
@@ -132,8 +139,8 @@ namespace EmergenceSDK.Internal.UI.Personas
         
         private void ToggleAvatarSelectionAndPersonaInfo(bool displayPersonaInfo)
         {
-            AvatarDisplayScreen.AvatarScrollRoot.gameObject.SetActive(!displayPersonaInfo);
-            AvatarDisplayScreen.SetButtonActive(displayPersonaInfo);
+            AvatarSelectionScreen.AvatarScrollRoot.gameObject.SetActive(!displayPersonaInfo);
+            AvatarSelectionScreen.SetButtonActive(displayPersonaInfo);
             PersonaInfo.gameObject.SetActive(displayPersonaInfo);
         }
 
@@ -173,7 +180,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         {
             currentPersona.name = PersonaInfo.PersonaName;
             currentPersona.bio = PersonaInfo.PersonaBio;
-            currentPersona.avatar = AvatarDisplayScreen.CurrentAvatar;
+            currentPersona.avatar = AvatarSelectionScreen.CurrentAvatar;
         }
 
         private void OnDeleteClicked()
@@ -197,7 +204,6 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void OnReplaceAvatarClicked()
         {
-            AvatarDisplayScreen.SetButtonActive(false);
             Footer.SetBackButtonText("Cancel");
             Footer.SetNextButtonText("Confirm Avatar");
             Footer.TogglePanelInformation(false);
@@ -205,7 +211,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void ClearCurrentPersona()
         {
-            AvatarDisplayScreen.CurrentAvatar = null;
+            AvatarSelectionScreen.CurrentAvatar = null;
         }
     }
 }
