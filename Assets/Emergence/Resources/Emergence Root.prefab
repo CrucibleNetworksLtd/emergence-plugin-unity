@@ -803,7 +803,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 45, y: 20}
-  m_SizeDelta: {x: 0, y: 64}
+  m_SizeDelta: {x: 121.04, y: 64}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &2538973580807787285
 CanvasRenderer:
@@ -14314,7 +14314,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 25, y: -7.499939}
+  m_AnchoredPosition: {x: 25, y: -7.499878}
   m_SizeDelta: {x: -50, y: -15.000068}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5832855823676037421
@@ -15771,7 +15771,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5832855824203081860}
   m_HandleRect: {fileID: 5832855824203081859}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -16640,7 +16640,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DefaultImage: {fileID: 2800000, guid: bfc305db338beaa498c338b0c5c11a12, type: 3}
   Footer: {fileID: 6368885911558156845}
-  AvatarDisplayScreen: {fileID: 1578502445424549564}
+  AvatarSelectionScreen: {fileID: 1578502445424549564}
   PersonaInfo: {fileID: 8870555163406570138}
   StatusWidget: {fileID: 4047563838417354488}
 --- !u!1 &5832855823985710509
@@ -17262,7 +17262,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5832855823803862094}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999997
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

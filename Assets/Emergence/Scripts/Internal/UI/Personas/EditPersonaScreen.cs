@@ -53,9 +53,7 @@ namespace EmergenceSDK.Internal.UI.Personas
                 AvatarImage = null,
             };
             Refresh(persona, true, true);
-            AvatarSelectionScreen.gameObject.SetActive(true);
-            AvatarSelectionScreen.SetButtonActive(false);
-            PersonaInfo.gameObject.SetActive(false);
+            ToggleAvatarSelectionAndPersonaInfo(false);
             StatusWidget.SetStepVisible(true, true);
         }
         
@@ -123,18 +121,23 @@ namespace EmergenceSDK.Internal.UI.Personas
         private void OnBackClicked()
         {
             StatusWidget.SetStepVisible(true, isNew);
-            if (PersonaInfo.isActiveAndEnabled && !isNew) //Go back to avatar selection if editing existing persona
-                BackFromPersonaInfo();
-            else if (isNew && !PersonaInfo.isActiveAndEnabled) //Go back to dashboard if creating new persona and on avatar selection
+            if (PersonaInfo.isActiveAndEnabled && !isNew) //Go back to Dashboard if editing existing persona
+            {
+                ClearCurrentPersona();
                 ScreenManager.Instance.ShowDashboard();
+            }
+            else if (isNew && !PersonaInfo.isActiveAndEnabled) //Go back to dashboard if creating new persona and on avatar selection
+            {
+                ScreenManager.Instance.ShowDashboard();
+            }
+            else if(!isNew && !PersonaInfo.isActiveAndEnabled) //Go back to avatar selection if editing existing persona and on avatar selection
+            {
+                ToggleAvatarSelectionAndPersonaInfo(true);
+            }
             else //Go back to avatar selection if creating new persona and on persona info
+            {
                 ToggleAvatarSelectionAndPersonaInfo(false);
-        }
-
-        private void BackFromPersonaInfo()
-        {
-            ClearCurrentPersona();
-            ScreenManager.Instance.ShowDashboard();
+            }
         }
         
         private void ToggleAvatarSelectionAndPersonaInfo(bool displayPersonaInfo)
@@ -207,6 +210,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             Footer.SetBackButtonText("Cancel");
             Footer.SetNextButtonText("Confirm Avatar");
             Footer.TogglePanelInformation(false);
+            StatusWidget.SetStepVisible(false, false);
         }
 
         private void ClearCurrentPersona()
