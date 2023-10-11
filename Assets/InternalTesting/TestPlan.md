@@ -198,7 +198,7 @@ Testing that the edit/create persona screens are delivered in the correct order.
   - [ ] The user is taken back to the avatar selection when pressing back from this screen
   - [ ] There is a status widget in the top left corner that says 2 of 3 Create Persona.
   - [ ] The user is taken back to the dashboard when pressing next from this screen
-- [ ] The user is taken to the edit persona screen when pressing the edit button opn the top right of the persona info widget
+- [ ] The user is taken to the edit persona screen when pressing the edit button on the top right of the persona info widget
   - [ ] There is a status widget in the top left corner that says EDIT PERSONA.
   - [ ] The user is taken back to the dashboard screen when pressing cancel from this screen
   - [ ] The user is taken back to the dashboard screen when pressing save changes from this screen
@@ -214,6 +214,9 @@ Testing that the edit/create persona screens are delivered in the correct order.
 
 **Test Description**:
 Testing that the user can create a persona from scratch.
+
+**Dependencies**:
+- The user has no personas.
 
 **Expected Output**:
 - [ ] The user is taken to the create persona screen when pressing the central plus button.
