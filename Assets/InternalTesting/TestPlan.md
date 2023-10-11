@@ -133,23 +133,34 @@ Making sure that the UI is displayed correctly and that the user can select an a
 - [ ] There should be an icon for each avatar arranged in a grid on the left.
 - [ ] The user can see the icon of the selected avatar on the right.
 - [ ] The user can see the icon of the selected avatar on the right blurred and scaled behind the avatar.
-- [ ] The user can see a cancel button in the bottom left corner.
-- [ ] The user can see a confirm avatar button in the bottom right corner.
-- [ ] Pressing the cancel button:
-  - [ ] Takes the user back to the create persona screen.
-  - [ ] If the selected avatar was different to the active avatar, the active avatar is not changed.
-- Pressing the confirm avatar button:
-  - [ ] Takes the user back to the create persona screen.
-  - [ ] If the selected avatar was different to the active avatar, the active avatar is changed to the selected avatar.
-  - [ ] If the selected avatar was the same as the active avatar, the active avatar is not changed.
+- [ ] The user can see a cancel/back button in the bottom left corner.
+- [ ] The user can see a confirm avatar/next button in the bottom right corner.
+- [ ] Pressing the cancel button if the selected avatar was different to the active avatar, the active avatar is not changed.
+- [ ] Pressing the confirm avatar button if the selected avatar was different to the active avatar, the active avatar is changed to the selected avatar.
 
 
-#### Unit 1.1.6: Edit persona screen basic functionality.
+#### Unit 1.1.6: Persona information screen basic functionality.
 
 **Priority**: Medium
 
 **Test Description**:
-Making sure that the UI is displayed correctly and that the user can edit the persona information.
+Making sure that the UI is displayed correctly and that the user can enter persona information.
+
+**Expected Output**:
+- [ ] The user can see a text box for the name.
+- [ ] The user can see a text box for the description.
+- [ ] If the user tries to proceed without entering a name of at least 3 characters, the user is shown an error message.
+- [ ] The user can see the icon of the current avatar on the right.
+- [ ] The user can see the icon of the current avatar on the right blurred and scaled behind the avatar.
+- [ ] When the user proceeds, the name and description are saved to the persona.
+- [ ] When the user proceeds, the users avatar is set to the one displayed on the right.
+
+#### Unit 1.1.7: Edit persona screen basic functionality.
+
+**Priority**: Medium
+
+**Test Description**:
+Making sure that the user can successfully edit a persona.
 
 **Glossary**
 - Active Persona: The persona that the user has currently set to active in Emergence.
@@ -158,6 +169,9 @@ Making sure that the UI is displayed correctly and that the user can edit the pe
 
 **Dependencies**:
 - Unit 1.1.4, as you need to be able to create a persona to edit it.
+- Unit 1.1.6, the basics of the form need to work.
+- The user has at least two avatars.
+- The users persona has a name and description.
 
 **Required Inputs**:
 - The user has at least two avatars.
@@ -165,17 +179,11 @@ Making sure that the UI is displayed correctly and that the user can edit the pe
 **Expected Output**:
 - [ ] The user can see the name and description of the current persona in the box under name.
 - [ ] The user can read the bio in the box under bio.
-- [ ] The user can see the icon of the current avatar on the right.
-- [ ] The user can see the icon of the current avatar on the right blurred and scaled behind the avatar.
 - [ ] The user can see a button saying replace avatar under the icon.
 - [ ] The user can see a back button in the bottom left corner.
-- [ ] Pressing the back button:
-  - [ ] Takes the user back to the dashboard screen.
-  - [ ] Does not save any changes made to the persona.
+- [ ] Pressing the back button does not save any changes made to the persona.
 - [ ] The user can see a save changes button in the bottom right corner.
-- [ ] Pressing the save changes button:
-  - [ ] Takes the user back to the dashboard screen.
-  - [ ] The changes made to the persona are saved.
+- [ ] Pressing the save changes button the changes made to the persona are saved.
 - [ ] If the persona is not the active persona: 
   - [ ] The user can see a delete persona button in the bottom right corner.
   - [ ] Pressing the delete persona button:
@@ -183,7 +191,7 @@ Making sure that the UI is displayed correctly and that the user can edit the pe
     - [ ] The persona is deleted.
 - [ ] If the persona is the active persona the user cannot see the delete button.
 
-#### Unit 1.1.7: Edit/Create persona screen advanced functionality - correct flow.
+#### Unit 1.1.8: Edit/Create persona screen advanced functionality - correct flow.
 
 **Priority**: Low
 
@@ -208,7 +216,7 @@ Testing that the edit/create persona screens are delivered in the correct order.
     - [ ] There is a status widget in the top left corner that says EDIT PERSONA > AVATAR SELECTION.
   - [ ] The user is taken to the dashboard screen when pressing delete persona from this screen (The persona must not be active for delete to work)
 
-#### Unit 1.1.8: Create persona screen advanced functionality - starting fresh.
+#### Unit 1.1.9: Create persona screen advanced functionality - starting fresh.
 
 **Priority**: Low
 
