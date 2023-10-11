@@ -215,6 +215,155 @@ Making sure that the UI is displayed correctly and that the user can login to th
 - [ ] The QR code is refreshed every 60 seconds.
 - [ ] The QR code time to refresh is displayed on the screen under the QR code.
 
+---
+
+## Featureset 3 Sample Project
+
+### Feature 3.1 General Features
+
+These are the features of the sample project (other than the interactable stations).
+
+#### Unit 3.1.1: Open Overlay via keybind
+
+**Priority**: High
+
+**Test Description**:
+Checking that the overlay can be opened via a keybind
+
+**Required Inputs**:
+- Pressing the Z key
+
+**Expected Output**:
+- [ ] The Emergence overlay opens. If the user has never logged in using the overlay in this project, it should show the onboarding slides, otherwise, it should go straight to the QR code screen.
+
+#### Unit 3.1.2: VRM Avatar Loading
+
+**Priority**: High
+
+**Test Description**:
+Checking the player's character model is changed when a persona is loaded.
+
+**Required Inputs**:
+- User is already signed into Emergence
+- User has a persona
+- User's persona has an EAS avatar
+
+**Expected Output**:
+- [ ] User's character model changes to be the avatar associated with the persona.
+
+### Feature 3.2 Example Stations
+
+These are the interactable stations, which each have button(s) to perform some action as part of an interactive example 
+
+#### Unit 3.2.1: Open Overlay Station
+
+**Priority**: High
+
+**Test Description**:
+Making sure the station works correctly by allowing the user to open the overlay.
+
+**Required Inputs**:
+- The user is close enough to the button (within about a metre of the button).
+
+**Expected Output**:
+- [ ] Each button says what method they call on them at the bottom.
+- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
+- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
+- [ ] When the button is pressed, the overlay opens. If the user has never logged in using the overlay in this project, it should show the onboarding slides, otherwise, it should go straight to the QR code screen.
+
+#### Unit 3.2.2: Request to Sign Message Station
+
+**Priority**: High
+
+**Test Description**:
+Making sure the station works by sending a message to be signed to the users wallet.
+
+**Required Inputs**:
+- The user is close enough to the button they wish to make use of.
+
+**Expected Output**:
+- [ ] The button says what method they call on them at the bottom.
+- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
+- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
+- [ ] When the request signed message button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
+- [ ] If the user is logged in, when they press the button a request to sign message should be sent to the user's wallet. When this is signed, the returned message should be checked for validity using "ValidateSignedMessage" (this isn't technically required, but is to show the feature to new users). Then, the signed message is shown to the user.
+
+#### Unit 3.2.2: Reading and Writing To Smart Contracts Station
+
+**Priority**: High
+
+**Test Description**:
+Making sure the station works correctly by allowing the user to read and write from the simple smart contract.
+
+**Required Inputs**:
+- The user is close enough to the button they wish to make use of.
+
+**Expected Output**:
+- [ ] Each button says what method they call on them at the bottom.
+- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
+- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
+- [ ] It shouldn't be possible to use both buttons at once.
+- [ ] When either the GetCurrentCount button or the IncrementCount button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
+- [ ] If the user has logged in before pressing the GetCurrentCount button, it calls the "GetCurrentCount" method via ReadMethod and displays "Calling GetCurrentCount on 0xC9571AaF9EbCa8C08EC37D962310d0Ab9F8A5Dd2" to the user.
+- [ ] Once the GetCurrentCount async request comes back from the ReadMethod, it outputs the number in the response to the user.
+- [ ] If the user has logged in before pressing the IncrementCount button, it calls the "IncrementCount" method via WriteMethod and displays "Calling GetCurrentCount on 0xC9571AaF9EbCa8C08EC37D962310d0Ab9F8A5Dd2. Check your wallet for the transaction confirmation message!" to the user. If the user isn't on the Goerli network, they should recieve a message asking them to switch chain first, then the accept transaction message should show in their wallet.
+- [ ] When the user signs the transaction in their wallet, "WalletConnect'd wallet confirmed!" is displayed to the user.
+- [ ] When the transaction has been confirmed, it displays "Transaction Hash: {hash}" to the user, where {hash} is the transaction hash.
+- [ ] After using the IncrementCount button, using the GetCurrentCount button again should give a higher number than it did previously.
+
+#### Unit 3.2.3: Emergence Avatars Station
+
+**Priority**: High
+
+**Test Description**:
+Making sure the station works correctly by allowing the user to mint an EAS avatar.
+
+**Required Inputs**:
+- The user is close enough to the button (within about a metre of the button).
+
+**Expected Output**:
+- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
+- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
+- [ ] When the mint avatar button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
+- [ ] If the user has logged in before pressing the mint avatar button, it calls the "mint" method via WriteMethod and displays "Calling Mint on 0x074534df6174759a5ae3ad81e3bcdfc0f940f6a6. Check your wallet for the transaction confirmation message!" to the user. If the user isn't on the Polygon network, they should recieve a message asking them to switch chain first, then the accept transaction message should show in their wallet.
+- [ ] If the user is already on the Polygon network, the accept transaction message should show in their wallet without a switch chain message / confirmation.
+- [ ] When the user signs the transaction in their wallet, "WalletConnect'd wallet confirmed!" is displayed to the user.
+- [ ] When the transaction has been confirmed, it displays "Transaction Hash: {hash}" to the user, where {hash} is the transaction hash.
+- [ ] Once the transaction has been confirmed, the user should have a new avatar in their wallet.
+
+#### Unit 3.2.4: Inventory Service Station
+
+**Priority**: High
+
+**Test Description**:
+Making sure the station works correctly by showing the user an example of an in-game inventory.
+
+**Required Inputs**:
+- The user is close enough to the button (within about a metre of the button).
+
+**Expected Output**:
+- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
+- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
+- [ ] When the in-game inventory button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
+- [ ] If the user has logged in before pressing the in-game inventory button, it opens an example of an in-game inventory. This shouldn't cover the whole screen, and should display NFTs from the logged-in users wallet. It doesn't need to be interactable.
+- [ ] If the button is pressed after the inventory has been opened, then it closes the inventory.
+
+#### Unit 3.2.5: Dynamic Metadata Station
+
+**Priority**: High
+
+**Test Description**:
+Making sure the station works correctly by opening the NFT picker, and incrementing a counter in the dynamic metadata of the selected NFT.
+
+**Required Inputs**:
+- The user is close enough to the button (within about a metre of the button).
+
+**Expected Output**:
+- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
+- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
+- [ ] When the in-game inventory button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
+- [ ] If the user has logged in before pressing the dynamic metadata button, it opens the NFT picker with the default filter-set. When the user selects an NFT with this picker, the message "Current Dynamic Metadata is: {0}" is displayed, where {0} is the current dynamic metadata of this NFT. Then it displays the message "Network: {n} Contract: {c} Token ID: {t}", where {n} is the blockchain the NFT is on, {c} is the contract address, and {t} is the token ID. Then, it calls WriteDynamicMetadata on this NFT, where if the existing dynamic metdata contains just an interger, it increments that interger by 1 and then writes the result of that to the metadata. If it contains any other metadata, it overwrites this metadata with the interger 1. After this has happened, it writes "New Dynamic Metadata is: {0}" where {0} is the new dynamic metadata
+- [ ] If the output of WriteDyanmicMetadata is an error, it writes the error code to the output.
 
 ---
 
