@@ -47,7 +47,7 @@ namespace EmergenceSDK.InternalTesting
             foreach (var persona in personas)
             {
                 EditorGUILayout.LabelField("Persona: " + persona.name);
-                EditorGUILayout.LabelField("Bio: " + persona.bio);
+                EditorGUILayout.LabelField("PersonaBio: " + persona.bio);
             }
 
             if(currentPersona == null)

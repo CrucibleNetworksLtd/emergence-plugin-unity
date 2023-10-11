@@ -14,7 +14,7 @@ This is the screen with the hexagon UI that shows the user's current persona and
 
 #### Unit 1.1.1: Basic functionality of the dashboard screen.
 
-**Priority**: High
+**Priority**: Medium
 
 **Test Description**:
 Basic functionality of the dashboard screen. Making sure that the UI is displayed correctly and that the user can view all the correct persona information.
@@ -86,6 +86,149 @@ Making sure that the UI is displaying the correct persona information.
 - [ ] Each hexagon has the correct name
 - [ ] Each hexagon has the correct description
 
+#### Unit 1.1.4: Create persona screen basic functionality.
+
+**Priority**: Medium
+
+**Test Description**:
+Making sure that the UI is displayed correctly and that the user can create a persona.
+
+**Expected Output**:
+- [ ] The user can see a plus in the top left corner.
+- Pressing the plus:
+  - [ ] Takes the user to the avatar selection screen.
+  - [ ] The user can see a back button in the bottom left corner.
+  - [ ] The user can see a persona information button in the bottom right corner.
+  - [ ] Pressing the back button takes the user back to the dashboard screen, with no new persona created.
+  - [ ] Using the flow in 1.1.5, the user can select an avatar.
+- Pressing the persona information button:
+  - [ ] Takes the user to the persona information screen. (see unit 1.1.6 for functionality here)
+  - [ ] The user can see a select avatar button in the bottom left corner.
+  - [ ] Pressing the select avatar button takes the user to the avatar selection screen.
+  - [ ] The user can see a create persona button in the bottom right corner.
+  - [ ] The stages UI is showing 2 of 3.
+  - [ ] Using flow in 1.1.6, the user can create a persona.
+- Pressing the create persona button:
+  - [ ] Takes the user to the dashboard screen.
+  - [ ] The user can see a new persona in the dashboard screen.
+  - [ ] The new persona is the active persona.
+  - [ ] The avatar icon is the avatar that was selected in the avatar selection screen.
+  - [ ] The name is the name that was entered in the persona information screen.
+  - [ ] The description is the description that was entered in the persona information screen.
+  - [ ] The users avatar model will change to the avatar that was selected in the avatar selection screen (this may take up to 30s to change).
+
+#### Unit 1.1.5: Avatar selection screen basic functionality.
+
+**Priority**: Medium
+
+**Test Description**:
+Making sure that the UI is displayed correctly and that the user can select an avatar.
+
+**Glossary**
+- Active Avatar: The avatar that the user has currently set to active in Emergence.
+- Selected Avatar: The avatar that the user has selected to view in the edit persona screen, it may not be the same as the active avatar.
+- [.../...] The left option is for the create persona flow, the right option is for the edit persona flow.
+
+**Expected Output**:
+- [ ] There should be an icon for each avatar arranged in a grid on the left.
+- [ ] The user can see the icon of the selected avatar on the right.
+- [ ] The user can see the icon of the selected avatar on the right blurred and scaled behind the avatar.
+- [ ] The user can see a [back/cancel] button in the bottom left corner.
+- [ ] The user can see a [next button/confirm avatar] in the bottom right corner.
+- [ ] Pressing the [back/cancel] button if the selected avatar was different to the active avatar, the active avatar is not changed.
+- [ ] Pressing the [next button/confirm avatar] button if the selected avatar was different to the active avatar, the active avatar is changed to the selected avatar.
+
+#### Unit 1.1.6: Persona information screen basic functionality.
+
+**Priority**: Medium
+
+**Test Description**:
+Making sure that the UI is displayed correctly and that the user can enter persona information.
+
+**Expected Output**:
+- [ ] The user can see a text box for the name.
+- [ ] The user can see a text box for the description.
+- [ ] If the user tries to proceed without entering a name of at least 3 characters, the user is shown an error message.
+- [ ] The user can see the icon of the current avatar on the right.
+- [ ] The user can see the icon of the current avatar on the right blurred and scaled behind the avatar.
+- [ ] When the user proceeds, the name and description are saved to the persona.
+- [ ] When the user proceeds, the users avatar is set to the one displayed on the right.
+
+#### Unit 1.1.7: Edit persona screen basic functionality.
+
+**Priority**: Medium
+
+**Test Description**:
+Making sure that the user can successfully edit a persona.
+
+**Glossary**
+- Active Persona: The persona that the user has currently set to active in Emergence.
+- Active Avatar: The avatar that the user has currently set to active in Emergence.
+- Selected Avatar: The avatar that the user has selected to view in the edit persona screen, it may not be the same as the active avatar.
+
+**Dependencies**:
+- Unit 1.1.4, as you need to be able to create a persona to edit it.
+- Unit 1.1.6, the basics of the form need to work.
+- The user has at least two avatars.
+- The users persona has a name and description.
+
+**Required Inputs**:
+- The user has at least two avatars.
+
+**Expected Output**:
+- [ ] The user can see the name and description of the current persona in the box under name.
+- [ ] The user can read the bio in the box under bio.
+- [ ] The user can see a button saying replace avatar under the icon.
+- [ ] The user can see a back button in the bottom left corner.
+- [ ] Pressing the back button does not save any changes made to the persona.
+- [ ] The user can see a save changes button in the bottom right corner.
+- [ ] Pressing the save changes button the changes made to the persona are saved.
+- [ ] If the persona is not the active persona: 
+  - [ ] The user can see a delete persona button in the bottom right corner.
+  - [ ] Pressing the delete persona button:
+    - [ ] Takes the user back to the dashboard screen.
+    - [ ] The persona is deleted.
+- [ ] If the persona is the active persona the user cannot see the delete button.
+
+#### Unit 1.1.8: Edit/Create persona screen advanced functionality - correct flow.
+
+**Priority**: Low
+
+**Test Description**:
+Testing that the edit/create persona screens are delivered in the correct order.
+
+**Expected Output**:
+- [ ] The user is taken to the select avatar screen when pressing the top left plus button.
+  - [ ] There is a status widget in the top left corner that says 1 of 3 Create Avatar.
+  - [ ] The user is taken back to the dashboard when pressing back from this screen
+- [ ] The user is taken to the persona information screen when pressing the bottom right button.
+  - [ ] The user is taken back to the avatar selection when pressing back from this screen
+  - [ ] There is a status widget in the top left corner that says 2 of 3 Create Persona.
+  - [ ] The user is taken back to the dashboard when pressing next from this screen
+- [ ] The user is taken to the edit persona screen when pressing the edit button on the top right of the persona info widget
+  - [ ] There is a status widget in the top left corner that says EDIT PERSONA.
+  - [ ] The user is taken back to the dashboard screen when pressing cancel from this screen
+  - [ ] The user is taken back to the dashboard screen when pressing save changes from this screen
+  - [ ] The user is taken to the avatar selection screen when pressing replace avatar from this screen
+    - [ ] The user is taken to the persona information screen when pressing next from this screen
+    - [ ] The user is taken to the persona information screen when pressing cancel from this screen
+    - [ ] There is a status widget in the top left corner that says EDIT PERSONA > AVATAR SELECTION.
+  - [ ] The user is taken to the dashboard screen when pressing delete persona from this screen (The persona must not be active for delete to work)
+
+#### Unit 1.1.9: Create persona screen advanced functionality - starting fresh.
+
+**Priority**: Low
+
+**Test Description**:
+Testing that the user can create a persona from scratch.
+
+**Dependencies**:
+- The user has no personas.
+
+**Expected Output**:
+- [ ] The user is taken to the create persona screen when pressing the central plus button.
+- [ ] The user can complete the flow in 1.1.4.
+
 ---
 
 ## Featureset 2 Wallet System
@@ -122,13 +265,17 @@ These are the features of the sample project (other than the interactable statio
 **Priority**: High
 
 **Test Description**:
-Checking that the overlay can be opened via a keybind
+Checking that the overlay can be opened via a keybind (Set in the Emergence prefab)
 
 **Required Inputs**:
-- Pressing the Z key
+- Pressing the Z key (or whatever keybind is set in the Emergence prefab
+- Use the PlayerPrefsEditor window to set the HasLoggedIn key to 0 (Window/Emergence Internal/PlayerPrefsEditor)
 
 **Expected Output**:
-- [ ] The Emergence overlay opens. If the user has never logged in using the overlay in this project, it should show the onboarding slides, otherwise, it should go straight to the QR code screen.
+- [ ] The Emergence overlay opens.
+- [ ] The user is taken to the welcome screens.
+- [ ] The user is taken to the login screen, and can complete the flow in 2.1.1.
+- [ ] Reopen the overlay with the keybind and just see the login screen.
 
 #### Unit 3.1.2: VRM Avatar Loading
 
@@ -137,127 +284,128 @@ Checking that the overlay can be opened via a keybind
 **Test Description**:
 Checking the player's character model is changed when a persona is loaded.
 
-**Required Inputs**:
+**Dependencies**:
 - User is already signed into Emergence
 - User has a persona
 - User's persona has an EAS avatar
 
 **Expected Output**:
-- [ ] User's character model changes to be the avatar associated with the persona.
+- [ ] User's character model changes to be the avatar associated with the persona. (this may take up to 30s to change)
 
 ### Feature 3.2 Example Stations
 
 These are the interactable stations, which each have button(s) to perform some action as part of an interactive example 
 
-#### Unit 3.2.1: Open Overlay Station
+#### Unit 3.2.1: Basic functionality of the stations
+
+**Priority**: High
+
+**Test Description**:
+Making sure that the UI is displayed correctly and that the user can interact with the stations.
+
+**Expected Output**:
+- [ ] The user can see the stations in the world.
+- [ ] The user can see the buttons on the stations.
+- [ ] The user can see the text on the stations.
+- [ ] The user can see the text on the buttons when they are within a metre of the buttons.
+- [ ] The user can no longer see the text when they move away from the buttons
+- [ ] If the user is not signed in they see the text: Sign in using first station
+- [ ] If the user is signed in they see the text: Press 'E' to activate
+- [ ] If the user presses E something happens (see other tests)
+
+#### Unit 3.2.2: Open Overlay Station
 
 **Priority**: High
 
 **Test Description**:
 Making sure the station works correctly by allowing the user to open the overlay.
 
-**Required Inputs**:
-- The user is close enough to the button (within about a metre of the button).
+**Dependencies**:
+- 3.2.1 - Basic functionality of the stations
 
 **Expected Output**:
-- [ ] Each button says what method they call on them at the bottom.
-- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
-- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
-- [ ] When the button is pressed, the overlay opens. If the user has never logged in using the overlay in this project, it should show the onboarding slides, otherwise, it should go straight to the QR code screen.
+- [ ] When the button is pressed, the overlay opens.
 
-#### Unit 3.2.2: Request to Sign Message Station
+#### Unit 3.2.3: Request to Sign Message Station
 
 **Priority**: High
 
 **Test Description**:
 Making sure the station works by sending a message to be signed to the users wallet.
 
-**Required Inputs**:
-- The user is close enough to the button they wish to make use of.
+**Dependencies**:
+- 3.2.1 - Basic functionality of the stations
 
 **Expected Output**:
-- [ ] The button says what method they call on them at the bottom.
-- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
-- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
-- [ ] When the request signed message button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
-- [ ] If the user is logged in, when they press the button a request to sign message should be sent to the user's wallet. When this is signed, the returned message should be checked for validity using "ValidateSignedMessage" (this isn't technically required, but is to show the feature to new users). Then, the signed message is shown to the user.
+- [ ] If the user presses the button a request to sign message should be sent to the user's wallet. 
+- [ ] If the user signs, the signed message is shown to the user.
+- [ ] If the user does not sign, the user is shown a message saying that an error occured during signing.
 
-#### Unit 3.2.2: Reading and Writing To Smart Contracts Station
+#### Unit 3.2.4: Reading and Writing To Smart Contracts Station
 
 **Priority**: High
 
 **Test Description**:
 Making sure the station works correctly by allowing the user to read and write from the simple smart contract.
 
-**Required Inputs**:
-- The user is close enough to the button they wish to make use of.
+**Dependencies**:
+- 3.2.1 - Basic functionality of the stations
 
 **Expected Output**:
-- [ ] Each button says what method they call on them at the bottom.
-- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
-- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
 - [ ] It shouldn't be possible to use both buttons at once.
-- [ ] When either the GetCurrentCount button or the IncrementCount button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
-- [ ] If the user has logged in before pressing the GetCurrentCount button, it calls the "GetCurrentCount" method via ReadMethod and displays "Calling GetCurrentCount on 0xC9571AaF9EbCa8C08EC37D962310d0Ab9F8A5Dd2" to the user.
+- [ ] Pressing the GetCurrentCount button, it displays "Calling GetCurrentCount on 0xC9571AaF9EbCa8C08EC37D962310d0Ab9F8A5Dd2" to the user.
 - [ ] Once the GetCurrentCount async request comes back from the ReadMethod, it outputs the number in the response to the user.
-- [ ] If the user has logged in before pressing the IncrementCount button, it calls the "IncrementCount" method via WriteMethod and displays "Calling GetCurrentCount on 0xC9571AaF9EbCa8C08EC37D962310d0Ab9F8A5Dd2. Check your wallet for the transaction confirmation message!" to the user. If the user isn't on the Goerli network, they should recieve a message asking them to switch chain first, then the accept transaction message should show in their wallet.
-- [ ] When the user signs the transaction in their wallet, "WalletConnect'd wallet confirmed!" is displayed to the user.
-- [ ] When the transaction has been confirmed, it displays "Transaction Hash: {hash}" to the user, where {hash} is the transaction hash.
+- [ ] Pressing displays "Calling GetCurrentCount on 0xC9571AaF9EbCa8C08EC37D962310d0Ab9F8A5Dd2." to the user. 
+- [ ] If the user isn't on the Goerli network, they should recieve a message asking them to switch chain first, then the accept transaction message should show in their wallet.
+- [ ] When the transaction has been confirmed, it displays a confirmation message to the user.
 - [ ] After using the IncrementCount button, using the GetCurrentCount button again should give a higher number than it did previously.
 
-#### Unit 3.2.3: Emergence Avatars Station
+#### Unit 3.2.5: Emergence Avatars Station
 
 **Priority**: High
 
 **Test Description**:
 Making sure the station works correctly by allowing the user to mint an EAS avatar.
 
-**Required Inputs**:
-- The user is close enough to the button (within about a metre of the button).
+**Dependencies**:
+- 3.2.1 - Basic functionality of the stations
+- The user does not already have Emergence Avatar A in their wallet
 
 **Expected Output**:
-- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
-- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
-- [ ] When the mint avatar button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
-- [ ] If the user has logged in before pressing the mint avatar button, it calls the "mint" method via WriteMethod and displays "Calling Mint on 0x074534df6174759a5ae3ad81e3bcdfc0f940f6a6. Check your wallet for the transaction confirmation message!" to the user. If the user isn't on the Polygon network, they should recieve a message asking them to switch chain first, then the accept transaction message should show in their wallet.
-- [ ] If the user is already on the Polygon network, the accept transaction message should show in their wallet without a switch chain message / confirmation.
-- [ ] When the user signs the transaction in their wallet, "WalletConnect'd wallet confirmed!" is displayed to the user.
-- [ ] When the transaction has been confirmed, it displays "Transaction Hash: {hash}" to the user, where {hash} is the transaction hash.
+- If the user presses the mint avatar button, to the user:
+  - [ ] If the user isn't on the Polygon network, they should recieve a message asking them to switch chain first, then the accept transaction message should show in their wallet.
+  - [ ] If the user is already on the Polygon network, the accept transaction message should show in their wallet without a switch chain message / confirmation.
 - [ ] Once the transaction has been confirmed, the user should have a new avatar in their wallet.
 
-#### Unit 3.2.4: Inventory Service Station
+#### Unit 3.2.6: Inventory Service Station
 
 **Priority**: High
 
 **Test Description**:
 Making sure the station works correctly by showing the user an example of an in-game inventory.
 
-**Required Inputs**:
-- The user is close enough to the button (within about a metre of the button).
+**Dependencies**:
+- 3.2.1 - Basic functionality of the stations
 
 **Expected Output**:
-- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
-- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
-- [ ] When the in-game inventory button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
-- [ ] If the user has logged in before pressing the in-game inventory button, it opens an example of an in-game inventory. This shouldn't cover the whole screen, and should display NFTs from the logged-in users wallet. It doesn't need to be interactable.
+- [ ] If the user presses the in-game inventory button, it opens an example of an in-game inventory. Which should display NFTs from the logged-in users wallet.
 - [ ] If the button is pressed after the inventory has been opened, then it closes the inventory.
 
-#### Unit 3.2.5: Dynamic Metadata Station
+#### Unit 3.2.7: Dynamic Metadata Station
 
 **Priority**: High
 
 **Test Description**:
 Making sure the station works correctly by opening the NFT picker, and incrementing a counter in the dynamic metadata of the selected NFT.
 
-**Required Inputs**:
-- The user is close enough to the button (within about a metre of the button).
+**Dependencies**:
+- 3.2.1 - Basic functionality of the stations
 
 **Expected Output**:
-- [ ] When the user looks at the button, the HUD displays "Press E" to interact.
-- [ ] The text on the station should tell the user what the button does, where they can find the code that the button activates, and why they'd use the code in their game.
-- [ ] When the in-game inventory button is pressed, it first checks if the user has logged into the overlay. If they haven't it displays "Make sure your walletconnect'd (press "z") before trying to use this sample!" to the user.
-- [ ] If the user has logged in before pressing the dynamic metadata button, it opens the NFT picker with the default filter-set. When the user selects an NFT with this picker, the message "Current Dynamic Metadata is: {0}" is displayed, where {0} is the current dynamic metadata of this NFT. Then it displays the message "Network: {n} Contract: {c} Token ID: {t}", where {n} is the blockchain the NFT is on, {c} is the contract address, and {t} is the token ID. Then, it calls WriteDynamicMetadata on this NFT, where if the existing dynamic metdata contains just an interger, it increments that interger by 1 and then writes the result of that to the metadata. If it contains any other metadata, it overwrites this metadata with the interger 1. After this has happened, it writes "New Dynamic Metadata is: {0}" where {0} is the new dynamic metadata
-- [ ] If the output of WriteDyanmicMetadata is an error, it writes the error code to the output.
+- [ ] If the user presses the dynamic metadata button, it opens the collection screen with the default filter-set. 
+- When the user selects an NFT with this picker: 
+  - [ ] If there is already Dynamic Metadata it increments the dynamic metadata interger by 1 and then displays that on the right sidebar.
+  - [ ] If there is no Dynamic Metadata it creates a new Dynamic Metadata with the value 1 and then displays that on the right sidebar.
 
 ---
 

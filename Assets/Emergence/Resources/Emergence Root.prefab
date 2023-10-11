@@ -713,6 +713,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9139191956014472081}
+  - component: {fileID: 6368885911558156845}
   m_Layer: 5
   m_Name: Footer
   m_TagString: Untagged
@@ -743,6 +744,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 104}
   m_Pivot: {x: 0.5, y: 0}
+--- !u!114 &6368885911558156845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 964169539743765252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41f5bb72d63548fb9d9cd5d6ecb494d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PanelInformation: {fileID: 5832855822558417093}
+  PanelAvatar: {fileID: 5832855824454923248}
+  BackButton: {fileID: 6234090903034012260}
+  NextButton: {fileID: 563752545648888312}
+  NextButtonText: {fileID: 5214213910762851065}
+  BackButtonText: {fileID: 1805295552102031717}
 --- !u!1 &1001063158959120367
 GameObject:
   m_ObjectHideFlags: 0
@@ -784,7 +803,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 45, y: 20}
-  m_SizeDelta: {x: 0, y: 64}
+  m_SizeDelta: {x: 121.04, y: 64}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &2538973580807787285
 CanvasRenderer:
@@ -3540,7 +3559,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -39}
+  m_AnchoredPosition: {x: 0, y: -38.999905}
   m_SizeDelta: {x: 496, y: 52}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &1793323122092018299
@@ -3590,6 +3609,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7040103795515171705}
+  - component: {fileID: 1578502445424549564}
   m_Layer: 5
   m_Name: Avatar image Panel
   m_TagString: Untagged
@@ -3618,6 +3638,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 52}
   m_SizeDelta: {x: 626, y: -104}
   m_Pivot: {x: 1, y: 0.5}
+--- !u!114 &1578502445424549564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1935055170905717409}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a95510ec1a1746de8a7bef12f5c8fd9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AvatarScrollRoot: {fileID: 5832855823541903982}
+  AvatarScrollItemsPool: {fileID: 5832855823694895959}
+  ReplaceAvatarButton: {fileID: 703048670092808003}
+  PersonaAvatarBackground: {fileID: 6170179446639887871}
+  PersonaAvatar: {fileID: 2303667710717406142}
+  DefaultImage: {fileID: 2800000, guid: 4eddab77796f04696899d341f22a41e5, type: 3}
 --- !u!1 &1952697061943916756
 GameObject:
   m_ObjectHideFlags: 0
@@ -9230,6 +9268,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5832855822558417094}
+  - component: {fileID: 8870555163406570138}
   m_Layer: 5
   m_Name: Information Panel
   m_TagString: Untagged
@@ -9261,6 +9300,21 @@ RectTransform:
   m_AnchoredPosition: {x: -313, y: 0}
   m_SizeDelta: {x: -626, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8870555163406570138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5832855822558417093}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 840e36c45ff54cf1ab1b00a213e36776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NameInputField: {fileID: 5832855823760313409}
+  BioIf: {fileID: 710174428795851567}
+  DeleteButton: {fileID: 1428865393667144393}
 --- !u!1 &5832855822612638096
 GameObject:
   m_ObjectHideFlags: 0
@@ -14260,7 +14314,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 25, y: -7.499939}
+  m_AnchoredPosition: {x: 25, y: -7.499878}
   m_SizeDelta: {x: -50, y: -15.000068}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5832855823676037421
@@ -14454,7 +14508,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5832855822627826033}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -15717,8 +15771,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5832855824203081860}
   m_HandleRect: {fileID: 5832855824203081859}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.9999998
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -16584,28 +16638,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2275db32792b56428664d4dc4fae2f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PanelInformation: {fileID: 5832855822558417093}
-  PanelAvatar: {fileID: 5832855824454923248}
-  BackButton: {fileID: 6234090903034012260}
-  NextButton: {fileID: 563752545648888312}
-  NextButtonText: {fileID: 5214213910762851065}
-  BackButtonText: {fileID: 1805295552102031717}
-  ReplaceAvatarButton: {fileID: 703048670092808003}
-  PersonaAvatarBackground: {fileID: 6170179446639887871}
-  PersonaAvatar: {fileID: 2303667710717406142}
-  AvatarScrollRoot: {fileID: 5832855823541903982}
-  AvatarScrollItemsPool: {fileID: 5832855823694895959}
-  NameInputField: {fileID: 5832855823760313409}
-  BioIf: {fileID: 710174428795851567}
-  DeleteButton: {fileID: 1428865393667144393}
-  EditGOs:
-  - {fileID: 5955506983738700488}
-  - {fileID: 29980584523433877}
-  - {fileID: 5897674280182853718}
-  CreateGOs:
-  - {fileID: 4659066317506878145}
-  - {fileID: 5462817544395062917}
   DefaultImage: {fileID: 2800000, guid: bfc305db338beaa498c338b0c5c11a12, type: 3}
+  Footer: {fileID: 6368885911558156845}
+  AvatarSelectionScreen: {fileID: 1578502445424549564}
+  PersonaInfo: {fileID: 8870555163406570138}
+  StatusWidget: {fileID: 4047563838417354488}
 --- !u!1 &5832855823985710509
 GameObject:
   m_ObjectHideFlags: 0
@@ -18863,6 +18900,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5832855824454923249}
+  - component: {fileID: 4047563838417354488}
   m_Layer: 5
   m_Name: Avatar Panel
   m_TagString: Untagged
@@ -18893,6 +18931,22 @@ RectTransform:
   m_AnchoredPosition: {x: -313, y: 52}
   m_SizeDelta: {x: -626, y: -104}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &4047563838417354488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5832855824454923248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1bf49ba4af74b20b487cebe67f30401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  createStepOne: {fileID: 6949949884537848835}
+  createStepTwo: {fileID: 1860959837933398707}
+  editStepOne: {fileID: 5270622622089447277}
+  editStepTwo: {fileID: 1615276311579098894}
 --- !u!1 &5832855824458603962
 GameObject:
   m_ObjectHideFlags: 0
@@ -24888,6 +24942,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Edit avatar Secondary Button
       objectReference: {fileID: 0}
+    - target: {fileID: 6934459097886289876, guid: bfb5fce40b6563f409034993e3fbc87d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8375422563412025605, guid: bfb5fce40b6563f409034993e3fbc87d,
         type: 3}
       propertyPath: m_Pivot.x
@@ -25016,7 +25075,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 3646248578326109468}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5955506983738700488}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -25025,12 +25084,6 @@ MonoBehaviour:
 --- !u!224 &5089465263474195481 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8375422563412025605, guid: bfb5fce40b6563f409034993e3fbc87d,
-    type: 3}
-  m_PrefabInstance: {fileID: 3646248578326109468}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &5955506983738700488 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6934459097886289876, guid: bfb5fce40b6563f409034993e3fbc87d,
     type: 3}
   m_PrefabInstance: {fileID: 3646248578326109468}
   m_PrefabAsset: {fileID: 0}
