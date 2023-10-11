@@ -97,8 +97,6 @@ Making sure that the UI is displayed correctly and that the user can create a pe
 - [ ] The user can see a plus in the top left corner.
 - Pressing the plus:
   - [ ] Takes the user to the avatar selection screen.
-  - [ ] Displays a UI illustration the stages of persona creation in the top right (3 is a check/tick).
-  - [ ] The stages UI is showing 1 of 3.
   - [ ] The user can see a back button in the bottom left corner.
   - [ ] The user can see a persona information button in the bottom right corner.
   - [ ] Pressing the back button takes the user back to the dashboard screen, with no new persona created.
@@ -106,6 +104,7 @@ Making sure that the UI is displayed correctly and that the user can create a pe
 - Pressing the persona information button:
   - [ ] Takes the user to the persona information screen. (see unit 1.1.6 for functionality here)
   - [ ] The user can see a select avatar button in the bottom left corner.
+  - [ ] Pressing the select avatar button takes the user to the avatar selection screen.
   - [ ] The user can see a create persona button in the bottom right corner.
   - [ ] The stages UI is showing 2 of 3.
   - [ ] Using flow in 1.1.6, the user can create a persona.
@@ -128,16 +127,16 @@ Making sure that the UI is displayed correctly and that the user can select an a
 **Glossary**
 - Active Avatar: The avatar that the user has currently set to active in Emergence.
 - Selected Avatar: The avatar that the user has selected to view in the edit persona screen, it may not be the same as the active avatar.
+- [.../...] The left option is for the create persona flow, the right option is for the edit persona flow.
 
 **Expected Output**:
 - [ ] There should be an icon for each avatar arranged in a grid on the left.
 - [ ] The user can see the icon of the selected avatar on the right.
 - [ ] The user can see the icon of the selected avatar on the right blurred and scaled behind the avatar.
-- [ ] The user can see a cancel/back button in the bottom left corner.
-- [ ] The user can see a confirm avatar/next button in the bottom right corner.
-- [ ] Pressing the cancel button if the selected avatar was different to the active avatar, the active avatar is not changed.
-- [ ] Pressing the confirm avatar button if the selected avatar was different to the active avatar, the active avatar is changed to the selected avatar.
-
+- [ ] The user can see a [back/cancel] button in the bottom left corner.
+- [ ] The user can see a [next button/confirm avatar] in the bottom right corner.
+- [ ] Pressing the [back/cancel] button if the selected avatar was different to the active avatar, the active avatar is not changed.
+- [ ] Pressing the [next button/confirm avatar] button if the selected avatar was different to the active avatar, the active avatar is changed to the selected avatar.
 
 #### Unit 1.1.6: Persona information screen basic functionality.
 
