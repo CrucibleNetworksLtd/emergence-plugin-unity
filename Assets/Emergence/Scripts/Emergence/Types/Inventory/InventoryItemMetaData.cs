@@ -20,9 +20,9 @@ namespace EmergenceSDK.Types.Inventory
         {
             Name = other.Name;
             Description = other.Description;
-            Attributes = new List<InventoryItemMetaAttributes>(other.Attributes);
-            Content = new List<InventoryItemMetaContent>(other.Content);
-            Restrictions = new List<object>(other.Restrictions);
+            Attributes = new List<InventoryItemMetaAttributes>(other.Attributes ?? new List<InventoryItemMetaAttributes>());
+            Content = new List<InventoryItemMetaContent>(other.Content ?? new List<InventoryItemMetaContent>());
+            Restrictions = new List<object>(other.Restrictions ?? new List<object>());
             DynamicMetadata = other.DynamicMetadata;
         }
     }
