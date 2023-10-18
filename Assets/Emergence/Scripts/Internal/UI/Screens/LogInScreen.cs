@@ -145,6 +145,12 @@ namespace EmergenceSDK.Internal.UI.Screens
             return true;
         }
 
+        public void FullRestart()
+        {
+            loginComplete = false;
+            Restart();
+        }
+        
         public void Restart()
         {
             if(loginComplete)
