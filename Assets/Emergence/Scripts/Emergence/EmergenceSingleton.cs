@@ -23,33 +23,33 @@ namespace EmergenceSDK
 
         public event Action OnGameClosing;
 
-        [FormerlySerializedAs("_environment")] public Environment Environment = new Environment();
+        public Environment Environment = new Environment();
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
         private UICursorHandler cursorHandler;
         private GameObject ui;
         private string accessToken;
         private string address;
-        private InputAction uiToggleAction;
         private InputAction closeAction;
 
-        [FormerlySerializedAs("key")] [Header("Keyboard shortcut to open Emergence")] [SerializeField]
-        private Key Key = Key.Tab;
+        [Header("Keyboard shortcut to open Emergence")] 
+        [SerializeField]
+        private KeyCode Key = KeyCode.Z;
 
-        [FormerlySerializedAs("shift")] 
         [SerializeField] 
-        private bool Shift = true;
+        private bool Shift = false;
 
-        [FormerlySerializedAs("ctrl")] 
         [SerializeField] 
         private bool Ctrl = false;
 
-        [FormerlySerializedAs("OnEmergenceUIOpened")] [Header("Events")] public EmergenceUIEvents.EmergenceUIOpened EmergenceUIOpened;
-        [FormerlySerializedAs("OnEmergenceUIClosed")] public EmergenceUIEvents.EmergenceUIClosed EmergenceUIClosed;
+        [Header("Events")] 
+        public EmergenceUIEvents.EmergenceUIOpened EmergenceUIOpened;
+        public EmergenceUIEvents.EmergenceUIClosed EmergenceUIClosed;
 
         // Not showing this event in the Inspector because the actual visibility 
         // parameter value would be overwritten by the value set in the inspector
-        [FormerlySerializedAs("OnEmergenceUIVisibilityChanged")] [HideInInspector] public EmergenceUIEvents.EmergenceUIStateChanged EmergenceUIVisibilityChanged;
+        [HideInInspector] 
+        public EmergenceUIEvents.EmergenceUIStateChanged EmergenceUIVisibilityChanged;
         public EmergencePersona CurrentCachedPersona { get; set; }
 
         [Header("Set the emergence SDK log level")]
@@ -59,18 +59,7 @@ namespace EmergenceSDK
         {
             if (ScreenManager.Instance == null)
             {
-                ui.SetActive(true);
-                GameObject UIRoot = Instantiate(Resources.Load<GameObject>("Emergence Root"));
-                UIRoot.name = "Emergence UI Overlay";
-                UIRoot.GetComponentInChildren<EventSystem>().enabled = true;
-                ui.SetActive(false);
-                ScreenManager.Instance.gameObject.SetActive(true);
-                ScreenManager.Instance.ShowWelcome().Forget();
-                CursorHandler.SaveCursor();
-                CursorHandler.UpdateCursor();
-                EmergenceUIOpened.Invoke();
-                EmergenceUIVisibilityChanged?.Invoke(true);
-                
+                OpenOverlayFirstTime();
             }
             else
             {
@@ -84,7 +73,22 @@ namespace EmergenceSDK
                 }
             }
         }
-        
+
+        private void OpenOverlayFirstTime()
+        {
+            ui.SetActive(true);
+            GameObject UIRoot = Instantiate(Resources.Load<GameObject>("Emergence Root"));
+            UIRoot.name = "Emergence UI Overlay";
+            UIRoot.GetComponentInChildren<EventSystem>().enabled = true;
+            ui.SetActive(false);
+            ScreenManager.Instance.gameObject.SetActive(true);
+            ScreenManager.Instance.ShowWelcome().Forget();
+            CursorHandler.SaveCursor();
+            CursorHandler.UpdateCursor();
+            EmergenceUIOpened.Invoke();
+            EmergenceUIVisibilityChanged?.Invoke(true);
+        }
+
         public void CloseEmergenceUI()
         {
             if (ScreenManager.Instance == null)
@@ -111,21 +115,16 @@ namespace EmergenceSDK
         
         private void OnEnable()
         {
-            uiToggleAction.Enable();
             closeAction.Enable();
         }
 
         private void OnDisable()
         {
-            uiToggleAction.Disable();
             closeAction.Disable();
         }
 
         private new void Awake() 
         {
-            uiToggleAction = new InputAction("UIToggle", binding: $"<Keyboard>/{Key.ToString().ToLower()}");
-            uiToggleAction.performed += _ => ToggleUIKeyPressed();
-
             closeAction = new InputAction("CloseAction", binding: "<Keyboard>/escape");
             closeAction.performed += _ => CloseUI();
             
@@ -150,28 +149,35 @@ namespace EmergenceSDK
             ui = transform.GetChild(0).gameObject;
             ui.SetActive(false);
         }
-        
-        private void ToggleUIKeyPressed()
+
+        void Update()
         {
-            if ((Shift && !Keyboard.current.shiftKey.isPressed) || (Ctrl && !Keyboard.current.ctrlKey.isPressed))
+            if (Input.GetKeyDown(Key))
             {
-                return;
+                var shiftCheck = !Shift || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+                var ctrlCheck = !Ctrl || Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+                var necessaryModifiersPressed = shiftCheck && ctrlCheck;
+                if (!necessaryModifiersPressed)
+                {
+                    return;
+                }
+                ToggleUI();
             }
-            ToggleUI();
         }
         
         private void ToggleUI()
         {
-            if (ScreenManager.Instance != null)
+            if (ScreenManager.Instance == null)
             {
-                if (ScreenManager.Instance.IsVisible)
-                {
-                    CloseEmergenceUI();
-                }
-                else
-                {
-                    OpenEmergenceUI();
-                }
+                OpenOverlayFirstTime();
+            }
+            else if (ScreenManager.Instance.IsVisible)
+            {
+                CloseEmergenceUI();
+            }
+            else
+            {
+                OpenEmergenceUI();
             }
         }
 
