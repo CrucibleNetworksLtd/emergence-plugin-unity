@@ -88,6 +88,9 @@ namespace EmergenceSDK.Internal.Services
                 case UnityWebRequest.kHttpVerbPOST:
                     ret = GeneratePostRequest(url, bodyData);
                     break;
+                case UnityWebRequest.kHttpVerbPUT:
+                    ret = GeneratePutRequest(url, bodyData);
+                    break;
                 default:
                     throw new Exception("Unsupported HTTP method: " + method);
             }
@@ -106,6 +109,16 @@ namespace EmergenceSDK.Internal.Services
             if(bodyData.Length > 0)
             {
                 request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyData));
+                request.uploadHandler.contentType = "application/json";
+            }
+            return request;
+        }
+        
+        private static UnityWebRequest GeneratePutRequest(string url, string bodyData)
+        {
+            var request = UnityWebRequest.Put(url, bodyData);
+            if(bodyData.Length > 0)
+            {
                 request.uploadHandler.contentType = "application/json";
             }
             return request;

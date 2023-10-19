@@ -66,15 +66,20 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void UpdateDynamicMetadata(InventoryItem item)
         {
             EmergenceLogger.LogInfo("Updating Dynamic metadata", true);
-            if (string.IsNullOrEmpty(item.Meta.DynamicMetadata)) 
-                return;
-            
-            var curMetadata = int.Parse(item.Meta.DynamicMetadata);
-            curMetadata++;
+            if (!string.IsNullOrEmpty(item.Meta.DynamicMetadata))
+            {
+                var curMetadata = int.Parse(item.Meta.DynamicMetadata);
+                curMetadata++;
+                dynamicMetaDataService.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
+                    curMetadata.ToString(), UpdateDynamicMetadataSuccess, EmergenceLogger.LogError);
+            }
+            else
+            {
+                var curMetadata = 1;
+                dynamicMetaDataService.WriteNewDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
+                    curMetadata.ToString(), UpdateDynamicMetadataSuccess, EmergenceLogger.LogError);
+            }
 
-            dynamicMetaDataService.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
-                curMetadata.ToString(), UpdateDynamicMetadataSuccess, EmergenceLogger.LogError);
-            
             void UpdateDynamicMetadataSuccess(string response)
             {
                 var dynamicMetaData = JsonUtility.FromJson<DynamicMetaData>(response);
