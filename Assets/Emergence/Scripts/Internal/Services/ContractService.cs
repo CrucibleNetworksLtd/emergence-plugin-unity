@@ -126,7 +126,7 @@ namespace EmergenceSDK.Internal.Services
                 var transactionStatus = await EmergenceServices.GetService<IChainService>().GetTransactionStatusAsync(transactionHash, contractInfo.NodeUrl);
                 if(transactionStatus.Result?.transaction?.Confirmations >= 3)
                 {
-                    WriteMethodConfirmed.Invoke(new WriteContractResponse(transactionHash));
+                    WriteMethodConfirmed?.Invoke(new WriteContractResponse(transactionHash));
                     return;
                 }
                 attempts++;
