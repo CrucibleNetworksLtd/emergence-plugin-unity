@@ -31,7 +31,7 @@ namespace EmergenceSDK.Internal.Services
             return new ServiceResponse<List<Avatar>>(true, avatarResponse.message);
         }
         
-        public async UniTask<ServiceResponse<Avatar>> AvatarByIdAsync(string id)
+        public async UniTask<ServiceResponse<Avatar>> AvatarByIdAsync(string id) //Not a full ID????
         {
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "id?id=" + id;
             

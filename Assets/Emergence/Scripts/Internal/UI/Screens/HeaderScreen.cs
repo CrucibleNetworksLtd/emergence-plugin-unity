@@ -62,7 +62,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     {
                         result += "." + splitted[1].Substring(0, Mathf.Min(UnitConverter.SIGNIFICANT_DIGITS, splitted.Length));
                     }
-                    walletBalance.text = result;
+                    walletBalance.text = result + " " + EmergenceSingleton.Instance.Configuration.Chain.CurrencySymbol;
                 }
                 else
                 {

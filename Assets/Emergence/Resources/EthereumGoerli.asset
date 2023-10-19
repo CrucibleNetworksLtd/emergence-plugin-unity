@@ -14,4 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DefaultNodeURL: https://goerli.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134
   ChainID: 5
-  networkName: Goerli
+  NetworkName: Goerli
+  CurrencySymbol: ETH
+  CurrencyName: Ether

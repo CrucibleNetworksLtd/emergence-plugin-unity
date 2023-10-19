@@ -14,4 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DefaultNodeURL: https://polygon-mumbai.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134
   ChainID: 80001
-  networkName: Mumbai
+  NetworkName: Mumbai
+  CurrencySymbol: M
+  CurrencyName: Matic

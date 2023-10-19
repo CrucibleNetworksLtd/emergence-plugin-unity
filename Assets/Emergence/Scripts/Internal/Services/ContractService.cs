@@ -148,6 +148,9 @@ namespace EmergenceSDK.Internal.Services
             public int chainId;
             public string chainName;
             public string[] rpcUrls;
+            public string currencyName;
+            public string currencySymbol;
+            public int currencyDecimals = 18;
         }
         
         private async UniTask<bool> SwitchChain(ContractInfo contractInfo)
@@ -162,7 +165,9 @@ namespace EmergenceSDK.Internal.Services
             {
                 chainId = contractInfo.ChainId,
                 chainName = contractInfo.Network,
-                rpcUrls = new[]{contractInfo.NodeUrl}
+                rpcUrls = new[]{contractInfo.NodeUrl},
+                currencyName = contractInfo.CurrencyName,
+                currencySymbol = contractInfo.CurrencySymbol
             };
 
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError,
