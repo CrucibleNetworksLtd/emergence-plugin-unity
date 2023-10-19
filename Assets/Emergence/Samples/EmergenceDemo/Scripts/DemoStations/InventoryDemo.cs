@@ -9,7 +9,6 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    //TODO: fix this!
     public class InventoryDemo : DemoStation<InventoryDemo>, IDemoStation
     {
         [SerializeField] private GameObject itemEntryPrefab;
@@ -84,6 +83,11 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void SuccessInventoryByOwner(List<InventoryItem> inventoryItems)
         {
             inventoryItemStore.SetItems(inventoryItems);
+            foreach (var inventoryItem in inventoryItems)
+            {
+                var entry = CreateEntry();
+                entry.GetComponent<InventoryItemEntry>().SetItem(inventoryItem);
+            }
         }
     }
 }
