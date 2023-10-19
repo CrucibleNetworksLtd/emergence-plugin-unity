@@ -149,7 +149,7 @@ namespace EmergenceSDK.Internal.Services
             {
                 persona.avatarId = "";
             }
-            else
+            else if (persona.avatarId.Length > 0)
             {
                 if (persona.avatar != null)
                 {
