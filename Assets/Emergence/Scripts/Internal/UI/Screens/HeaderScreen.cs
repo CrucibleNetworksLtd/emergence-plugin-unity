@@ -21,7 +21,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public static HeaderScreen Instance;
 
-        private readonly float refreshTimeOut = 30.0f;
+        private readonly float refreshTimeOut = 90.0f;
         private IWalletService walletService => EmergenceServices.GetService<WalletService>();
         private ISessionService sessionService => EmergenceServices.GetService<SessionService>();
         
