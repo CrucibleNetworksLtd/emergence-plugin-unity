@@ -71,6 +71,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 }
 
                 HeaderScreen.Instance.Refresh(handshake);
+                HeaderScreen.Instance.Show();
                 
                 var refreshAccessToken = await HandleRefreshAccessToken();
                 if (!refreshAccessToken)

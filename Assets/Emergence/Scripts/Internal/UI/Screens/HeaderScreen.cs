@@ -37,8 +37,6 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         private void Start()
         {
-            Hide();
-
             refreshCancellationToken = new CancellationTokenSource();
             _ = RefreshWalletBalanceAsync(refreshCancellationToken.Token);
         }
@@ -64,7 +62,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     {
                         result += "." + splitted[1].Substring(0, Mathf.Min(UnitConverter.SIGNIFICANT_DIGITS, splitted.Length));
                     }
-                    walletBalance.text = result;// + " " + Emergence.Instance.TokenSymbol;
+                    walletBalance.text = result;
                 }
                 else
                 {
@@ -105,6 +103,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private async void OnDisconnectClick()
         {
             Modal.Instance.Show("Disconnecting wallet...");
+            refreshCancellationToken?.Cancel();
             var result = await sessionService.DisconnectAsync();
             Modal.Instance.Hide();
             if (result.Success)
