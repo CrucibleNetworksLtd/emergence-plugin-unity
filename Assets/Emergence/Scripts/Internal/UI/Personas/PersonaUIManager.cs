@@ -111,7 +111,6 @@ namespace EmergenceSDK.Internal.UI.Personas
             
             dashboardScreen.HideUI();
             dashboardScreen.HideDetailsPanel();
-            HeaderScreen.Instance.Show();
             while (personaScrollContents.childCount > 0)
             {
                 personaButtonPool.ReturnUsedObject(personaScrollContents.GetChild(0).gameObject);
@@ -122,7 +121,13 @@ namespace EmergenceSDK.Internal.UI.Personas
             var personas = await personaService.GetPersonasAsync();
             if (personas.Success)
             {
-                GetPersonasSuccess(personas.Result0, personas.Result1);
+                if(personas.Result0.Count == 0 || personas.Result1 == null)
+                {
+                    Modal.Instance.Hide();
+                    dashboardScreen.ShowUI(true);
+                    return;
+                }
+                GetPersonasSuccess(personas.Result0);
             }
             else
             {
@@ -131,7 +136,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             personaCarousel.GoToActivePersona();
         }
 
-        private void GetPersonasSuccess(List<Persona> personas, Persona currentPersona)
+        private void GetPersonasSuccess(List<Persona> personas)
         {
             Modal.Instance.Show("Retrieving avatars...");
             try
@@ -140,7 +145,7 @@ namespace EmergenceSDK.Internal.UI.Personas
                 imagesRefreshing.Clear();
 
                 //Update scroll items
-                List<PersonaScrollItem> scrollItems = CreateScrollItems(personas, currentPersona);
+                List<PersonaScrollItem> scrollItems = CreateScrollItems(personas);
                 if(scrollItems.Count > 0)
                 {
                     PersonaScrollItemStore.SetPersonas(scrollItems);
@@ -162,7 +167,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
         }
         
-        private List<PersonaScrollItem> CreateScrollItems(List<Persona> personas, Persona currentPersona)
+        private List<PersonaScrollItem> CreateScrollItems(List<Persona> personas)
         {
             List<PersonaScrollItem> scrollItems = new List<PersonaScrollItem>();
 
