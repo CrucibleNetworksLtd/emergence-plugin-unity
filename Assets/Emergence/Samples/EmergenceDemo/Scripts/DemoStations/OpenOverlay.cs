@@ -52,9 +52,10 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         public void OnPersonaUpdated(Persona persona) 
         {
-            Debug.Log("Changing avatar");
+            EmergenceLogger.LogInfo("Changing avatar", true);
             if (persona != null && !string.IsNullOrEmpty(persona.avatarId))
             {
+                
                 avatarService.AvatarById(persona.avatarId, (async avatar =>
                 {
                     var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, Helpers.InternalIPFSURLToHTTP(avatar.tokenURI), EmergenceLogger.LogError);
