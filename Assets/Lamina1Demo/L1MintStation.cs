@@ -55,7 +55,7 @@ namespace EmergenceSDK
             
             var contractInfo = new ContractInfo(deployedContract, "mint");
             
-            ContractService.WriteMethod(contractInfo, "", "", "0", new string[] { }, OnWriteSuccess, EmergenceLogger.LogError);
+            ContractService.WriteMethod(contractInfo, "", "", "1000000000000000000", new string[] { }, OnWriteSuccess, EmergenceLogger.LogError);
         }
         
         private void OnWriteSuccess(BaseResponse<string> response)

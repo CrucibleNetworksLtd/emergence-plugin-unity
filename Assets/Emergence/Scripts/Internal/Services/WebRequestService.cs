@@ -176,6 +176,12 @@ namespace EmergenceSDK.Internal.Services
                         return new WebResponse(false, serverMessage);
                     }
                 }
+
+                return new WebResponse(false, e.Message);
+            }
+            catch (UnityWebRequestException e)
+            {
+                errorCallback?.Invoke(e.Message, request.responseCode);
                 return new WebResponse(false, e.Message);
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))

@@ -15,7 +15,8 @@ namespace EmergenceSDK.Internal.Services
     {
         public event WriteMethodSuccess WriteMethodConfirmed;
         
-        private readonly List<string> loadedContractAddresses = new(); 
+        private readonly List<string> loadedContractAddresses = new();
+        private int desiredConfirmationCount = 1;
         private bool CheckForNewContract(ContractInfo contractInfo) => !loadedContractAddresses.Contains(contractInfo.ContractAddress);
         
         /// <summary>
@@ -74,8 +75,7 @@ namespace EmergenceSDK.Internal.Services
             var readContractResponse = SerializationHelper.Deserialize<BaseResponse<ReadContractResponse>>(response.Response);
             return new ServiceResponse<ReadContractResponse>(true, readContractResponse.message);
         }
-
-
+        
         public async UniTask ReadMethod<T>(ContractInfo contractInfo, T body, ReadMethodSuccess success, ErrorCallback errorCallback)
         {
             var response = await ReadMethodAsync(contractInfo, body);
@@ -109,29 +109,35 @@ namespace EmergenceSDK.Internal.Services
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString, headers);
             if(response.IsSuccess == false)
                 return new ServiceResponse<WriteContractResponse>(false);
-            
+
             var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response.Response);
             CheckForTransactionSuccess(contractInfo, writeContractResponse.message.transactionHash).Forget();
             return new ServiceResponse<WriteContractResponse>(true, writeContractResponse.message);
         }
         
-        private async UniTask CheckForTransactionSuccess(ContractInfo contractInfo, string transactionHash, int maxAttempts = 15)
+        private async UniTask CheckForTransactionSuccess(ContractInfo contractInfo, string transactionHash, int maxAttempts = 10)
         {
             int attempts = 0;
-            int timeOut = 5000;
+            int timeOut = 7500;
+            int confirmations = 0;
             while (attempts < maxAttempts)
             {
                 await UniTask.Delay(timeOut);
 
                 var transactionStatus = await EmergenceServices.GetService<IChainService>().GetTransactionStatusAsync(transactionHash, contractInfo.NodeUrl);
-                if(transactionStatus.Result?.transaction?.Confirmations >= 3)
+                if (transactionStatus.Result?.transaction?.Confirmations != null)
+                    confirmations = (int)transactionStatus.Result?.transaction?.Confirmations;
+                if(transactionStatus.Result?.transaction?.Confirmations >= desiredConfirmationCount)
                 {
                     WriteMethodConfirmed?.Invoke(new WriteContractResponse(transactionHash));
-                    return;
+                    break;
                 }
                 attempts++;
             }
-            EmergenceLogger.LogError("Transaction failed");
+            if(confirmations != 0)
+                EmergenceLogger.LogInfo($"Transaction received {confirmations} confirmations after {(timeOut*maxAttempts)/1000} seconds");
+            else
+                EmergenceLogger.LogWarning("Transaction failed to receive any confirmations");
         }
 
         public async UniTask WriteMethod<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, WriteMethodSuccess success, ErrorCallback errorCallback)
