@@ -22,7 +22,7 @@ namespace EmergenceSDK.Types
             set
             {
                 _avatar = value;
-                avatarId = value?.avatarId;
+                avatarId = GenerateAvatarId(value);
             }
         }
 
@@ -31,6 +31,13 @@ namespace EmergenceSDK.Types
         {
             get;
             set;
+        }
+        
+        private string GenerateAvatarId(Avatar avatar)
+        {
+            if(avatar == null)
+                return "";
+            return $"{avatar.chain}:{avatar.contractAddress}:{avatar.tokenId}:{avatar.GUID}";
         }
 
         public override string ToString()

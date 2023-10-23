@@ -31,8 +31,9 @@ namespace EmergenceSDK.Internal.Services
             return new ServiceResponse<List<Avatar>>(true, avatarResponse.message);
         }
         
-        public async UniTask<ServiceResponse<Avatar>> AvatarByIdAsync(string id) //Not a full ID????
+        public async UniTask<ServiceResponse<Avatar>> AvatarByIdAsync(string id)
         {
+            EmergenceLogger.LogInfo($"AvatarByIdAsync: {id}");
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "id?id=" + id;
             
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError);
