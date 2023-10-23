@@ -95,7 +95,6 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void OnSaveAvatar()
         {
-            AvatarSelectionScreen.CurrentAvatar = AvatarSelectionScreen.CurrentAvatar;
             ToggleAvatarSelectionAndPersonaInfo(true);
         }
         
