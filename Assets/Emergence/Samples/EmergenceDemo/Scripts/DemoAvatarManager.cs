@@ -9,35 +9,41 @@ namespace EmergenceSDK.EmergenceDemo
 {
     public class DemoAvatarManager : SingletonComponent<DemoAvatarManager>
     {
+        private Vrm10Instance vrm;
+        private SkinnedMeshRenderer originalMesh;
+
         public async void SwapAvatars(string vrmURL)
         {
+            //Set original mesh if it is not already set
+            if (originalMesh == null)
+            {
+                originalMesh = GameObject.Find("PlayerArmature").GetComponentInChildren<SkinnedMeshRenderer>();
+            }
+            
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, vrmURL, "");
             await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
             byte[] response = request.downloadHandler.data;
             WebRequestService.CleanupRequest(request);
-
-            var vrm10 = await Vrm10.LoadBytesAsync(response, true);
-            GameObject playerArmature = GameObject.Find("PlayerArmature");
             
-            if (playerArmature == null)
+            var newVRM = await Vrm10.LoadBytesAsync(response, true);
+            if(newVRM.gameObject != null && vrm != null)
             {
-                playerArmature = Instantiate(Resources.Load<GameObject>("PlayerArmature"));
-                playerArmature.name = "PlayerArmature";
+                Destroy(vrm.gameObject);
             }
+            vrm = newVRM;
             
-            var originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
-            vrm10.transform.position = playerArmature.transform.position;
-            vrm10.transform.rotation = playerArmature.transform.rotation;
-            vrm10.transform.parent = playerArmature.transform;
-            vrm10.name = "VRMAvatar";
+            GameObject playerArmature = GameObject.Find("PlayerArmature");
+            vrm.transform.position = playerArmature.transform.position;
+            vrm.transform.rotation = playerArmature.transform.rotation;
+            vrm.transform.parent = playerArmature.transform;
+            vrm.name = "VRMAvatar";
             
             await UniTask.DelayFrame(1); 
             
-            UnityEngine.Avatar vrmAvatar = vrm10.GetComponent<Animator>().avatar;
+            UnityEngine.Avatar vrmAvatar = vrm.GetComponent<Animator>().avatar;
             playerArmature.GetComponent<Animator>().avatar = vrmAvatar;
 
-            vrm10.gameObject.GetComponent<Animator>().enabled = false;
-
+            vrm.gameObject.GetComponent<Animator>().enabled = false;
             originalMesh.enabled = false;
         }
         
@@ -51,8 +57,6 @@ namespace EmergenceSDK.EmergenceDemo
                 playerArmature = Instantiate(Resources.Load<GameObject>("PlayerArmature"));
                 playerArmature.name = "PlayerArmature";
             }
-            
-            var originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
 
             originalMesh.enabled = true;
             playerArmature.GetComponent<Animator>().avatar = Resources.Load<UnityEngine.Avatar>("ArmatureAvatar");

@@ -14,13 +14,6 @@ namespace EmergenceSDK.Internal.UI.Inventory
         [SerializeField]
         private RawImage itemImage;
 
-        private bool isPlaying = false;
-
-        private List<Texture2D> frames = new();
-        private List<float> frameDelays = new();
-
-        private int curFrame = 0;
-
         private static HttpClient client = new();
 
         public void LoadStaticImage(Texture2D texture)

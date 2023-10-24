@@ -109,7 +109,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             if (result.Success)
             {
                 Hide();
-                ScreenManager.Instance.Restart();
+                ScreenManager.Instance.Restart().Forget();
             }
         }
     }

@@ -37,7 +37,7 @@ namespace EmergenceSDK.Internal.Utils
             return result;
         }
 
-        public async void HandleLog(string logString, string callingClass, EmergenceLogger.LogLevel type) 
+        public void HandleLog(string logString, string callingClass, EmergenceLogger.LogLevel type) 
         {
             myLogQueue.Enqueue((Text: "[" + type + "] : " + logString, Style: logStyle));
             myLogQueue.Enqueue((Text: callingClass, Style: callingClassStyle));

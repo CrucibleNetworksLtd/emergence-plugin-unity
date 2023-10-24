@@ -8,7 +8,7 @@ namespace EmergenceSDK
 {
     public class TextureEditor : MonoBehaviour
     {
-        async void Start()
+        void Start()
         {
             DownloadImage downloadImage = new DownloadImage();
             downloadImage.Download(null, "https://ipfs.io/ipfs/QmSFGKuCsZEPzEEuPUGHyuc1YMsqi4jJdgKkDhyxgu1AHS/33.gif", HandleImageDownloadSuccess, (url, error, code) => { }).Forget();

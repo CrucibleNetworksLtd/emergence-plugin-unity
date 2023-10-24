@@ -142,7 +142,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             if (!tokenResponse.Success)
                 return false;
             PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
-            ScreenManager.Instance.ShowDashboard();
+            ScreenManager.Instance.ShowDashboard().Forget();
             return true;
         }
 
