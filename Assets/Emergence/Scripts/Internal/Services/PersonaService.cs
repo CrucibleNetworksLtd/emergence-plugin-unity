@@ -30,7 +30,7 @@ namespace EmergenceSDK.Internal.Services
 
             private set 
             {
-                if (cachedPersona?.id == value?.id)
+                if (cachedPersona?.id == value?.id && cachedPersona?.avatarId == value?.avatarId)
                     return;
 
                 cachedPersona = value;
@@ -149,7 +149,7 @@ namespace EmergenceSDK.Internal.Services
             {
                 persona.avatarId = "";
             }
-            else if (persona.avatarId.Length > 0)
+            else if (persona.avatarId.Length > 3)
             {
                 if (persona.avatar != null)
                 {

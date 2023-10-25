@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: L1MintDeployedSmartContract
   m_EditorClassIdentifier: 
   contractAddress: 0xdd3896170f02C557b131246907F2bdDE40c65e60
-  contract: {fileID: 11400000, guid: 8818a6a0382134aacb3623b361866a61, type: 2}
+  contract: {fileID: 11400000, guid: 113f4ca467c814b7aad828c959dd7f8d, type: 2}
   chain: {fileID: 11400000, guid: 6470f9a4549ba4c728f1dc937ee1fa2c, type: 2}

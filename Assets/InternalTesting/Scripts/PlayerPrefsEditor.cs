@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using EmergenceSDK.Internal.Utils;
 using UnityEditor;
 using UnityEngine;
@@ -26,3 +27,4 @@ public class PlayerPrefsEditor : EditorWindow
         }
     }
 }
+#endif

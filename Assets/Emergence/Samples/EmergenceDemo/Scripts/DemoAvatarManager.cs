@@ -49,6 +49,10 @@ namespace EmergenceSDK.EmergenceDemo
         
         public void SetDefaultAvatar()
         {
+            if (originalMesh == null)
+            {
+                originalMesh = GameObject.Find("PlayerArmature").GetComponentInChildren<SkinnedMeshRenderer>();
+            }
             GameObject vrmAvatar = GameObject.Find("VRMAvatar");
             GameObject playerArmature = GameObject.Find("PlayerArmature");
             
