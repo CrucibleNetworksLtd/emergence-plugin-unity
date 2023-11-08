@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
@@ -28,9 +29,9 @@ namespace EmergenceSDK.Internal.Services
         {
             get => cachedPersona;
 
-            private set 
+            private set
             {
-                if (cachedPersona?.id == value?.id && cachedPersona?.avatarId == value?.avatarId)
+                if(ObjectEqualityUtil.AreObjectsEqual(cachedPersona, value))
                     return;
 
                 cachedPersona = value;
@@ -38,7 +39,7 @@ namespace EmergenceSDK.Internal.Services
             }
 
         }
-
+        
         public bool GetCurrentPersona(out Persona currentPersona)
         {
             currentPersona = CurrentPersona;
