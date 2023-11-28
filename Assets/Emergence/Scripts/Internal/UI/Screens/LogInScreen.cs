@@ -5,6 +5,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace EmergenceSDK.Internal.UI.Screens
@@ -15,7 +16,13 @@ namespace EmergenceSDK.Internal.UI.Screens
         public RawImage rawQRImage;
         public Button backButton;
         public TextMeshProUGUI refreshCounterText;
-
+        
+        [Header("Futureverse")]
+        public Button LoginWithFV;
+        public Button LoginWithWC;
+        public Button CreateFPass;
+        public Button RetryFPassCheck;
+        
         public void SetTimeRemainingText() => refreshCounterText.text = timeRemaining.ToString("0");
 
         private readonly int qrRefreshTimeOut = 60;
