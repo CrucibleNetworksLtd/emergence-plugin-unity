@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -17,6 +18,11 @@ namespace EmergenceSDK.Internal.UI.Screens
         public Button backButton;
         public TextMeshProUGUI refreshCounterText;
         
+        [Header("Sub Screens")]
+        public GameObject qrScreen;
+        public GameObject futureverseScreen;
+        public GameObject startupScreen;
+        
         [Header("Futureverse")]
         public Button LoginWithFV;
         public Button LoginWithWC;
@@ -27,6 +33,8 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private readonly int qrRefreshTimeOut = 60;
         private int timeRemaining;
+        
+        private bool usingFV = false;
         
         public static LogInScreen Instance;
         
@@ -42,6 +50,53 @@ namespace EmergenceSDK.Internal.UI.Screens
         private void Awake()
         {
             Instance = this;
+            
+            LoginWithFV.onClick.AddListener(LoginWithFVClicked);
+            LoginWithWC.onClick.AddListener(LoginWithWCClicked);
+            
+            CreateFPass.onClick.AddListener(CreateFPassClicked);
+            RetryFPassCheck.onClick.AddListener(RetryFPassCheckClicked);
+        }
+
+        private void HideAllScreens()
+        {
+            qrScreen.SetActive(false);
+            futureverseScreen.SetActive(false);
+            startupScreen.SetActive(false);
+        }
+        
+        private void LoginWithFVClicked()
+        {
+            HideAllScreens();
+            usingFV = true;
+            qrScreen.SetActive(true);
+        }
+        
+        private void LoginWithWCClicked()
+        {
+            HideAllScreens();
+            usingFV = false;
+            qrScreen.SetActive(true);
+        }
+        
+        private void CreateFPassClicked()
+        {
+            Application.OpenURL("https://futurepass.futureverse.app/");
+        }
+
+        private void RetryFPassCheckClicked()
+        {
+            FullRestart();
+        }
+
+
+        private void OnDestroy()
+        {
+            LoginWithFV.onClick.RemoveListener(LoginWithFVClicked);
+            LoginWithWC.onClick.RemoveListener(LoginWithWCClicked);
+            
+            CreateFPass.onClick.RemoveListener(CreateFPassClicked);
+            RetryFPassCheck.onClick.RemoveListener(RetryFPassCheckClicked);
         }
 
         private void OnEnable()
@@ -148,8 +203,33 @@ namespace EmergenceSDK.Internal.UI.Screens
             var tokenResponse = await personaService.GetAccessTokenAsync();
             if (!tokenResponse.Success)
                 return false;
+
+            if (usingFV)
+            {
+                var loggedInWithFV = await AttemptFVLogin();
+                if (!loggedInWithFV)
+                { 
+                    HideAllScreens();
+                    futureverseScreen.SetActive(true);
+                    return true; //Bit of a hack to prevent the screen from refreshing.
+                }
+            }
+
             PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
             ScreenManager.Instance.ShowDashboard().Forget();
+            return true;
+        }
+
+        private async UniTask<bool> AttemptFVLogin()
+        {
+            var fvService = EmergenceServices.GetService<IFutureverseService>();
+            var linkedPassInfo = await fvService.GetLinkedFuturepassInformation();
+            if (!linkedPassInfo.Success)
+                return false;
+            var fpass = await fvService.GetFuturePassInformation(linkedPassInfo.Result.ownedFuturepass);
+            if (!fpass.Success)
+                return false;
+            EmergenceLogger.LogInfo("Logged in with Futureverse.");
             return true;
         }
 
@@ -163,6 +243,10 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             if(loginComplete)
                 return;
+            
+            HideAllScreens();
+            startupScreen.SetActive(true);
+            
             timeRemaining = qrRefreshTimeOut;
             qrCancellationToken.Cancel();
             qrCancellationToken = new CancellationTokenSource();

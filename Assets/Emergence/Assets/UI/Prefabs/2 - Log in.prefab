@@ -401,6 +401,39 @@ Transform:
   m_Father: {fileID: 3239401303305131987}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2412153247935832932
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5484432918081859406}
+  m_Layer: 0
+  m_Name: StartupScreen
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5484432918081859406
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2412153247935832932}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 590.5, y: 274.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6327601352933475382}
+  - {fileID: 54820470063262798}
+  m_Father: {fileID: 3239401305376179650}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2537909979082734655
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,6 +651,9 @@ MonoBehaviour:
   rawQRImage: {fileID: 3239401303820466794}
   backButton: {fileID: 2096571863748915045}
   refreshCounterText: {fileID: 3239401304280372750}
+  qrScreen: {fileID: 5435868443297538998}
+  futureverseScreen: {fileID: 8999934848240542198}
+  startupScreen: {fileID: 2412153247935832932}
   LoginWithFV: {fileID: 617189775883837140}
   LoginWithWC: {fileID: 8494673748350320234}
   CreateFPass: {fileID: 1805932965639632804}
@@ -1408,8 +1444,7 @@ RectTransform:
   - {fileID: 3239401304476135716}
   - {fileID: 3239401304928483319}
   - {fileID: 970377022399129146}
-  - {fileID: 6327601352933475382}
-  - {fileID: 54820470063262798}
+  - {fileID: 5484432918081859406}
   m_Father: {fileID: 3239401303305131987}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1444,18 +1479,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4663817856882074325}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3700193039598119158}
-  m_Father: {fileID: 3239401305376179650}
-  m_RootOrder: 6
+  m_Father: {fileID: 5484432918081859406}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -96}
+  m_AnchoredPosition: {x: -590.5, y: -370.5}
   m_SizeDelta: {x: 640, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6707917323446394110
@@ -1671,7 +1706,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5303407070214721048}
   m_Layer: 0
-  m_Name: WCLogin
+  m_Name: QRScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1795,18 +1830,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7067579599453259332}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8316250632472429322}
-  m_Father: {fileID: 3239401305376179650}
-  m_RootOrder: 5
+  m_Father: {fileID: 5484432918081859406}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 56}
+  m_AnchoredPosition: {x: -590.5, y: -218.5}
   m_SizeDelta: {x: 640, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &256625702941693476
@@ -2183,7 +2218,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.929925, y: 0}
+  m_AnchoredPosition: {x: 1.9299316, y: 0}
   m_SizeDelta: {x: -25.060154, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6831921777843028704
@@ -2551,7 +2586,7 @@ GameObject:
   m_Component:
   - component: {fileID: 970377022399129146}
   m_Layer: 0
-  m_Name: FPLoginFailed
+  m_Name: FPLoginFailedScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

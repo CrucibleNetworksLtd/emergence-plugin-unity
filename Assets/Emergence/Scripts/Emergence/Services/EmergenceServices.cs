@@ -37,6 +37,7 @@ namespace EmergenceSDK.Services
             services.Add(new WalletService(personaService, sessionService));
             services.Add(new ContractService());
             services.Add(new ChainService());
+            services.Add(new FutureverseService());
         }
     }
 }
