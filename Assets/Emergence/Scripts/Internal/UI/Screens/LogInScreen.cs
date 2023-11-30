@@ -229,7 +229,8 @@ namespace EmergenceSDK.Internal.UI.Screens
             var fpass = await fvService.GetFuturePassInformation(linkedPassInfo.Result.ownedFuturepass);
             if (!fpass.Success)
                 return false;
-            EmergenceLogger.LogInfo("Logged in with Futureverse.");
+            EmergenceLogger.LogInfo("Logged in with Futureverse.", true);
+            fvService.GetFutureverseInventory();
             return true;
         }
 
