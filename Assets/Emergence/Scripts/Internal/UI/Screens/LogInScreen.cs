@@ -230,7 +230,6 @@ namespace EmergenceSDK.Internal.UI.Screens
             if (!fpass.Success)
                 return false;
             EmergenceLogger.LogInfo("Logged in with Futureverse.", true);
-            fvService.GetFutureverseInventory();
             return true;
         }
 

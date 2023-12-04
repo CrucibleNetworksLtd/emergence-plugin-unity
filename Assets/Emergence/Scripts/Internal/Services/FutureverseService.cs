@@ -4,6 +4,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
+using EmergenceSDK.Types.Inventory;
 using EmergenceSDK.Types.Responses;
 using EmergenceSDK.Types.Responses.FuturePass;
 using UnityEngine.Networking;
@@ -58,6 +59,35 @@ namespace EmergenceSDK.Internal.Services
             
             FVInventoryResponse fpResponse = SerializationHelper.Deserialize<FVInventoryResponse>(response.Response);
             return new ServiceResponse<FVInventoryResponse>(true, fpResponse);
+        }
+
+        public async UniTask<ServiceResponse<List<InventoryItem>>> GetFutureverseInventoryAsInventoryItems()
+        {
+            var futureverseInventory = await GetFutureverseInventory();
+            if(futureverseInventory.Success == false)
+                return new ServiceResponse<List<InventoryItem>>(false);
+            var ret = new List<InventoryItem>();
+            foreach (var edge in futureverseInventory.Result.data.nfts.edges)
+            {
+                var node = edge.node;
+                var newItem = new InventoryItem();
+                newItem.ID = $"{node.collection.chainType}:{node.collection.chainId}:{node.collection.location}:{node.tokenIdNumber}";
+                newItem.Blockchain = $"{node.collection.chainType}:{node.collection.chainId}";
+                newItem.Contract = $"{node.collection.location}";
+                newItem.TokenId = $"{node.tokenIdNumber}";
+                newItem.Meta = new InventoryItemMetaData();
+                newItem.Meta.Name = $"#{node.tokenIdNumber}";
+                newItem.Meta.Description = node.collection.name;
+                var newMetaContent = new InventoryItemMetaContent();
+                newMetaContent.URL = node.metadata.properties.image;
+                newMetaContent.MimeType = node.metadata.properties.glb_url == null ? "model/gltf-binary" : "image/png";
+                newItem.Meta.Content = new List<InventoryItemMetaContent>();
+                newItem.Meta.Content.Add(newMetaContent);
+                
+                ret.Add(newItem);
+            }
+
+            return new ServiceResponse<List<InventoryItem>>(true, ret);
         }
     }
 }

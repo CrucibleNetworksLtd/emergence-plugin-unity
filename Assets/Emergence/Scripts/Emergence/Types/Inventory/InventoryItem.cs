@@ -32,11 +32,11 @@ namespace EmergenceSDK.Types.Inventory
             Blockchain = other.Blockchain;
             Contract = other.Contract;
             TokenId = other.TokenId;
-            Creators = new List<InventoryItemCreators>(other.Creators);
+            Creators = other.Creators != null ? new List<InventoryItemCreators>(other.Creators) : new List<InventoryItemCreators>();
             Owners = other.Owners;
             Royalties = other.Royalties;
             LazySupply = other.LazySupply;
-            Pending = new List<object>(other.Pending);
+            Pending = other.Pending != null ? new List<object>(other.Pending) : new List<object>();
             MintedAt = other.MintedAt;
             LastUpdatedAt = other.LastUpdatedAt;
             Supply = other.Supply;
