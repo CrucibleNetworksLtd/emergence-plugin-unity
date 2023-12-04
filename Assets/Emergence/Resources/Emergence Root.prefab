@@ -681,7 +681,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 45, y: 20}
-  m_SizeDelta: {x: 121.04, y: 64}
+  m_SizeDelta: {x: 0, y: 64}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &2538973580807787285
 CanvasRenderer:
@@ -12577,6 +12577,8 @@ MonoBehaviour:
     type: 3}
   itemsListPanel: {fileID: 5832855823364401269}
   detailsPanel: {fileID: 5832855824481242076}
+  categories: {fileID: 5832855823581041970}
+  blockchainDropdownGO: {fileID: 5832855824390920752}
   itemNameText: {fileID: 5832855822859623037}
   itemDescriptionText: {fileID: 5832855824458603964}
   dynamicMetadata: {fileID: 5832855822939819082}

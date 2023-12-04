@@ -23,6 +23,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         public GameObject itemEntryPrefab;
         public GameObject itemsListPanel;
         public GameObject detailsPanel;
+        public GameObject categories;
+        public GameObject blockchainDropdownGO;
         public TextMeshProUGUI itemNameText;
         public TextMeshProUGUI itemDescriptionText;
         public TextMeshProUGUI dynamicMetadata;
@@ -83,8 +85,16 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private GameObject InstantiateItemEntry() => Instantiate(itemEntryPrefab, contentGO.transform, false);
         
+        
+        private void HideFVSidebars(bool isUsingFV)
+        {
+            categories.SetActive(!isUsingFV);
+            blockchainDropdownGO.SetActive(!isUsingFV);
+        }
+        
         public async UniTask Refresh()
         {
+            HideFVSidebars(EmergenceServices.GetService<IFutureverseService>().UsingFutureverse);
             var inventoryService = EmergenceServices.GetService<IInventoryService>();
             var updatedInventory = await inventoryService.InventoryByOwnerAsync(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible);
             inventoryItemStore.SetItems(updatedInventory.Result);
