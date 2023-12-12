@@ -43,8 +43,16 @@ namespace EmergenceSDK.Internal.Services
             
             FuturepassInformationResponse fpResponse = SerializationHelper.Deserialize<FuturepassInformationResponse>(response.Response);
             UsingFutureverse = true;
+            EmergenceServices.GetService<ISessionService>().OnSessionDisconnected += OnSessionDisconnected;
             FuturepassInformation = fpResponse;
             return new ServiceResponse<FuturepassInformationResponse>(true, fpResponse);
+        }
+        
+        private void OnSessionDisconnected()
+        {
+            UsingFutureverse = false;
+            FuturepassInformation = null;
+            EmergenceServices.GetService<ISessionService>().OnSessionDisconnected -= OnSessionDisconnected;
         }
         
         public async UniTask<ServiceResponse<FVInventoryResponse>> GetFutureverseInventory()
