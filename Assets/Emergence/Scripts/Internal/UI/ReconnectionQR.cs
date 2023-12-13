@@ -33,9 +33,10 @@ namespace EmergenceSDK.Internal.UI
         private bool loginComplete = false;
         
         private static ReconnectionQR instance;
-
+        
         private List<Action> reconnectionEvents = new List<Action>();
 
+        
         public static async UniTask<bool> FireEventOnReconnection(Action action)
         {
             if (instance == null)
