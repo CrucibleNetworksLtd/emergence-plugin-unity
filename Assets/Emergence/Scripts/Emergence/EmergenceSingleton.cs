@@ -54,6 +54,9 @@ namespace EmergenceSDK
 
         [Header("Set the emergence SDK log level")]
         public EmergenceLogger.LogLevel LogLevel;
+        
+        private ReconnectionQR reconnectionQR;
+        public ReconnectionQR ReconnectionQR => reconnectionQR ??= GetComponentInChildren<ReconnectionQR>(true);
 
         public void OpenEmergenceUI()
         {

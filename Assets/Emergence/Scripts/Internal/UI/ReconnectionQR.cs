@@ -32,16 +32,11 @@ namespace EmergenceSDK.Internal.UI
         private bool loginComplete = false;
         
         private static ReconnectionQR instance;
-        
-        private void Awake()
-        {
-            instance = this;
-        }
-        
+
         public static async UniTask<bool> AttemptReconnection()
         {
             if (instance == null)
-                return false;
+                instance = EmergenceSingleton.Instance.ReconnectionQR;
             instance.gameObject.SetActive(true);
             return await instance.HandleReconnection();
         }
@@ -153,7 +148,7 @@ namespace EmergenceSDK.Internal.UI
         }
         
         
-        public void Restart()
+        private void Restart()
         {
             timeRemaining = qrRefreshTimeOut;
             qrCancellationToken.Cancel();
