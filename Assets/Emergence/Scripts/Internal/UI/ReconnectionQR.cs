@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
@@ -102,6 +101,7 @@ namespace EmergenceSDK.Internal.UI
                 reconnectionEvent.Invoke();
             }
             reconnectionEvents.Clear();
+            instance.gameObject.SetActive(false);
         }
 
         private async UniTask StartCountdown(CancellationToken cancellationToken)
@@ -166,6 +166,8 @@ namespace EmergenceSDK.Internal.UI
         
         private void Restart()
         {
+            if(loginComplete)
+                return;
             timeRemaining = qrRefreshTimeOut;
             qrCancellationToken.Cancel();
             qrCancellationToken = new CancellationTokenSource();
