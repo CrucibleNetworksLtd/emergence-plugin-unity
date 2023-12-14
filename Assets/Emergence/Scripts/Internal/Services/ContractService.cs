@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -18,6 +19,8 @@ namespace EmergenceSDK.Internal.Services
         private readonly List<string> loadedContractAddresses = new();
         private int desiredConfirmationCount = 1;
         private bool CheckForNewContract(ContractInfo contractInfo) => !loadedContractAddresses.Contains(contractInfo.ContractAddress);
+
+        private const int MaxRetryAttempts = 1;
         
         /// <summary>
         /// Loads the contract if it is new
@@ -85,10 +88,24 @@ namespace EmergenceSDK.Internal.Services
                 errorCallback?.Invoke("Error in ReadMethod", (long)response.Code);
         }
 
-        public async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsync<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body)
+        public async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsync<T>(ContractInfo contractInfo,
+            string localAccountNameIn, string gasPriceIn, string value, T body)
         {
-            if(!await SwitchChain(contractInfo))
-                return new ServiceResponse<WriteContractResponse>(false);
+            return await WriteMethodAsyncImpl<T>(contractInfo, localAccountNameIn, gasPriceIn, value, body, 0);
+        }
+        
+        private async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsyncRetry<T>(SerialisedWriteRequest<T> request)
+        {
+            if (request.Attempt <= MaxRetryAttempts)
+                return await WriteMethodAsyncImpl(request.ContractInfo, request.LocalAccountNameIn, request.GasPriceIn, request.Value, request.Body, ++request.Attempt);
+            return new ServiceResponse<WriteContractResponse>(false);
+        }
+        
+        public async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsyncImpl<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, int attempt)
+        {
+            var switchChainResonse = await SwitchChain(contractInfo);
+            if (!switchChainResonse.IsSuccess)
+                return await HandleWriteMethodError(switchChainResonse, new SerialisedWriteRequest<T>(contractInfo, localAccountNameIn, gasPriceIn, value, body, attempt));
             if (!await AttemptToLoadContract(contractInfo))
                 return new ServiceResponse<WriteContractResponse>(false);
             
@@ -108,13 +125,31 @@ namespace EmergenceSDK.Internal.Services
             headers.Add("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString, headers);
             if(response.IsSuccess == false)
-                return new ServiceResponse<WriteContractResponse>(false);
+                return await HandleWriteMethodError(response,
+                    new SerialisedWriteRequest<T>(contractInfo, localAccountNameIn, gasPriceIn, value, body, attempt));
 
             var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response.Response);
             CheckForTransactionSuccess(contractInfo, writeContractResponse.message.transactionHash).Forget();
             return new ServiceResponse<WriteContractResponse>(true, writeContractResponse.message);
         }
-        
+
+        private async UniTask<ServiceResponse<WriteContractResponse>> HandleWriteMethodError<T>(WebResponse response, SerialisedWriteRequest<T> serialisedWriteRequest)
+        {
+            var ret = new ServiceResponse<WriteContractResponse>(false);
+            switch (response.StatusCode)
+            {
+                case 502:
+                case 500: 
+                case 504:
+                {
+                    await ReconnectionQR.FireEventOnReconnection(async () => ret = await WriteMethodAsyncRetry(serialisedWriteRequest));
+                    break;
+                }
+            }
+
+            return ret;
+        }
+
         private async UniTask CheckForTransactionSuccess(ContractInfo contractInfo, string transactionHash, int maxAttempts = 10)
         {
             int attempts = 0;
@@ -149,7 +184,7 @@ namespace EmergenceSDK.Internal.Services
                 errorCallback?.Invoke("Error in WriteMethod", (long)response.Code);
         }
 
-        internal class SwitchChainRequest
+        private class SwitchChainRequest
         {
             public int chainId;
             public string chainName;
@@ -159,7 +194,7 @@ namespace EmergenceSDK.Internal.Services
             public int currencyDecimals = 18;
         }
         
-        private async UniTask<bool> SwitchChain(ContractInfo contractInfo)
+        private async UniTask<WebResponse> SwitchChain(ContractInfo contractInfo)
         {
             string url = StaticConfig.APIBase + "switchChain";
             
@@ -179,7 +214,27 @@ namespace EmergenceSDK.Internal.Services
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError,
                 SerializationHelper.Serialize(data, false), headers);
 
-            return response.IsSuccess;
+            return response;
+        }
+        
+        private class SerialisedWriteRequest<T>
+        {
+            public readonly ContractInfo ContractInfo;
+            public readonly string LocalAccountNameIn;
+            public readonly string GasPriceIn;
+            public readonly string Value;
+            public readonly T Body;
+            public int Attempt;
+            
+            public SerialisedWriteRequest(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, int attempt)
+            {
+                ContractInfo = contractInfo;
+                LocalAccountNameIn = localAccountNameIn;
+                GasPriceIn = gasPriceIn;
+                Value = value;
+                Body = body;
+                Attempt = attempt;
+            }
         }
     }
 }

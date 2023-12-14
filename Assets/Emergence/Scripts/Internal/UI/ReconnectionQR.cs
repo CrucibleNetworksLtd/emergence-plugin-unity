@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace EmergenceSDK.Internal.UI
         public Button closeButton;
         public TextMeshProUGUI refreshCounterText;
         public void SetTimeRemainingText() => refreshCounterText.text = timeRemaining.ToString("0");
+        
 
         private readonly int qrRefreshTimeOut = 60;
         private int timeRemaining;
@@ -33,11 +35,20 @@ namespace EmergenceSDK.Internal.UI
         
         private static ReconnectionQR instance;
 
-        public static async UniTask<bool> AttemptReconnection()
+        private List<Action> reconnectionEvents = new List<Action>();
+
+        public static async UniTask<bool> FireEventOnReconnection(Action action)
         {
             if (instance == null)
                 instance = EmergenceSingleton.Instance.ReconnectionQR;
             instance.gameObject.SetActive(true);
+            instance.reconnectionEvents.Add(action);
+            instance.closeButton.onClick.RemoveAllListeners();
+            instance.closeButton.onClick.AddListener(() =>
+            {
+                instance.reconnectionEvents.Clear();
+                instance.gameObject.SetActive(false);
+            });
             return await instance.HandleReconnection();
         }
 
@@ -86,6 +97,11 @@ namespace EmergenceSDK.Internal.UI
                 Restart();
             }
             loginComplete = true;
+            foreach (var reconnectionEvent in reconnectionEvents)
+            {
+                reconnectionEvent.Invoke();
+            }
+            reconnectionEvents.Clear();
         }
 
         private async UniTask StartCountdown(CancellationToken cancellationToken)
