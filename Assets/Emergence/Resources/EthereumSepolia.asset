@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b788b53a5f437c0489c8bd8b4b4a8fc6, type: 3}
-  m_Name: Polygon
+  m_Name: EthereumSepolia
   m_EditorClassIdentifier: 
-  DefaultNodeURL: https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134
-  ChainID: 137
-  NetworkName: Polygon
-  CurrencySymbol: MATIC
-  CurrencyName: Matic
+  DefaultNodeURL: https://sepolia.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134
+  ChainID: 11155111
+  NetworkName: Sepolia
+  CurrencySymbol: ETH
+  CurrencyName: Ether

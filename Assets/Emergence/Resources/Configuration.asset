@@ -12,6 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07fc96fcd841014799c96404c400a5e, type: 3}
   m_Name: Configuration
   m_EditorClassIdentifier: 
-  APIBase: https://evm3.openmeta.xyz/api/
   defaultIpfsGateway: http://ipfs.openmeta.xyz/ipfs/
-  Chain: {fileID: 11400000, guid: f83c7faeb452eab4c83051e3d97f008c, type: 2}
+  Chain: {fileID: 11400000, guid: d5b7de099e9aa214eb68949414c5c485, type: 2}

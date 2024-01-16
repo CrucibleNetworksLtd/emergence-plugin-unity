@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47186414874dd0d4f8021fc4966fa662, type: 3}
-  m_Name: DeployedCounterSmartContract
+  m_Name: GoerliDeployedCounterSmartContract
   m_EditorClassIdentifier: 
-  contractAddress: 0xf0C47D3BC64036eB73ee7C55dE96B1192537f881
+  contractAddress: 0xC9571AaF9EbCa8C08EC37D962310d0Ab9F8A5Dd2
   contract: {fileID: 11400000, guid: 9c227bd1f290f4d47abfa18faca8bd78, type: 2}
-  chain: {fileID: 11400000, guid: d5b7de099e9aa214eb68949414c5c485, type: 2}
+  chain: {fileID: 11400000, guid: f83c7faeb452eab4c83051e3d97f008c, type: 2}
