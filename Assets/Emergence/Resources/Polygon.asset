@@ -15,5 +15,5 @@ MonoBehaviour:
   DefaultNodeURL: https://polygon-mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134
   ChainID: 137
   NetworkName: Polygon
-  CurrencySymbol: M
+  CurrencySymbol: MATIC
   CurrencyName: Matic
