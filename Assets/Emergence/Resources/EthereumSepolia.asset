@@ -9,8 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d07fc96fcd841014799c96404c400a5e, type: 3}
-  m_Name: Configuration
+  m_Script: {fileID: 11500000, guid: b788b53a5f437c0489c8bd8b4b4a8fc6, type: 3}
+  m_Name: EthereumSepolia
   m_EditorClassIdentifier: 
-  defaultIpfsGateway: http://ipfs.openmeta.xyz/ipfs/
-  Chain: {fileID: 11400000, guid: d5b7de099e9aa214eb68949414c5c485, type: 2}
+  DefaultNodeURL: https://sepolia.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134
+  ChainID: 11155111
+  NetworkName: Sepolia
+  CurrencySymbol: ETH
+  CurrencyName: Ether
