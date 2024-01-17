@@ -88,6 +88,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             SetAllZOrders();
 
             var spacesToMove = -selected;
+
             itemPositions = UpdatedDesiredPositions(spacesToMove);
 
             foreach (var item in Items)
@@ -105,7 +106,6 @@ namespace EmergenceSDK.Internal.UI.Personas
                 var scale = GetScalePerPosition(Math.Abs(itemPositions[item]));
                 var refreshScaleTween = new LocalScaleTween()
                 {
-                    from = Vector3.one * GetScalePerPosition(),
                     to = new Vector3(scale, scale, scale),
                     duration = duration,
                 };
