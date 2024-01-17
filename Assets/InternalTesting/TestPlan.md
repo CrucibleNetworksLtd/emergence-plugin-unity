@@ -58,6 +58,7 @@ Basic functionality of the dashboard screen. Making sure that the UI is displaye
 - [ ] If you select the second hexagon from the right you should see the leftmost hexagon.
 - [ ] If you select the second hexagon from the left you should see the rightmost hexagon.
 - [ ] Clicking the small hexagon in the top left corner of the screen takes you to the current active persona.
+  - [ ] (Regression) Clicking the small hexagon shouldn't cause the icons surrounding the current active persona to pulsate/highlight
 - [ ] Clicking the small plus below the small hexagon takes you to the create persona screen.
 - [ ] The active persona has a badge in the description box that says "Active"
 - [ ] A selected non-active persona has a button to activate it in the description box.
