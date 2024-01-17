@@ -88,6 +88,10 @@ namespace EmergenceSDK.Internal.UI.Personas
             SetAllZOrders();
 
             var spacesToMove = -selected;
+
+            // Need the old positions for proper scale tweening.
+            // This is a little GC intensive probably but can deal with it later.
+            var oldPositions = new Dictionary<PersonaScrollItem, int>(itemPositions);
             itemPositions = UpdatedDesiredPositions(spacesToMove);
 
             foreach (var item in Items)
@@ -105,7 +109,7 @@ namespace EmergenceSDK.Internal.UI.Personas
                 var scale = GetScalePerPosition(Math.Abs(itemPositions[item]));
                 var refreshScaleTween = new LocalScaleTween()
                 {
-                    from = Vector3.one * GetScalePerPosition(),
+                    from = Vector3.one * GetScalePerPosition(oldPositions[item]), // Tween from old pos
                     to = new Vector3(scale, scale, scale),
                     duration = duration,
                 };
