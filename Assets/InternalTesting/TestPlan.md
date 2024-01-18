@@ -253,6 +253,30 @@ Making sure that the UI is displayed correctly and that the user can login to th
 - [ ] The QR code is refreshed every 60 seconds.
 - [ ] The QR code time to refresh is displayed on the screen under the QR code.
 
+
+#### Unit 2.1.2: Reconnection logic
+
+**Priority**: Low
+
+**Test Description**:
+Covers testing the reconnection process using the QR code system.
+
+**Required Inputs**:
+- Log into Emergence using your Wallet app on your phone.
+- Close MetaMask / Wallet App completely on your phone.
+- Wait for a hard to specify amount of time, at least 60 seconds
+- Try to do a write method, e.g. using the write method demo station, and have the write transaction NOT go through to the phone (if it does close and wait longer)
+- Wait for 60 seconds
+- You should now see the QR Code for rescan again.
+
+**Expected Output**:
+- [ ] The user can see a QR code on the screen after 60s.
+- [ ] The user can scan the QR code with their wallet app and get a sign in request.
+- [ ] The user can sign the request and be logged in to their Emergence account.
+- [ ] If the user declines the sign in request the QR code is refreshed.
+- [ ] The QR code is refreshed every 60 seconds.
+- [ ] The QR code time to refresh is displayed on the screen under the QR code.
+- [ ] The user is prompted with the original write transaction again.
 ---
 
 ## Featureset 3 Sample Project
