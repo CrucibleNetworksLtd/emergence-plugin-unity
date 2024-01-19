@@ -66,7 +66,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 }
                 else
                 {
-                    ModalPromptOK.Instance.Show("Sorry, there was a problem getting your balance, will retry in " + refreshTimeOut.ToString("0") + " seconds");
+                    Debug.LogError("There was a problem getting your balance, will retry in " + refreshTimeOut.ToString("0") + " seconds");
                 }
                 await UniTask.Delay((int)(refreshTimeOut * 1000), cancellationToken: cancellationToken);
             }
