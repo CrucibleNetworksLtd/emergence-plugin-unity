@@ -71,6 +71,7 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "personas";
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.SetRequestHeader("Authorization", CurrentAccessToken);
+            request.SetRequestHeader("ngrok-skip-browser-warning", "1");
             try
             {
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -108,6 +109,7 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.SetRequestHeader("Authorization", CurrentAccessToken);
+            request.SetRequestHeader("ngrok-skip-browser-warning", "1");
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -197,6 +199,7 @@ namespace EmergenceSDK.Internal.Services
             request.uploadHandler.contentType = "application/json";
 
             request.SetRequestHeader("Authorization", CurrentAccessToken);
+            request.SetRequestHeader("ngrok-skip-browser-warning", "1");
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -251,7 +254,8 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             request.method = "DELETE";
             request.SetRequestHeader("Authorization", CurrentAccessToken);
-            
+            request.SetRequestHeader("ngrok-skip-browser-warning", "1");
+
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -290,6 +294,8 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.method = "PATCH";
             request.SetRequestHeader("Authorization", CurrentAccessToken);
+            request.SetRequestHeader("ngrok-skip-browser-warning", "1");
+
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);

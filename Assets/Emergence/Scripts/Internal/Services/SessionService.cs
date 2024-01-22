@@ -36,6 +36,8 @@ namespace EmergenceSDK.Internal.Services
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
+            request.SetRequestHeader("ngrok-skip-browser-warning", "1");
+
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -71,7 +73,9 @@ namespace EmergenceSDK.Internal.Services
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
                 request.SetRequestHeader("auth", personaService.CurrentAccessToken);
+                request.SetRequestHeader("ngrok-skip-browser-warning", "1");
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+                
                 if (response.IsSuccess == false)
                 {
                     WebRequestService.CleanupRequest(request);
@@ -119,6 +123,7 @@ namespace EmergenceSDK.Internal.Services
             using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             try
             {
+                request.SetRequestHeader("ngrok-skip-browser-warning", "1");
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if(response.IsSuccess == false)
                 {
@@ -140,8 +145,18 @@ namespace EmergenceSDK.Internal.Services
                 return new ServiceResponse<Texture2D>(false);
             }
 
+            Debug.Log("BEGIN RESPONSE HEADERS");
             string deviceId = request.GetResponseHeader("deviceId");
+            foreach (var headers in request.GetResponseHeaders())
+            {
+                Debug.Log("\t" + headers.Key + ": " + headers.Value);
+            }
+            Debug.Log("END RESPONSE HEADERS");
+            
             EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
+            Debug.Log("Received ID: " + deviceId);
+            Debug.Log("Singleton hash: " + EmergenceSingleton.Instance.GetHashCode());
+            Debug.Log("Stored ID: " + EmergenceSingleton.Instance.CurrentDeviceId);
             WebRequestService.CleanupRequest(request);
             return new ServiceResponse<Texture2D>(true, ((DownloadHandlerTexture)request.downloadHandler).texture);
         }

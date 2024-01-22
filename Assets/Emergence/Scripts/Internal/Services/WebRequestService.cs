@@ -67,6 +67,7 @@ namespace EmergenceSDK.Internal.Services
         {
             var personaService = EmergenceServices.GetService<IPersonaService>();
             request.SetRequestHeader("Authorization", personaService.CurrentAccessToken);
+            request.SetRequestHeader("ngrok-skip-browser-warning", "1");
 
             if (headers != null)
             {
@@ -134,8 +135,21 @@ namespace EmergenceSDK.Internal.Services
             openRequests.TryRemove(request, out _);
         }
 
+        #if DEBUG
+        class AcceptAllCertificates : CertificateHandler
+        {
+            protected override bool ValidateCertificate(byte[] certificateData)
+            {
+                return true;
+            }
+        }
+        #endif
+        
         public static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request, ErrorCallback errorCallback)
         {
+            #if DEBUG
+                request.certificateHandler = new AcceptAllCertificates();
+            #endif
             EmergenceLogger.LogInfo($"Performing {request.method} request to {request.url}, DeviceId: {EmergenceSingleton.Instance.CurrentDeviceId}");
             try
             {

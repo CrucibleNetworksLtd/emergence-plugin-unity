@@ -6,7 +6,8 @@ namespace EmergenceSDK.Internal.Utils
         /// URL pointing to the Emergence API.
         /// <remarks>Changing this will break Emergence</remarks>
         /// </summary>
-        public const string APIBase = "https://evm3.openmeta.xyz/api/";
+        //public const string APIBase = "https://evm2.openmeta.xyz/api/";
+        public const string APIBase = "https://b5e3-79-19-156-33.ngrok-free.app/api/";
 
         public const string HasLoggedInOnceKey = "HasLoggedInOnce";
     }

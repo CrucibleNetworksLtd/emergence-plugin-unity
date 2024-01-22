@@ -53,6 +53,7 @@ namespace EmergenceSDK.EmergenceDemo
             try
             {
                 var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, vrmURL, "");
+                request.SetRequestHeader("ngrok-skip-browser-warning", "1");
                 await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 byte[] response = request.downloadHandler.data;
                 WebRequestService.CleanupRequest(request);

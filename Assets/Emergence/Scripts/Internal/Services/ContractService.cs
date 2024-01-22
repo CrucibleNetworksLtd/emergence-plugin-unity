@@ -51,6 +51,7 @@ namespace EmergenceSDK.Internal.Services
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, dataString);
             request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("ngrok-skip-browser-warning", "1");
             var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
 
             if (response.IsSuccess && EmergenceUtils.ProcessRequest<LoadContractResponse>(request, EmergenceLogger.LogError, out var processedResponse))

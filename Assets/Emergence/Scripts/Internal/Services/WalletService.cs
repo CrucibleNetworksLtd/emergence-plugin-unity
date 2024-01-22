@@ -4,6 +4,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
@@ -38,6 +39,7 @@ namespace EmergenceSDK.Internal.Services
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             try
             {
+                request.SetRequestHeader("ngrok-skip-browser-warning", "1");
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if(response.IsSuccess == false)
                 {
@@ -72,6 +74,7 @@ namespace EmergenceSDK.Internal.Services
         
             try
             {
+                request.SetRequestHeader("ngrok-skip-browser-warning", "1");
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if(response.IsSuccess == false)
                 {
@@ -110,10 +113,15 @@ namespace EmergenceSDK.Internal.Services
                          EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL;
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
+            Debug.Log("HANDSHAKE");
+            Debug.Log("Singleton hash: " + EmergenceSingleton.Instance.GetHashCode());
+            Debug.Log("Stored ID: " + EmergenceSingleton.Instance.CurrentDeviceId);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-        
+            request.SetRequestHeader("ngrok-skip-browser-warning", "1");
+
             try
             {
+                
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if(response.IsSuccess == false)
                 {
@@ -169,6 +177,8 @@ namespace EmergenceSDK.Internal.Services
                          "&address=" + WalletAddress;
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
+            request.SetRequestHeader("ngrok-skip-browser-warning", "1");
+
             try
             {
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -213,6 +223,7 @@ namespace EmergenceSDK.Internal.Services
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, dataString);
             try
             {
+                request.SetRequestHeader("ngrok-skip-browser-warning", "1");
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if(response.IsSuccess == false)
                 {
