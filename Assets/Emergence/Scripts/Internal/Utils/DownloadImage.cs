@@ -1,14 +1,15 @@
 using System;
-using System.Net.Http;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Services;
+using EmergenceSDK.Types;
 using MG.GIF;
+using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Utils
 {
     public class DownloadImage
     {
-        HttpClient client = new HttpClient();
         public RequestImage.DownloadReady successCallback = null;
         public RequestImage.DownloadFailed failedCallback = null;
         
@@ -32,25 +33,27 @@ namespace EmergenceSDK.Internal.Utils
 
         private async UniTask MakeRequest(string url)
         {
-            HttpResponseMessage response;
+            var request = UnityWebRequest.Get(url);
+            WebResponse response;
+
             try
             {
-                response = await client.GetAsync(url);
+                response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
                 failedCallback?.Invoke(url, e.Message, 0); // Use 0 or a different default value for non-http-related exceptions.
                 return;
             }
 
-            if (!response.IsSuccessStatusCode)
+            if (!response.IsSuccess)
             {
-                failedCallback?.Invoke(url, response.ReasonPhrase, (int)response.StatusCode);
+                failedCallback?.Invoke(url, response.Response, response.StatusCode);
                 EmergenceLogger.LogWarning("Failed to download image at " + url);
                 return;
             }
 
-            byte[] imageBytes = await response.Content.ReadAsByteArrayAsync();
+            byte[] imageBytes = response.DownloadHandler.data;
             var texture = await GetTextureFromImageBytes(imageBytes, url);
             successCallback?.Invoke(url, texture, this);
         }

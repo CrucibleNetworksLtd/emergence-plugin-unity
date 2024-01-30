@@ -1,11 +1,12 @@
+using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
+using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using MG.GIF;
 using UnityEngine;
 using UnityEngine.UI;
+using EmergenceSDK.Internal.Services;
 
 namespace EmergenceSDK.Internal.UI.Inventory
 {
@@ -13,9 +14,7 @@ namespace EmergenceSDK.Internal.UI.Inventory
     {
         [SerializeField]
         private RawImage itemImage;
-
-        private static HttpClient client = new();
-
+        
         public void LoadStaticImage(Texture2D texture)
         {
             itemImage.texture = texture;
@@ -34,19 +33,19 @@ namespace EmergenceSDK.Internal.UI.Inventory
                 //this is designed to only download enough for the first frame of at most a 4k gif, so animated gifs will be much larger
                 int maxFrameSizeBytes = 16778020;
 
-                var request = new HttpRequestMessage(HttpMethod.Get, imageUrl);
-                request.Headers.Range = new RangeHeaderValue(0, maxFrameSizeBytes - 1);
+                var request = UnityWebRequest.Get(imageUrl);
+                request.SetRequestHeader("Range", "bytes=0-" + (maxFrameSizeBytes - 1));
 
-                var response = await client.SendAsync(request);
+                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
 
-                if (!response.IsSuccessStatusCode)
+                if (!response.IsSuccess)
                 {
-                    EmergenceLogger.LogWarning("File load error.\n" + response.ReasonPhrase);
+                    EmergenceLogger.LogWarning("File load error.\n");
                     itemImage.texture = RequestImage.Instance.DefaultThumbnail;
                     return;
                 }
 
-                byte[] imageData = await response.Content.ReadAsByteArrayAsync();
+                byte[] imageData = response.DownloadHandler.data;
 
                 using (var decoder = new Decoder(imageData))
                 {
@@ -67,9 +66,9 @@ namespace EmergenceSDK.Internal.UI.Inventory
                     }
                 }
             }
-            catch (HttpRequestException e)
+            catch (Exception e)
             {
-                EmergenceLogger.LogError("Error making the HTTP request.\n" + e.Message);
+                EmergenceLogger.LogError("Error in SetGifFromUrl.\n" + e.Message);
                 itemImage.texture = RequestImage.Instance.DefaultThumbnail;
             }
         }
