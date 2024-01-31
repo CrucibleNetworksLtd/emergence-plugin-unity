@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UniGLTF;
 using UniGLTF.Utils;
 using UnityEngine;
@@ -71,7 +72,7 @@ namespace UniVRM10
             }
         }
 
-        public override async Task<RuntimeGltfInstance> LoadAsync(IAwaitCaller awaitCaller, Func<string, IDisposable> MeasureTime = null)
+        public override async UniTask<RuntimeGltfInstance> LoadAsync(IAwaitCaller awaitCaller, Func<string, IDisposable> MeasureTime = null)
         {
             if (awaitCaller == null)
             {
@@ -154,7 +155,7 @@ namespace UniVRM10
         /// </summary>
         /// <param name="MeasureTime"></param>
         /// <returns></returns>
-        protected override async Task LoadGeometryAsync(IAwaitCaller awaitCaller, Func<string, IDisposable> MeasureTime)
+        protected override async UniTask LoadGeometryAsync(IAwaitCaller awaitCaller, Func<string, IDisposable> MeasureTime)
         {
             // fill assets
             for (int i = 0; i < m_model.Materials.Count; ++i)
@@ -232,7 +233,7 @@ namespace UniVRM10
             }
         }
 
-        protected override async Task OnLoadHierarchy(IAwaitCaller awaitCaller, Func<string, IDisposable> MeasureTime)
+        protected override async UniTask OnLoadHierarchy(IAwaitCaller awaitCaller, Func<string, IDisposable> MeasureTime)
         {
             Root.name = "VRM1";
 

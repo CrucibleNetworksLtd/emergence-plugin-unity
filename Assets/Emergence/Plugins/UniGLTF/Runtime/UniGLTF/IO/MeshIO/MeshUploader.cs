@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
@@ -42,7 +42,7 @@ namespace UniGLTF
             }
         }
 
-        private static async Task BuildBlendShapeAsync(IAwaitCaller awaitCaller, Mesh mesh, BlendShape blendShape,
+        private static async UniTask BuildBlendShapeAsync(IAwaitCaller awaitCaller, Mesh mesh, BlendShape blendShape,
             Vector3[] emptyVertices)
         {
             Vector3[] positions = null;
@@ -88,7 +88,7 @@ namespace UniGLTF
             Profiler.EndSample();
         }
 
-        public static async Task<MeshWithMaterials> BuildMeshAndUploadAsync(
+        public static async UniTask<MeshWithMaterials> BuildMeshAndUploadAsync(
             IAwaitCaller awaitCaller,
             MeshData data,
             Func<int, Material> materialFromIndex)
