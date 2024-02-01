@@ -22,7 +22,7 @@ namespace EmergenceSDK.Internal.Services
         private ConcurrentDictionary<UnityWebRequest, DateTime> openRequests = new();
 
         //This timeout avoids this issue: https://forum.unity.com/threads/catching-curl-error-28.1274846/
-        public const int TimeoutMilliseconds = 100000;
+        private const int TimeoutMilliseconds = 100000;
 
         private WebRequestService()
         {
