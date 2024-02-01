@@ -60,13 +60,13 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 {
                     var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, Helpers.InternalIPFSURLToHTTP(avatar.tokenURI), EmergenceLogger.LogError);
                     var token = Newtonsoft.Json.JsonConvert.DeserializeObject<EASMetadata[]>(response.Response);
-                    DemoAvatarManager.Instance.SwapAvatars(Helpers.InternalIPFSURLToHTTP(token[0].UriBase));
+                    DemoAvatarManager.Instance.SwapAvatars(GameObject.Find("PlayerArmature"), Helpers.InternalIPFSURLToHTTP(token[0].UriBase));
                 
                 }), EmergenceLogger.LogError);
             }
             else
             {
-                DemoAvatarManager.Instance.SetDefaultAvatar();
+                DemoAvatarManager.Instance.SetDefaultAvatar(GameObject.Find("PlayerArmature"));
             }
         }
     }

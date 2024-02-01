@@ -12,43 +12,72 @@ namespace EmergenceSDK.EmergenceDemo
 {
     public class DemoAvatarManager : SingletonComponent<DemoAvatarManager>
     {
-        private Vrm10Instance vrm;
         private SkinnedMeshRenderer originalMesh;
-        private Dictionary<Guid, CancellationTokenSource> cancellationTokenSources = new Dictionary<Guid, CancellationTokenSource>();
+        private Dictionary<Guid, CancellationTokenSource> cancellationTokenSources = new();
+        private Dictionary<GameObject, List<Guid>> armatureOperationGuids = new();
 
-        public async void SwapAvatars(string vrmURL)
+        public async void SwapAvatars(GameObject playerArmature, string vrmURL)
         {
-            // Generate a unique operation ID
-            var operationId = Guid.NewGuid();
-
             // Cancel all ongoing avatar swap operations
-            CancelAllAvatarSwaps();
+            CancelAvatarSwaps(playerArmature);
 
             // Set original mesh if it is not already set
             if (originalMesh == null)
             {
-                originalMesh = GameObject.Find("PlayerArmature").GetComponentInChildren<SkinnedMeshRenderer>();
+                originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
             }
 
+            var cts = CreateCancellationToken(playerArmature, out var operationId);
+
+            // Start the avatar swap task with the generated operation ID and token
+            await SwapAvatarTask(playerArmature, operationId, vrmURL, cts.Token);
+        }
+
+        private CancellationTokenSource CreateCancellationToken(GameObject playerArmature, out Guid operationId)
+        {
+            // Generate a unique operation ID
+            operationId = Guid.NewGuid();
             // Create a new cancellation token source for this operation
             var cts = new CancellationTokenSource();
             cancellationTokenSources[operationId] = cts;
+            if (armatureOperationGuids.TryGetValue(playerArmature, out var guids))
+            {
+                guids.Add(operationId);
+            }
+            else
+            {
+                armatureOperationGuids[playerArmature] = new List<Guid> { operationId };
+            }
 
-            // Start the avatar swap task with the generated operation ID and token
-            await SwapAvatarTask(operationId, vrmURL, cts.Token);
+            return cts;
         }
 
-        private void CancelAllAvatarSwaps()
+        private void RemoveAllCancellationTokens(bool cancel = false)
         {
             foreach (var cts in cancellationTokenSources.Values)
             {
-                cts.Cancel();
+                if (cancel && !cts.IsCancellationRequested)
+                {
+                    cts.Cancel();
+                }
                 cts.Dispose();
             }
             cancellationTokenSources.Clear();
+            armatureOperationGuids.Clear();
         }
 
-        private async UniTask SwapAvatarTask(Guid operationId, string vrmURL, CancellationToken ct)
+        private void CancelAvatarSwaps(GameObject playerArmature)
+        {
+            if (armatureOperationGuids.TryGetValue(playerArmature, out var guids))
+            {
+                foreach (var guid in guids)
+                {
+                    RemoveCancellationToken(guid, true);
+                }
+            }
+        }
+
+        private async UniTask SwapAvatarTask(GameObject playerArmature, Guid operationId, string vrmURL, CancellationToken ct)
         {
             try
             {
@@ -59,28 +88,31 @@ namespace EmergenceSDK.EmergenceDemo
 
                 ct.ThrowIfCancellationRequested();
 
-                var newVRM = await Vrm10.LoadBytesAsync(response, true);
-                if (newVRM.gameObject != null && vrm != null)
-                {
-                    Destroy(vrm.gameObject);
-                }
-
+                var oldVrm = playerArmature.GetComponentInChildren<Vrm10Instance>();
+                var newVrm = await Vrm10.LoadBytesAsync(response, true, ct: ct);
+                
                 ct.ThrowIfCancellationRequested();
-
-                vrm = newVRM;
-
-                GameObject playerArmature = GameObject.Find("PlayerArmature");
-                vrm.transform.position = playerArmature.transform.position;
-                vrm.transform.rotation = playerArmature.transform.rotation;
-                vrm.transform.parent = playerArmature.transform;
-                vrm.name = "VRMAvatar";
+                
+                if (newVrm.gameObject != null)
+                {
+                    if (oldVrm != null)
+                    {
+                        Destroy(oldVrm.gameObject);
+                    }
+                }
+                
+                var vrmTransform = newVrm.transform;
+                vrmTransform.position = playerArmature.transform.position;
+                vrmTransform.rotation = playerArmature.transform.rotation;
+                vrmTransform.parent = playerArmature.transform;
+                newVrm.name = "VRMAvatar";
 
                 await UniTask.DelayFrame(1, cancellationToken: ct);
 
-                UnityEngine.Avatar vrmAvatar = vrm.GetComponent<Animator>().avatar;
+                Avatar vrmAvatar = newVrm.GetComponent<Animator>().avatar;
                 playerArmature.GetComponent<Animator>().avatar = vrmAvatar;
 
-                vrm.gameObject.GetComponent<Animator>().enabled = false;
+                newVrm.gameObject.GetComponent<Animator>().enabled = false;
                 originalMesh.enabled = false;
             }
             catch (OperationCanceledException)
@@ -90,24 +122,34 @@ namespace EmergenceSDK.EmergenceDemo
             finally
             {
                 // Cleanup: Remove the CancellationTokenSource from the dictionary
-                if (cancellationTokenSources.TryGetValue(operationId, out var source))
+                RemoveCancellationToken(operationId);
+            }
+        }
+
+        private void RemoveCancellationToken(Guid guid, bool cancel = false)
+        {
+            if (cancellationTokenSources.Remove(guid, out var source))
+            {
+                if (cancel && !source.IsCancellationRequested)
                 {
-                    cancellationTokenSources.Remove(operationId);
-                    source.Dispose();
+                    source.Cancel();
+                }
+                source.Dispose();
+                foreach (var guids in armatureOperationGuids.Values)
+                {
+                    guids.Remove(guid);
                 }
             }
         }
 
-        public void SetDefaultAvatar()
+        public void SetDefaultAvatar(GameObject playerArmature = null)
         {
-            CancelAllAvatarSwaps();
+            CancelAvatarSwaps(playerArmature);
 
-            if (originalMesh == null)
+            if (playerArmature != null && originalMesh == null)
             {
-                originalMesh = GameObject.Find("PlayerArmature").GetComponentInChildren<SkinnedMeshRenderer>();
+                originalMesh = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
             }
-            GameObject vrmAvatar = GameObject.Find("VRMAvatar");
-            GameObject playerArmature = GameObject.Find("PlayerArmature");
             
             if (playerArmature == null)
             {
@@ -117,7 +159,26 @@ namespace EmergenceSDK.EmergenceDemo
 
             originalMesh.enabled = true;
             playerArmature.GetComponent<Animator>().avatar = Resources.Load<UnityEngine.Avatar>("ArmatureAvatar");
+            
+            GameObject FindChild(GameObject parent, string name)
+            {
+                foreach (var child in parent.transform.GetChildren())
+                {
+                    if (child.name == name)
+                    {
+                        return child.gameObject;
+                    }
 
+                    if (child.childCount > 0)
+                    {
+                        FindChild(child.gameObject, name);
+                    }
+                }
+
+                return null;
+            }
+
+            GameObject vrmAvatar = FindChild(playerArmature, "VRMAvatar");
             if (vrmAvatar != null)
             {
                 Destroy(vrmAvatar);
@@ -128,7 +189,7 @@ namespace EmergenceSDK.EmergenceDemo
         // This method is called when the Unity Editor stops playing
         private void OnApplicationQuit()
         {
-            CancelAllAvatarSwaps();
+            RemoveAllCancellationTokens(true);
         }
 #endif
     }
