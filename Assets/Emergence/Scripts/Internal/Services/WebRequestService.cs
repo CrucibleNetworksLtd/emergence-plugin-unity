@@ -150,7 +150,7 @@ namespace EmergenceSDK.Internal.Services
                     var response = request.result;
                     if (response == UnityWebRequest.Result.Success)
                     {
-                        return new WebResponse(true, request.downloadHandler.text);
+                        return new WebResponse(true, request.downloadHandler.text, request.responseCode, request.downloadHandler);
                     }
                     else
                     {
