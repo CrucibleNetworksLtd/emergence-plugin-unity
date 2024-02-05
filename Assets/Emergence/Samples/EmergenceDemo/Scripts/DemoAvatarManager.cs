@@ -70,8 +70,9 @@ namespace EmergenceSDK.EmergenceDemo
         {
             if (armatureOperationGuids.TryGetValue(playerArmature, out var guids))
             {
-                foreach (var guid in guids)
+                for (var i = guids.Count - 1; i >= 0; i--)
                 {
+                    var guid = guids[i];
                     RemoveCancellationToken(guid, true);
                 }
             }
