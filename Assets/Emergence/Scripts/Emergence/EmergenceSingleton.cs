@@ -82,7 +82,6 @@ namespace EmergenceSDK
             ui.SetActive(true);
             GameObject UIRoot = Instantiate(Resources.Load<GameObject>("Emergence Root"));
             UIRoot.name = "Emergence UI Overlay";
-            UIRoot.GetComponentInChildren<EventSystem>().enabled = true;
             ui.SetActive(false);
             ScreenManager.Instance.gameObject.SetActive(true);
             ScreenManager.Instance.ShowWelcome().Forget();
