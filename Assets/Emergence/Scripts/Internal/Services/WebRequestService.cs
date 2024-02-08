@@ -155,7 +155,7 @@ namespace EmergenceSDK.Internal.Services
                     else
                     {
                         errorCallback?.Invoke(request.error, request.responseCode);
-                        return new WebResponse(false, request.error);
+                        return new WebResponse(false, request.error, request.responseCode);
                     }
                 }
                 catch (TimeoutException)
@@ -182,12 +182,12 @@ namespace EmergenceSDK.Internal.Services
             catch (UnityWebRequestException e)
             {
                 errorCallback?.Invoke(e.Message, request.responseCode);
-                return new WebResponse(false, e.Message);
+                return new WebResponse(false, e.Message, request.responseCode);
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {
                 errorCallback?.Invoke(request.error, request.responseCode);
-                return new WebResponse(false, ex.Message);
+                return new WebResponse(false, ex.Message, request.responseCode);
             }
             finally
             {

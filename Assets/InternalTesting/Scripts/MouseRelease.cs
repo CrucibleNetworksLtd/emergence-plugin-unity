@@ -18,7 +18,7 @@ namespace EmergenceSDK.InternalTesting
             if (EditorApplication.isPlaying)
             {
                 // Check if the user presses Shift + 1
-                if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Alpha1))
+                if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.Alpha1))
                 {
                     // Release the mouse cursor
                     Cursor.lockState = CursorLockMode.None;
