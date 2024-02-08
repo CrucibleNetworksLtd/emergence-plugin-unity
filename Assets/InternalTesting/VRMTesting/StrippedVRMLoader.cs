@@ -14,7 +14,7 @@ namespace EmergenceSDK
         public float offset = 3f;
         
         // Start is called before the first frame update
-        async void Start()
+        void Start()
         {
             for (var i = 0; i < vrmUrls.Length; i++)
             {
