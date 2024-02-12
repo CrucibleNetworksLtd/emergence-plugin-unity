@@ -130,7 +130,11 @@ namespace UniVRM10
 
         private void OnDestroy()
         {
-            Runtime.Dispose();
+            if (m_runtime != null)
+            {
+                m_runtime.Dispose();
+                m_runtime = null;
+            }
         }
 
         private void OnDrawGizmosSelected()

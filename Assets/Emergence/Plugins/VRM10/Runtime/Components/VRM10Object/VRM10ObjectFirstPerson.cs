@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UniGLTF.MeshUtility;
 using UnityEngine;
 using VRMShaders;
@@ -43,7 +44,7 @@ namespace UniVRM10
         // </summary>
         // <parameter>renderer: 元になるSkinnedMeshRenderer</parameter>
         // <parameter>eraseBones: 削除対象になるボーンのindex</parameter>
-        private async static Task<SkinnedMeshRenderer> CreateHeadlessMeshAsync(SkinnedMeshRenderer renderer, int[] eraseBones, IAwaitCaller awaitCaller)
+        private async static UniTask<SkinnedMeshRenderer> CreateHeadlessMeshAsync(SkinnedMeshRenderer renderer, int[] eraseBones, IAwaitCaller awaitCaller)
         {
             var mesh = await BoneMeshEraser.CreateErasedMeshAsync(renderer.sharedMesh, eraseBones, awaitCaller);
 

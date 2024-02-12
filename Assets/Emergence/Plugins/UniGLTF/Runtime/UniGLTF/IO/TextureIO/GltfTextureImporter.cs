@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Unity.Collections;
 using UnityEngine;
 using VRMShaders;
@@ -31,7 +31,7 @@ namespace UniGLTF
                 () =>
                 {
                     var imageBytes = data.GetBytesFromImage(imageIndex);
-                    return Task.FromResult<(byte[], string)?>((ToArray(imageBytes?.binary ?? default), imageBytes?.mimeType));
+                    return UniTask.FromResult<(byte[], string)?>((ToArray(imageBytes?.binary ?? default), imageBytes?.mimeType));
                 },
                 default, default, default, default, default);
             return (texDesc.SubAssetKey, texDesc);
@@ -58,7 +58,7 @@ namespace UniGLTF
                 TextureImportTypes.sRGB,
                 default,
                 default,
-                () => Task.FromResult(GetImageBytesFromImageIndex(data, imageIndex.Value)),
+                () => UniTask.FromResult(GetImageBytesFromImageIndex(data, imageIndex.Value)),
                 default, default, default, default, default);
             key = desc.SubAssetKey;
             return true;
@@ -86,7 +86,7 @@ namespace UniGLTF
                 TextureImportTypes.Linear,
                 default,
                 default,
-                () => Task.FromResult(GetImageBytesFromImageIndex(data, imageIndex.Value)),
+                () => UniTask.FromResult(GetImageBytesFromImageIndex(data, imageIndex.Value)),
                 default, default, default, default, default);
             key = desc.SubAssetKey;
             return true;
@@ -114,7 +114,7 @@ namespace UniGLTF
                 TextureImportTypes.NormalMap,
                 default,
                 default,
-                () => Task.FromResult(GetImageBytesFromImageIndex(data, imageIndex.Value)),
+                () => UniTask.FromResult(GetImageBytesFromImageIndex(data, imageIndex.Value)),
                 default, default, default, default, default);
             key = desc.SubAssetKey;
             return true;
@@ -136,7 +136,7 @@ namespace UniGLTF
                     var gltfImage = data.GLTF.images[imageIndex.Value];
                     name = TextureImportName.GetUnityObjectName(TextureImportTypes.StandardMap, gltfTexture.name, gltfImage.uri);
                     sampler = TextureSamplerUtil.CreateSampler(data.GLTF, metallicRoughnessTextureIndex.Value);
-                    getMetallicRoughnessAsync = () => Task.FromResult(GetImageBytesFromImageIndex(data, imageIndex.Value));
+                    getMetallicRoughnessAsync = () => UniTask.FromResult(GetImageBytesFromImageIndex(data, imageIndex.Value));
                 }
             }
 
@@ -155,7 +155,7 @@ namespace UniGLTF
                     {
                         sampler = TextureSamplerUtil.CreateSampler(data.GLTF, occlusionTextureIndex.Value);
                     }
-                    getOcclusionAsync = () => Task.FromResult(GetImageBytesFromImageIndex(data, imageIndex.Value));
+                    getOcclusionAsync = () => UniTask.FromResult(GetImageBytesFromImageIndex(data, imageIndex.Value));
                 }
             }
 
