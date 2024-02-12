@@ -11,6 +11,8 @@ namespace EmergenceSDK.Services
     
     public delegate void ErrorCallback(string message, long code);
     
+    public delegate void CancellationCallback();
+    
     public delegate void PersonaUpdated(Persona persona);
     
     public delegate void SuccessGetCurrentPersona(Persona currentPersona);

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -10,23 +12,32 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class AvatarService : IAvatarService
     {
-        public async UniTask AvatarsByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback)
+        public async UniTask AvatarsByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback, CancellationCallback cancellationCallback = default, CancellationToken ct = default)
         {
-            var response = await AvatarsByOwnerAsync(address);
-            if(response.Success)
-                success?.Invoke(response.Result);
-            else
-                errorCallback?.Invoke("Error in AvatarsByOwner.", (long)response.Code);
+            var response = await AvatarsByOwnerAsync(address, ct);
+            try
+            {
+                if(response.Success)
+                    success?.Invoke(response.Result);
+                else
+                    errorCallback?.Invoke("Error in AvatarsByOwner.", (long)response.Code);
+            }
+            catch (OperationCanceledException)
+            {
+                cancellationCallback?.Invoke();
+            }
         }
         
-        public async UniTask<ServiceResponse<List<Avatar>>> AvatarsByOwnerAsync(string address)
+        public async UniTask<ServiceResponse<List<Avatar>>> AvatarsByOwnerAsync(string address, CancellationToken ct = default)
         {
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "byOwner?address=" + address;
 
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError);
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError, ct: ct);
             if(response.IsSuccess == false)
                 return new ServiceResponse<List<Avatar>>(false);
 
+            ct.ThrowIfCancellationRequested();
+            
             GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response.Response);
             return new ServiceResponse<List<Avatar>>(true, avatarResponse.message);
         }
