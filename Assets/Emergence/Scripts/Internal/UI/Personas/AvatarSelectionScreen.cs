@@ -152,7 +152,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             imagesRefreshing.Remove(avatarId);
             if (imagesRefreshing.Count <= 1 && !requestingInProgress)
             {
-                Modal.Instance.Hide();
+                ModalCancel.Instance.Hide();
             }
         }
 
