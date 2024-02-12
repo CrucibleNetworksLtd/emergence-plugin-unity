@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
@@ -46,7 +47,7 @@ namespace EmergenceSDK.Internal.Services
         /// Performs an asynchronous UnityWebRequest and returns the result as a string.
         /// </summary>
         public static async UniTask<WebResponse> PerformAsyncWebRequest(string method, string url,
-            ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null)
+            ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null, CancellationToken ct = default)
         {
             UnityWebRequest request = GetRequestFromMethodType(method, url, bodyData);
             Instance.AddOpenRequest(request);
@@ -134,12 +135,12 @@ namespace EmergenceSDK.Internal.Services
             openRequests.TryRemove(request, out _);
         }
 
-        public static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request, ErrorCallback errorCallback)
+        public static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request, ErrorCallback errorCallback, CancellationToken ct = default)
         {
             EmergenceLogger.LogInfo($"Performing {request.method} request to {request.url}, DeviceId: {EmergenceSingleton.Instance.CurrentDeviceId}");
             try
             {
-                var sendTask = request.SendWebRequest().ToUniTask();
+                var sendTask = request.SendWebRequest().WithCancellation(ct);
 
                 try
                 {
