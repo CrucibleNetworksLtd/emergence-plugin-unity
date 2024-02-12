@@ -11,6 +11,7 @@ namespace EmergenceSDK.Internal.UI
         public Button yesButton;
         public Button noButton;
         public Image bgBlurredImage;
+        public Image clickBlocker;
 
         public static ModalPromptYESNO Instance;
 
@@ -33,13 +34,14 @@ namespace EmergenceSDK.Internal.UI
             noButton.onClick.RemoveListener(OnNoClicked);
         }
 
-        public void Show(string title, string question, ModalPromptYesCallback yesCallback = null, ModalPromptNoCallback noCallback = null)
+        public void Show(string title, string question, ModalPromptYesCallback yesCallback = null, ModalPromptNoCallback noCallback = null, bool captureClicks = true)
         {
             label.text = "<b>" + title + "</b> " + question;
             gameObject.SetActive(true);
             this.yesCallback = yesCallback;
             this.noCallback = noCallback;
             bgBlurredImage.enabled = false;
+            clickBlocker.raycastTarget = captureClicks;
         }
 
         public void Hide()
