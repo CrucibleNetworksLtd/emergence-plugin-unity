@@ -53,7 +53,7 @@ namespace EmergenceSDK.Internal.Services
             Instance.AddOpenRequest(request);
 
             SetupRequestHeaders(request, headers);
-            var ret = await PerformAsyncWebRequest(request, errorCallback);
+            var ret = await PerformAsyncWebRequest(request, errorCallback, ct);
             CleanupRequest(request);
             return ret;
         }
