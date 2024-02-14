@@ -8,7 +8,6 @@ namespace EmergenceSDK.Internal.UI
     {
         public TextMeshProUGUI label;
         public Button cancelButton;
-        public Image clickBlocker;
 
         public static ModalCancel Instance;
 
@@ -28,12 +27,11 @@ namespace EmergenceSDK.Internal.UI
             cancelButton.onClick.RemoveListener(OnCancelClicked);
         }
 
-        public void Show(string message, ModalPromptCancelCallback cancelCallback = default, bool captureClicks = true)
+        public void Show(string message, ModalPromptCancelCallback cancelCallback = default)
         {
             label.text = message;
             gameObject.SetActive(true);
             _callback = cancelCallback;
-            clickBlocker.raycastTarget = captureClicks;
         }
 
         public void Hide()
@@ -44,7 +42,6 @@ namespace EmergenceSDK.Internal.UI
         private void OnCancelClicked()
         {
             _callback?.Invoke();
-            Hide();
         }
     }
 }

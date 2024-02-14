@@ -9,7 +9,6 @@ namespace EmergenceSDK.Internal.UI
         public TextMeshProUGUI label;
         public CanvasGroup cg;
         public Button okButton;
-        public Image clickBlocker;
 
         public static ModalPromptOK Instance;
 
@@ -29,12 +28,11 @@ namespace EmergenceSDK.Internal.UI
             okButton.onClick.RemoveListener(OnOkClicked);
         }
 
-        public void Show(string message, ModalPromptOkCallback callback = null, bool captureClicks = true)
+        public void Show(string message, ModalPromptOkCallback callback = null)
         {
             label.text = message;
             gameObject.SetActive(true);
             this.callback = callback;
-            clickBlocker.raycastTarget = captureClicks;
         }
 
         public void Hide()

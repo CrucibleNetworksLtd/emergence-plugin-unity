@@ -7,7 +7,6 @@ namespace EmergenceSDK.Internal.UI
     public class Modal : MonoBehaviour
     {
         public TextMeshProUGUI label;
-        public Image clickBlocker;
         public static Modal Instance;
 
         private void Awake()
@@ -16,11 +15,10 @@ namespace EmergenceSDK.Internal.UI
             Hide();
         }
 
-        public void Show(string message, bool captureClicks = true)
+        public void Show(string message)
         {
             label.text = message;
             gameObject.SetActive(true);
-            clickBlocker.raycastTarget = captureClicks;
         }
 
         public void Hide()
