@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEngine;
@@ -70,7 +71,11 @@ namespace EmergenceSDK.Internal.UI.Personas
             }
 
             var cts = new CancellationTokenSource();
-            ModalCancel.Instance.Show("Retrieving avatar data...", () => {cts.Cancel();});
+            ModalCancel.Instance.Show("Retrieving avatar data...", () => {
+                cts.Cancel();
+                ModalCancel.Instance.Hide();
+                ScreenManager.Instance.ShowDashboard();
+            });
 
             // Default avatar
             GameObject go = AvatarScrollItemsPool.GetNewObject();
@@ -82,11 +87,18 @@ namespace EmergenceSDK.Internal.UI.Personas
             {
                 AvatarService.AvatarsByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
                     {
-                        ModalCancel.Instance.Show("Retrieving avatar images...");
+                        ModalCancel.Instance.Show("Retrieving avatar images...", () =>
+                        {
+                            cts.Cancel();
+                            ModalCancel.Instance.Hide();
+                            ScreenManager.Instance.ShowDashboard();
+                        });
+                        
                         requestingInProgress = true;
                         imagesRefreshing.Clear();
                         for (int i = 0; i < avatars.Count; i++)
                         {
+                            cts.Token.ThrowIfCancellationRequested();
                             go = AvatarScrollItemsPool.GetNewObject();
                             go.transform.SetParent(AvatarScrollRoot);
                             go.transform.localScale = Vector3.one;
@@ -104,14 +116,14 @@ namespace EmergenceSDK.Internal.UI.Personas
                     {
                         EmergenceLogger.LogError(error, code);
                         ModalCancel.Instance.Hide();
-                    }, () =>
+                    },
+                    () =>
                     {
+                        requestingInProgress = false;
                         ModalCancel.Instance.Hide();
-                    }, cts.Token);
-            }
-            else
-            {
-                ModalCancel.Instance.Hide();
+                        ScreenManager.Instance.ShowDashboard();
+                    },
+                    ct: cts.Token);
             }
         }
         
