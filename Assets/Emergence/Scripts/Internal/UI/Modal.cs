@@ -1,12 +1,12 @@
 ﻿using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace EmergenceSDK.Internal.UI
 {
     public class Modal : MonoBehaviour
     {
         public TextMeshProUGUI label;
-
         public static Modal Instance;
 
         private void Awake()

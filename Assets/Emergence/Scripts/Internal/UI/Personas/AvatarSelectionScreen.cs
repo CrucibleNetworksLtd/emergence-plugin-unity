@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEngine;
@@ -68,7 +70,12 @@ namespace EmergenceSDK.Internal.UI.Personas
                 AvatarScrollItemsPool.ReturnUsedObject(child);
             }
 
-            Modal.Instance.Show("Retrieving avatar data...");
+            var cts = new CancellationTokenSource();
+            ModalCancel.Instance.Show("Retrieving avatar data...", () => {
+                cts.Cancel();
+                ModalCancel.Instance.Hide();
+                ScreenManager.Instance.ShowDashboard();
+            });
 
             // Default avatar
             GameObject go = AvatarScrollItemsPool.GetNewObject();
@@ -76,32 +83,48 @@ namespace EmergenceSDK.Internal.UI.Personas
             go.transform.localScale = Vector3.one;
 
             go.GetComponent<AvatarScrollItem>().Refresh(DefaultImage, null);
-
-            AvatarService.AvatarsByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
-                {
-                    Modal.Instance.Show("Retrieving avatar images...");
-                    requestingInProgress = true;
-                    imagesRefreshing.Clear();
-                    for (int i = 0; i < avatars.Count; i++)
+            if (!cts.Token.IsCancellationRequested)
+            {
+                AvatarService.AvatarsByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
                     {
-                        go = AvatarScrollItemsPool.GetNewObject();
-                        go.transform.SetParent(AvatarScrollRoot);
-                        go.transform.localScale = Vector3.one;
+                        ModalCancel.Instance.Show("Retrieving avatar images...", () =>
+                        {
+                            cts.Cancel();
+                            ModalCancel.Instance.Hide();
+                            ScreenManager.Instance.ShowDashboard();
+                        });
+                        
+                        requestingInProgress = true;
+                        imagesRefreshing.Clear();
+                        for (int i = 0; i < avatars.Count; i++)
+                        {
+                            cts.Token.ThrowIfCancellationRequested();
+                            go = AvatarScrollItemsPool.GetNewObject();
+                            go.transform.SetParent(AvatarScrollRoot);
+                            go.transform.localScale = Vector3.one;
 
-                        imagesRefreshing.Add(avatars[i].avatarId);
-                        go.GetComponent<AvatarScrollItem>().Refresh(DefaultImage, avatars[i]);
-                    }
-                    requestingInProgress = false;
-                    if (imagesRefreshing.Count <= 0)
+                            imagesRefreshing.Add(avatars[i].avatarId);
+                            go.GetComponent<AvatarScrollItem>().Refresh(DefaultImage, avatars[i]);
+                        }
+                        requestingInProgress = false;
+                        if (imagesRefreshing.Count <= 0)
+                        {
+                            ModalCancel.Instance.Hide();
+                        }
+                    },
+                    (error, code) =>
                     {
-                        Modal.Instance.Hide();
-                    }
-                },
-                (error, code) =>
-                {
-                    EmergenceLogger.LogError(error, code);
-                    Modal.Instance.Hide();
-                });
+                        EmergenceLogger.LogError(error, code);
+                        ModalCancel.Instance.Hide();
+                    },
+                    () =>
+                    {
+                        requestingInProgress = false;
+                        ModalCancel.Instance.Hide();
+                        ScreenManager.Instance.ShowDashboard();
+                    },
+                    ct: cts.Token);
+            }
         }
         
         private void OnImageCompleted(Avatar avatar, bool success)
@@ -141,7 +164,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             imagesRefreshing.Remove(avatarId);
             if (imagesRefreshing.Count <= 1 && !requestingInProgress)
             {
-                Modal.Instance.Hide();
+                ModalCancel.Instance.Hide();
             }
         }
 

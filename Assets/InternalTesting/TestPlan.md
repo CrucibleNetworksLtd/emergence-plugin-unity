@@ -95,6 +95,7 @@ Making sure that the UI is displaying the correct persona information.
 Making sure that the UI is displayed correctly and that the user can create a persona.
 
 **Expected Output**:
+- [ ] EM-765. Pressing the Cancel button takes the user back to the previous screen.
 - [ ] The user can see a plus in the top left corner.
 - Pressing the plus:
   - [ ] Takes the user to the avatar selection screen.
@@ -177,6 +178,7 @@ Making sure that the user can successfully edit a persona.
 - The user has at least two avatars.
 
 **Expected Output**:
+- [ ] EM-765. Pressing the Cancel button takes the user back to the previous screen.
 - [ ] The user can see the name and description of the current persona in the box under name.
 - [ ] The user can read the bio in the box under bio.
 - [ ] The user can see a button saying replace avatar under the icon.
