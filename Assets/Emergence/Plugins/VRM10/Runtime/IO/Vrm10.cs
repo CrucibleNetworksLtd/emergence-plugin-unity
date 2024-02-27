@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UniGLTF;
 using UnityEngine;
 using VRMShaders;
@@ -34,7 +34,7 @@ namespace UniVRM10
         /// <param name="vrmMetaInformationCallback">return callback that notify meta information before loading.</param>
         /// <param name="ct">CancellationToken</param>
         /// <returns>vrm-1.0 instance. Maybe return null if unexpected error was raised.</returns>
-        public static async Task<Vrm10Instance> LoadPathAsync(
+        public static async UniTask<Vrm10Instance> LoadPathAsync(
             string path,
             bool canLoadVrm0X = true,
             ControlRigGenerationOption controlRigGenerationOption = ControlRigGenerationOption.Generate,
@@ -78,7 +78,7 @@ namespace UniVRM10
         /// <param name="vrmMetaInformationCallback">return callback that notify meta information before loading.</param>
         /// <param name="ct">CancellationToken</param>
         /// <returns>vrm-1.0 instance. Maybe return null if unexpected error was raised.</returns>
-        public static async Task<Vrm10Instance> LoadBytesAsync(
+        public static async UniTask<Vrm10Instance> LoadBytesAsync(
             byte[] bytes,
             bool canLoadVrm0X = true,
             ControlRigGenerationOption controlRigGenerationOption = ControlRigGenerationOption.Generate,
@@ -107,7 +107,7 @@ namespace UniVRM10
                 ct);
         }
 
-        private static async Task<Vrm10Instance> LoadAsync(
+        private static async UniTask<Vrm10Instance> LoadAsync(
             string name,
             byte[] bytes,
             bool canLoadVrm0X,
@@ -175,7 +175,7 @@ namespace UniVRM10
             }
         }
 
-        private static async Task<Vrm10Instance> TryLoadingAsVrm10Async(
+        private static async UniTask<Vrm10Instance> TryLoadingAsVrm10Async(
             GltfData gltfData,
             ControlRigGenerationOption controlRigGenerationOption,
             bool showMeshes,
@@ -210,7 +210,7 @@ namespace UniVRM10
                 ct);
         }
 
-        private static async Task<Vrm10Instance> TryMigratingFromVrm0XAsync(
+        private static async UniTask<Vrm10Instance> TryMigratingFromVrm0XAsync(
             GltfData gltfData,
             ControlRigGenerationOption controlRigGenerationOption,
             bool showMeshes,
@@ -253,7 +253,7 @@ namespace UniVRM10
             }
         }
 
-        private static async Task<Vrm10Instance> LoadVrm10DataAsync(
+        private static async UniTask<Vrm10Instance> LoadVrm10DataAsync(
             Vrm10Data vrm10Data,
             MigrationData migrationData,
             ControlRigGenerationOption controlRigGenerationOption,

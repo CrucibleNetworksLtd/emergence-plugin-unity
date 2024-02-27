@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace VRMShaders
 {
@@ -56,7 +56,7 @@ namespace VRMShaders
         /// テクスチャ生成情報を基に、テクスチャ生成を行う。
         /// SubAssetKey が同じ場合はキャッシュを返す。
         /// </summary>
-        public async Task<Texture> GetTextureAsync(TextureDescriptor texDesc, IAwaitCaller awaitCaller)
+        public async UniTask<Texture> GetTextureAsync(TextureDescriptor texDesc, IAwaitCaller awaitCaller)
         {
             var subAssetKey = texDesc.SubAssetKey;
 

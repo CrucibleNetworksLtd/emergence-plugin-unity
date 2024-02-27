@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UniGLTF;
 using UniGLTF.Utils;
@@ -331,7 +330,7 @@ namespace UniVRM10
             return clip;
         }
 
-        public async Task<Texture2D> LoadVrmThumbnailAsync(IAwaitCaller awaitCaller = null)
+        public async UniTask<Texture2D> LoadVrmThumbnailAsync(IAwaitCaller awaitCaller = null)
         {
             if (awaitCaller == null)
             {
@@ -349,7 +348,7 @@ namespace UniVRM10
             }
         }
 
-        async Task<VRM10Object> LoadVrmAsync(IAwaitCaller awaitCaller, UniGLTF.Extensions.VRMC_vrm.VRMC_vrm vrmExtension)
+        async UniTask<VRM10Object> LoadVrmAsync(IAwaitCaller awaitCaller, UniGLTF.Extensions.VRMC_vrm.VRMC_vrm vrmExtension)
         {
             if (m_externalMap.TryGetValue(VRM10Object.SubAssetKey, out UnityEngine.Object obj) && obj is VRM10Object vrm)
             {
@@ -508,7 +507,7 @@ namespace UniVRM10
             return vrm;
         }
 
-        async Task LoadSpringBoneAsync(IAwaitCaller awaitCaller, Vrm10Instance controller, UniGLTF.Extensions.VRMC_springBone.VRMC_springBone gltfVrmSpringBone)
+        async UniTask LoadSpringBoneAsync(IAwaitCaller awaitCaller, Vrm10Instance controller, UniGLTF.Extensions.VRMC_springBone.VRMC_springBone gltfVrmSpringBone)
         {
             await awaitCaller.NextFrame();
 
@@ -662,7 +661,7 @@ namespace UniVRM10
         /// <param name="awaitCaller"></param>
         /// <param name="controller"></param>
         /// <returns></returns>
-        async Task LoadConstraintAsync(IAwaitCaller awaitCaller, Vrm10Instance controller)
+        async UniTask LoadConstraintAsync(IAwaitCaller awaitCaller, Vrm10Instance controller)
         {
             for (int i = 0; i < Data.GLTF.nodes.Count; ++i)
             {

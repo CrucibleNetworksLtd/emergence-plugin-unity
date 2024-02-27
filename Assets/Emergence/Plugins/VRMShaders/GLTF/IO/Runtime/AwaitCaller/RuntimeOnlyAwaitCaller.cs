@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace VRMShaders
 {
@@ -24,25 +24,25 @@ namespace VRMShaders
             ResetLastTimeoutBaseTime();
         }
 
-        public Task NextFrame()
+        public UniTask NextFrame()
         {
             ResetLastTimeoutBaseTime();
-            var tcs = new TaskCompletionSource<object>();
-            _scheduler.Enqueue(() => tcs.SetResult(default));
+            var tcs = new UniTaskCompletionSource<object>();
+            _scheduler.Enqueue(() => tcs.TrySetResult(default));
             return tcs.Task;
         }
 
-        public Task Run(Action action)
+        public UniTask Run(Action action)
         {
-            return Task.Run(action);
+            return UniTask.RunOnThreadPool(action);
         }
 
-        public Task<T> Run<T>(Func<T> action)
+        public UniTask<T> Run<T>(Func<T> action)
         {
-            return Task.Run(action);
+            return UniTask.RunOnThreadPool(action);
         }
 
-        public Task NextFrameIfTimedOut() => CheckTimeout() ? NextFrame() : Task.CompletedTask;
+        public UniTask NextFrameIfTimedOut() => CheckTimeout() ? NextFrame() : UniTask.CompletedTask;
 
         private void ResetLastTimeoutBaseTime() => _lastTimeoutBaseTime = 0f;
 

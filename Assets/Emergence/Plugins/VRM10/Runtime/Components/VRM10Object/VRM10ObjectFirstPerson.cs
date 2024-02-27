@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UniGLTF.MeshUtility;
 using UnityEngine;
@@ -61,7 +60,7 @@ namespace UniVRM10
 
         bool m_done;
 
-        async Task SetupSelfRendererAsync(GameObject go, UniGLTF.RuntimeGltfInstance runtime,
+        async UniTask SetupSelfRendererAsync(GameObject go, UniGLTF.RuntimeGltfInstance runtime,
             Transform firstPersonBone, RendererFirstPersonFlags x,
             (int FirstPersonOnly, int ThirdPersonOnly) layer, IAwaitCaller awaitCaller = null)
         {
@@ -137,7 +136,7 @@ namespace UniVRM10
         /// <param name="thirdPersonOnlyLayer">layer VRMThirdPersonOnly ir 10</param>
         /// <param name="awaitCaller">Headless mesh creation task scheduler. By default, creation is immediate</param>
         /// <returns></returns>
-        public async Task SetupAsync(GameObject go, IAwaitCaller awaitCaller, bool isSelf = true, int? firstPersonOnlyLayer = default, int? thirdPersonOnlyLayer = default)
+        public async UniTask SetupAsync(GameObject go, IAwaitCaller awaitCaller, bool isSelf = true, int? firstPersonOnlyLayer = default, int? thirdPersonOnlyLayer = default)
         {
             if (awaitCaller == null)
             {
