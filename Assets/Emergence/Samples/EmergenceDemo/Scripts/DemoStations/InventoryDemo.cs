@@ -5,6 +5,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
+using Tweens;
 using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
@@ -63,16 +64,20 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             if (!isInventoryVisible)
             {
-                DG.Tweening.DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
-                    x => scrollView.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, 0), 0.25f);
+                scrollView.AddTween(new AnchoredPositionTween() {
+                    to = Vector2.zero,
+                    duration = .25f
+                });
                 isInventoryVisible = true;
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
             }
             else
             {
-                DG.Tweening.DOTween.To(() => scrollView.GetComponent<RectTransform>().anchoredPosition,
-                    x => scrollView.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, -200f), 0.25f);
+                scrollView.AddTween(new AnchoredPositionTween() {
+                    to = new Vector2(0, -200f),
+                    duration = .25f
+                });
                 isInventoryVisible = false;
                 Cursor.visible = false;
             }

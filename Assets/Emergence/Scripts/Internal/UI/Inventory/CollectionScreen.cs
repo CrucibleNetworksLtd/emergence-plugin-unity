@@ -7,6 +7,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types.Inventory;
 using TMPro;
+using Tweens;
 using UnityEngine;
 using UnityEngine.UI;
 using Avatar = EmergenceSDK.Types.Avatar;
@@ -202,12 +203,19 @@ namespace EmergenceSDK.Internal.UI.Screens
 
             if (!isItemSelected)
             {
-                DG.Tweening.DOTween.To(() => detailsPanel.GetComponent<RectTransform>().anchoredPosition,
-                    x => detailsPanel.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(0, 0), 0.25f);
+                detailsPanel.AddTween(new AnchoredPositionTween() {
+                    to = Vector2.zero,
+                    duration = .25f
+                });
 
-                DG.Tweening.DOTween.To(() => itemsListPanel.GetComponent<RectTransform>().offsetMax,
-                    x => itemsListPanel.GetComponent<RectTransform>().offsetMax = x, new Vector2(-443.5f, 0), 0.25f);
-
+                RectTransform itemsListTransform = itemsListPanel.GetComponent<RectTransform>();
+                itemsListPanel.AddTween(new Vector2Tween {
+                    from = itemsListTransform.offsetMax,
+                    to = new Vector2(-443.5f, 0),
+                    duration = .25f,
+                    onUpdate = (_, value) => itemsListTransform.offsetMax = value,
+                });
+                
                 isItemSelected = true;
                 selectedItem = item;
             }
@@ -215,11 +223,19 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public void OnCloseDetailsPanelButtonPressed() 
         {
-            DG.Tweening.DOTween.To(() => detailsPanel.GetComponent<RectTransform>().anchoredPosition,
-                x=> detailsPanel.GetComponent<RectTransform>().anchoredPosition = x, new Vector2(Screen.width / 2, 0), 0.25f);
-                
-            DG.Tweening.DOTween.To(() => itemsListPanel.GetComponent<RectTransform>().offsetMax,
-                x=> itemsListPanel.GetComponent<RectTransform>().offsetMax = x, new Vector2(0, 0), 0.25f);
+            
+            detailsPanel.AddTween(new AnchoredPositionTween() {
+                to = new Vector2(Screen.width / 2f, 0),
+                duration = .25f
+            });
+
+            RectTransform itemsListTransform = itemsListPanel.GetComponent<RectTransform>();
+            itemsListPanel.AddTween(new Vector2Tween {
+                from = itemsListTransform.offsetMax,
+                to = Vector2.zero,
+                duration = .25f,
+                onUpdate = (_, value) => itemsListTransform.offsetMax = value,
+            });
             
             isItemSelected = false;
         }
