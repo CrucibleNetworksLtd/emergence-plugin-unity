@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VRMShaders
@@ -9,7 +9,7 @@ namespace VRMShaders
     /// </summary>
     public sealed class UnityTextureDeserializer : ITextureDeserializer
     {
-        public async Task<Texture2D> LoadTextureAsync(DeserializingTextureInfo textureInfo, IAwaitCaller awaitCaller)
+        public async UniTask<Texture2D> LoadTextureAsync(DeserializingTextureInfo textureInfo, IAwaitCaller awaitCaller)
         {
             switch (textureInfo.DataMimeType)
             {

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace VRMShaders
 {
@@ -8,22 +8,41 @@ namespace VRMShaders
     /// </summary>
     public sealed class ImmediateCaller : IAwaitCaller
     {
-        public Task NextFrame()
+        public Exception Exception { get; set; }
+
+        public UniTask NextFrame()
         {
-            return Task.FromResult<object>(null);
+            return UniTask.FromResult<object>(null);
         }
 
-        public Task Run(Action action)
+        public UniTask Run(Action action)
         {
-            action();
-            return Task.FromResult<object>(null);
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Exception = e;
+                return UniTask.FromException(e);
+            }
+            
+            return UniTask.FromResult<object>(null);
         }
 
-        public Task<T> Run<T>(Func<T> action)
+        public UniTask<T> Run<T>(Func<T> action)
         {
-            return Task.FromResult(action());
+            try
+            {
+                return UniTask.FromResult(action());
+            }
+            catch (Exception e)
+            {
+                Exception = e;
+                return UniTask.FromException<T>(e);
+            }
         }
 
-        public Task NextFrameIfTimedOut() => NextFrame();
+        public UniTask NextFrameIfTimedOut() => NextFrame();
     }
 }

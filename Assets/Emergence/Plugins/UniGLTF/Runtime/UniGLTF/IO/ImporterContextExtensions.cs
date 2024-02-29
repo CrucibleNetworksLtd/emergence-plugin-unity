@@ -13,21 +13,16 @@ namespace UniGLTF
         public static RuntimeGltfInstance Load(this ImporterContext self)
         {
             var meassureTime = new ImporterContextSpeedLog();
-            var task = self.LoadAsync(new ImmediateCaller(), meassureTime.MeasureTime);
+            var immediateCaller = new ImmediateCaller();
+            var task = self.LoadAsync(immediateCaller, meassureTime.MeasureTime);
             if (!task.GetAwaiter().IsCompleted)
             {
                 throw new Exception();
             }
+            
             if (task.Status.IsFaulted())
             {
-                try
-                {
-                    task.GetAwaiter().GetResult();
-                }
-                catch (Exception e)
-                {
-                    throw new AggregateException(e);
-                }
+                throw new AggregateException(immediateCaller.Exception);
             }
 
             if (Symbols.VRM_DEVELOP)

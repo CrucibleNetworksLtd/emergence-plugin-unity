@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VRMShaders
@@ -13,6 +13,6 @@ namespace VRMShaders
         /// imageData をもとに Texture2D を生成する.
         /// await する場合は awaitCaller を用いて await しなければならない。(Editor では同期ロードをしなければならないため)
         /// </summary>
-        Task<Texture2D> LoadTextureAsync(DeserializingTextureInfo textureInfo, IAwaitCaller awaitCaller);
+        UniTask<Texture2D> LoadTextureAsync(DeserializingTextureInfo textureInfo, IAwaitCaller awaitCaller);
     }
 }
