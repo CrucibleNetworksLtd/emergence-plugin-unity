@@ -59,7 +59,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 avatarService.AvatarById(persona.avatarId, (async avatar =>
                 {
                     var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, Helpers.InternalIPFSURLToHTTP(avatar.tokenURI), EmergenceLogger.LogError);
-                    var token = Newtonsoft.Json.JsonConvert.DeserializeObject<EASMetadata[]>(response.Response);
+                    var token = SerializationHelper.Deserialize<EASMetadata[]>(response.Response);
                     DemoAvatarManager.Instance.SwapAvatars(GameObject.Find("PlayerArmature"), Helpers.InternalIPFSURLToHTTP(token[0].UriBase));
                 
                 }), EmergenceLogger.LogError);
