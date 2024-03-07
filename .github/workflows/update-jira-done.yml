@@ -1,0 +1,33 @@
+﻿name: Update JIRA Issue Status
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  update-jira-issue-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Extract JIRA issue ID from branch name
+        id: extract-jira-id
+        run: |
+          echo "Extracting JIRA issue ID from branch name: ${{ github.event.pull_request.head.ref }}"
+          JIRA_ISSUE_ID=$(echo ${{ github.event.pull_request.head.ref }} | grep -oP 'EM-\d+')
+          echo "Extracted JIRA issue ID: $JIRA_ISSUE_ID"
+          echo "::set-output name=jira_issue_id::$JIRA_ISSUE_ID"
+        shell: bash
+
+      - name: Get JIRA Credentials
+        uses: atlassian/gajira-login@master
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+      - name: Transition issue
+        uses: atlassian/gajira-transition@v3
+        with:
+          issue: ${{ steps.extract-jira-id.outputs.jira_issue_id }}
+          transition: "Done"
