@@ -1,8 +1,10 @@
+using System;
 using System.IO;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -58,10 +60,15 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 
                 avatarService.AvatarById(persona.avatarId, (async avatar =>
                 {
-                    var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, Helpers.InternalIPFSURLToHTTP(avatar.tokenURI), EmergenceLogger.LogError);
-                    var token = SerializationHelper.Deserialize<EASMetadata[]>(response.Response);
-                    DemoAvatarManager.Instance.SwapAvatars(GameObject.Find("PlayerArmature"), Helpers.InternalIPFSURLToHTTP(token[0].UriBase));
-                
+                    var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET,
+                        Helpers.InternalIPFSURLToHTTP(avatar.tokenURI), EmergenceLogger.LogError);
+                    try
+                    {
+                        var token = SerializationHelper.Deserialize<EASMetadata[]>(response.Response);
+                        DemoAvatarManager.Instance.SwapAvatars(GameObject.Find("PlayerArmature"),
+                            Helpers.InternalIPFSURLToHTTP(token[0].UriBase));
+                    }
+                    catch (JsonException) {}
                 }), EmergenceLogger.LogError);
             }
             else
