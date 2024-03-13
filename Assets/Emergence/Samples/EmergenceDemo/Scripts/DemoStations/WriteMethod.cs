@@ -51,6 +51,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             var contractInfo = new ContractInfo(deployedContract, "IncrementCount");
             ContractService.WriteMethod(contractInfo, "", "", "0", new string[] { }, WriteMethodSuccess, EmergenceLogger.LogError);
+            //ContractService.WriteMethodViaPrivateKey(contractInfo, "", "", "0", "197233bb20ca5efda264661b53546828a6de6b531f317338fe3de7b179958d54", WriteMethodSuccess, EmergenceLogger.LogError);
         }
 
         private void WriteMethodSuccess(WriteContractResponse response)
