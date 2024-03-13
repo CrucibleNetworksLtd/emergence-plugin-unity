@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
@@ -29,6 +30,11 @@ namespace EmergenceSDK.Services
         /// Calls a "write" method on the given contract.
         /// </summary>
         UniTask WriteMethod<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, WriteMethodSuccess success, ErrorCallback errorCallback);
+        
+        /// <summary>
+        /// Calls a "write" method on the given contract.
+        /// </summary>
+        Task WriteMethodViaPrivateKey(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, string privateKey, WriteMethodSuccess success, ErrorCallback errorCallback);
 
         /// <summary>
         /// Calls a "write" method on the given contract.
