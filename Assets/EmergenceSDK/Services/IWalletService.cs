@@ -13,6 +13,7 @@ namespace EmergenceSDK.Services
         /// Address of the wallet that is currently logged in
         /// </summary>
         public string WalletAddress { get; }
+        public string ChecksummedWalletAddress { get; }
 
         /// <summary>
         /// Attempts to sign a message using the walletconnect protocol, the success callback will return the signed message
