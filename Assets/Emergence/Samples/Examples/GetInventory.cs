@@ -12,7 +12,7 @@ namespace EmergenceSDK.Samples.Examples
         
         public void Awake()
         {
-            inventoryService = EmergenceServices.GetService<IInventoryService>();
+            inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
         }
         
         /// <summary>

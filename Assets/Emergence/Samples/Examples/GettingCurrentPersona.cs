@@ -12,7 +12,7 @@ namespace EmergenceSDK.Samples.Examples
         private void Awake()
         {
             // Initialize the personaService variable by getting the IPersonaService instance from the EmergenceServices class
-            personaService = EmergenceServices.GetService<IPersonaService>();
+            personaService = EmergenceServiceProvider.GetService<IPersonaService>();
         }
 
         private void Start()

@@ -37,7 +37,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         public void Start()
         {
-            personaService = EmergenceServices.GetService<IPersonaService>();
+            personaService = EmergenceServiceProvider.GetService<IPersonaService>();
         }
 
         private void ActivateStations()

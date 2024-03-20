@@ -22,8 +22,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         public static HeaderScreen Instance;
 
         private readonly float refreshTimeOut = 90.0f;
-        private IWalletService walletService => EmergenceServices.GetService<WalletService>();
-        private ISessionService sessionService => EmergenceServices.GetService<SessionService>();
+        private IWalletService walletService => EmergenceServiceProvider.GetService<WalletService>();
+        private ISessionService sessionService => EmergenceServiceProvider.GetService<SessionService>();
         
         private CancellationTokenSource refreshCancellationToken;
 

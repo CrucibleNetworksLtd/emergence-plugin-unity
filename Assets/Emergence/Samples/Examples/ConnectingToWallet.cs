@@ -11,8 +11,8 @@ namespace EmergenceSDK.Samples.Examples
 
         private void Awake()
         {
-            sessionService = EmergenceServices.GetService<ISessionService>();
-            walletService = EmergenceServices.GetService<IWalletService>();
+            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
+            walletService = EmergenceServiceProvider.GetService<IWalletService>();
         }
 
         private void Start()

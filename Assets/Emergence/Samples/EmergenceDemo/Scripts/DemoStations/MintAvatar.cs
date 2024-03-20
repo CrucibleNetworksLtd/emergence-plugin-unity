@@ -20,7 +20,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             }
         }
 
-        private IContractService ContractService => contractService ??= EmergenceServices.GetService<IContractService>();
+        private IContractService ContractService => contractService ??= EmergenceServiceProvider.GetService<IContractService>();
         private IContractService contractService;
         
         private void Start()

@@ -39,9 +39,9 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         public static LogInScreen Instance;
         
-        private IPersonaService personaService => EmergenceServices.GetService<IPersonaService>();
-        private IWalletService walletService => EmergenceServices.GetService<IWalletService>();
-        private ISessionService sessionService => EmergenceServices.GetService<ISessionService>();
+        private IPersonaService personaService => EmergenceServiceProvider.GetService<IPersonaService>();
+        private IWalletService walletService => EmergenceServiceProvider.GetService<IWalletService>();
+        private ISessionService sessionService => EmergenceServiceProvider.GetService<ISessionService>();
         
         private CancellationTokenSource qrCancellationToken = new CancellationTokenSource();
         private bool hasStarted = false;
@@ -223,7 +223,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private async UniTask<bool> AttemptFVLogin()
         {
-            var fvService = EmergenceServices.GetService<IFutureverseService>();
+            var fvService = EmergenceServiceProvider.GetService<IFutureverseService>();
             var linkedPassInfo = await fvService.GetLinkedFuturepassInformation();
             if (!linkedPassInfo.Success)
                 return false;

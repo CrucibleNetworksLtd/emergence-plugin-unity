@@ -20,7 +20,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         
         private void Start()
         {
-            wallletService = EmergenceServices.GetService<IWalletService>();
+            wallletService = EmergenceServiceProvider.GetService<IWalletService>();
             
             instructionsGO.SetActive(false);
             IsReady = false;

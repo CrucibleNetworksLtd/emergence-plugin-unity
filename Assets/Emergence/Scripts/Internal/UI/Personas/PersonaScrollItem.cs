@@ -116,7 +116,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void InitialiseServicesAndProperties(Texture2D texture, Persona persona)
         {
-            avatarService = EmergenceServices.GetService<IAvatarService>();
+            avatarService = EmergenceServiceProvider.GetService<IAvatarService>();
             Persona = persona;
             Index = transform.GetSiblingIndex();
         }
@@ -131,7 +131,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void UpdateBorder()
         {
-            var personaService = EmergenceServices.GetService<IPersonaService>();
+            var personaService = EmergenceServiceProvider.GetService<IPersonaService>();
             if (personaService.GetCurrentPersona(out var currentPersona))
             {
                 var isCurrentPersona = Persona.id == currentPersona.id;

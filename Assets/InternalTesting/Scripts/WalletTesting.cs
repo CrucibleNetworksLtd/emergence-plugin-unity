@@ -23,7 +23,7 @@ namespace EmergenceSDK.InternalTesting
             }
             needsCleanUp = true;
             
-            walletService ??= EmergenceServices.GetService<IWalletService>();
+            walletService ??= EmergenceServiceProvider.GetService<IWalletService>();
             
             EditorGUILayout.LabelField("Test Wallet Service");
             if(GUILayout.Button("Test Sign"))

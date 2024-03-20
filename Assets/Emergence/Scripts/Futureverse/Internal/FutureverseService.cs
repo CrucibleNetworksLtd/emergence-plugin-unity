@@ -54,7 +54,7 @@ namespace EmergenceSDK.Futureverse.Internal
         public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassInformation()
         {
             var url =
-                $"{GetFuturePassApiUrl()}linked-futurepass?eoa=1:EVM:{EmergenceServices.GetService<IWalletService>().WalletAddress}";
+                $"{GetFuturePassApiUrl()}linked-futurepass?eoa=1:EVM:{EmergenceServiceProvider.GetService<IWalletService>().WalletAddress}";
 
             var response =
                 await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url,
@@ -81,7 +81,7 @@ namespace EmergenceSDK.Futureverse.Internal
             FuturepassInformationResponse fpResponse =
                 SerializationHelper.Deserialize<FuturepassInformationResponse>(response.Response);
             UsingFutureverse = true;
-            EmergenceServices.GetService<ISessionService>().OnSessionDisconnected += OnSessionDisconnected;
+            EmergenceServiceProvider.GetService<ISessionService>().OnSessionDisconnected += OnSessionDisconnected;
             FuturepassInformation = fpResponse;
             return new ServiceResponse<FuturepassInformationResponse>(true, fpResponse);
         }
@@ -90,7 +90,7 @@ namespace EmergenceSDK.Futureverse.Internal
         {
             UsingFutureverse = false;
             FuturepassInformation = null;
-            EmergenceServices.GetService<ISessionService>().OnSessionDisconnected -= OnSessionDisconnected;
+            EmergenceServiceProvider.GetService<ISessionService>().OnSessionDisconnected -= OnSessionDisconnected;
         }
 
         public async UniTask<ServiceResponse<FVInventoryResponse>> GetFutureverseInventory()

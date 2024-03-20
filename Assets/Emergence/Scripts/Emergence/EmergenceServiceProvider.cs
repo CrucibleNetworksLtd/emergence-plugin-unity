@@ -11,9 +11,9 @@ namespace EmergenceSDK
     /// The services singleton provides you with all the methods you need to get going with Emergence.
     /// </summary>
     /// <remarks>See our prefabs for examples of how to use it!</remarks>
-    public class EmergenceServices : MonoBehaviour
+    public class EmergenceServiceProvider : MonoBehaviour
     {
-        private static EmergenceServices instance;
+        private static EmergenceServiceProvider instance;
 
         private List<IEmergenceService> services = new List<IEmergenceService>();
         

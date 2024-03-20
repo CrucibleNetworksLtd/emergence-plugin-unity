@@ -159,7 +159,7 @@ namespace EmergenceSDK.Internal.Services
             {
                 await UniTask.Delay(timeOut);
 
-                var transactionStatus = await EmergenceServices.GetService<IChainService>().GetTransactionStatusAsync(transactionHash, contractInfo.NodeUrl);
+                var transactionStatus = await EmergenceServiceProvider.GetService<IChainService>().GetTransactionStatusAsync(transactionHash, contractInfo.NodeUrl);
                 if (transactionStatus.Result?.transaction?.Confirmations != null)
                     confirmations = (int)transactionStatus.Result?.transaction?.Confirmations;
                 if(transactionStatus.Result?.transaction?.Confirmations >= desiredConfirmationCount)

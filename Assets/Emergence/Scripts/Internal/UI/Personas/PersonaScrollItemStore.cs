@@ -35,7 +35,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private void RefreshCurrentPersona()
         {
-            var personaService = EmergenceServices.GetService<IPersonaService>();
+            var personaService = EmergenceServiceProvider.GetService<IPersonaService>();
             if (personaService.GetCurrentPersona(out var currentPersona))
             {
                 currentPersonaItem = items.FirstOrDefault(item => item.Persona?.id == currentPersona.id);

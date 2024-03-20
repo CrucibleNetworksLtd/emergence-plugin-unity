@@ -66,7 +66,7 @@ namespace EmergenceSDK.Internal.Services
 
         private static void SetupRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)
         {
-            var personaService = EmergenceServices.GetService<IPersonaService>();
+            var personaService = EmergenceServiceProvider.GetService<IPersonaService>();
             request.SetRequestHeader("Authorization", personaService.CurrentAccessToken);
 
             if (headers != null)

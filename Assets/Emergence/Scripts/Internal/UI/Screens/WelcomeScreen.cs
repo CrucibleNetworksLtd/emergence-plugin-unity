@@ -45,7 +45,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void Start()
         {
-            walletService = EmergenceServices.GetService<IWalletService>();
+            walletService = EmergenceServiceProvider.GetService<IWalletService>();
         }
 
         private void OnDestroy()

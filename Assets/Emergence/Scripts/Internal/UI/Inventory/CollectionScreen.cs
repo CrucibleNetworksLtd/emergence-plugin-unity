@@ -95,8 +95,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         public async UniTask Refresh()
         {
-            HideFVSidebars(EmergenceServices.GetService<IFutureverseService>().UsingFutureverse);
-            var inventoryService = EmergenceServices.GetService<IInventoryService>();
+            HideFVSidebars(EmergenceServiceProvider.GetService<IFutureverseService>().UsingFutureverse);
+            var inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
             var updatedInventory = await inventoryService.InventoryByOwnerAsync(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible);
             inventoryItemStore.SetItems(updatedInventory.Result);
             if (updatedInventory.Success)
@@ -105,7 +105,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             }
             Modal.Instance.Hide();
              
-            var avatarService = EmergenceServices.GetService<IAvatarService>();
+            var avatarService = EmergenceServiceProvider.GetService<IAvatarService>();
             var updatedAvatars = await avatarService.AvatarsByOwnerAsync(EmergenceSingleton.Instance.GetCachedAddress());
             if (updatedAvatars.Success)
             {

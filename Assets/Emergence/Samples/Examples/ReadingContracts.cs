@@ -18,7 +18,7 @@ namespace EmergenceSDK.Samples.Examples
         
         public void Awake()
         {
-            contractService = EmergenceServices.GetService<IContractService>();
+            contractService = EmergenceServiceProvider.GetService<IContractService>();
         }
 
         public void Start()

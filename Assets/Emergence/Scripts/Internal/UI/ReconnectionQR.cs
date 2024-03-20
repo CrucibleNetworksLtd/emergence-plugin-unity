@@ -23,9 +23,9 @@ namespace EmergenceSDK.Internal.UI
         private readonly int qrRefreshTimeOut = 60;
         private int timeRemaining;
         
-        private IPersonaService personaService => EmergenceServices.GetService<IPersonaService>();
-        private IWalletService walletService => EmergenceServices.GetService<IWalletService>();
-        private ISessionService sessionService => EmergenceServices.GetService<ISessionService>();
+        private IPersonaService personaService => EmergenceServiceProvider.GetService<IPersonaService>();
+        private IWalletService walletService => EmergenceServiceProvider.GetService<IWalletService>();
+        private ISessionService sessionService => EmergenceServiceProvider.GetService<ISessionService>();
         
         private CancellationTokenSource qrCancellationToken = new CancellationTokenSource();
         private bool hasStarted = false;

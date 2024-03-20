@@ -29,7 +29,7 @@ namespace EmergenceSDK.InternalTesting
             }
             needsCleanUp = true;
 
-            personaService ??= EmergenceServices.GetService<IPersonaService>();
+            personaService ??= EmergenceServiceProvider.GetService<IPersonaService>();
             
             EditorGUILayout.LabelField("Test Persona Service");
 

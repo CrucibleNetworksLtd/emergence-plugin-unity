@@ -107,7 +107,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         public async UniTask Refresh()
         {
-            personaService = EmergenceServices.GetService<IPersonaService>();
+            personaService = EmergenceServiceProvider.GetService<IPersonaService>();
             
             dashboardScreen.HideUI();
             dashboardScreen.HideDetailsPanel();

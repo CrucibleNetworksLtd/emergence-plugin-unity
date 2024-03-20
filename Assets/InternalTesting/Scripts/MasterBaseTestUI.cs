@@ -57,7 +57,7 @@ namespace EmergenceSDK.InternalTesting
             if (needToGenerateQR)
             {
                 needToGenerateQR = false;
-                EmergenceServices.GetService<ISessionService>().GetQRCode(OnGetQRCodeSuccess, EmergenceLogger.LogError);
+                EmergenceServiceProvider.GetService<ISessionService>().GetQRCode(OnGetQRCodeSuccess, EmergenceLogger.LogError);
             }
 
             if (displayQR)
@@ -70,7 +70,7 @@ namespace EmergenceSDK.InternalTesting
         {
             qrcode = qrcodeIn;
             displayQR = true;
-            EmergenceServices.GetService<IWalletService>().Handshake((walletAddress) =>
+            EmergenceServiceProvider.GetService<IWalletService>().Handshake((walletAddress) =>
             {
                 EmergenceLogger.LogInfo("Hand shook with wallet: " + walletAddress);
                 displayQR = false;

@@ -26,7 +26,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Start()
         {
-            dynamicMetaDataService = EmergenceServices.GetService<IDynamicMetadataService>();
+            dynamicMetaDataService = EmergenceServiceProvider.GetService<IDynamicMetadataService>();
             
             instructionsGO.SetActive(false);
             IsReady = false;

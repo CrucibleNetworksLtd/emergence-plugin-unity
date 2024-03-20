@@ -27,9 +27,9 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Start()
         {
-            personaService = EmergenceServices.GetService<IPersonaService>();
+            personaService = EmergenceServiceProvider.GetService<IPersonaService>();
             personaService.OnCurrentPersonaUpdated += OnPersonaUpdated;
-            avatarService = EmergenceServices.GetService<IAvatarService>();
+            avatarService = EmergenceServiceProvider.GetService<IAvatarService>();
             
             instructionsGO.SetActive(false);
         }

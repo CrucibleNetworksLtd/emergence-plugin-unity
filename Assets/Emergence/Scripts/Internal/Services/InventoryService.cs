@@ -14,9 +14,9 @@ namespace EmergenceSDK.Internal.Services
     {
         public async UniTask<ServiceResponse<List<InventoryItem>>> InventoryByOwnerAsync(string address, InventoryChain chain)
         {
-            if (EmergenceServices.GetService<IFutureverseService>().UsingFutureverse)
+            if (EmergenceServiceProvider.GetService<IFutureverseService>().UsingFutureverse)
             {
-                return await EmergenceServices.GetService<IFutureverseService>().GetFutureverseInventoryAsInventoryItems();
+                return await EmergenceServiceProvider.GetService<IFutureverseService>().GetFutureverseInventoryAsInventoryItems();
             }
             
             string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address + "&chain=" + InventoryKeys.ChainToKey[chain];

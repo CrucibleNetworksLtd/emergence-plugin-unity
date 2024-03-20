@@ -118,7 +118,7 @@ namespace EmergenceSDK
             }
             try
             {
-                var personaService = EmergenceServices.GetService<IPersonaService>();
+                var personaService = EmergenceServiceProvider.GetService<IPersonaService>();
                 EmergenceLogger.LogInfo("AccessToken: " + personaService.CurrentAccessToken);
                 request.SetRequestHeader("Authorization", personaService.CurrentAccessToken);
 

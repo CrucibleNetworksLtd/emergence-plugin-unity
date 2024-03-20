@@ -19,7 +19,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         public PersonaInfoPanel PersonaInfo;
         public PersonaCreationEditingStatusWidget StatusWidget;
         private Persona currentPersona;
-        private IPersonaService PersonaService => EmergenceServices.GetService<IPersonaService>();
+        private IPersonaService PersonaService => EmergenceServiceProvider.GetService<IPersonaService>();
         private bool isNew;
 
         private void Awake()

@@ -26,7 +26,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         public Texture2D DefaultImage;
         
         private HashSet<string> imagesRefreshing = new HashSet<string>();
-        private IAvatarService AvatarService => EmergenceServices.GetService<IAvatarService>();
+        private IAvatarService AvatarService => EmergenceServiceProvider.GetService<IAvatarService>();
         private bool requestingInProgress = false;
         
         public Avatar CurrentAvatar = null;

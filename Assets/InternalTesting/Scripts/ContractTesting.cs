@@ -45,7 +45,7 @@ namespace EmergenceSDK.InternalTesting
         private void ReadMethodPressed()
         {
             var contractInfo = new ContractInfo(readContract, readContractMethodName);
-            EmergenceServices.GetService<IContractService>().ReadMethod(contractInfo,
+            EmergenceServiceProvider.GetService<IContractService>().ReadMethod(contractInfo,
                 new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
                 (result) => EditorUtility.DisplayDialog("Read Method Result", "Result: " + result, "OK"),
                 EmergenceLogger.LogError);
@@ -54,7 +54,7 @@ namespace EmergenceSDK.InternalTesting
         private void WriteMethodPressed()
         {
             var contractInfo = new ContractInfo(writeContract, writeContractMethodName);
-            EmergenceServices.GetService<IContractService>().WriteMethod(contractInfo,
+            EmergenceServiceProvider.GetService<IContractService>().WriteMethod(contractInfo,
                 "", "", "0", new string[] { },
                 (response) => EditorUtility.DisplayDialog("Write Method Response", "Response: " + response, "OK"),
                 EmergenceLogger.LogError);
