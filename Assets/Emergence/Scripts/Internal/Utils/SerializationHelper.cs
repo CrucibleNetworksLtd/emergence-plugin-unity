@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace EmergenceSDK.Internal.Utils
@@ -28,6 +29,19 @@ namespace EmergenceSDK.Internal.Utils
             catch (Exception e)
             {
                 EmergenceLogger.LogError($"Error deserializing {typeof(T).Name}: {e.Message}");
+                throw;
+            }
+        }
+
+        public static JToken Parse(string jsonString)
+        {
+            try
+            {  
+                return JToken.Parse(jsonString);
+            }
+            catch (Exception e)
+            {
+                EmergenceLogger.LogError($"Error parsing string: {e.Message}");
                 throw;
             }
         }
