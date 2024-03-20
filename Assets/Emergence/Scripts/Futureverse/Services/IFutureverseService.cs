@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Futureverse.Types;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;

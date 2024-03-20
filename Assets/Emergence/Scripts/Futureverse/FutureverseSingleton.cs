@@ -1,7 +1,6 @@
 ﻿using System;
 using EmergenceSDK.Futureverse.Internal;
 using EmergenceSDK.Futureverse.Services;
-using EmergenceSDK.Futureverse.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEngine;
