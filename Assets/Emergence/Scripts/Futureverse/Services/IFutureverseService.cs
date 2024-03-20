@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Futureverse.Types;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
@@ -17,5 +18,6 @@ namespace EmergenceSDK.Futureverse.Services
 
         UniTask<ServiceResponse<FVInventoryResponse>> GetFutureverseInventory();
         UniTask<ServiceResponse<List<InventoryItem>>> GetFutureverseInventoryAsInventoryItems();
+        UniTask<List<FutureverseAssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId);
     }
 }

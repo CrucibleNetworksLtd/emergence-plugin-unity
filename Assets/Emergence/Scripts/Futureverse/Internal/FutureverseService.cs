@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Futureverse.Services;
+using EmergenceSDK.Futureverse.Types;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -136,6 +137,85 @@ namespace EmergenceSDK.Futureverse.Internal
             }
 
             return new ServiceResponse<List<InventoryItem>>(true, ret);
+        }
+
+        private static List<FutureverseAssetTreePath> ParseGetAssetTreeResponse(WebResponse response)
+        {
+            List<FutureverseAssetTreePath> assetTree = new();
+            if (response.IsSuccess)
+            {
+                var statusCode = response.StatusCode;
+                if (statusCode is >= 200 and <= 299)
+                {
+                    JToken parsed = SerializationHelper.Parse(response.Response);
+                    if (parsed is JObject)
+                    {
+                        var obj = (JObject)parsed;
+                        var dataArray = (JArray)obj["data"]?["asset"]?["assetTree"]?["data"]?["@graph"];
+                        if (dataArray != null)
+                        {
+                            foreach (var data in dataArray)
+                            {
+                                FutureverseAssetTreePath assetPath = new(
+                                    (string)data["@id"],
+                                    (string)data["rdf:type"]?["@id"],
+                                    new()
+                                );
+
+                                foreach (var property in ((JObject)data).Properties())
+                                {
+                                    if (property.Name is "@id" or "rdf:type")
+                                    {
+                                        //ignore these ones
+                                        continue;
+                                    }
+
+                                    var treeObject = new FutureverseAssetTreeObject((string)data["@id"], new());
+                                    if (property.Value is JObject jObject)
+                                    {
+                                        foreach (var childProperty in jObject.Properties())
+                                        {
+                                            if (childProperty.Name == "@id")
+                                            {
+                                                //ignore
+                                                continue;
+                                            }
+
+                                            treeObject.AdditionalData.Add(childProperty.Name, childProperty);
+                                        }
+                                    }
+
+                                    assetPath.Objects.Add(property.Name, treeObject);
+                                }
+
+                                assetTree.Add(assetPath);
+                            }
+
+                            return assetTree;
+                        }
+                    }
+                }
+            }
+            
+            return assetTree;
+        }
+
+        private static string BuildGetAssetTreeRequestBody(string tokenId, string collectionId)
+        {
+            string body =
+                @"{""query"":""query Asset($tokenId: String!, $collectionId: CollectionId!) {\n  asset(tokenId: $tokenId, collectionId: $collectionId) {\n    assetTree {\n      data\n    }\n  }\n}"",""variables"":{""tokenId"":""" +
+                tokenId + @""",""collectionId"":""" + collectionId + @"""}}";
+            return body;
+        }
+
+        public async UniTask<List<FutureverseAssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId)
+        {
+            var body = BuildGetAssetTreeRequestBody(tokenId, collectionId);
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
+            request.SetRequestHeader("Content-Type", "application/json");
+            request.timeout = FutureverseSingleton.Instance.requestTimeout;
+            var response = await WebRequestService.PerformAsyncWebRequest(request, (message, code) => { });
+            return ParseGetAssetTreeResponse(response);
         }
     }
 }
