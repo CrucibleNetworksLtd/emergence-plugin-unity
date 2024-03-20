@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Futureverse.Services;
 using EmergenceSDK.Internal.UI.Inventory;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;

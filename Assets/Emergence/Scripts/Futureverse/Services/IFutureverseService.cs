@@ -1,12 +1,13 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Futureverse.Types;
+using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
 using EmergenceSDK.Types.Responses;
 using EmergenceSDK.Types.Responses.FuturePass;
 
-namespace EmergenceSDK.Services
+namespace EmergenceSDK.Futureverse.Services
 {
     public interface IFutureverseService : IEmergenceService
     {

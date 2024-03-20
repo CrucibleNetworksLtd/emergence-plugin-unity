@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using EmergenceSDK.Futureverse.Internal;
 using EmergenceSDK.Internal.Services;
+using EmergenceSDK.Services;
 using UnityEngine;
 
-namespace EmergenceSDK.Services
+namespace EmergenceSDK
 {
     /// <summary>
     /// The services singleton provides you with all the methods you need to get going with Emergence.

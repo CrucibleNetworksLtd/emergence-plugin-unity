@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
 using EmergenceSDK.Types.Responses;
-using UnityEngine;
 using UnityEngine.Networking;
 
-namespace EmergenceSDK.Services
+namespace EmergenceSDK
 {
     /// <summary>
     /// A static class containing utility methods for making HTTP requests and handling responses in the Emergence SDK.

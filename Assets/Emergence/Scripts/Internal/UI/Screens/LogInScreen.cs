@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Futureverse.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using TMPro;
