@@ -202,10 +202,7 @@ namespace EmergenceSDK.Futureverse.Internal
 
         private static string BuildGetAssetTreeRequestBody(string tokenId, string collectionId)
         {
-            string body =
-                @"{""query"":""query Asset($tokenId: String!, $collectionId: CollectionId!) {\n  asset(tokenId: $tokenId, collectionId: $collectionId) {\n    assetTree {\n      data\n    }\n  }\n}"",""variables"":{""tokenId"":""" +
-                tokenId + @""",""collectionId"":""" + collectionId + @"""}}";
-            return body;
+            return $@"{{""query"":""query Asset($tokenId: String!, $collectionId: CollectionId!) {{ asset(tokenId: $tokenId, collectionId: $collectionId) {{ assetTree {{ data }} }} }}"",""variables"":{{""tokenId"":""{tokenId}"",""collectionId"":""{collectionId}""}}}}";
         }
 
         public async UniTask<List<FutureverseAssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId)
