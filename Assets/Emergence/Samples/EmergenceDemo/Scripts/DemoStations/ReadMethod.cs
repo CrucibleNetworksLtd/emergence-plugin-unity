@@ -3,7 +3,6 @@ using System.Linq;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
 

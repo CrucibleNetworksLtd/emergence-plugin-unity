@@ -3,7 +3,6 @@
 using System.Collections.Generic;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using UnityEditor;
 using UnityEngine;
 using Avatar = EmergenceSDK.Types.Avatar;

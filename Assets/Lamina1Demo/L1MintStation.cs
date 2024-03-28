@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using EmergenceSDK.EmergenceDemo.DemoStations;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
@@ -7,7 +5,7 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Lamina1Demo
 {
     public class L1MintStation : DemoStation<L1MintStation>, IDemoStation
     {

@@ -1,6 +1,4 @@
-using System;
-using System.IO;
-using EmergenceSDK.Internal.Services;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -60,11 +58,17 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 
                 avatarService.AvatarById(persona.avatarId, (async avatar =>
                 {
-                    var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET,
-                        Helpers.InternalIPFSURLToHTTP(avatar.tokenURI), EmergenceLogger.LogError);
+                    var request = UnityWebRequest.Get(Helpers.InternalIPFSURLToHTTP(avatar.tokenURI));
+                    string response;
+                    using (request.uploadHandler)
+                    {
+                        await request.SendWebRequest().ToUniTask();
+                        response = request.downloadHandler.text;
+                    }
+
                     try
                     {
-                        var token = SerializationHelper.Deserialize<EASMetadata[]>(response.Response);
+                        var token = SerializationHelper.Deserialize<EASMetadata[]>(response);
                         DemoAvatarManager.Instance.SwapAvatars(GameObject.Find("PlayerArmature"),
                             Helpers.InternalIPFSURLToHTTP(token[0].UriBase));
                     }
