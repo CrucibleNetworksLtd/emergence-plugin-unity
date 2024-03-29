@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+using EmergenceSDK.Internal.Utils;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace EmergenceSDK.Types.Inventory
 {
+    [SerializationHelper.StoreOriginalJTokens]
     public class InventoryItem
     {
         public string ID { get; set; }
@@ -20,6 +24,9 @@ namespace EmergenceSDK.Types.Inventory
         public InventoryItemMetaData Meta { get; set; }
         public bool Deleted { get; set; }
         public string TotalStock { get; set; }
+        
+        [SerializationHelper.OriginalJToken][JsonIgnore]
+        public JToken OriginalData { get; internal set; }
 
         public InventoryItem()
         {
@@ -43,6 +50,7 @@ namespace EmergenceSDK.Types.Inventory
             Meta = new InventoryItemMetaData(other.Meta);
             Deleted = other.Deleted;
             TotalStock = other.TotalStock;
+            OriginalData = other.OriginalData;
         }
     }
 }
