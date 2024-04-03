@@ -131,7 +131,16 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 newMetaContent.MimeType = node.metadata.properties.models?["glb"] != null ? "model/gltf-binary" : "image/png";
                 newItem.Meta.Content = new List<InventoryItemMetaContent>();
                 newItem.Meta.Content.Add(newMetaContent);
-
+                foreach (var kvp in node.metadata.attributes)
+                {
+                    var inventoryItemMetaAttributes = new InventoryItemMetaAttributes
+                    {
+                        Key = kvp.Key,
+                        Value = kvp.Value
+                    };
+                    newItem.Meta.Attributes.Add(inventoryItemMetaAttributes);
+                }
+                
                 ret.Add(newItem);
             }
 
