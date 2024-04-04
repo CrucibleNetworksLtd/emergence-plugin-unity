@@ -21,7 +21,7 @@ namespace EmergenceSDK.Services
         /// <summary>
         /// Attempts to sign a message using the walletconnect protocol.
         /// </summary>
-        UniTask<ServiceResponse<string>> RequestToSignAsync(string messageToSign);
+        UniTask<ServiceResponse<string>> RequestToSignAsync(string messageToSign, int attempt);
         
         /// <summary>
         /// Attempts to handshake with the Emergence server, retrieving the wallet address if successful.

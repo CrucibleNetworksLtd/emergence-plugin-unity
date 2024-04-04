@@ -1,16 +1,20 @@
 using System;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using EmergenceSDK.Types.Responses;
 using UnityEngine.Networking;
+using UnityEngine.PlayerLoop;
 
 namespace EmergenceSDK.Internal.Services
 {
     internal class WalletService : IWalletService
     {
+        private const int MaxSignRetryAttempts = 1;
+
         private string walletAddress = string.Empty;
         
         private bool completedHandshake = false;
@@ -62,7 +66,7 @@ namespace EmergenceSDK.Internal.Services
             return new ServiceResponse<bool>(false);
         }
         
-        public async UniTask<ServiceResponse<string>> RequestToSignAsync(string messageToSign)
+        public async UniTask<ServiceResponse<string>> RequestToSignAsync(string messageToSign, int attempt = 0)
         {
             var content = "{\"message\": \"" + messageToSign + "\"}";
 
@@ -70,15 +74,28 @@ namespace EmergenceSDK.Internal.Services
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, content);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-        
+
             try
             {
-                var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+                if (response.IsSuccess == false)
                 {
                     WebRequestService.CleanupRequest(request);
                     return new ServiceResponse<string>(false);
                 }
+            }
+            catch (UnityWebRequestException)
+            {
+                WebRequestService.CleanupRequest(request);
+                
+                var ret = new ServiceResponse<string>(false);
+
+                if (attempt < MaxSignRetryAttempts)
+                {
+                    await ReconnectionQR.FireEventOnReconnection(async () => ret = await RequestToSignAsync(messageToSign, attempt));
+                }
+                
+                return ret;
             }
             catch (Exception)
             {
@@ -89,11 +106,10 @@ namespace EmergenceSDK.Internal.Services
         
             var requestSuccessful = EmergenceUtils.ProcessRequest<WalletSignMessage>(request, EmergenceLogger.LogError, out var processedResponse);
             WebRequestService.CleanupRequest(request);
-            if (requestSuccessful)
-            {
-                return new ServiceResponse<string>(true, processedResponse.signedMessage);
-            }
-            return new ServiceResponse<string>(false);
+            
+            return requestSuccessful
+                ? new ServiceResponse<string>(true, processedResponse.signedMessage)
+                : new ServiceResponse<string>(false);
         }
 
         public async UniTask RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback)
