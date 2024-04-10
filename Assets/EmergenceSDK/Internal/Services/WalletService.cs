@@ -11,17 +11,12 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class WalletService : IWalletService
     {
-        private string walletAddress = string.Empty;
-        
         private bool completedHandshake = false;
 
-        public bool HasAddress => walletAddress != null && walletAddress.Trim() != string.Empty;
+        public bool HasAddress => WalletAddress != null && WalletAddress.Trim() != string.Empty;
 
-        public string WalletAddress
-        {
-            get => walletAddress;
-            set => walletAddress = value;
-        }
+        public string WalletAddress { get; private set; } = string.Empty;
+        public string ChecksummedWalletAddress { get; private set; } = string.Empty;
 
         private IPersonaService personaService;
         private ISessionService sessionService;
@@ -143,7 +138,9 @@ namespace EmergenceSDK.Internal.Services
                 
                 completedHandshake = true;
                 WalletAddress = processedResponse.address;
+                ChecksummedWalletAddress = processedResponse.checksummedAddress;
                 EmergenceSingleton.Instance.SetCachedAddress(processedResponse.address);
+                EmergenceSingleton.Instance.SetCachedChecksummedAddress(processedResponse.checksummedAddress);
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<string>(true, processedResponse.address);
             }
