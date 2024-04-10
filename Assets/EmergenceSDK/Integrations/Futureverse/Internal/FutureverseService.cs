@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
@@ -222,6 +224,168 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             request.timeout = FutureverseSingleton.Instance.requestTimeout;
             var response = await WebRequestService.PerformAsyncWebRequest(request, (message, code) => { });
             return ParseGetAssetTreeResponse(response);
+        }
+        
+        private static string BuildGetNonceForChainAddressRequestBody(string eoaAddress)
+        {
+            return $@"{{""query"":""query GetNonce($input: NonceInput!) {{ getNonceForChainAddress(input: $input) }}"",""variables"":{{""input"":{{""chainAddress"":""{eoaAddress}""}}}}}}";        }
+        
+        private static string BuildSubmitTransactionRequestBody(string generatedArtm, string signedMessage)
+        {
+            return $@"{{""query"":""mutation SubmitTransaction($input: SubmitTransactionInput!) {{ submitTransaction(input: $input) {{ transactionHash }} }}"",""variables"":{{""input"":{{""transaction"":""{generatedArtm}"",""signature"":""{signedMessage}""}}}}}}";        }
+        
+        private static string BuildGetArtmStatusRequestBody(string transactionHash)
+        {
+            return $@"{{""query"":""query Transaction($transactionHash: TransactionHash!) {{ transaction(transactionHash: {{_TransactionHash}}) {{ status error {{ code message }} events {{ action args type }} }} }}"",""variables"":{{""transactionHash"":""{transactionHash}""}}}}";        }
+
+        private static bool IsArResponseValid(string body, out JObject jObject)
+        {
+            jObject = default;
+            var parsed = SerializationHelper.Parse(body);
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            return parsed is JObject jObj && jObj["errors"] == null && (jObject = jObj) != null; // Last part is for setting out parameter in one line, as it's always true
+        }
+
+        public static bool IsArResponseValid(WebResponse response, out JObject jObject)
+        {
+            jObject = default;
+            return response.IsSuccess && response.StatusCode is >= 200 and <= 299 && IsArResponseValid(response.Response, out jObject);
+        }
+
+        public static void LogArResponseErrors(JObject jObject)
+        {
+            var errors = (JArray)jObject["errors"];
+            foreach (var error in errors)
+            {
+                EmergenceLogger.LogError((string)error["message"]);
+            }
+        }
+
+        struct GetArtmStatusResult
+        {
+            public readonly bool Success;
+            public readonly string Status;
+
+            public GetArtmStatusResult(bool success, string status)
+            {
+                Success = success;
+                Status = status;
+            }
+        }
+
+        async Task<GetArtmStatusResult> GetArtmStatusAsync(string transactionHash)
+        {
+            {
+                var body = BuildGetArtmStatusRequestBody(transactionHash);
+                using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.timeout = FutureverseSingleton.Instance.requestTimeout;
+                var nonceResponse = await WebRequestService.PerformAsyncWebRequest(request, (errorMessage, code) => { });
+                
+                if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseStatus(jObject, out var transactionStatus))
+                {
+                    LogArResponseErrors(jObject);
+                    return new (false, "");
+                }
+
+                return new(true, transactionStatus);
+            }
+            
+            bool ParseStatus(JObject jObject, out string status)
+            {
+                status = jObject["data"]?["transaction"]?["status"]?.Value<string>();
+                return status != null;
+            }
+        }
+        
+        private async UniTask<string> CheckForArtmTransactionDone(string transactionHash, int initialDelay = 1000, int refetchInterval = 5000, int maxAttempts = 3)
+        {
+            int attempts = 0;
+            while (attempts < maxAttempts)
+            {
+                var delay = attempts > 0 ? refetchInterval : initialDelay;
+                if (delay > 0)
+                {
+                    await UniTask.Delay(delay);
+                }
+
+                var artmStatus = await GetArtmStatusAsync(transactionHash);
+                if (artmStatus.Success && artmStatus.Status != "PENDING")
+                {
+                    return artmStatus.Status;
+                }
+                
+                attempts++;
+            }
+            
+            return null;
+        }
+        
+        public async UniTask<bool> SendArtmAsync(string message,
+            string eoaAddress,
+            List<FutureverseArtmOperation> artmOperations)
+        {
+            string generatedArtm;
+            string signature;
+            
+            {
+                var body = BuildGetNonceForChainAddressRequestBody(eoaAddress);
+                using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.timeout = FutureverseSingleton.Instance.requestTimeout;
+                var nonceResponse = await WebRequestService.PerformAsyncWebRequest(request, (errorMessage, code) => { });
+                
+                if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseNonce(jObject, out var nonce))
+                {
+                    LogArResponseErrors(jObject);
+                    return false;
+                }
+
+                generatedArtm = ArtmBuilder.GenerateArtm(message, artmOperations, eoaAddress, nonce);
+                var signatureResponse = await EmergenceServiceProvider.GetService<IWalletService>().RequestToSignAsync(generatedArtm);
+                if (!signatureResponse.Success)
+                {
+                    return false;
+                }
+
+                signature = signatureResponse.Result;
+            }
+
+            string transactionHash;
+            {
+                var body = BuildSubmitTransactionRequestBody(generatedArtm, signature);
+                using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.timeout = FutureverseSingleton.Instance.requestTimeout;
+                var submitResponse = await WebRequestService.PerformAsyncWebRequest(request, (errorMessage, code) => { });
+                
+                if (!IsArResponseValid(submitResponse, out var jObject) || !ParseTransactionHash(jObject, out transactionHash))
+                {
+                    LogArResponseErrors(jObject);
+                    return false;
+                }
+            }
+            
+            return await CheckForArtmTransactionDone(transactionHash) != "PENDING";
+
+            bool ParseNonce(JObject jObject, out int nonce)
+            {
+                var tempNonce = jObject["data"]?["getNonceForChainAddress"]?.Value<int>();
+                if (tempNonce != null)
+                {
+                    nonce = (int)tempNonce;
+                    return true;
+                }
+
+                nonce = default;
+                return false;
+            }
+            
+            bool ParseTransactionHash(JObject jObject, out string hash)
+            {
+                hash = jObject["data"]?["submitTransaction"]?["transactionHash"]?.Value<string>();
+                return hash != null;
+            }
         }
     }
 }
