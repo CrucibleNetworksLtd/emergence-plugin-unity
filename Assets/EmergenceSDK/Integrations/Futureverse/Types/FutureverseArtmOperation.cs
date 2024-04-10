@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EmergenceSDK.Futureverse.Types
+namespace EmergenceSDK.Integrations.Futureverse.Types
 {
     public struct FutureverseArtmOperation
     {

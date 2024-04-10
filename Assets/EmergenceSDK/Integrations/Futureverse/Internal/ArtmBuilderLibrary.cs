@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using EmergenceSDK.Futureverse.Types;
+using EmergenceSDK.Integrations.Futureverse.Types;
 
-namespace EmergenceSDK.Futureverse.Internal
+namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
-    internal class ArtmBuilder
+    internal class ArtmBuilderLibrary
     {
         public static string GenerateArtm(string message, List<FutureverseArtmOperation> artmOperations,
             string address, string nonce)
