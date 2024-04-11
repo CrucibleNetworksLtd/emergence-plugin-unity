@@ -132,6 +132,7 @@ namespace EmergenceSDK.Tests.Futureverse
             return futureverseService.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Development, async () =>
             {
                 await futureverseService.GetAssetTreeAsync("473", "7672:root:303204");
+                Assert.Pass("Success - IFutureverseService::GetAssetTreeAsync ran without throwing");
             }).ToCoroutine();
         }
     }
