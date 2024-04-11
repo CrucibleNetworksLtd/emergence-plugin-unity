@@ -13,7 +13,7 @@ namespace EmergenceSDK.Tests.Futureverse
 {
     // TestFixture attribute denotes a class that contains tests
     [TestFixture]
-    public class ArtmTests
+    public class AssetRegistryTests
     {
         [OneTimeSetUp]
         public void Setup()
