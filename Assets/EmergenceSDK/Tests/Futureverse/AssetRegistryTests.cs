@@ -30,8 +30,9 @@ namespace EmergenceSDK.Tests.Futureverse
         
         // Test attribute denotes a test method
         [Test]
-        public void ParseAssetTree()
+        public void ParseAssetTree_Passes()
         {
+            // ToDo: Redo this test or replace ParseGetAssetTreeJson with a simple call to SerializationHelper.Deserialize by restructuring the data
             string json = @"
             {
                 ""data"": {
