@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
+using EmergenceSDK.Integrations.Futureverse.Types.Exceptions;
 using EmergenceSDK.Integrations.Futureverse.Types.Responses;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Types;
@@ -31,25 +32,51 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
             return "https://ar-api.futureverse.app/graphql";
 #else
-            if (FutureverseSingleton.Instance.selectedEnvironment == FutureverseSingleton.Environment.Production)
+            return GetEnvironment() switch
             {
-                return "https://ar-api.futureverse.app/graphql";
-            }
-
-            if (FutureverseSingleton.Instance.selectedEnvironment == FutureverseSingleton.Environment.Development)
-            {
-                return "https://ar-api.futureverse.dev/graphql";
-            }
-
-            if (FutureverseSingleton.Instance.selectedEnvironment == FutureverseSingleton.Environment.Staging)
-            {
-                return "https://ar-api.futureverse.cloud/graphql";
-            }
-
-            throw new ArgumentOutOfRangeException();
+                FutureverseSingleton.Environment.Production => "https://ar-api.futureverse.app/graphql",
+                FutureverseSingleton.Environment.Development => "https://ar-api.futureverse.dev/graphql",
+                FutureverseSingleton.Environment.Staging => "https://ar-api.futureverse.cloud/graphql",
+                _ => throw new ArgumentOutOfRangeException()
+            };
 #endif
         }
 
+        public FutureverseSingleton.Environment GetEnvironment()
+        {
+            return ForcedEnvironment ?? FutureverseSingleton.Instance.selectedEnvironment;
+        }
+
+        public FutureverseSingleton.Environment? ForcedEnvironment { get; set; }
+
+        public void RunInForcedEnvironment(FutureverseSingleton.Environment environment, Action action)
+        {
+            var prevForcedEnvironment = ForcedEnvironment;
+            ForcedEnvironment = environment;
+            try
+            {
+                action.Invoke();
+            }
+            finally
+            {
+                ForcedEnvironment = prevForcedEnvironment;
+            }
+        }
+
+        public async UniTask RunInForcedEnvironmentAsync(FutureverseSingleton.Environment environment, Func<UniTask> action)
+        {
+            var prevForcedEnvironment = ForcedEnvironment;
+            ForcedEnvironment = environment;
+            try
+            {
+                await action();
+            }
+            finally
+            {
+                ForcedEnvironment = prevForcedEnvironment;
+            }
+        }
+        
         private string GetFuturePassApiUrl()
         {
             return "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/";
@@ -150,65 +177,59 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return new ServiceResponse<List<InventoryItem>>(true, ret);
         }
 
-        private static List<FutureverseAssetTreePath> ParseGetAssetTreeResponse(WebResponse response)
+        private List<FutureverseAssetTreePath> ParseGetAssetTreeResponse(WebResponse response)
         {
+            if (response.StatusCode == 204) return new List<FutureverseAssetTreePath>();
+            if (!response.IsSuccess) throw new FutureverseRequestFailedException(response);
+            
+            return response.StatusCode is >= 200 and <= 299
+                ? ParseGetAssetTreeJson(response.Response)
+                : new List<FutureverseAssetTreePath>();
+        }
+
+        public List<FutureverseAssetTreePath> ParseGetAssetTreeJson(string json)
+        {
+            var parsed = SerializationHelper.Parse(json);
             List<FutureverseAssetTreePath> assetTree = new();
-            if (response.IsSuccess)
+            if (parsed is JObject obj)
             {
-                var statusCode = response.StatusCode;
-                if (statusCode is >= 200 and <= 299)
+                var dataArray = (JArray)obj["data"]?["asset"]?["assetTree"]?["data"]?["@graph"];
+                if (dataArray != null)
                 {
-                    JToken parsed = SerializationHelper.Parse(response.Response);
-                    if (parsed is JObject)
+                    foreach (var data in dataArray)
                     {
-                        var obj = (JObject)parsed;
-                        var dataArray = (JArray)obj["data"]?["asset"]?["assetTree"]?["data"]?["@graph"];
-                        if (dataArray != null)
+                        FutureverseAssetTreePath assetPath = new(
+                            (string)data["@id"],
+                            (string)data["rdf:type"]?["@id"],
+                            new Dictionary<string, FutureverseAssetTreeObject>()
+                        );
+
+                        foreach (var property in ((JObject)data).Properties())
                         {
-                            foreach (var data in dataArray)
+                            if (property.Name is "@id" or "rdf:type") continue;
+
+                            if (property.Value is JObject jObject)
                             {
-                                FutureverseAssetTreePath assetPath = new(
-                                    (string)data["@id"],
-                                    (string)data["rdf:type"]?["@id"],
-                                    new()
-                                );
-
-                                foreach (var property in ((JObject)data).Properties())
+                                var treeObject = new FutureverseAssetTreeObject((string)jObject["@id"], new Dictionary<string, JToken>());
+                                
+                                foreach (var childProperty in jObject.Properties())
                                 {
-                                    if (property.Name is "@id" or "rdf:type")
-                                    {
-                                        //ignore these ones
-                                        continue;
-                                    }
-
-                                    var treeObject = new FutureverseAssetTreeObject((string)data["@id"], new());
-                                    if (property.Value is JObject jObject)
-                                    {
-                                        foreach (var childProperty in jObject.Properties())
-                                        {
-                                            if (childProperty.Name == "@id")
-                                            {
-                                                //ignore
-                                                continue;
-                                            }
-
-                                            treeObject.AdditionalData.Add(childProperty.Name, childProperty);
-                                        }
-                                    }
-
-                                    assetPath.Objects.Add(property.Name, treeObject);
+                                    if (childProperty.Name == "@id") continue;
+                                    treeObject.AdditionalData.Add(childProperty.Name, childProperty);
                                 }
-
-                                assetTree.Add(assetPath);
+                                
+                                assetPath.Objects.Add(property.Name, treeObject);
                             }
-
-                            return assetTree;
                         }
+
+                        assetTree.Add(assetPath);
                     }
+                    
+                    return assetTree;
                 }
             }
             
-            return assetTree;
+            throw new FutureverseInvalidJsonStructureException();
         }
 
         private static string BuildGetAssetTreeRequestBody(string tokenId, string collectionId)
