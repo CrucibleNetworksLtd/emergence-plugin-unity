@@ -1,9 +1,12 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse;
+using EmergenceSDK.Integrations.Futureverse.Internal;
 using EmergenceSDK.Integrations.Futureverse.Services;
+using EmergenceSDK.Integrations.Futureverse.Types;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEngine;
@@ -19,7 +22,6 @@ namespace EmergenceSDK.Tests.Futureverse
         public void Setup()
         {
             EmergenceServiceProvider.Load();
-            
         }
 
         [OneTimeTearDown]
@@ -27,10 +29,10 @@ namespace EmergenceSDK.Tests.Futureverse
         {
             EmergenceServiceProvider.Unload();
         }
-        
+
         // Test attribute denotes a test method
         [Test]
-        public void ParseAssetTree_Passes()
+        public void ParseAssetTree_ParsesCorrectly()
         {
             // ToDo: Redo this test or replace ParseGetAssetTreeJson with a simple call to SerializationHelper.Deserialize by restructuring the data
             string json = @"
@@ -84,7 +86,7 @@ namespace EmergenceSDK.Tests.Futureverse
                     }
                 }
             }";
-            
+
             var tree = EmergenceServiceProvider.GetService<IFutureverseService>().ParseGetAssetTreeJson(json);
             Assert.AreEqual(3, tree.Count);
 
@@ -92,7 +94,9 @@ namespace EmergenceSDK.Tests.Futureverse
             Assert.AreEqual("did:fv-asset:7672:root:303204:473", firstPath.ID);
             Assert.AreEqual("http://schema.futureverse.cloud/pb#bear", firstPath.RdfType);
             Assert.AreEqual(3, firstPath.Objects.Count);
-            var firstObject = firstPath.Objects["http://schema.futureverse.com/fvp#sft_link_owner_0xffffffff00000000000000000000000000000524"];
+            var firstObject =
+                firstPath.Objects[
+                    "http://schema.futureverse.com/fvp#sft_link_owner_0xffffffff00000000000000000000000000000524"];
             Assert.NotNull(firstObject);
             Assert.AreEqual("did:fv-asset:7672:root:241764:0", firstObject.ID);
             Assert.IsEmpty(firstObject.AdditionalData);
@@ -106,35 +110,77 @@ namespace EmergenceSDK.Tests.Futureverse
             Assert.AreEqual(3, thirdObject.AdditionalData.Count);
             var thirdObjectAdditionalArray = thirdObject.AdditionalData["array"];
             Assert.IsInstanceOf<JProperty>(thirdObjectAdditionalArray);
-            Assert.AreEqual(@"[""sdfsdfsd"",""ADASDASDA"",""adasdada""]", ((JProperty)thirdObjectAdditionalArray).Value.ToString(Newtonsoft.Json.Formatting.None));
+            Assert.AreEqual(@"[""sdfsdfsd"",""ADASDASDA"",""adasdada""]",
+                ((JProperty)thirdObjectAdditionalArray).Value.ToString(Newtonsoft.Json.Formatting.None));
             var thirdObjectAdditionalInt = thirdObject.AdditionalData["int"];
-            Assert.AreEqual("69", ((JProperty)thirdObjectAdditionalInt).Value.ToString(Newtonsoft.Json.Formatting.None));
+            Assert.AreEqual("69",
+                ((JProperty)thirdObjectAdditionalInt).Value.ToString(Newtonsoft.Json.Formatting.None));
             Assert.IsInstanceOf<JProperty>(thirdObjectAdditionalInt);
             var thirdObjectAdditionalObject = thirdObject.AdditionalData["object"];
             Assert.IsInstanceOf<JProperty>(thirdObjectAdditionalObject);
-            Assert.AreEqual(@"{""test"":[""sdfsdfsd"",""ADASDASDA"",""adasdada""]}", ((JProperty)thirdObjectAdditionalObject).Value.ToString(Newtonsoft.Json.Formatting.None));
-            
+            Assert.AreEqual(@"{""test"":[""sdfsdfsd"",""ADASDASDA"",""adasdada""]}",
+                ((JProperty)thirdObjectAdditionalObject).Value.ToString(Newtonsoft.Json.Formatting.None));
+
             var secondPath = tree[1];
             Assert.AreEqual("did:fv-asset:7672:root:275556:3", secondPath.ID);
             Assert.AreEqual("http://schema.futureverse.com#None", secondPath.RdfType);
             Assert.IsEmpty(secondPath.Objects);
-            
+
             var thirdPath = tree[2];
             Assert.AreEqual("did:fv-asset:7672:root:241764:0", thirdPath.ID);
             Assert.AreEqual("http://schema.futureverse.com#None", thirdPath.RdfType);
             Assert.IsEmpty(thirdPath.Objects);
         }
-        
+
         // Test attribute denotes a test method
         [UnityTest]
-        public IEnumerator GetAssetTreeAsync()
+        public IEnumerator GetAssetTreeAsync_PassesWithoutExceptions()
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            return futureverseService.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Development, async () =>
+            return futureverseService.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Development,
+                async () =>
+                {
+                    await futureverseService.GetAssetTreeAsync("473", "7672:root:303204");
+                    Assert.Pass("Success - IFutureverseService::GetAssetTreeAsync ran without throwing");
+                }).ToCoroutine();
+        }
+
+        [Test]
+        public void GenerateArtm_GeneratesCorrectly()
+        {
+            #region ExpectedResult
+            const string expected = 
+                "Asset Registry transaction\n" +
+                "\n" +
+                "Message\n" +
+                "\n" +
+                "Operations:\n" +
+                "\n" +
+                "asset-link create\n" +
+                "- slot\n" +
+                "- linkA\n" +
+                "- linkB\n" +
+                "end\n" +
+                "\n" +
+                "asset-link delete\n" +
+                "- slot\n" +
+                "- linkA\n" +
+                "- linkB\n" +
+                "end\n" +
+                "\n" +
+                "Operations END\n" +
+                "\n" +
+                "Address: Address\n" +
+                "Nonce: 123456789";
+            #endregion
+            
+            var result = ArtmBuilder.GenerateArtm("Message", new List<FutureverseArtmOperation>
             {
-                await futureverseService.GetAssetTreeAsync("473", "7672:root:303204");
-                Assert.Pass("Success - IFutureverseService::GetAssetTreeAsync ran without throwing");
-            }).ToCoroutine();
+                new (FutureverseArtmOperationType.CreateLink, "slot", "linkA", "linkB"),
+                new (FutureverseArtmOperationType.DeleteLink, "slot", "linkA", "linkB"),
+            }, "Address", 123456789);
+            
+            Assert.AreEqual(expected, result);
         }
     }
 }
