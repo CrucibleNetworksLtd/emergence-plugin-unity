@@ -265,7 +265,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             }
         }
 
-        async Task<GetArtmStatusResult> GetArtmStatusAsync(string transactionHash)
+        async Task<GetArtmStatusResult> RetrieveArtmStatusAsync(string transactionHash)
         {
             {
                 var body = BuildGetArtmStatusRequestBody(transactionHash);
@@ -290,7 +290,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             }
         }
         
-        private async UniTask<string> CheckForArtmTransactionDone(string transactionHash, int initialDelay = 1000, int refetchInterval = 5000, int maxAttempts = 3)
+        public async UniTask<ArtmStatus> GetArtmStatus(string transactionHash, int initialDelay = 1000, int refetchInterval = 5000, int maxAttempts = 3)
         {
             int attempts = 0;
             while (attempts < maxAttempts)
@@ -301,16 +301,26 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     await UniTask.Delay(delay);
                 }
 
-                var artmStatus = await GetArtmStatusAsync(transactionHash);
+                var artmStatus = await RetrieveArtmStatusAsync(transactionHash);
                 if (artmStatus.Success && artmStatus.Status != "PENDING")
                 {
-                    return artmStatus.Status;
+                    switch (artmStatus.Status)
+                    {
+                        case "PENDING":
+                            return ArtmStatus.Pending;
+                        case "SUCCESS":
+                            return ArtmStatus.Success;
+                        case "FAILURE":
+                            return ArtmStatus.Failure;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(artmStatus.Status), "Unexpected ARTM status: " + artmStatus.Status);
+                    }
                 }
                 
                 attempts++;
             }
             
-            return null;
+            throw new ExhaustedRequestAttemptsException();
         }
         
         public async UniTask<bool> SendArtmAsync(string message,
@@ -358,7 +368,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 }
             }
             
-            return await CheckForArtmTransactionDone(transactionHash) != "PENDING";
+            return await GetArtmStatus(transactionHash) != ArtmStatus.Pending;
 
             bool ParseNonce(JObject jObject, out int nonce)
             {
