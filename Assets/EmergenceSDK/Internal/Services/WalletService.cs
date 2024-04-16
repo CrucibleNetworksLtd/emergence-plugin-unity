@@ -58,7 +58,12 @@ namespace EmergenceSDK.Internal.Services
         
         public async UniTask<ServiceResponse<string>> RequestToSignAsync(string messageToSign)
         {
-            var content = "{\"message\": \"" + messageToSign + "\"}";
+            var content = SerializationHelper.Serialize(
+                new
+                {
+                    message = messageToSign
+                }
+            );
 
             string url = StaticConfig.APIBase + "request-to-sign";
 

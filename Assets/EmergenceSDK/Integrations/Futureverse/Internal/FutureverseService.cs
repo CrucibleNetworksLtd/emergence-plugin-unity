@@ -187,48 +187,62 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             List<FutureverseAssetTreePath> assetTree = new();
             if (parsed is JObject obj)
             {
-                var dataArray = (JArray)obj["data"]?["asset"]?["assetTree"]?["data"]?["@graph"];
-                if (dataArray != null)
+                if (obj.SelectToken("data.asset.assetTree.data.@graph") is JArray dataArray)
                 {
                     foreach (var data in dataArray)
                     {
+                        var id = (string)data.SelectToken("@id");
+                        var rdfType = (string)data.SelectToken("rdf:type.@id");
                         FutureverseAssetTreePath assetPath = new(
-                            (string)data["@id"],
-                            (string)data["rdf:type"]?["@id"],
+                            id,
+                            rdfType,
                             new Dictionary<string, FutureverseAssetTreeObject>()
                         );
 
-                        foreach (var property in ((JObject)data).Properties())
+                        var dataObject = data as JObject;
+                        if (dataObject != null)
                         {
-                            if (property.Name is "@id" or "rdf:type") continue;
-
-                            if (property.Value is JObject jObject)
+                            foreach (var property in dataObject.Properties())
                             {
-                                var treeObject = new FutureverseAssetTreeObject((string)jObject["@id"], new Dictionary<string, JToken>());
-                                
+                                if (property.Name is "@id" or "rdf:type") continue;
+
+                                if (property.Value is not JObject jObject) continue;
+                                var treeObject = new FutureverseAssetTreeObject(
+                                    (string)jObject.SelectToken("@id"),
+                                    new Dictionary<string, JToken>()
+                                );
+
                                 foreach (var childProperty in jObject.Properties())
                                 {
                                     if (childProperty.Name == "@id") continue;
-                                    treeObject.AdditionalData.Add(childProperty.Name, childProperty);
+                                    treeObject.AdditionalData.Add(childProperty.Name, childProperty.Value);
                                 }
-                                
+
                                 assetPath.Objects.Add(property.Name, treeObject);
                             }
                         }
 
                         assetTree.Add(assetPath);
                     }
-                    
+
                     return assetTree;
                 }
             }
-            
+
             throw new FutureverseInvalidJsonStructureException();
         }
 
         private static string BuildGetAssetTreeRequestBody(string tokenId, string collectionId)
         {
-            return $@"{{""query"":""query Asset($tokenId: String!, $collectionId: CollectionId!) {{ asset(tokenId: $tokenId, collectionId: $collectionId) {{ assetTree {{ data }} }} }}"",""variables"":{{""tokenId"":""{tokenId}"",""collectionId"":""{collectionId}""}}}}";
+            var requestBody = new
+            {
+                query = "query Asset($tokenId: String!, $collectionId: CollectionId!) { asset(tokenId: $tokenId, collectionId: $collectionId) { assetTree { data } } }",
+                variables = new
+                {
+                    tokenId, collectionId
+                }
+            };
+            return SerializationHelper.Serialize(requestBody);
         }
 
         public async UniTask<List<FutureverseAssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId)
@@ -243,33 +257,65 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         
         private static string BuildGetNonceForChainAddressRequestBody(string eoaAddress)
         {
-            return $@"{{""query"":""query GetNonce($input: NonceInput!) {{ getNonceForChainAddress(input: $input) }}"",""variables"":{{""input"":{{""chainAddress"":""{eoaAddress}""}}}}}}";        }
-        
+            var requestBody = new
+            {
+                query = "query GetNonce($input: NonceInput!) { getNonceForChainAddress(input: $input) }",
+                variables = new
+                {
+                    input = new
+                    {
+                        chainAddress = eoaAddress
+                    }
+                }
+            };
+            return SerializationHelper.Serialize(requestBody);
+        }
+
         private static string BuildSubmitTransactionRequestBody(string generatedArtm, string signedMessage)
         {
-            return $@"{{""query"":""mutation SubmitTransaction($input: SubmitTransactionInput!) {{ submitTransaction(input: $input) {{ transactionHash }} }}"",""variables"":{{""input"":{{""transaction"":""{generatedArtm}"",""signature"":""{signedMessage}""}}}}}}";        }
-        
+            var requestBody = new
+            {
+                query = "mutation SubmitTransaction($input: SubmitTransactionInput!) { submitTransaction(input: $input) { transactionHash } }",
+                variables = new
+                {
+                    input = new
+                    {
+                        transaction = generatedArtm,
+                        signature = signedMessage
+                    }
+                }
+            };
+            return SerializationHelper.Serialize(requestBody);
+        }
+
         private static string BuildGetArtmStatusRequestBody(string transactionHash)
         {
-            return $@"{{""query"":""query Transaction($transactionHash: TransactionHash!) {{ transaction(transactionHash: {{_TransactionHash}}) {{ status error {{ code message }} events {{ action args type }} }} }}"",""variables"":{{""transactionHash"":""{transactionHash}""}}}}";        }
+            var requestBody = new
+            {
+                query = "query Transaction($transactionHash: TransactionHash!) { transaction(transactionHash: {$transactionHash}) { status error { code message } events { action args type } } }",
+                variables = new
+                {
+                    transactionHash
+                }
+            };
+            return SerializationHelper.Serialize(requestBody);
+        }
 
         private static bool IsArResponseValid(string body, out JObject jObject)
         {
-            jObject = default;
-            var parsed = SerializationHelper.Parse(body);
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            return parsed is JObject jObj && jObj["errors"] == null && (jObject = jObj) != null; // Last part is for setting out parameter in one line, as it's always true
+            return (jObject = SerializationHelper.Parse(body) as JObject) != null;
         }
 
-        public static bool IsArResponseValid(WebResponse response, out JObject jObject)
+        private static bool IsArResponseValid(WebResponse response, out JObject jObject)
         {
             jObject = default;
             return response.IsSuccess && response.StatusCode is >= 200 and <= 299 && IsArResponseValid(response.Response, out jObject);
         }
 
-        public static void LogArResponseErrors(JObject jObject)
+        private static void LogArResponseErrors(JObject jObject)
         {
-            var errors = (JArray)jObject["errors"];
+            if (jObject?["errors"] is not JArray errors) return;
+            
             foreach (var error in errors)
             {
                 EmergenceLogger.LogError((string)error["message"]);
@@ -395,7 +441,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
             bool ParseNonce(JObject jObject, out int nonce)
             {
-                var tempNonce = jObject["data"]?["getNonceForChainAddress"]?.Value<int>();
+                var tempNonce = (int?)jObject.SelectToken("data.getNonceForChainAddress");
                 if (tempNonce != null)
                 {
                     nonce = (int)tempNonce;
@@ -408,8 +454,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             
             bool ParseTransactionHash(JObject jObject, out string hash)
             {
-                hash = jObject["data"]?["submitTransaction"]?["transactionHash"]?.Value<string>();
-                return hash != null;
+                return (hash = (string)jObject.SelectToken("data.submitTransaction.transactionHash")) != null;
             }
         }
 
