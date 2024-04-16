@@ -19,13 +19,13 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
         
         bool UsingFutureverse { get; }
         UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassInformation();
-
         UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturePassInformation(string futurepass);
-
         UniTask<ServiceResponse<InventoryResponse>> GetFutureverseInventory();
         UniTask<ServiceResponse<List<InventoryItem>>> GetFutureverseInventoryAsInventoryItems();
 
         List<FutureverseAssetTreePath> ParseGetAssetTreeJson(string json);
         UniTask<List<FutureverseAssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId);
+        UniTask<bool> SendArtmAsync(string message, string eoaAddress, List<FutureverseArtmOperation> artmOperations);
+        UniTask<ArtmStatus> GetArtmStatus(string transactionHash, int initialDelay = 1000, int refetchInterval = 5000, int maxAttempts = 3);
     }
 }

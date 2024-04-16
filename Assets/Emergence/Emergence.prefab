@@ -536,9 +536,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7431462305389702395}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 923b47d1c4d68d94ca240e055c8142c3, type: 3}
+  m_Script: {fileID: 11500000, guid: 29746b60eb8d4ad5a60be6a05295a85f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectedEnvironment: 0
+  requestTimeout: 60
 --- !u!1 &8614198520801094759
 GameObject:
   m_ObjectHideFlags: 0
