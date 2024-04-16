@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using TMPro;
@@ -22,7 +23,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private readonly float refreshTimeOut = 90.0f;
         private IWalletService walletService => EmergenceServiceProvider.GetService<IWalletService>();
-        private ISessionService sessionService => EmergenceServiceProvider.GetService<ISessionService>();
+        private ISessionServiceInternal sessionServiceInternal => EmergenceServiceProvider.GetService<ISessionServiceInternal>();
         
         private CancellationTokenSource refreshCancellationToken;
 
@@ -103,7 +104,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             Modal.Instance.Show("Disconnecting wallet...");
             refreshCancellationToken?.Cancel();
-            var result = await sessionService.DisconnectAsync();
+            var result = await sessionServiceInternal.DisconnectAsync();
             Modal.Instance.Hide();
             if (result.Success)
             {

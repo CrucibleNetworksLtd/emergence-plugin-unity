@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
 using EmergenceSDK.Integrations.Futureverse.Types.Exceptions;
@@ -11,6 +12,7 @@ using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
+using EmergenceSDK.Services.Interfaces;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
 using EmergenceSDK.Types.Responses;
@@ -19,7 +21,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
-    internal class FutureverseService : IFutureverseService
+    internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, IDisconnectable
     {
         public bool UsingFutureverse { get; private set; } = false;
 
@@ -112,16 +114,8 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             FuturepassInformationResponse fpResponse =
                 SerializationHelper.Deserialize<FuturepassInformationResponse>(response.Response);
             UsingFutureverse = true;
-            EmergenceServiceProvider.GetService<ISessionService>().OnSessionDisconnected += OnSessionDisconnected;
             FuturepassInformation = fpResponse;
             return new ServiceResponse<FuturepassInformationResponse>(true, fpResponse);
-        }
-
-        private void OnSessionDisconnected()
-        {
-            UsingFutureverse = false;
-            FuturepassInformation = null;
-            EmergenceServiceProvider.GetService<ISessionService>().OnSessionDisconnected -= OnSessionDisconnected;
         }
 
         public async UniTask<ServiceResponse<InventoryResponse>> GetFutureverseInventory()
@@ -417,6 +411,12 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 hash = jObject["data"]?["submitTransaction"]?["transactionHash"]?.Value<string>();
                 return hash != null;
             }
+        }
+
+        public void HandleDisconnection()
+        {
+            UsingFutureverse = false;
+            FuturepassInformation = null;
         }
     }
 }

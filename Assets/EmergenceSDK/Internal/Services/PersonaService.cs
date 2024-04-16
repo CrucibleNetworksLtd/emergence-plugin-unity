@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
+using EmergenceSDK.Services.Interfaces;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using EmergenceSDK.Types.Responses;
@@ -11,25 +13,23 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class PersonaService : IPersonaService
+    internal class PersonaService : IPersonaServiceInternal, IPersonaService, IDisconnectable
     {
-        public string CurrentAccessToken
+        public readonly ISessionServiceInternal SessionServiceInternal;
+        public PersonaService(ISessionServiceInternal sessionServiceInternal)
         {
-            get => currentAccessToken;
-            set => currentAccessToken = value;
+            SessionServiceInternal = sessionServiceInternal;
         }
-        private string currentAccessToken = string.Empty;
-        public bool HasAccessToken => currentAccessToken.Length > 0;
+        
         public event PersonaUpdated OnCurrentPersonaUpdated;
     
         private Persona cachedPersona;
-        private Dictionary<string, string> AuthDict => new() { { "deviceId", EmergenceSingleton.Instance.CurrentDeviceId } };
 
-        public Persona CurrentPersona
+        private Persona CachedPersona
         {
             get => cachedPersona;
 
-            private set
+            set
             {
                 if(ObjectEqualityUtil.AreObjectsEqual(cachedPersona, value))
                     return;
@@ -40,37 +40,18 @@ namespace EmergenceSDK.Internal.Services
 
         }
         
-        public bool GetCurrentPersona(out Persona currentPersona)
+        public bool GetCachedPersona(out Persona currentPersona)
         {
-            currentPersona = CurrentPersona;
-            return currentPersona != null;
+            return (currentPersona = CachedPersona) != null;
         }
 
-        public async UniTask<ServiceResponse<string>> GetAccessTokenAsync()
-        {
-            string url = StaticConfig.APIBase + "get-access-token";
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError, "", AuthDict);
-            if(response.IsSuccess == false)
-                return new ServiceResponse<string>(false);
-            var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response.Response);
-            currentAccessToken = SerializationHelper.Serialize(accessTokenResponse.message.AccessToken, false);
-            return new ServiceResponse<string>(true, currentAccessToken);
-        }
 
-        public async UniTask GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
-        {
-            var response = await GetAccessTokenAsync();
-            if(response.Success)
-                success?.Invoke(response.Result);
-            else
-                errorCallback?.Invoke("Error in GetAccessToken.", (long)response.Code);
-        }
         
         public async UniTask<ServiceResponse<List<Persona>, Persona>> GetPersonasAsync()
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "personas";
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
-            request.SetRequestHeader("Authorization", CurrentAccessToken);
+            request.SetRequestHeader("Authorization", SessionServiceInternal.CurrentAccessToken);
             try
             {
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -90,8 +71,8 @@ namespace EmergenceSDK.Internal.Services
 
             PersonasResponse personasResponse = SerializationHelper.Deserialize<PersonasResponse>(request.downloadHandler.text);
             WebRequestService.CleanupRequest(request);
-            CurrentPersona = personasResponse.personas.FirstOrDefault(p => p.id == personasResponse.selected);
-            return new ServiceResponse<List<Persona>, Persona>(true, personasResponse.personas, CurrentPersona);
+            CachedPersona = personasResponse.personas.FirstOrDefault(p => p.id == personasResponse.selected);
+            return new ServiceResponse<List<Persona>, Persona>(true, personasResponse.personas, CachedPersona);
         }
 
         public async UniTask GetPersonas(SuccessPersonas success, ErrorCallback errorCallback)
@@ -107,7 +88,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
-            request.SetRequestHeader("Authorization", CurrentAccessToken);
+            request.SetRequestHeader("Authorization", SessionServiceInternal.CurrentAccessToken);
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -130,9 +111,9 @@ namespace EmergenceSDK.Internal.Services
                 return new ServiceResponse<Persona>(false);
             }
 
-            CurrentPersona = SerializationHelper.Deserialize<Persona>(request.downloadHandler.text);
+            CachedPersona = SerializationHelper.Deserialize<Persona>(request.downloadHandler.text);
             WebRequestService.CleanupRequest(request);
-            return new ServiceResponse<Persona>(true, CurrentPersona);
+            return new ServiceResponse<Persona>(true, CachedPersona);
         }
 
         public async UniTask GetCurrentPersona(SuccessGetCurrentPersona success, ErrorCallback errorCallback)
@@ -162,7 +143,8 @@ namespace EmergenceSDK.Internal.Services
             
             string jsonPersona = SerializationHelper.Serialize(persona);
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, jsonPersona, AuthDict);
+            var headers = new Dictionary<string, string> { { "deviceId", EmergenceSingleton.Instance.CurrentDeviceId } };
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, jsonPersona, headers);
             if(response.IsSuccess == false)
                 return new ServiceResponse(false);
             
@@ -196,7 +178,7 @@ namespace EmergenceSDK.Internal.Services
             request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
             request.uploadHandler.contentType = "application/json";
 
-            request.SetRequestHeader("Authorization", CurrentAccessToken);
+            request.SetRequestHeader("Authorization", SessionServiceInternal.CurrentAccessToken);
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -216,7 +198,7 @@ namespace EmergenceSDK.Internal.Services
             }
 
             WebRequestService.CleanupRequest(request);
-            CurrentPersona = persona;
+            CachedPersona = persona;
             return new ServiceResponse(true);
 
         }
@@ -250,7 +232,7 @@ namespace EmergenceSDK.Internal.Services
 
             using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             request.method = "DELETE";
-            request.SetRequestHeader("Authorization", CurrentAccessToken);
+            request.SetRequestHeader("Authorization", SessionServiceInternal.CurrentAccessToken);
             
             try
             {
@@ -289,7 +271,7 @@ namespace EmergenceSDK.Internal.Services
 
             using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.method = "PATCH";
-            request.SetRequestHeader("Authorization", CurrentAccessToken);
+            request.SetRequestHeader("Authorization", SessionServiceInternal.CurrentAccessToken);
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -309,7 +291,7 @@ namespace EmergenceSDK.Internal.Services
             }
 
             WebRequestService.CleanupRequest(request);
-            CurrentPersona = persona;
+            CachedPersona = persona;
             return new ServiceResponse(true);
         }
 
@@ -322,9 +304,8 @@ namespace EmergenceSDK.Internal.Services
                 errorCallback?.Invoke("Error in SetCurrentPersona.", (long)response.Code);
         }
 
-        internal void OnSessionDisconnected()
+        public void HandleDisconnection()
         {
-            CurrentAccessToken = "";
             cachedPersona = null;
         }
     }

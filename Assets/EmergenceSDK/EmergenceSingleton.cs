@@ -108,7 +108,7 @@ namespace EmergenceSDK
             return address;
         }
 
-        public void SetCachedAddress(string _address)
+        internal void SetCachedAddress(string _address)
         {
             EmergenceLogger.LogInfo("Setting cached address to: " + _address);
             address = _address;
@@ -119,7 +119,7 @@ namespace EmergenceSDK
             return checksummedAddress;
         }
         
-        public void SetCachedChecksummedAddress(string _checksummedAddress)
+        internal void SetCachedChecksummedAddress(string _checksummedAddress)
         {
             EmergenceLogger.LogInfo("Setting cached address to: " + _checksummedAddress);
             checksummedAddress = _checksummedAddress;

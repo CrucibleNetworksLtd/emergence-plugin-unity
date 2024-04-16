@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse;
 using EmergenceSDK.Integrations.Futureverse.Internal;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
 using Newtonsoft.Json.Linq;
@@ -87,7 +88,7 @@ namespace EmergenceSDK.Tests.Futureverse
                 }
             }";
 
-            var tree = EmergenceServiceProvider.GetService<IFutureverseService>().ParseGetAssetTreeJson(json);
+            var tree = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>().ParseGetAssetTreeJson(json);
             Assert.AreEqual(3, tree.Count);
 
             var firstPath = tree[0];
@@ -137,7 +138,8 @@ namespace EmergenceSDK.Tests.Futureverse
         public IEnumerator GetAssetTreeAsync_PassesWithoutExceptions()
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            return futureverseService.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Development,
+            var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
+            return futureverseServiceInternal.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Development,
                 async () =>
                 {
                     await futureverseService.GetAssetTreeAsync("473", "7672:root:303204");

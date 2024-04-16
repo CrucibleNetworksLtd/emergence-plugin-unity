@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -16,6 +17,9 @@ namespace EmergenceSDK.InternalTesting
         private bool accessTokenRetrieved = false;
         private List<Persona> personas = new List<Persona>();
         private IPersonaService personaService;
+        private IPersonaServiceInternal personaServiceInternal;
+        private ISessionService sessionService;
+        private ISessionServiceInternal sessionServiceInternal;
         
         private Persona currentPersona;
         private Persona testPersona;
@@ -30,6 +34,9 @@ namespace EmergenceSDK.InternalTesting
             needsCleanUp = true;
 
             personaService ??= EmergenceServiceProvider.GetService<IPersonaService>();
+            personaServiceInternal ??= EmergenceServiceProvider.GetService<IPersonaServiceInternal>();
+            sessionService ??= EmergenceServiceProvider.GetService<ISessionService>();
+            sessionServiceInternal ??= EmergenceServiceProvider.GetService<ISessionServiceInternal>();
             
             EditorGUILayout.LabelField("Test Persona Service");
 
@@ -59,7 +66,7 @@ namespace EmergenceSDK.InternalTesting
                 newPersona.name = "TestPersona";
                 newPersona.bio = "TestBio";
                 newPersona.avatar = currentPersona.avatar;
-                personaService.CreatePersona(newPersona, () => GetPersonaPressed(), EmergenceLogger.LogError);
+                personaServiceInternal.CreatePersona(newPersona, () => GetPersonaPressed(), EmergenceLogger.LogError);
             }
 
             if(testPersona == null)
@@ -68,18 +75,18 @@ namespace EmergenceSDK.InternalTesting
             if (GUILayout.Button("Update Test Persona"))
             {
                 testPersona.bio = "UpdatedBio";
-                personaService.EditPersona(testPersona, () => GetPersonaPressed(), EmergenceLogger.LogError);
+                personaServiceInternal.EditPersona(testPersona, () => GetPersonaPressed(), EmergenceLogger.LogError);
             }
             
             if (GUILayout.Button("Delete Test Persona"))
             {
-                personaService.DeletePersona(testPersona, () => GetPersonaPressed(), EmergenceLogger.LogError);
+                personaServiceInternal.DeletePersona(testPersona, () => GetPersonaPressed(), EmergenceLogger.LogError);
             }
         }
 
         private void GetAccessTokenPressed()
         {
-            personaService.GetAccessToken((accessToken) =>
+            sessionServiceInternal.GetAccessToken((accessToken) =>
             {
                 accessTokenRetrieved = !String.IsNullOrEmpty(accessToken);
                 Repaint();
@@ -88,7 +95,7 @@ namespace EmergenceSDK.InternalTesting
 
         private void GetPersonaPressed()
         {
-            personaService.GetPersonas((personasIn, currentPersonaIn) =>
+            personaServiceInternal.GetPersonas((personasIn, currentPersonaIn) =>
             {
                 currentPersona = currentPersonaIn ?? personasIn.FirstOrDefault();
                 personas = personasIn;

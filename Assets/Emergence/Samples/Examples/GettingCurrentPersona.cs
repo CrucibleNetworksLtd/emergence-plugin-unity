@@ -1,3 +1,4 @@
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -8,11 +9,13 @@ namespace EmergenceSDK.Samples.Examples
     public class GettingCurrentPersona : MonoBehaviour
     {
         private IPersonaService personaService;
+        private IPersonaServiceInternal personaServiceInternal;
 
         private void Awake()
         {
             // Initialize the personaService variable by getting the IPersonaService instance from the EmergenceServices class
             personaService = EmergenceServiceProvider.GetService<IPersonaService>();
+            personaServiceInternal = EmergenceServiceProvider.GetService<IPersonaServiceInternal>();
         }
 
         private void Start()
@@ -23,7 +26,7 @@ namespace EmergenceSDK.Samples.Examples
         private async void GetCurrentPersonaAsync()
         {
             // Waits for the personaService to return the current persona and then calls the GetPersonaSuccess method
-            await personaService.GetCurrentPersona(GetPersonaSuccess, EmergenceLogger.LogError);
+            await personaServiceInternal.GetCurrentPersona(GetPersonaSuccess, EmergenceLogger.LogError);
         }
 
         // This method is called when the personaService successfully returns the current persona
@@ -40,7 +43,7 @@ namespace EmergenceSDK.Samples.Examples
         private void GetCachedPersona()
         {
             // Checks if there is a cached persona and logs it to the console if there is
-            if (personaService.GetCurrentPersona(out Persona persona))
+            if (personaService.GetCachedPersona(out Persona persona))
             {
                 Debug.Log($"Found cached persona: {persona}");
             }

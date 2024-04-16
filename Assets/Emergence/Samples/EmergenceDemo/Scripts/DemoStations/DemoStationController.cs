@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public class DemoStationController : MonoBehaviour
     {
-        private bool IsLoggedIn() => personaService.CurrentAccessToken.Length != 0;
+        private bool IsLoggedIn() => sessionServiceInternal.CurrentAccessToken.Length != 0;
         
         public DemoStation<OpenOverlay> openOverlay;
         
@@ -20,7 +21,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         public DemoStation<WriteMethod> writeMethod;
 
         private List<IDemoStation> stationsRequiringLogin;
-        private IPersonaService personaService;
+        private ISessionServiceInternal sessionServiceInternal;
 
         public async void Awake()
         {
@@ -43,7 +44,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         public void Start()
         {
-            personaService = EmergenceServiceProvider.GetService<IPersonaService>();
+            sessionServiceInternal = EmergenceServiceProvider.GetService<ISessionServiceInternal>();
         }
 
         private void ActivateStations()

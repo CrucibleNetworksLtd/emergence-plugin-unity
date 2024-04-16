@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using EmergenceSDK.Integrations.Futureverse.Internal;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Services;
 
@@ -23,18 +24,16 @@ namespace EmergenceSDK
 
         private void LoadServices()
         {
-            _services.Clear();
-            var personaService = new PersonaService();
-            _services.Add(personaService);
-            var sessionService = new SessionService(personaService);
-            _services.Add(sessionService);
-            _services.Add(new AvatarService());
-            _services.Add(new InventoryService());
-            _services.Add(new DynamicMetadataService());
-            _services.Add(new WalletService(personaService, sessionService));
-            _services.Add(new ContractService());
-            _services.Add(new ChainService());
-            _services.Add(new FutureverseService());
+            ClearServices();
+            AddService(new AvatarService());
+            AddService(new InventoryService());
+            AddService(new DynamicMetadataService());
+            AddService(new ContractService());
+            AddService(new ChainService());
+            AddService(new FutureverseService());
+            var sessionServiceInternal = (ISessionServiceInternal)AddService(new SessionService());
+            AddService(new WalletService(sessionServiceInternal));
+            AddService(new PersonaService(sessionServiceInternal));
         }
 
         private EmergenceServiceProvider()
@@ -42,6 +41,17 @@ namespace EmergenceSDK
             LoadServices();
         }
 
+        internal IEmergenceService AddService(IEmergenceService service)
+        {
+            _services.Add(service);
+            return service;
+        }
+
+        internal void ClearServices()
+        {
+            _services.Clear();
+        }
+        
         /// <summary>
         /// Gets the service of the specified type.
         /// </summary>
@@ -49,13 +59,18 @@ namespace EmergenceSDK
         {
             return Instance._services.OfType<T>().FirstOrDefault();
         }
+        
+        public static List<T> GetServices<T>()
+        {
+            return Instance._services.OfType<T>().ToList();
+        }
 
-        public static void Load()
+        internal static void Load()
         {
             _instance = new EmergenceServiceProvider();
         }
 
-        public static void Unload()
+        internal static void Unload()
         {
             _instance = null;
         }

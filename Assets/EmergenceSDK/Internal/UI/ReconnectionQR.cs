@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -23,9 +24,8 @@ namespace EmergenceSDK.Internal.UI
         private readonly int qrRefreshTimeOut = 60;
         private int timeRemaining;
         
-        private IPersonaService personaService => EmergenceServiceProvider.GetService<IPersonaService>();
-        private IWalletService walletService => EmergenceServiceProvider.GetService<IWalletService>();
-        private ISessionService sessionService => EmergenceServiceProvider.GetService<ISessionService>();
+        private IWalletServiceInternal walletServiceInternal => EmergenceServiceProvider.GetService<IWalletServiceInternal>();
+        private ISessionServiceInternal sessionServiceInternal => EmergenceServiceProvider.GetService<ISessionServiceInternal>();
         
         private CancellationTokenSource qrCancellationToken = new CancellationTokenSource();
         private bool hasStarted = false;
@@ -131,7 +131,7 @@ namespace EmergenceSDK.Internal.UI
         
         private async UniTask<bool> RefreshQR()
         {
-            var qrResponse = await sessionService.GetQRCodeAsync();
+            var qrResponse = await sessionServiceInternal.GetQRCodeAsync();
             if (!qrResponse.Success)
             {
                 EmergenceLogger.LogError("Error retrieving QR code.");
@@ -144,7 +144,7 @@ namespace EmergenceSDK.Internal.UI
         
         private async UniTask<string> Handshake()
         {
-            var handshakeResponse = await walletService.HandshakeAsync();
+            var handshakeResponse = await walletServiceInternal.HandshakeAsync();
             if (!handshakeResponse.Success)
             {
                 EmergenceLogger.LogError("Error during handshake.");
@@ -155,7 +155,7 @@ namespace EmergenceSDK.Internal.UI
 
         private async UniTask<bool> HandleRefreshAccessToken()
         {
-            var tokenResponse = await personaService.GetAccessTokenAsync();
+            var tokenResponse = await sessionServiceInternal.GetAccessTokenAsync();
             if (!tokenResponse.Success)
                 return false;
 
