@@ -389,8 +389,9 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                             return ArtmStatus.Pending;
                         case "SUCCESS":
                             return ArtmStatus.Success;
-                        case "FAILURE":
-                            return ArtmStatus.Failure;
+                        case "FAILED":
+                        case "FAILURE": // Futureverse stated this would be the failure state, but actually it's "FAILED" so I'm covering both
+                            return ArtmStatus.Failed;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(artmStatus) + "." + nameof(artmStatus.Status), "Unexpected ARTM status: " + artmStatus.Status);
                     }
