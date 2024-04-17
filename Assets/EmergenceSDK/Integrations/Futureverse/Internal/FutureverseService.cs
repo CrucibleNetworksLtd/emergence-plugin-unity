@@ -440,7 +440,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             try
             {
                 EmergenceLogger.LogInfo("Transaction Hash: " + transactionHash);
-                return await GetArtmStatus(transactionHash, maxAttempts: 1000) != ArtmStatus.Pending;
+                return await GetArtmStatus(transactionHash, maxAttempts: 5) != ArtmStatus.Pending;
             }
             catch (ExhaustedRequestAttemptsException)
             {
