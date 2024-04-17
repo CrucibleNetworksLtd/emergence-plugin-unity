@@ -292,7 +292,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         {
             var requestBody = new
             {
-                query = "query Transaction($transactionHash: TransactionHash!) { transaction(transactionHash: {$transactionHash}) { status error { code message } events { action args type } } }",
+                query = "query Transaction($transactionHash: TransactionHash!) { transaction(transactionHash: $transactionHash) { status error { code message } events { action args type } } }",
                 variables = new
                 {
                     transactionHash
@@ -341,9 +341,9 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
                 request.SetRequestHeader("Content-Type", "application/json");
                 request.timeout = FutureverseSingleton.Instance.requestTimeout;
-                var nonceResponse = await WebRequestService.PerformAsyncWebRequest(request, (errorMessage, code) => { });
+                var response = await WebRequestService.PerformAsyncWebRequest(request, (errorMessage, code) => { });
                 
-                if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseStatus(jObject, out var transactionStatus))
+                if (!IsArResponseValid(response, out var jObject) || !ParseStatus(jObject, out var transactionStatus))
                 {
                     LogArResponseErrors(jObject);
                     return new (false, "");
@@ -436,8 +436,18 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     return false;
                 }
             }
-            
-            return await GetArtmStatus(transactionHash) != ArtmStatus.Pending;
+
+            try
+            {
+                EmergenceLogger.LogInfo("Transaction Hash: " + transactionHash);
+                return await GetArtmStatus(transactionHash, maxAttempts: 1000) != ArtmStatus.Pending;
+            }
+            catch (ExhaustedRequestAttemptsException)
+            {
+                EmergenceLogger.LogWarning("Exhausted confirmation attempts");
+                return false;
+            }
+
 
             bool ParseNonce(JObject jObject, out int nonce)
             {
