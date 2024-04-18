@@ -6,25 +6,25 @@ namespace EmergenceSDK.Integrations.Futureverse.Types
     public class InventoryQuery
     {
         [JsonProperty("query")]
-        public string Query { get; } = @"query ExampleQuery($addresses: [Address]!, $chainLocations: [BlockchainLocationInput], $first: Int) {
-        nfts(addresses: $addresses, chainLocations: $chainLocations, first: $first) {
-            edges {
-                node {
-                    assetType
-                    collection {
-                        chainId
-                        chainType
-                        location
-                        name
-                    }
-                    tokenIdNumber
-                    metadata {
-                        properties
+        public string Query { get; } = @"query Asset($addresses: [ChainAddress!]!, $first: Float) {
+            assets(addresses: $addresses, first: $first) {
+                edges {
+                    node {
+                        metadata {
+                            properties
+                            attributes
+                        }
+                        collection {
+                            chainId
+                            chainType
+                            location
+                            name
+                        }
+                        tokenId
                     }
                 }
             }
-        }
-    }";
+        }";
 
         [JsonProperty("variables")]
         public QueryVariables Variables { get; }

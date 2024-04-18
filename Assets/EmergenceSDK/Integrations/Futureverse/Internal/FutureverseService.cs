@@ -97,9 +97,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
         public async UniTask<ServiceResponse<InventoryResponse>> GetFutureverseInventory()
         {
-            var url = FutureverseSingleton.Instance.selectedEnvironment == FutureverseSingleton.Environment.Production
-                ? "https://w1jv6xw3jh.execute-api.us-west-2.amazonaws.com/api/graphql"
-                : "https://adx1wewtnh.execute-api.us-west-2.amazonaws.com/api/graphql";
+            var url = GetArApiUrl();
             var query = SerializationHelper.Serialize(new InventoryQuery(CombinedAddress));
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url,
                 EmergenceLogger.LogError, query);
@@ -116,24 +114,33 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             if (futureverseInventory.Success == false)
                 return new ServiceResponse<List<InventoryItem>>(false);
             var ret = new List<InventoryItem>();
-            foreach (var edge in futureverseInventory.Result.data.nfts.edges)
+            foreach (var edge in futureverseInventory.Result.data.assets.edges)
             {
                 var node = edge.node;
                 var newItem = new InventoryItem();
                 newItem.ID =
-                    $"{node.collection.chainType}:{node.collection.chainId}:{node.collection.location}:{node.tokenIdNumber}";
+                    $"{node.collection.chainType}:{node.collection.chainId}:{node.collection.location}:{node.tokenId}";
                 newItem.Blockchain = $"{node.collection.chainType}:{node.collection.chainId}";
                 newItem.Contract = $"{node.collection.location}";
-                newItem.TokenId = $"{node.tokenIdNumber}";
+                newItem.TokenId = $"{node.tokenId}";
                 newItem.Meta = new InventoryItemMetaData();
-                newItem.Meta.Name = $"#{node.tokenIdNumber}";
+                newItem.Meta.Name = $"#{node.tokenId}";
                 newItem.Meta.Description = node.collection.name;
                 var newMetaContent = new InventoryItemMetaContent();
                 newMetaContent.URL = node.metadata.properties.image;
-                newMetaContent.MimeType = node.metadata.properties.glb_url == null ? "model/gltf-binary" : "image/png";
+                newMetaContent.MimeType = node.metadata.properties.models?["glb"] != null ? "model/gltf-binary" : "image/png";
                 newItem.Meta.Content = new List<InventoryItemMetaContent>();
                 newItem.Meta.Content.Add(newMetaContent);
-
+                foreach (var kvp in node.metadata.attributes)
+                {
+                    var inventoryItemMetaAttributes = new InventoryItemMetaAttributes
+                    {
+                        Key = kvp.Key,
+                        Value = kvp.Value
+                    };
+                    newItem.Meta.Attributes.Add(inventoryItemMetaAttributes);
+                }
+                
                 ret.Add(newItem);
             }
 
