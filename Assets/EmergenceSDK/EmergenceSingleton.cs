@@ -28,6 +28,7 @@ namespace EmergenceSDK
         private GameObject ui;
         private string accessToken;
         private string address;
+        private string checksummedAddress;
         private InputAction closeAction;
 
         [Header("Keyboard shortcut to open Emergence")] 
@@ -111,6 +112,17 @@ namespace EmergenceSDK
         {
             EmergenceLogger.LogInfo("Setting cached address to: " + _address);
             address = _address;
+        }
+
+        public string GetCachedChecksummedAddress()
+        {
+            return checksummedAddress;
+        }
+        
+        public void SetCachedChecksummedAddress(string _checksummedAddress)
+        {
+            EmergenceLogger.LogInfo("Setting cached address to: " + _checksummedAddress);
+            checksummedAddress = _checksummedAddress;
         }
         
         private void OnEnable()
