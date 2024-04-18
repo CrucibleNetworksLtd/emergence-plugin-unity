@@ -14,7 +14,8 @@ namespace EmergenceSDK.Internal.Services
     {
         private bool completedHandshake = false;
 
-        public bool HasAddress => WalletAddress != null && WalletAddress.Trim() != string.Empty;
+        public bool IsLoggedIn => WalletAddress != null && WalletAddress.Trim() != string.Empty &&
+                                  ChecksummedWalletAddress != null && ChecksummedWalletAddress.Trim() != string.Empty;
 
         public string WalletAddress { get; private set; } = string.Empty;
         public string ChecksummedWalletAddress { get; private set; } = string.Empty;

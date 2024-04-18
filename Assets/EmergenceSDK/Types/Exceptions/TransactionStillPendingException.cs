@@ -1,6 +1,6 @@
-﻿using System;
+﻿using EmergenceSDK.Integrations.Futureverse.Types;
 
-namespace EmergenceSDK.Integrations.Futureverse.Types
+namespace EmergenceSDK.Types.Exceptions
 {
     public class TransactionStillPendingException : ExhaustedRequestAttemptsException
     {
