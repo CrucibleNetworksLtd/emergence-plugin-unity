@@ -292,7 +292,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         {
             var requestBody = new
             {
-                query = "query Transaction($transactionHash: TransactionHash!) { transaction(transactionHash: {$transactionHash}) { status error { code message } events { action args type } } }",
+                query = "query Transaction($transactionHash: TransactionHash!) { transaction(transactionHash: $transactionHash) { status error { code message } events { action args type } } }",
                 variables = new
                 {
                     transactionHash
@@ -341,9 +341,9 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
                 request.SetRequestHeader("Content-Type", "application/json");
                 request.timeout = FutureverseSingleton.Instance.requestTimeout;
-                var nonceResponse = await WebRequestService.PerformAsyncWebRequest(request, (errorMessage, code) => { });
+                var response = await WebRequestService.PerformAsyncWebRequest(request, (errorMessage, code) => { });
                 
-                if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseStatus(jObject, out var transactionStatus))
+                if (!IsArResponseValid(response, out var jObject) || !ParseStatus(jObject, out var transactionStatus))
                 {
                     LogArResponseErrors(jObject);
                     return new (false, "");
@@ -359,6 +359,16 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             }
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transactionHash"></param>
+        /// <param name="initialDelay"></param>
+        /// <param name="refetchInterval"></param>
+        /// <param name="maxAttempts"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <exception cref="TransactionStillPendingException"></exception>
         public async UniTask<ArtmStatus> GetArtmStatus(string transactionHash, int initialDelay = 1000, int refetchInterval = 5000, int maxAttempts = 3)
         {
             int attempts = 0;
@@ -379,20 +389,21 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                             return ArtmStatus.Pending;
                         case "SUCCESS":
                             return ArtmStatus.Success;
-                        case "FAILURE":
-                            return ArtmStatus.Failure;
+                        case "FAILED":
+                        case "FAILURE": // Futureverse stated this would be the failure state, but actually it's "FAILED" so I'm covering both
+                            return ArtmStatus.Failed;
                         default:
-                            throw new ArgumentOutOfRangeException(nameof(artmStatus.Status), "Unexpected ARTM status: " + artmStatus.Status);
+                            throw new ArgumentOutOfRangeException(nameof(artmStatus) + "." + nameof(artmStatus.Status), "Unexpected ARTM status: " + artmStatus.Status);
                     }
                 }
                 
                 attempts++;
             }
             
-            throw new ExhaustedRequestAttemptsException();
+            throw new TransactionStillPendingException();
         }
         
-        public async UniTask<bool> SendArtmAsync(string message,
+        public async UniTask<ArtmStatus?> SendArtmAsync(string message,
             string eoaAddress,
             List<FutureverseArtmOperation> artmOperations)
         {
@@ -409,14 +420,14 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseNonce(jObject, out var nonce))
                 {
                     LogArResponseErrors(jObject);
-                    return false;
+                    return null;
                 }
 
                 generatedArtm = ArtmBuilder.GenerateArtm(message, artmOperations, eoaAddress, nonce);
                 var signatureResponse = await EmergenceServiceProvider.GetService<IWalletService>().RequestToSignAsync(generatedArtm);
                 if (!signatureResponse.Success)
                 {
-                    return false;
+                    return null;
                 }
 
                 signature = signatureResponse.Result;
@@ -433,11 +444,21 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 if (!IsArResponseValid(submitResponse, out var jObject) || !ParseTransactionHash(jObject, out transactionHash))
                 {
                     LogArResponseErrors(jObject);
-                    return false;
+                    return null;
                 }
             }
-            
-            return await GetArtmStatus(transactionHash) != ArtmStatus.Pending;
+
+            try
+            {
+                EmergenceLogger.LogInfo("Transaction Hash: " + transactionHash);
+                return await GetArtmStatus(transactionHash, maxAttempts: 5);
+            }
+            catch (ExhaustedRequestAttemptsException)
+            {
+                EmergenceLogger.LogWarning("Exhausted confirmation attempts");
+                throw;
+            }
+
 
             bool ParseNonce(JObject jObject, out int nonce)
             {
