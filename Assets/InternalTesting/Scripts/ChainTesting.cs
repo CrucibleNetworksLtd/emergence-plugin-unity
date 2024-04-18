@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types.Responses;
 using UnityEditor;
 using UnityEngine;
 

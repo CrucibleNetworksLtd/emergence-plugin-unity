@@ -1,7 +1,5 @@
 #if UNITY_EDITOR
 
-using System;
-using EmergenceSDK.Types;
 using UnityEditor;
 using UnityEngine;
 

@@ -1,8 +1,8 @@
 #if UNITY_EDITOR
 
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using UnityEditor;
 using UnityEngine;
 
@@ -57,7 +57,7 @@ namespace EmergenceSDK.InternalTesting
             if (needToGenerateQR)
             {
                 needToGenerateQR = false;
-                EmergenceServiceProvider.GetService<ISessionService>().GetQRCode(OnGetQRCodeSuccess, EmergenceLogger.LogError);
+                EmergenceServiceProvider.GetService<ISessionServiceInternal>().GetQRCode(OnGetQRCodeSuccess, EmergenceLogger.LogError);
             }
 
             if (displayQR)
@@ -70,7 +70,7 @@ namespace EmergenceSDK.InternalTesting
         {
             qrcode = qrcodeIn;
             displayQR = true;
-            EmergenceServiceProvider.GetService<IWalletService>().Handshake((walletAddress) =>
+            EmergenceServiceProvider.GetService<IWalletServiceInternal>().Handshake((walletAddress) =>
             {
                 EmergenceLogger.LogInfo("Hand shook with wallet: " + walletAddress);
                 displayQR = false;
