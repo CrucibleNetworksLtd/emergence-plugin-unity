@@ -1,7 +1,11 @@
 using System.Collections.Generic;
+using EmergenceSDK.Internal.Utils;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace EmergenceSDK.Integrations.Futureverse.Types.Responses
 {
+    [SerializationHelper.StoreOriginalJTokens]
     public class InventoryResponse
     {
         public class Data
@@ -46,6 +50,9 @@ namespace EmergenceSDK.Integrations.Futureverse.Types.Responses
                         public Collection collection { get; set; }
                         public int tokenId { get; set; }
                         public Metadata metadata { get; set; }
+
+                        [field: SerializationHelper.OriginalJToken]
+                        public JToken OriginalData { get; } = null;
                     }
                     
                     public Node node { get; set; }

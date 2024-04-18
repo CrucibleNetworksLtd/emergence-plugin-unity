@@ -140,7 +140,8 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     };
                     newItem.Meta.Attributes.Add(inventoryItemMetaAttributes);
                 }
-                
+                newItem.OriginalData = node.OriginalData;
+
                 ret.Add(newItem);
             }
 
