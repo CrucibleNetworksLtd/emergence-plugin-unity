@@ -24,7 +24,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Types.Responses
         public List<LinkedEoa> linkedEoas { get; set; }
         public List<object> invalidEoas { get; set; }
 
-        public List<string> GetCombinedAddresses()
+        internal List<string> GetCombinedAddresses()
         {
             var ret = new List<string>();
             ret.Add($"{futurepass.Split(':').Last()}");

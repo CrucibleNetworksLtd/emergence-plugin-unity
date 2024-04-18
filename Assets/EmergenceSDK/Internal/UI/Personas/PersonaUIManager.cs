@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -19,6 +20,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         private readonly PersonaCarousel personaCarousel;
         private readonly Transform personaScrollContents;
         private IPersonaService personaService;
+        private IPersonaServiceInternal personaServiceInternal;
         internal readonly PersonaScrollItemStore PersonaScrollItemStore = new PersonaScrollItemStore();
 
         private HashSet<string> imagesRefreshing = new HashSet<string>();
@@ -73,7 +75,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         private async void OnUsePersonaAsCurrent()
         {
             Modal.Instance.Show("Loading Personas...");
-            var setPersonaResponse = await personaService.SetCurrentPersonaAsync(SelectedPersona);
+            var setPersonaResponse = await personaServiceInternal.SetCurrentPersonaAsync(SelectedPersona);
             if (setPersonaResponse.Success)
             {
                 Refresh().Forget();
@@ -96,7 +98,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         private async void DeleteSelectedPersona()
         {
             Modal.Instance.Show("Deleting Persona...");
-            var personaServiceResult = await personaService.DeletePersonaAsync(SelectedPersona);
+            var personaServiceResult = await personaServiceInternal.DeletePersonaAsync(SelectedPersona);
             if (personaServiceResult.Success)
             {
                 Refresh().Forget();
@@ -107,6 +109,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         public async UniTask Refresh()
         {
             personaService = EmergenceServiceProvider.GetService<IPersonaService>();
+            personaServiceInternal = EmergenceServiceProvider.GetService<IPersonaServiceInternal>();
             
             dashboardScreen.HideUI();
             dashboardScreen.HideDetailsPanel();
@@ -117,7 +120,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
             Modal.Instance.Show("Loading Personas...");
             
-            var personas = await personaService.GetPersonasAsync();
+            var personas = await personaServiceInternal.GetPersonasAsync();
             if (personas.Success)
             {
                 if(personas.Result0.Count == 0 || personas.Result1 == null)

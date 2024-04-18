@@ -10,10 +10,6 @@ namespace EmergenceSDK.Internal.Services
     //COMING SOON: Local EVM support
     internal class LocalSessionService : SessionService
     {
-        public LocalSessionService(IPersonaService personaService) : base(personaService)
-        {
-        }
-
         //Local EVM only
         public async UniTask Finish(SuccessFinish success, ErrorCallback errorCallback)
         {

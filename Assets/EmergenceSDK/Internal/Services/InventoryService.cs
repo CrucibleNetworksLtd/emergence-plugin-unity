@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -17,7 +18,7 @@ namespace EmergenceSDK.Internal.Services
         {
             if (EmergenceServiceProvider.GetService<IFutureverseService>().UsingFutureverse)
             {
-                return await EmergenceServiceProvider.GetService<IFutureverseService>().GetFutureverseInventoryAsInventoryItems();
+                return await EmergenceServiceProvider.GetService<IFutureverseServiceInternal>().GetFutureverseInventoryAsInventoryItems();
             }
             
             string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address + "&chain=" + InventoryKeys.ChainToKey[chain];

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse;
 using EmergenceSDK.Integrations.Futureverse.Internal;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
 using Newtonsoft.Json.Linq;
@@ -87,7 +88,7 @@ namespace EmergenceSDK.Tests.Futureverse
                 }
             }";
 
-            var tree = EmergenceServiceProvider.GetService<IFutureverseService>().ParseGetAssetTreeJson(json);
+            var tree = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>().ParseGetAssetTreeJson(json);
             Assert.AreEqual(3, tree.Count);
 
             var firstPath = tree[0];
@@ -109,17 +110,17 @@ namespace EmergenceSDK.Tests.Futureverse
             Assert.AreEqual("did:fv-asset:7672:root:275556:3", thirdObject.ID);
             Assert.AreEqual(3, thirdObject.AdditionalData.Count);
             var thirdObjectAdditionalArray = thirdObject.AdditionalData["array"];
-            Assert.IsInstanceOf<JProperty>(thirdObjectAdditionalArray);
+            Assert.IsInstanceOf<JArray>(thirdObjectAdditionalArray);
             Assert.AreEqual(@"[""sdfsdfsd"",""ADASDASDA"",""adasdada""]",
-                ((JProperty)thirdObjectAdditionalArray).Value.ToString(Newtonsoft.Json.Formatting.None));
+                thirdObjectAdditionalArray.ToString(Newtonsoft.Json.Formatting.None));
             var thirdObjectAdditionalInt = thirdObject.AdditionalData["int"];
+            Assert.IsInstanceOf<JValue>(thirdObjectAdditionalInt);
             Assert.AreEqual("69",
-                ((JProperty)thirdObjectAdditionalInt).Value.ToString(Newtonsoft.Json.Formatting.None));
-            Assert.IsInstanceOf<JProperty>(thirdObjectAdditionalInt);
+                thirdObjectAdditionalInt.ToString(Newtonsoft.Json.Formatting.None));
             var thirdObjectAdditionalObject = thirdObject.AdditionalData["object"];
-            Assert.IsInstanceOf<JProperty>(thirdObjectAdditionalObject);
+            Assert.IsInstanceOf<JObject>(thirdObjectAdditionalObject);
             Assert.AreEqual(@"{""test"":[""sdfsdfsd"",""ADASDASDA"",""adasdada""]}",
-                ((JProperty)thirdObjectAdditionalObject).Value.ToString(Newtonsoft.Json.Formatting.None));
+                thirdObjectAdditionalObject.ToString(Newtonsoft.Json.Formatting.None));
 
             var secondPath = tree[1];
             Assert.AreEqual("did:fv-asset:7672:root:275556:3", secondPath.ID);
@@ -137,7 +138,8 @@ namespace EmergenceSDK.Tests.Futureverse
         public IEnumerator GetAssetTreeAsync_PassesWithoutExceptions()
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            return futureverseService.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Development,
+            var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
+            return futureverseServiceInternal.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Development,
                 async () =>
                 {
                     await futureverseService.GetAssetTreeAsync("473", "7672:root:303204");

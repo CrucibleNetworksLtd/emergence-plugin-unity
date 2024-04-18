@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types.Delegates;
@@ -65,8 +66,8 @@ namespace EmergenceSDK.Internal.Services
 
         private static void SetupRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)
         {
-            var personaService = EmergenceServiceProvider.GetService<IPersonaService>();
-            request.SetRequestHeader("Authorization", personaService.CurrentAccessToken);
+            var sessionServiceInternal = EmergenceServiceProvider.GetService<ISessionServiceInternal>();
+            request.SetRequestHeader("Authorization", sessionServiceInternal.CurrentAccessToken);
 
             if (headers != null)
             {

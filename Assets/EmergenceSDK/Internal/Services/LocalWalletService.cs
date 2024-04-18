@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -11,10 +12,7 @@ namespace EmergenceSDK.Internal.Services
     //COMING SOON: Local EVM support
     internal class LocalWalletService : WalletService
     {
-        
-        public LocalWalletService(IPersonaService personaService, ISessionService sessionService) : base(personaService, sessionService)
-        {
-        }
+        public LocalWalletService(ISessionServiceInternal sessionServiceInternal) : base(sessionServiceInternal) { }
         
         //Local EVM only
         public async UniTask CreateWallet(string path, string password, CreateWalletSuccess success, ErrorCallback errorCallback)

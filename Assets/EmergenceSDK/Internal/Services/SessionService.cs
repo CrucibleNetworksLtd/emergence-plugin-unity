@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
+using EmergenceSDK.Services.Interfaces;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using EmergenceSDK.Types.Responses;
@@ -10,21 +13,23 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class SessionService : ISessionService
+    internal class SessionService : ISessionService, ISessionServiceInternal, IDisconnectable
     {
-        
+        public string CurrentAccessToken { get; private set; } = string.Empty;
+
         public bool DisconnectInProgress => disconnectInProgress;
         public event Action OnSessionDisconnected;
         private bool disconnectInProgress = false;
-
-        private IPersonaService personaService;
         
-        public SessionService(IPersonaService personaService)
+        public SessionService()
         {
-            this.personaService = personaService;
-            
-            if(personaService is PersonaService personaServiceInstance)
-                OnSessionDisconnected += () => personaServiceInstance.OnSessionDisconnected();
+            OnSessionDisconnected += () =>
+            {
+                foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectable>())
+                {
+                    disconnectable.HandleDisconnection();
+                }
+            };
 
             EmergenceSingleton.Instance.OnGameClosing += OnGameEnd;
         }
@@ -71,7 +76,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-                request.SetRequestHeader("auth", personaService.CurrentAccessToken);
+                request.SetRequestHeader("auth", CurrentAccessToken);
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if (response.IsSuccess == false)
                 {
@@ -154,6 +159,32 @@ namespace EmergenceSDK.Internal.Services
                 success?.Invoke(response.Result);
             else
                 errorCallback?.Invoke("Error in GetQRCode.", (long)response.Code);
+        }
+        
+        public async UniTask<ServiceResponse<string>> GetAccessTokenAsync()
+        {
+            string url = StaticConfig.APIBase + "get-access-token";
+            var headers = new Dictionary<string, string> { { "deviceId", EmergenceSingleton.Instance.CurrentDeviceId } };
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError, "", headers);
+            if(response.IsSuccess == false)
+                return new ServiceResponse<string>(false);
+            var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response.Response);
+            CurrentAccessToken = SerializationHelper.Serialize(accessTokenResponse.message.AccessToken, false);
+            return new ServiceResponse<string>(true, CurrentAccessToken);
+        }
+
+        public void HandleDisconnection()
+        {
+            CurrentAccessToken = "";
+        }
+
+        public async UniTask GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
+        {
+            var response = await GetAccessTokenAsync();
+            if(response.Success)
+                success?.Invoke(response.Result);
+            else
+                errorCallback?.Invoke("Error in GetAccessToken.", (long)response.Code);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -9,7 +10,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class WalletService : IWalletService
+    internal class WalletService : IWalletService, IWalletServiceInternal
     {
         private bool completedHandshake = false;
 
@@ -18,13 +19,11 @@ namespace EmergenceSDK.Internal.Services
         public string WalletAddress { get; private set; } = string.Empty;
         public string ChecksummedWalletAddress { get; private set; } = string.Empty;
 
-        private IPersonaService personaService;
-        private ISessionService sessionService;
+        private ISessionServiceInternal sessionServiceInternal;
 
-        public WalletService(IPersonaService personaService, ISessionService sessionService)
+        public WalletService(ISessionServiceInternal sessionServiceInternal)
         {
-            this.personaService = personaService;
-            this.sessionService = sessionService;
+            this.sessionServiceInternal = sessionServiceInternal;
         }
 
         public async UniTask<ServiceResponse<bool>> ReinitializeWalletConnect()
@@ -59,7 +58,12 @@ namespace EmergenceSDK.Internal.Services
         
         public async UniTask<ServiceResponse<string>> RequestToSignAsync(string messageToSign)
         {
-            var content = "{\"message\": \"" + messageToSign + "\"}";
+            var content = SerializationHelper.Serialize(
+                new
+                {
+                    message = messageToSign
+                }
+            );
 
             string url = StaticConfig.APIBase + "request-to-sign";
 
@@ -159,7 +163,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse<string>> GetBalanceAsync()
         {
-            if (sessionService.DisconnectInProgress)
+            if (sessionServiceInternal.DisconnectInProgress)
                 return new ServiceResponse<string>(false);
     
             string url = StaticConfig.APIBase + "getbalance" + 
@@ -206,7 +210,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string dataString = SerializationHelper.Serialize(data, false);
 
-            string url = StaticConfig.APIBase + "validate-signed-message" + "?request=" + personaService.CurrentAccessToken;
+            string url = StaticConfig.APIBase + "validate-signed-message" + "?request=" + sessionServiceInternal.CurrentAccessToken;
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, dataString);
             try

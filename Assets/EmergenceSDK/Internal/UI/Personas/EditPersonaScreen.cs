@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -20,6 +21,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         public PersonaCreationEditingStatusWidget StatusWidget;
         private Persona currentPersona;
         private IPersonaService PersonaService => EmergenceServiceProvider.GetService<IPersonaService>();
+        private IPersonaServiceInternal PersonaServiceInternal => EmergenceServiceProvider.GetService<IPersonaServiceInternal>();
         private bool isNew;
 
         private void Awake()
@@ -148,7 +150,7 @@ namespace EmergenceSDK.Internal.UI.Personas
 
         private async UniTask CreateNewPersona()
         {
-            var response = await PersonaService.CreatePersonaAsync(currentPersona);
+            var response = await PersonaServiceInternal.CreatePersonaAsync(currentPersona);
             if (response.Success)
             {
                 EmergenceLogger.LogInfo($"New persona {currentPersona.name} created");
@@ -164,7 +166,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         
         private async UniTask EditPersona()
         {
-            var response = await PersonaService.EditPersonaAsync(currentPersona);
+            var response = await PersonaServiceInternal.EditPersonaAsync(currentPersona);
             if (response.Success)
             {
                 EmergenceLogger.LogInfo("Changes to Persona saved");
@@ -190,7 +192,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             ModalPromptYESNO.Instance.Show("Delete " + currentPersona.name, "are you sure?", () =>
             {
                 Modal.Instance.Show("Deleting Persona...");
-                PersonaService.DeletePersona(currentPersona, () =>
+                PersonaServiceInternal.DeletePersona(currentPersona, () =>
                 {
                     EmergenceLogger.LogInfo("Deleting Persona");
                     Modal.Instance.Hide();

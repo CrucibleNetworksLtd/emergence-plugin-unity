@@ -27,7 +27,7 @@ namespace EmergenceSDK
     /// UI for email submission, this is not needed for the SDK to work. Feel free to remove this file.
     /// <remarks>We will use your email to send you updates about Emergence, and sometimes other information about web3 tech... could be cool!</remarks>
     /// </summary>
-    public class EmailSubmissionForm : EditorWindow
+    internal class EmailSubmissionForm : EditorWindow
     {
         private string email;
         private string baseUrl = "https://api.emailjs.com/api/v1.0/email/send";

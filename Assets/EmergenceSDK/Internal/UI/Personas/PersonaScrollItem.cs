@@ -132,7 +132,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         private void UpdateBorder()
         {
             var personaService = EmergenceServiceProvider.GetService<IPersonaService>();
-            if (personaService.GetCurrentPersona(out var currentPersona))
+            if (personaService.GetCachedPersona(out var currentPersona))
             {
                 var isCurrentPersona = Persona.id == currentPersona.id;
                 unselectedBorder.SetActive(!isCurrentPersona);

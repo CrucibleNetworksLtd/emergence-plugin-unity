@@ -1,3 +1,4 @@
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEngine;
@@ -6,18 +7,18 @@ namespace EmergenceSDK.Samples.Examples
 {
     public class ConnectingToWallet : MonoBehaviour
     {
-        private ISessionService sessionService;
-        private IWalletService walletService;
+        private ISessionServiceInternal sessionServiceInternal;
+        private IWalletServiceInternal walletServiceInternal;
 
         private void Awake()
         {
-            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
-            walletService = EmergenceServiceProvider.GetService<IWalletService>();
+            sessionServiceInternal = EmergenceServiceProvider.GetService<ISessionServiceInternal>();
+            walletServiceInternal = EmergenceServiceProvider.GetService<IWalletServiceInternal>();
         }
 
         private void Start()
         {
-            sessionService.GetQRCode(GotQRCode, EmergenceLogger.LogError);
+            sessionServiceInternal.GetQRCode(GotQRCode, EmergenceLogger.LogError);
         }
 
         private void GotQRCode(Texture2D qrcode)
@@ -27,7 +28,7 @@ namespace EmergenceSDK.Samples.Examples
             //.....
 
             //Wait for the user to connect to the wallet
-            walletService.Handshake(OnHandshakeSuccess, EmergenceLogger.LogError);
+            walletServiceInternal.Handshake(OnHandshakeSuccess, EmergenceLogger.LogError);
         }
 
         private void OnHandshakeSuccess(string walletaddress)

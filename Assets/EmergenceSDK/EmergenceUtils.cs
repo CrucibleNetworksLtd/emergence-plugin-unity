@@ -17,7 +17,7 @@ namespace EmergenceSDK
         /// <summary>
         /// Checks if there was an error in the UnityWebRequest result.
         /// </summary>
-        public static bool RequestError(UnityWebRequest request)
+        internal static bool RequestError(UnityWebRequest request)
         {
              bool error = request.result == UnityWebRequest.Result.ConnectionError ||
                           request.result == UnityWebRequest.Result.ProtocolError ||
@@ -34,7 +34,7 @@ namespace EmergenceSDK
         /// <summary>
         /// Prints the result of a UnityWebRequest to the console.
         /// </summary>
-        public static void PrintRequestResult(string name, UnityWebRequest request)
+        internal static void PrintRequestResult(string name, UnityWebRequest request)
         {
             EmergenceLogger.LogInfo(name + " completed " + request.responseCode);
             if (RequestError(request))
@@ -50,7 +50,7 @@ namespace EmergenceSDK
         /// <summary>
         /// Processes a UnityWebRequest response and returns the result as a response object.
         /// </summary>
-        public static bool ProcessRequest<T>(UnityWebRequest request, ErrorCallback errorCallback, out T response)
+        internal static bool ProcessRequest<T>(UnityWebRequest request, ErrorCallback errorCallback, out T response)
         {
             EmergenceLogger.LogInfo("Processing request: " + request.url);
             
@@ -82,7 +82,7 @@ namespace EmergenceSDK
         /// <summary>
         /// Processes the response of a UnityWebRequest and returns the result as a response object or an error response object.
         /// </summary>
-        public static bool ProcessResponse<T>(UnityWebRequest request, out BaseResponse<T> response, out BaseResponse<string> errorResponse)
+        internal static bool ProcessResponse<T>(UnityWebRequest request, out BaseResponse<T> response, out BaseResponse<string> errorResponse)
         {
             bool isOk = true;
             errorResponse = null;
@@ -99,42 +99,6 @@ namespace EmergenceSDK
             }
 
             return isOk;
-        }
-
-        /// <summary>
-        /// Performs an asynchronous UnityWebRequest and returns the result as a string.
-        /// </summary>
-        public static async UniTask<string> PerformAsyncWebRequest(string url, string method, ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null)
-        {
-            UnityWebRequest request;
-            if (method.Equals(UnityWebRequest.kHttpVerbGET))
-            {
-                request = UnityWebRequest.Get(url);
-            }
-            else
-            {
-                request = UnityWebRequest.Post(url, string.Empty);
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(bodyData));
-                request.uploadHandler.contentType = "application/json";
-            }
-            try
-            {
-                var personaService = EmergenceServiceProvider.GetService<IPersonaService>();
-                EmergenceLogger.LogInfo("AccessToken: " + personaService.CurrentAccessToken);
-                request.SetRequestHeader("Authorization", personaService.CurrentAccessToken);
-
-                if (headers != null) {
-                    foreach (var key in headers.Keys) {
-                        request.SetRequestHeader(key, headers[key]);
-                    }
-                }
-                return (await request.SendWebRequest()).downloadHandler.text;
-            }
-            catch (Exception ex) when (!(ex is OperationCanceledException))
-            {
-                errorCallback?.Invoke(request.error, request.responseCode);
-                return ex.Message;
-            }
         }
     }
 }
