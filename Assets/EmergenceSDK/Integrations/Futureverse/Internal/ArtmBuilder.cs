@@ -7,7 +7,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
     internal class ArtmBuilder
     {
         public static string GenerateArtm(string message, List<FutureverseArtmOperation> artmOperations,
-            string address, string nonce)
+            string address, int nonce)
         {
             Dictionary<FutureverseArtmOperationType, string> operationTypeStrings = new(){
                 {FutureverseArtmOperationType.CreateLink, "asset-link create"},
