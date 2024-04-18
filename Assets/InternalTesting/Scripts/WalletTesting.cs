@@ -2,7 +2,6 @@
 
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using UnityEditor;
 using UnityEngine;
 

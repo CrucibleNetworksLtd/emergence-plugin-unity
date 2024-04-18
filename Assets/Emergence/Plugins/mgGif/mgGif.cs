@@ -4,8 +4,6 @@ using UnityEngine;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Runtime.InteropServices;
-using EmergenceSDK.Internal.Utils; // unsafe
 
 namespace MG.GIF
 {
@@ -276,7 +274,6 @@ namespace MG.GIF
 
                     default:
                     {
-                        EmergenceLogger.LogError("Unexpected block type");
                         return null;
                     }
                 }
@@ -413,7 +410,6 @@ namespace MG.GIF
             }
             catch (Exception e)
             {
-                EmergenceLogger.LogError(e.Message);
                 return null;
             }
 

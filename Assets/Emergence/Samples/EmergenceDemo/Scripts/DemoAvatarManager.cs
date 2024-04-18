@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -82,10 +81,13 @@ namespace EmergenceSDK.EmergenceDemo
         {
             try
             {
-                var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, vrmURL, "");
-                await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                byte[] response = request.downloadHandler.data;
-                WebRequestService.CleanupRequest(request);
+                var request = UnityWebRequest.Get(vrmURL);
+                byte[] response;
+                using (request.uploadHandler)
+                {
+                    await request.SendWebRequest().ToUniTask(cancellationToken: ct);
+                    response = request.downloadHandler.data;
+                }
 
                 ct.ThrowIfCancellationRequested();
 

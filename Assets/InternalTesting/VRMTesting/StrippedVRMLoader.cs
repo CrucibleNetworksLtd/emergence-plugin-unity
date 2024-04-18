@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using EmergenceSDK.EmergenceDemo;
 using EmergenceSDK.Internal.Utils;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace EmergenceSDK
 {
