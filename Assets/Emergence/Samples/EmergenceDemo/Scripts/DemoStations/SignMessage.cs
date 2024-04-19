@@ -6,7 +6,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public class SignMessage : DemoStation<SignMessage>, IDemoStation
     {
-        private IWalletService wallletService;
+        private IWalletService walletService;
 
         public bool IsReady
         {
@@ -20,7 +20,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         
         private void Start()
         {
-            wallletService = EmergenceServiceProvider.GetService<IWalletService>();
+            walletService = EmergenceServiceProvider.GetService<IWalletService>();
             
             instructionsGO.SetActive(false);
             IsReady = false;
@@ -40,7 +40,11 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         {
             if (HasBeenActivated() && IsReady)
             {
-                wallletService.RequestToSign("Test message", SignSuccess, SignErrorCallback);
+                var message = "Test message";
+                walletService.RequestToSign(message, (signedMessage) =>
+                {
+                    SignSuccess(message, signedMessage);
+                }, SignErrorCallback);
             }
         }
 
@@ -49,9 +53,25 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             EmergenceLogger.LogError("Error signing message: " + message, true);
         }
 
-        private void SignSuccess(string message)
+        private void SignSuccess(string message, string signedMessage)
         {
-            EmergenceLogger.LogInfo("Message signed succesfully: " + message, true);
+            EmergenceLogger.LogInfo("Message signed succesfully: " + signedMessage, true);
+            EmergenceLogger.LogInfo("Validating message...", true);
+
+            walletService.ValidateSignedMessage(message, signedMessage, EmergenceSingleton.Instance.GetCachedAddress(), isValid =>
+            {
+                if (isValid)
+                {
+                    EmergenceLogger.LogInfo("Message is valid", true);
+                }
+                else
+                {
+                    EmergenceLogger.LogWarning("Message is not valid", true);
+                }
+            }, (_, _) =>
+            {
+                EmergenceLogger.LogError("Error validating message", true);
+            });
         }
     }
 }
