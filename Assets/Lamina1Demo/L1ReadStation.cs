@@ -52,7 +52,7 @@ namespace EmergenceSDK.Lamina1Demo
         {
             
             var contractInfo = new ContractInfo(deployedContract, "addressMints");
-            ContractService.ReadMethod(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() }, OnReadSuccess, EmergenceLogger.LogError);
+            ContractService.ReadMethod(contractInfo, new string[] { EmergenceServiceProvider.GetService<IWalletService>().WalletAddress }, OnReadSuccess, EmergenceLogger.LogError);
         }
         
         private void OnReadSuccess(BaseResponse<string> response)

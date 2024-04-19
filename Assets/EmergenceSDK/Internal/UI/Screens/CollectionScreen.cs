@@ -97,7 +97,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             HideFVSidebars(EmergenceServiceProvider.GetService<IFutureverseService>().UsingFutureverse);
             var inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
-            var updatedInventory = await inventoryService.InventoryByOwnerAsync(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible);
+            var updatedInventory = await inventoryService.InventoryByOwnerAsync(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible);
             inventoryItemStore.SetItems(updatedInventory.Result);
             if (updatedInventory.Success)
             {
@@ -106,7 +106,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             Modal.Instance.Hide();
              
             var avatarService = EmergenceServiceProvider.GetService<IAvatarService>();
-            var updatedAvatars = await avatarService.AvatarsByOwnerAsync(EmergenceSingleton.Instance.GetCachedAddress());
+            var updatedAvatars = await avatarService.AvatarsByOwnerAsync(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress);
             if (updatedAvatars.Success)
             {
                 avatars = updatedAvatars.Result;

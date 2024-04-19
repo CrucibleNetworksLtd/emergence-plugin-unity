@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 
+using EmergenceSDK.Services;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace EmergenceSDK.InternalTesting
     public abstract class BaseTestWindow : EditorWindow
     {
         protected bool needsCleanUp;
-        protected static bool IsLoggedIn() => EmergenceSingleton.Instance.GetCachedAddress() != null;
+        protected static bool IsLoggedIn() => EmergenceServiceProvider.GetService<IWalletService>().IsLoggedIn;
 
         protected bool ReadyToTest(out string message)
         {

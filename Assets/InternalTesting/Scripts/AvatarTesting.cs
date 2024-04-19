@@ -27,7 +27,7 @@ namespace EmergenceSDK.InternalTesting
 
             if (GUILayout.Button("TestAvatarsByOwner"))
             {
-                EmergenceServiceProvider.GetService<IAvatarService>().AvatarsByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatarsIn) => avatars = avatarsIn, EmergenceLogger.LogError);
+                EmergenceServiceProvider.GetService<IAvatarService>().AvatarsByOwner(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, (avatarsIn) => avatars = avatarsIn, EmergenceLogger.LogError);
             }
             EditorGUILayout.LabelField("Retrieved Avatars:");
             foreach (var avatar in avatars)

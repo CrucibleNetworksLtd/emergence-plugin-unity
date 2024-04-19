@@ -144,13 +144,47 @@ namespace EmergenceSDK.Internal.Services
                 completedHandshake = true;
                 WalletAddress = processedResponse.address;
                 ChecksummedWalletAddress = processedResponse.checksummedAddress;
-                EmergenceSingleton.Instance.SetCachedAddress(processedResponse.address);
-                EmergenceSingleton.Instance.SetCachedChecksummedAddress(processedResponse.checksummedAddress);
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<string>(true, processedResponse.address);
             }
             WebRequestService.CleanupRequest(request);
             return new ServiceResponse<string>(false);
+        }
+
+        public void RunWithSpoofedWalletAddress(string walletAddress, string checksummedWalletAddress, Action action)
+        {
+            var oldWalletAddress = WalletAddress;
+            var oldChecksummedWalletAddress = ChecksummedWalletAddress;
+            WalletAddress = walletAddress;
+            ChecksummedWalletAddress = checksummedWalletAddress;
+
+            try
+            {
+                action.Invoke();
+            }
+            finally
+            {
+                WalletAddress = oldWalletAddress;
+                ChecksummedWalletAddress = oldChecksummedWalletAddress;
+            }
+        }
+
+        public async UniTask RunWithSpoofedWalletAddressAsync(string walletAddress, string checksummedWalletAddress, Func<UniTask> action)
+        {
+            var oldWalletAddress = WalletAddress;
+            var oldChecksummedWalletAddress = ChecksummedWalletAddress;
+            WalletAddress = walletAddress;
+            ChecksummedWalletAddress = checksummedWalletAddress;
+
+            try
+            {
+                await action();
+            }
+            finally
+            {
+                WalletAddress = oldWalletAddress;
+                ChecksummedWalletAddress = oldChecksummedWalletAddress;
+            }
         }
 
         public async UniTask Handshake(HandshakeSuccess success, ErrorCallback errorCallback)

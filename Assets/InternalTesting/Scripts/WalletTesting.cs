@@ -41,7 +41,7 @@ namespace EmergenceSDK.InternalTesting
             var messageToSign = "Test message";
             walletService.RequestToSign(messageToSign, message =>
             {
-                walletService.ValidateSignedMessage(messageToSign, message, EmergenceSingleton.Instance.GetCachedAddress(), isValid =>
+                walletService.ValidateSignedMessage(messageToSign, message, walletService.WalletAddress, isValid =>
                 {
                     EmergenceLogger.LogInfo($"Message is valid: {isValid}");
                 }, EmergenceLogger.LogError);

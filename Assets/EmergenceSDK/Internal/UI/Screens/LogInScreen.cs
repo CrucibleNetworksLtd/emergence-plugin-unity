@@ -222,10 +222,10 @@ namespace EmergenceSDK.Internal.UI.Screens
         private async UniTask<bool> AttemptFVLogin()
         {
             var fvService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            var linkedPassInfo = await fvService.GetLinkedFuturepass();
+            var linkedPassInfo = await fvService.GetLinkedFuturepassAsync();
             if (!linkedPassInfo.Success)
                 return false;
-            var fpass = await fvService.GetFuturepassInformation(linkedPassInfo.Result.ownedFuturepass);
+            var fpass = await fvService.GetFuturepassInformationAsync(linkedPassInfo.Result.ownedFuturepass);
             if (!fpass.Success)
                 return false;
             EmergenceLogger.LogInfo("Logged in with Futureverse.", true);
