@@ -85,7 +85,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/";
         }
 
-        public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepass()
+        public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync()
         {
             var walletService = EmergenceServiceProvider.GetService<IWalletService>();
             if (!walletService.IsLoggedIn)
@@ -108,7 +108,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return new ServiceResponse<LinkedFuturepassResponse>(true, fpResponse);
         }
 
-        public async UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturepassInformation(string futurepass)
+        public async UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturepassInformationAsync(string futurepass)
         {
             var url = $"{GetFuturePassApiUrl()}linked-eoa?futurepass={futurepass}";
 
@@ -370,7 +370,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
-        public async UniTask<ArtmStatus> GetArtmStatus(string transactionHash, int initialDelay, int refetchInterval, int maxRetries)
+        public async UniTask<ArtmStatus> GetArtmStatusAsync(string transactionHash, int initialDelay, int refetchInterval, int maxRetries)
         {
             int attempts = -1;
             while (attempts < maxRetries)
@@ -422,7 +422,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
                 request.SetRequestHeader("Content-Type", "application/json");
                 request.timeout = FutureverseSingleton.Instance.requestTimeout;
-                var nonceResponse = await WebRequestService.PerformAsyncWebRequest(request, (errorMessage, code) => { });
+                var nonceResponse = await WebRequestService.PerformAsyncWebRequest(request, (_, _) => { });
                 
                 if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseNonce(jObject, out var nonce))
                 {
@@ -446,7 +446,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
                 request.SetRequestHeader("Content-Type", "application/json");
                 request.timeout = FutureverseSingleton.Instance.requestTimeout;
-                var submitResponse = await WebRequestService.PerformAsyncWebRequest(request, (errorMessage, code) => { });
+                var submitResponse = await WebRequestService.PerformAsyncWebRequest(request, (_, _) => { });
                 
                 if (!IsArResponseValid(submitResponse, out var jObject) || !ParseTransactionHash(jObject, out transactionHash))
                 {
@@ -458,7 +458,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             EmergenceLogger.LogInfo("Transaction Hash: " + transactionHash);
 
             return retrieveStatus
-                ? new ArtmTransactionResponse(await ((IFutureverseService)this).GetArtmStatus(transactionHash, maxRetries: 5), transactionHash)
+                ? new ArtmTransactionResponse(await ((IFutureverseService)this).GetArtmStatusAsync(transactionHash, maxRetries: 5), transactionHash)
                 : new ArtmTransactionResponse(transactionHash);
 
             bool ParseNonce(JObject jObject, out int nonce)
@@ -476,7 +476,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             
             bool ParseTransactionHash(JObject jObject, out string hash)
             {
-                return (hash = (string)jObject.SelectToken("data.submitTransaction.transactionHash")) != null;
+                return (hash = (string)jObject.SelectToken("data.submitTransaction.transactionHash")) != null && hash.Trim() != "";
             }
         }
 
