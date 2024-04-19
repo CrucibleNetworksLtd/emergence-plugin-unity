@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class InventoryDemo : DemoStation<InventoryDemo>, IDemoStation
+    public class InventoryDemo : DemoStation<InventoryDemo>, ILoggedInDemoStation
     {
         [SerializeField] private GameObject itemEntryPrefab;
         [SerializeField] private GameObject contentGO;
@@ -80,7 +80,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 Cursor.visible = false;
             }
 
-            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible, SuccessInventoryByOwner, EmergenceLogger.LogError);
+            inventoryService.InventoryByOwner(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible, SuccessInventoryByOwner, EmergenceLogger.LogError);
         }
         
         private void SuccessInventoryByOwner(List<InventoryItem> inventoryItems)

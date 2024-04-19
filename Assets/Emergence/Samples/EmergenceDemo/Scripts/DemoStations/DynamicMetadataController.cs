@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class DynamicMetadataController : DemoStation<DynamicMetadataController>, IDemoStation
+    public class DynamicMetadataController : DemoStation<DynamicMetadataController>, ILoggedInDemoStation
     {
         public DeployedSmartContract deployedContract;
         private IDynamicMetadataService dynamicMetaDataService;

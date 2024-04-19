@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class WriteMethod : DemoStation<WriteMethod>, IDemoStation
+    public class WriteMethod : DemoStation<WriteMethod>, ILoggedInDemoStation
     {
         public DeployedSmartContract deployedContract;
 

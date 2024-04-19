@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class ReadMethod : DemoStation<ReadMethod>, IDemoStation
+    public class ReadMethod : DemoStation<ReadMethod>, ILoggedInDemoStation
     {
         public DeployedSmartContract deployedContract;
 
@@ -52,7 +52,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void ReadCurrentCount()
         {
             ContractInfo contractInfo = new ContractInfo(deployedContract, "GetCurrentCount");
-            ContractService.ReadMethod<string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() }, ReadMethodSuccess, EmergenceLogger.LogError);
+            ContractService.ReadMethod<string[]>(contractInfo, new string[] { EmergenceServiceProvider.GetService<IWalletService>().WalletAddress }, ReadMethodSuccess, EmergenceLogger.LogError);
         }
 
         public class ContractResponse

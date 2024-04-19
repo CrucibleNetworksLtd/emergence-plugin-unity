@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class MintAvatar : DemoStation<MintAvatar>, IDemoStation
+    public class MintAvatar : DemoStation<MintAvatar>, ILoggedInDemoStation
     {
         public DeployedSmartContract deployedContract;
 
