@@ -15,7 +15,6 @@ using UnityEngine.TestTools;
 
 namespace EmergenceSDK.Tests.Futureverse
 {
-    // TestFixture attribute denotes a class that contains tests
     [TestFixture]
     public class AssetRegistryTests
     {
@@ -31,7 +30,6 @@ namespace EmergenceSDK.Tests.Futureverse
             EmergenceServiceProvider.Unload();
         }
 
-        // Test attribute denotes a test method
         [Test]
         public void ParseAssetTree_ParsesCorrectly()
         {
@@ -133,25 +131,21 @@ namespace EmergenceSDK.Tests.Futureverse
             Assert.IsEmpty(thirdPath.Objects);
         }
 
-        // Test attribute denotes a test method
         [UnityTest]
         public IEnumerator GetAssetTreeAsync_PassesWithoutExceptions()
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
             var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
             return futureverseServiceInternal.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Development,
-                async () =>
-                {
-                    await futureverseService.GetAssetTreeAsync("473", "7672:root:303204");
-                    Assert.Pass("Success - IFutureverseService::GetAssetTreeAsync ran without throwing");
-                }).ToCoroutine();
+                async () => { await futureverseService.GetAssetTreeAsync("473", "7672:root:303204"); }).ToCoroutine();
         }
 
         [Test]
         public void GenerateArtm_GeneratesCorrectly()
         {
             #region ExpectedResult
-            const string expected = 
+
+            const string expected =
                 "Asset Registry transaction\n" +
                 "\n" +
                 "Message\n" +
@@ -174,15 +168,29 @@ namespace EmergenceSDK.Tests.Futureverse
                 "\n" +
                 "Address: Address\n" +
                 "Nonce: 123456789";
+
             #endregion
-            
+
             var result = ArtmBuilder.GenerateArtm("Message", new List<FutureverseArtmOperation>
             {
-                new (FutureverseArtmOperationType.CreateLink, "slot", "linkA", "linkB"),
-                new (FutureverseArtmOperationType.DeleteLink, "slot", "linkA", "linkB"),
+                new(FutureverseArtmOperationType.CreateLink, "slot", "linkA", "linkB"),
+                new(FutureverseArtmOperationType.DeleteLink, "slot", "linkA", "linkB"),
             }, "Address", 123456789);
-            
+
             Assert.AreEqual(expected, result);
+        }
+
+        [UnityTest]
+        public IEnumerator GetArtmStatusAsync_PassesWithoutExceptions()
+        {
+            var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+            var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
+            return futureverseServiceInternal.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Staging,
+                async () =>
+                {
+                    var artmStatusAsync = await futureverseService.GetArtmStatusAsync("0x69c94ea3e0e7dea32d2d00813a64017dfbbd42dd18f5d56a12c907dccc7bb6d9");
+                    Assert.Pass("Passed with transaction status: " + artmStatusAsync);
+                }).ToCoroutine();
         }
     }
 }

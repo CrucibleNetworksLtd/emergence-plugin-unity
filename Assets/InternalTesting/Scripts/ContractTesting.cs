@@ -43,7 +43,7 @@ namespace EmergenceSDK.InternalTesting
         {
             var contractInfo = new ContractInfo(readContract, readContractMethodName);
             EmergenceServiceProvider.GetService<IContractService>().ReadMethod(contractInfo,
-                new string[] { EmergenceSingleton.Instance.GetCachedAddress() },
+                new string[] { EmergenceServiceProvider.GetService<IWalletService>().WalletAddress },
                 (result) => EditorUtility.DisplayDialog("Read Method Result", "Result: " + result, "OK"),
                 EmergenceLogger.LogError);
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class SignMessage : DemoStation<SignMessage>, IDemoStation
+    public class SignMessage : DemoStation<SignMessage>, ILoggedInDemoStation
     {
         private IWalletService walletService;
 
@@ -58,7 +58,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             EmergenceLogger.LogInfo("Message signed succesfully: " + signedMessage, true);
             EmergenceLogger.LogInfo("Validating message...", true);
 
-            walletService.ValidateSignedMessage(message, signedMessage, EmergenceSingleton.Instance.GetCachedAddress(), isValid =>
+            walletService.ValidateSignedMessage(message, signedMessage, walletService.WalletAddress, isValid =>
             {
                 if (isValid)
                 {

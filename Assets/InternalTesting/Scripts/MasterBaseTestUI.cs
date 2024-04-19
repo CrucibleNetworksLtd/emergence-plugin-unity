@@ -49,7 +49,7 @@ namespace EmergenceSDK.InternalTesting
 
             if (IsLoggedIn())
             {
-                EditorGUILayout.LabelField("Signed in as: " + EmergenceSingleton.Instance.GetCachedAddress());
+                EditorGUILayout.LabelField("Signed in as: " + EmergenceServiceProvider.GetService<IWalletService>().WalletAddress);
                 return;
             }
 

@@ -31,14 +31,14 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
         /// </summary>
         /// <returns>A <see cref="ServiceResponse{T}"/> object wrapping a <see cref="LinkedFuturepassResponse"/></returns>
         /// <exception cref="WalletNotConnectedException">Thrown if there is no currently connected wallet</exception>
-        UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepass();
+        UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync();
         
         /// <summary>
         /// Get the Futurepass information for the passed Futurepass
         /// </summary>
         /// <param name="futurepass">Futurepass address</param>
         /// <returns>A <see cref="ServiceResponse{T}"/> object wrapping a <see cref="FuturepassInformationResponse"/></returns>
-        UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturepassInformation(string futurepass);
+        UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturepassInformationAsync(string futurepass);
         
         /// <summary>
         /// Retrieve the asset tree for the Token ID and Collection ID
@@ -55,7 +55,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
         /// </summary>
         /// <param name="message">The message for the ARTM to send</param>
         /// <param name="artmOperations">A list of FutureverseArtmOperation structs</param>
-        /// <param name="retrieveStatus">If true, this method will call <see cref="GetArtmStatus"/> with the default parameters to retrieve the status for the transaction.</param>
+        /// <param name="retrieveStatus">If true, this method will call <see cref="GetArtmStatusAsync"/> with the default parameters to retrieve the status for the transaction.</param>
         /// <returns>A <see cref="ArtmTransactionResponse"/> object, containing the transaction hash. If the transaction status was retrieved it will also be present.</returns>
         /// <exception cref="WalletNotConnectedException">Thrown if there is no currently connected wallet</exception>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
@@ -72,6 +72,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
         /// <returns><see cref="ArtmStatus"/> enum representing the transaction status</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the transaction status is unexpected</exception>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
-        UniTask<ArtmStatus> GetArtmStatus(string transactionHash, int initialDelay = 1000, int refetchInterval = 5000, int maxRetries = 3);
+        UniTask<ArtmStatus> GetArtmStatusAsync(string transactionHash, int initialDelay = 1000, int refetchInterval = 5000, int maxRetries = 3);
     }
 }

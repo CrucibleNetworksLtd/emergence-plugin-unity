@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using EmergenceSDK.EmergenceDemo.DemoStations;
+using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Internal.UI.Inventory;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -6,10 +8,11 @@ using EmergenceSDK.Types.Inventory;
 using Tweens;
 using UnityEngine;
 
-namespace EmergenceSDK.EmergenceDemo.DemoStations
+namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 {
-    public class InventoryDemo : DemoStation<InventoryDemo>, ILoggedInDemoStation
+    public class FutureverseInventoryDemo : DemoStation<FutureverseInventoryDemo>, ILoggedInDemoStation
     {
+        private IFutureverseService futureverseService;
         [SerializeField] private GameObject itemEntryPrefab;
         [SerializeField] private GameObject contentGO;
         [SerializeField] private GameObject scrollView;
@@ -31,6 +34,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Start()
         {
+            futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
             inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
             inventoryItemStore = new InventoryItemStore();
             
@@ -50,9 +54,17 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Update()
         {
-            if (HasBeenActivated() && IsReady)
+            if (HasBeenActivated() && IsReady && futureverseService.UsingFutureverse)
             {
                 ShowInventory();
+            }
+            else if (IsReady && !futureverseService.UsingFutureverse)
+            {
+                InstructionsText.text = "You must connect with Futurepass";
+            }
+            else if (IsReady && futureverseService.UsingFutureverse)
+            {
+                InstructionsText.text = ActiveInstructions;
             }
         }
 

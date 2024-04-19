@@ -27,8 +27,6 @@ namespace EmergenceSDK
         private UICursorHandler cursorHandler;
         private GameObject ui;
         private string accessToken;
-        private string address;
-        private string checksummedAddress;
         private InputAction closeAction;
 
         [Header("Keyboard shortcut to open Emergence")] 
@@ -101,28 +99,6 @@ namespace EmergenceSDK
             CursorHandler.RestoreCursor();
             EmergenceUIClosed.Invoke();
             EmergenceUIVisibilityChanged?.Invoke(false);
-        }
-
-        public string GetCachedAddress()
-        {
-            return address;
-        }
-
-        internal void SetCachedAddress(string _address)
-        {
-            EmergenceLogger.LogInfo("Setting cached address to: " + _address);
-            address = _address;
-        }
-
-        public string GetCachedChecksummedAddress()
-        {
-            return checksummedAddress;
-        }
-        
-        internal void SetCachedChecksummedAddress(string _checksummedAddress)
-        {
-            EmergenceLogger.LogInfo("Setting cached address to: " + _checksummedAddress);
-            checksummedAddress = _checksummedAddress;
         }
         
         private void OnEnable()

@@ -26,7 +26,7 @@ namespace EmergenceSDK.InternalTesting
             EditorGUILayout.LabelField("Test Inventory Service");
             
             if (GUILayout.Button("InventoryByOwner")) 
-                EmergenceServiceProvider.GetService<IInventoryService>().InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible, (inventory) => inventoryItems = inventory, EmergenceLogger.LogError);
+                EmergenceServiceProvider.GetService<IInventoryService>().InventoryByOwner(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible, (inventory) => inventoryItems = inventory, EmergenceLogger.LogError);
             
             EditorGUILayout.LabelField("Retrieved Inventory:");
             foreach (var item in inventoryItems)

@@ -85,7 +85,7 @@ namespace EmergenceSDK.Internal.UI.Personas
             go.GetComponent<AvatarScrollItem>().Refresh(DefaultImage, null);
             if (!cts.Token.IsCancellationRequested)
             {
-                AvatarService.AvatarsByOwner(EmergenceSingleton.Instance.GetCachedAddress(), (avatars) =>
+                AvatarService.AvatarsByOwner(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, (avatars) =>
                     {
                         ModalCancel.Instance.Show("Retrieving avatar images...", () =>
                         {
