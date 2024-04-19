@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EmergenceSDK.Integrations.Futureverse.Types
+namespace EmergenceSDK.Types.Exceptions
 {
     public class ExhaustedRequestAttemptsException : Exception
     {

@@ -14,6 +14,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Services.Interfaces;
 using EmergenceSDK.Types;
+using EmergenceSDK.Types.Exceptions;
 using EmergenceSDK.Types.Inventory;
 using EmergenceSDK.Types.Responses;
 using Newtonsoft.Json.Linq;
@@ -84,10 +85,16 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/";
         }
 
-        public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassInformation()
+        public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepass()
         {
+            var walletService = EmergenceServiceProvider.GetService<IWalletService>();
+            if (!walletService.IsLoggedIn)
+            {
+                throw new WalletNotConnectedException();
+            }
+            
             var url =
-                $"{GetFuturePassApiUrl()}linked-futurepass?eoa=1:EVM:{EmergenceServiceProvider.GetService<IWalletService>().WalletAddress}";
+                $"{GetFuturePassApiUrl()}linked-futurepass?eoa=1:EVM:{walletService.WalletAddress}";
 
             var response =
                 await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url,
@@ -101,14 +108,14 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return new ServiceResponse<LinkedFuturepassResponse>(true, fpResponse);
         }
 
-        public async UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturePassInformation(string futurepass)
+        public async UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturepassInformation(string futurepass)
         {
             var url = $"{GetFuturePassApiUrl()}linked-eoa?futurepass={futurepass}";
 
             var response =
                 await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url,
                     EmergenceLogger.LogError);
-            if (response.IsSuccess == false)
+            if (!response.IsSuccess)
                 return new ServiceResponse<FuturepassInformationResponse>(false);
 
             FuturepassInformationResponse fpResponse =
@@ -124,7 +131,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             var query = SerializationHelper.Serialize(new InventoryQuery(CombinedAddress));
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url,
                 EmergenceLogger.LogError, query);
-            if (response.IsSuccess == false)
+            if (!response.IsSuccess)
                 return new ServiceResponse<InventoryResponse>(false, new InventoryResponse());
 
             InventoryResponse fpResponse = SerializationHelper.Deserialize<InventoryResponse>(response.Response);
@@ -154,6 +161,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 newMetaContent.MimeType = node.metadata.properties.models?["glb"] != null ? "model/gltf-binary" : "image/png";
                 newItem.Meta.Content = new List<InventoryItemMetaContent>();
                 newItem.Meta.Content.Add(newMetaContent);
+                newItem.Meta.Attributes = new List<InventoryItemMetaAttributes>();
                 foreach (var kvp in node.metadata.attributes)
                 {
                     var inventoryItemMetaAttributes = new InventoryItemMetaAttributes
@@ -199,8 +207,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                             new Dictionary<string, FutureverseAssetTreeObject>()
                         );
 
-                        var dataObject = data as JObject;
-                        if (dataObject != null)
+                        if (data is JObject dataObject)
                         {
                             foreach (var property in dataObject.Properties())
                             {
@@ -252,6 +259,12 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             request.SetRequestHeader("Content-Type", "application/json");
             request.timeout = FutureverseSingleton.Instance.requestTimeout;
             var response = await WebRequestService.PerformAsyncWebRequest(request, (message, code) => { });
+            if (!IsArResponseValid(response, out var jObject))
+            {
+                LogArResponseErrors(jObject);
+                throw new FutureverseAssetRegisterErrorException(response.Response);
+            }
+            
             return ParseGetAssetTreeResponse(response);
         }
         
@@ -301,15 +314,10 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return SerializationHelper.Serialize(requestBody);
         }
 
-        private static bool IsArResponseValid(string body, out JObject jObject)
+        private static bool IsArResponseValid(WebResponse response, out JObject jToken)
         {
-            return (jObject = SerializationHelper.Parse(body) as JObject) != null;
-        }
-
-        private static bool IsArResponseValid(WebResponse response, out JObject jObject)
-        {
-            jObject = default;
-            return response.IsSuccess && response.StatusCode is >= 200 and <= 299 && IsArResponseValid(response.Response, out jObject);
+            jToken = default;
+            return response.IsSuccess && response.StatusCode is >= 200 and <= 299 && (jToken = SerializationHelper.Parse(response.Response) as JObject) != null;
         }
 
         private static void LogArResponseErrors(JObject jObject)
@@ -334,6 +342,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             }
         }
 
+        /// <exception cref="FutureverseAssetRegisterErrorException"></exception>
         async Task<GetArtmStatusResult> RetrieveArtmStatusAsync(string transactionHash)
         {
             {
@@ -341,12 +350,12 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
                 request.SetRequestHeader("Content-Type", "application/json");
                 request.timeout = FutureverseSingleton.Instance.requestTimeout;
-                var response = await WebRequestService.PerformAsyncWebRequest(request, (errorMessage, code) => { });
+                var response = await WebRequestService.PerformAsyncWebRequest(request, null);
                 
                 if (!IsArResponseValid(response, out var jObject) || !ParseStatus(jObject, out var transactionStatus))
                 {
                     LogArResponseErrors(jObject);
-                    return new (false, "");
+                    throw new FutureverseAssetRegisterErrorException(response.Response);
                 }
 
                 return new(true, transactionStatus);
@@ -359,22 +368,14 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             }
         }
         
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="transactionHash"></param>
-        /// <param name="initialDelay"></param>
-        /// <param name="refetchInterval"></param>
-        /// <param name="maxAttempts"></param>
-        /// <returns></returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="TransactionStillPendingException"></exception>
-        public async UniTask<ArtmStatus> GetArtmStatus(string transactionHash, int initialDelay = 1000, int refetchInterval = 5000, int maxAttempts = 3)
+        /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
+        public async UniTask<ArtmStatus> GetArtmStatus(string transactionHash, int initialDelay, int refetchInterval, int maxRetries)
         {
-            int attempts = 0;
-            while (attempts < maxAttempts)
+            int attempts = -1;
+            while (attempts < maxRetries)
             {
-                var delay = attempts > 0 ? refetchInterval : initialDelay;
+                var delay = attempts > -1 ? refetchInterval : initialDelay;
                 if (delay > 0)
                 {
                     await UniTask.Delay(delay);
@@ -399,19 +400,25 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 
                 attempts++;
             }
-            
-            throw new TransactionStillPendingException();
+
+            return ArtmStatus.Pending;
         }
         
-        public async UniTask<ArtmStatus?> SendArtmAsync(string message,
-            string eoaAddress,
-            List<FutureverseArtmOperation> artmOperations)
+        public async Task<ArtmTransactionResponse> SendArtmAsync(string message, List<FutureverseArtmOperation> artmOperations, bool retrieveStatus)
         {
+            var walletService = EmergenceServiceProvider.GetService<IWalletService>();
+
+            if (!walletService.IsLoggedIn)
+            {
+                throw new WalletNotConnectedException();
+            }
+
             string generatedArtm;
             string signature;
             
             {
-                var body = BuildGetNonceForChainAddressRequestBody(eoaAddress);
+                var address = walletService.ChecksummedWalletAddress;
+                var body = BuildGetNonceForChainAddressRequestBody(address);
                 using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
                 request.SetRequestHeader("Content-Type", "application/json");
                 request.timeout = FutureverseSingleton.Instance.requestTimeout;
@@ -420,14 +427,14 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseNonce(jObject, out var nonce))
                 {
                     LogArResponseErrors(jObject);
-                    return null;
+                    throw new FutureverseAssetRegisterErrorException(nonceResponse.Response);
                 }
 
-                generatedArtm = ArtmBuilder.GenerateArtm(message, artmOperations, eoaAddress, nonce);
-                var signatureResponse = await EmergenceServiceProvider.GetService<IWalletService>().RequestToSignAsync(generatedArtm);
+                generatedArtm = ArtmBuilder.GenerateArtm(message, artmOperations, address, nonce);
+                var signatureResponse = await walletService.RequestToSignAsync(generatedArtm);
                 if (!signatureResponse.Success)
                 {
-                    return null;
+                    throw new SignMessageFailedException(signatureResponse.Result);
                 }
 
                 signature = signatureResponse.Result;
@@ -444,21 +451,15 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 if (!IsArResponseValid(submitResponse, out var jObject) || !ParseTransactionHash(jObject, out transactionHash))
                 {
                     LogArResponseErrors(jObject);
-                    return null;
+                    throw new FutureverseAssetRegisterErrorException(submitResponse.Response);
                 }
             }
 
-            try
-            {
-                EmergenceLogger.LogInfo("Transaction Hash: " + transactionHash);
-                return await GetArtmStatus(transactionHash, maxAttempts: 5);
-            }
-            catch (ExhaustedRequestAttemptsException)
-            {
-                EmergenceLogger.LogWarning("Exhausted confirmation attempts");
-                throw;
-            }
+            EmergenceLogger.LogInfo("Transaction Hash: " + transactionHash);
 
+            return retrieveStatus
+                ? new ArtmTransactionResponse(await ((IFutureverseService)this).GetArtmStatus(transactionHash, maxRetries: 5), transactionHash)
+                : new ArtmTransactionResponse(transactionHash);
 
             bool ParseNonce(JObject jObject, out int nonce)
             {
