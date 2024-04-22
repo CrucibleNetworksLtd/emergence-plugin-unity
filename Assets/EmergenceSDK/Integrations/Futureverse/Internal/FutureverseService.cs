@@ -157,7 +157,8 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 newItem.Meta.Name = $"#{node.tokenId}";
                 newItem.Meta.Description = node.collection.name;
                 var newMetaContent = new InventoryItemMetaContent();
-                newMetaContent.URL = node.metadata.properties.image;
+                newMetaContent.URL = Helpers.InternalIPFSURLToHTTP(node.metadata.properties.image,
+                    "http://ipfs.openmeta.xyz/ipfs/");
                 newMetaContent.MimeType = node.metadata.properties.models?["glb"] != null ? "model/gltf-binary" : "image/png";
                 newItem.Meta.Content = new List<InventoryItemMetaContent>();
                 newItem.Meta.Content.Add(newMetaContent);
