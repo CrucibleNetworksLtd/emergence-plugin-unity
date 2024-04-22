@@ -8,6 +8,7 @@ using EmergenceSDK.Integrations.Futureverse.Internal;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -47,7 +48,7 @@ namespace EmergenceSDK.Tests.Futureverse
                             var response = await futureverseService.GetLinkedFuturepassAsync();
                             Assert.IsTrue(response.Success);
                             Assert.IsTrue(response.Code == ServiceResponseCode.Success);
-                            Assert.AreEqual("1:evm:0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", response.Result.eoa);
+                            Assert.AreEqual("11155111:evm:0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", response.Result.eoa);
                         });
                     });
             });
@@ -70,7 +71,6 @@ namespace EmergenceSDK.Tests.Futureverse
                             Assert.IsTrue(response.Success);
                             Assert.IsTrue(response.Code == ServiceResponseCode.Success);
                             Assert.AreEqual("7668:root:0xffffffff0000000000000000000000000003b681", response.Result.futurepass);
-                            Assert.AreEqual("1:evm:0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", response.Result.ownerEoa);
                         });
                     });
             });

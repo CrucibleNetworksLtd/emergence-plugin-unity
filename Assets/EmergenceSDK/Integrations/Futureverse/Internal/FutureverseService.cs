@@ -80,9 +80,34 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             }
         }
         
-        private string GetFuturePassApiUrl()
+        private string GetFuturepassApiUrl()
         {
+#if !DEVELOPMENT_BUILD && !UNITY_EDITOR
             return "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/";
+#else
+            return GetEnvironment() switch
+            {
+                FutureverseSingleton.Environment.Production => "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/",
+                FutureverseSingleton.Environment.Development => "https://y4heevnpik.execute-api.us-west-2.amazonaws.com/api/v1/",
+                FutureverseSingleton.Environment.Staging => "https://y4heevnpik.execute-api.us-west-2.amazonaws.com/api/v1/",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+#endif
+        }
+        
+        private string GetFuturepassChainId()
+        {
+#if !DEVELOPMENT_BUILD && !UNITY_EDITOR
+            return "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/";
+#else
+            return GetEnvironment() switch
+            {
+                FutureverseSingleton.Environment.Production => "1",
+                FutureverseSingleton.Environment.Development => "11155111",
+                FutureverseSingleton.Environment.Staging => "11155111",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+#endif
         }
 
         public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync()
@@ -94,7 +119,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             }
             
             var url =
-                $"{GetFuturePassApiUrl()}linked-futurepass?eoa=1:EVM:{walletService.WalletAddress}";
+                $"{GetFuturepassApiUrl()}linked-futurepass?eoa={GetFuturepassChainId()}:EVM:{walletService.WalletAddress}";
 
             var response =
                 await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url,
@@ -110,7 +135,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
         public async UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturepassInformationAsync(string futurepass)
         {
-            var url = $"{GetFuturePassApiUrl()}linked-eoa?futurepass={futurepass}";
+            var url = $"{GetFuturepassApiUrl()}linked-eoa?futurepass={futurepass}";
 
             var response =
                 await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url,
