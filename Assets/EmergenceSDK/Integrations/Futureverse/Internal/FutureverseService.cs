@@ -94,21 +94,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             };
 #endif
         }
-        
-        private string GetFuturepassChainId()
-        {
-#if !DEVELOPMENT_BUILD && !UNITY_EDITOR
-            return "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/";
-#else
-            return GetEnvironment() switch
-            {
-                FutureverseSingleton.Environment.Production => "1",
-                FutureverseSingleton.Environment.Development => "11155111",
-                FutureverseSingleton.Environment.Staging => "11155111",
-                _ => throw new ArgumentOutOfRangeException()
-            };
-#endif
-        }
 
         public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync()
         {
@@ -119,7 +104,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             }
             
             var url =
-                $"{GetFuturepassApiUrl()}linked-futurepass?eoa={GetFuturepassChainId()}:EVM:{walletService.WalletAddress}";
+                $"{GetFuturepassApiUrl()}linked-futurepass?eoa={EmergenceSingleton.Instance.Configuration.Chain.ChainID}:EVM:{walletService.WalletAddress}";
 
             var response =
                 await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url,
