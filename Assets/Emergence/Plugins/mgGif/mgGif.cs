@@ -408,7 +408,7 @@ namespace MG.GIF
             {
                 DecompressLZW();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

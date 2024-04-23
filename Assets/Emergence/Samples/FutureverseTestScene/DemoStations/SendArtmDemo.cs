@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.EmergenceDemo.DemoStations;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
@@ -39,11 +40,11 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
             instructionsGO.SetActive(false);
         }
 
-        private async void Update()
+        private void Update()
         {
             if (HasBeenActivated() && IsReady && futureverseService.UsingFutureverse)
             {
-                SendTestArtm();
+                SendTestArtm().Forget();
             }
             else if (IsReady && !futureverseService.UsingFutureverse)
             {
@@ -55,7 +56,7 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
             }
         }
 
-        private async void SendTestArtm()
+        private async UniTask SendTestArtm()
         {
             EmergenceLogger.LogInfo("Sending ARTM...", true);
 
