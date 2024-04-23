@@ -83,13 +83,13 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         private string GetFuturepassApiUrl()
         {
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
-            return "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/";
+            return "https://account-indexer.api.futurepass.futureverse.app/api/v1/";
 #else
             return GetEnvironment() switch
             {
-                FutureverseSingleton.Environment.Production => "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/",
-                FutureverseSingleton.Environment.Development => "https://y4heevnpik.execute-api.us-west-2.amazonaws.com/api/v1/",
-                FutureverseSingleton.Environment.Staging => "https://y4heevnpik.execute-api.us-west-2.amazonaws.com/api/v1/",
+                FutureverseSingleton.Environment.Production => "https://account-indexer.api.futurepass.futureverse.app/api/v1/",
+                FutureverseSingleton.Environment.Development => "https://account-indexer.api.futurepass.futureverse.dev/api/v1/",
+                FutureverseSingleton.Environment.Staging => "https://account-indexer.api.futurepass.futureverse.dev/api/v1/",
                 _ => throw new ArgumentOutOfRangeException()
             };
 #endif
