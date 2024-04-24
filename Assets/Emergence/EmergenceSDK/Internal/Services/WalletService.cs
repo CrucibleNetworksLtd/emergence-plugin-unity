@@ -6,6 +6,7 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using EmergenceSDK.Types.Responses;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
@@ -91,6 +92,11 @@ namespace EmergenceSDK.Internal.Services
             WebRequestService.CleanupRequest(request);
             if (requestSuccessful)
             {
+                if (processedResponse == null)
+                {
+                    EmergenceLogger.LogWarning("Request was successful but processedResponse was null, response body was: `" + request.downloadHandler.text + "`");
+                    return new ServiceResponse<string>(false);
+                }
                 return new ServiceResponse<string>(true, processedResponse.signedMessage);
             }
             return new ServiceResponse<string>(false);
