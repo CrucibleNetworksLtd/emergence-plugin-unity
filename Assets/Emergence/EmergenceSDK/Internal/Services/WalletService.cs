@@ -87,19 +87,25 @@ namespace EmergenceSDK.Internal.Services
                 return new ServiceResponse<string>(false);
             }
             EmergenceUtils.PrintRequestResult("RequestToSignWalletConnect", request);
-        
-            var requestSuccessful = EmergenceUtils.ProcessRequest<WalletSignMessage>(request, EmergenceLogger.LogError, out var processedResponse);
-            WebRequestService.CleanupRequest(request);
-            if (requestSuccessful)
+
+            try
             {
-                if (processedResponse == null)
+                var requestSuccessful = EmergenceUtils.ProcessRequest<WalletSignMessage>(request, EmergenceLogger.LogError, out var processedResponse);
+                if (requestSuccessful)
                 {
-                    EmergenceLogger.LogWarning("Request was successful but processedResponse was null, response body was: `" + request.downloadHandler.text + "`");
-                    return new ServiceResponse<string>(false);
+                    if (processedResponse == null)
+                    {
+                        EmergenceLogger.LogWarning("Request was successful but processedResponse was null, response body was: `" + request.downloadHandler.text + "`");
+                        return new ServiceResponse<string>(false);
+                    }
+                    return new ServiceResponse<string>(true, processedResponse.signedMessage);
                 }
-                return new ServiceResponse<string>(true, processedResponse.signedMessage);
+                return new ServiceResponse<string>(false);
             }
-            return new ServiceResponse<string>(false);
+            finally
+            {
+                WebRequestService.CleanupRequest(request);
+            }
         }
 
         public async UniTask RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback)
