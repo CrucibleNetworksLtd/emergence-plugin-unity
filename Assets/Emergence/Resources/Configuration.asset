@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: Configuration
   m_EditorClassIdentifier: 
   defaultIpfsGateway: http://ipfs.openmeta.xyz/ipfs/
-  Chain: {fileID: 11400000, guid: d5b7de099e9aa214eb68949414c5c485, type: 2}
+  DevelopmentChain: {fileID: 11400000, guid: d5b7de099e9aa214eb68949414c5c485, type: 2}
+  StagingChain: {fileID: 11400000, guid: d5b7de099e9aa214eb68949414c5c485, type: 2}
+  ProductionChain: {fileID: 11400000, guid: c4d23595a0717d247b1594d178716285, type: 2}

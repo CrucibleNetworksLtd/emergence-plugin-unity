@@ -6,7 +6,7 @@ using EmergenceSDK.Types.Delegates;
 
 namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
 {
-    public interface IWalletServiceInternal : IEmergenceService
+    internal interface IWalletServiceInternal : IEmergenceService
     {
         /// <summary>
         /// Attempts to handshake with the Emergence server, retrieving the wallet address if successful.

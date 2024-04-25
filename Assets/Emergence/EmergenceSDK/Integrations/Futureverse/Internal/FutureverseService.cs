@@ -12,7 +12,6 @@ using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Services.Interfaces;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Exceptions;
 using EmergenceSDK.Types.Inventory;
@@ -22,7 +21,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
-    internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, IDisconnectable
+    internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, IDisconnectableEmergenceService
     {
         public bool UsingFutureverse { get; private set; } = false;
 
@@ -35,49 +34,14 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
             return "https://ar-api.futureverse.app/graphql";
 #else
-            return GetEnvironment() switch
+            return EmergenceSingleton.Instance.Environment switch
             {
-                FutureverseSingleton.Environment.Production => "https://ar-api.futureverse.app/graphql",
-                FutureverseSingleton.Environment.Development => "https://ar-api.futureverse.dev/graphql",
-                FutureverseSingleton.Environment.Staging => "https://ar-api.futureverse.cloud/graphql",
+                EmergenceEnvironment.Production => "https://ar-api.futureverse.app/graphql",
+                EmergenceEnvironment.Development => "https://ar-api.futureverse.dev/graphql",
+                EmergenceEnvironment.Staging => "https://ar-api.futureverse.cloud/graphql",
                 _ => throw new ArgumentOutOfRangeException()
             };
 #endif
-        }
-
-        public FutureverseSingleton.Environment GetEnvironment()
-        {
-            return ForcedEnvironment ?? FutureverseSingleton.Instance.selectedEnvironment;
-        }
-
-        public FutureverseSingleton.Environment? ForcedEnvironment { get; set; }
-
-        public void RunInForcedEnvironment(FutureverseSingleton.Environment environment, Action action)
-        {
-            var prevForcedEnvironment = ForcedEnvironment;
-            ForcedEnvironment = environment;
-            try
-            {
-                action.Invoke();
-            }
-            finally
-            {
-                ForcedEnvironment = prevForcedEnvironment;
-            }
-        }
-
-        public async UniTask RunInForcedEnvironmentAsync(FutureverseSingleton.Environment environment, Func<UniTask> action)
-        {
-            var prevForcedEnvironment = ForcedEnvironment;
-            ForcedEnvironment = environment;
-            try
-            {
-                await action();
-            }
-            finally
-            {
-                ForcedEnvironment = prevForcedEnvironment;
-            }
         }
         
         private string GetFuturepassApiUrl()
@@ -85,11 +49,11 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
             return "https://account-indexer.api.futurepass.futureverse.app/api/v1/";
 #else
-            return GetEnvironment() switch
+            return EmergenceSingleton.Instance.Environment switch
             {
-                FutureverseSingleton.Environment.Production => "https://account-indexer.api.futurepass.futureverse.app/api/v1/",
-                FutureverseSingleton.Environment.Development => "https://account-indexer.api.futurepass.futureverse.dev/api/v1/",
-                FutureverseSingleton.Environment.Staging => "https://account-indexer.api.futurepass.futureverse.dev/api/v1/",
+                EmergenceEnvironment.Production => "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/",
+                EmergenceEnvironment.Development => "https://y4heevnpik.execute-api.us-west-2.amazonaws.com/api/v1/",
+                EmergenceEnvironment.Staging => "https://y4heevnpik.execute-api.us-west-2.amazonaws.com/api/v1/",
                 _ => throw new ArgumentOutOfRangeException()
             };
 #endif

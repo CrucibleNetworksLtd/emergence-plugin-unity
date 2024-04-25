@@ -20,8 +20,10 @@ namespace EmergenceSDK.Services
         event PersonaUpdated OnCurrentPersonaUpdated;
         
         /// <summary>
-        /// Attempts to get the current persona from the cache. Returns true if it was found, false otherwise.
+        /// Attempts to get the current persona from the cache.
         /// </summary>
+        /// <param name="currentPersona">The retrieved persona</param>
+        /// <returns>True if it was found, false otherwise</returns>
         bool GetCachedPersona(out Persona currentPersona);
     }
 }

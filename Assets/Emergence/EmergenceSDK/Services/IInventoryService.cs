@@ -12,11 +12,21 @@ namespace EmergenceSDK.Services
     public interface IInventoryService : IEmergenceService
     {
         /// <summary>
-        /// Attempts to retrieve the inventory of the given address on the given chain.
+        /// Attempts to retrieve the inventory of the given <paramref name="address"/> on the given <paramref name="address"/>.
         /// </summary>
+        /// <param name="address">Wallet address</param>
+        /// <param name="chain">Chain to check against</param>
+        /// <returns>A <see cref="List{T}"/> of <see cref="InventoryItem"/>s wrapped within a <see cref="ServiceResponse{T}"/></returns>
         UniTask<ServiceResponse<List<InventoryItem>>> InventoryByOwnerAsync(string address, InventoryChain chain);
+        
         /// <summary>
-        /// Attempts to retrieve the inventory of the given address on the given chain.
+        /// Attempts to retrieve the inventory of the given <paramref name="address"/> on the given <paramref name="address"/>
+        /// Callbacks are called when done
+        /// </summary>
+        /// <param name="address">Wallet address</param>
+        /// <param name="chain">Chain to check against</param>
+        /// <param name="success">Delegate of type <see cref="SuccessInventoryByOwner"/>, called in case of success</param>
+        /// <param name="errorCallback">Delegate of type <see cref="ErrorCallback"/>, called in case of failure</param>
         UniTask InventoryByOwner(string address, InventoryChain chain, SuccessInventoryByOwner success, ErrorCallback errorCallback);
     }
     

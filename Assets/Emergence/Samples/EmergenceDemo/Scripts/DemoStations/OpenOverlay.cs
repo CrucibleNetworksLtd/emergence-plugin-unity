@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Avatars;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -69,15 +70,15 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                     try
                     {
                         var token = SerializationHelper.Deserialize<EASMetadata[]>(response);
-                        DemoAvatarManager.Instance.SwapAvatars(GameObject.Find("PlayerArmature"),
-                            Helpers.InternalIPFSURLToHTTP(token[0].UriBase));
+                        SimpleAvatarSwapper.Instance.SwapAvatars(GameObject.Find("PlayerArmature"),
+                            Helpers.InternalIPFSURLToHTTP(token[0].UriBase)).Forget();
                     }
                     catch (JsonException) {}
                 }), EmergenceLogger.LogError);
             }
             else
             {
-                DemoAvatarManager.Instance.SetDefaultAvatar(GameObject.Find("PlayerArmature"));
+                SimpleAvatarSwapper.Instance.SetDefaultAvatar(GameObject.Find("PlayerArmature"));
             }
         }
     }

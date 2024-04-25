@@ -175,7 +175,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         private async UniTask<bool> RefreshQR()
         {
-            var qrResponse = await sessionServiceInternal.GetQRCodeAsync();
+            var qrResponse = await sessionServiceInternal.GetQrCodeAsync();
             if (!qrResponse.Success)
             {
                 EmergenceLogger.LogError("Error retrieving QR code.");

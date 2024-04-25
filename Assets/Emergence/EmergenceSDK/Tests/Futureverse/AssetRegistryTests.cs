@@ -8,6 +8,7 @@ using EmergenceSDK.Integrations.Futureverse.Internal;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
+using EmergenceSDK.Types;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEngine;
@@ -135,8 +136,7 @@ namespace EmergenceSDK.Tests.Futureverse
         public IEnumerator GetAssetTreeAsync_PassesWithoutExceptions()
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
-            return futureverseServiceInternal.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Development,
+            return EmergenceSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Development,
                 async () => { await futureverseService.GetAssetTreeAsync("473", "7672:root:303204"); }).ToCoroutine();
         }
 
@@ -184,8 +184,7 @@ namespace EmergenceSDK.Tests.Futureverse
         public IEnumerator GetArtmStatusAsync_PassesWithoutExceptions()
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
-            return futureverseServiceInternal.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Staging,
+            return EmergenceSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Staging,
                 async () =>
                 {
                     var artmStatusAsync = await futureverseService.GetArtmStatusAsync("0x69c94ea3e0e7dea32d2d00813a64017dfbbd42dd18f5d56a12c907dccc7bb6d9");

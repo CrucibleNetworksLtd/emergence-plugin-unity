@@ -65,13 +65,13 @@ namespace EmergenceSDK.Internal.Services
             return loadedContractAddresses.Contains(contractAddress);
         }
 
-        public async UniTask<ServiceResponse<ReadContractResponse>> ReadMethodAsync<T>(ContractInfo contractInfo, T body)
+        public async UniTask<ServiceResponse<ReadContractResponse>> ReadMethodAsync<T>(ContractInfo contractInfo, T parameters)
         {
             if (!await AttemptToLoadContract(contractInfo)) 
                 return new ServiceResponse<ReadContractResponse>(false);
             
             string url = contractInfo.ToReadUrl();
-            string dataString = SerializationHelper.Serialize(body, false);
+            string dataString = SerializationHelper.Serialize(parameters, false);
 
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString);
             if(response.IsSuccess == false)
@@ -80,9 +80,9 @@ namespace EmergenceSDK.Internal.Services
             return new ServiceResponse<ReadContractResponse>(true, readContractResponse.message);
         }
         
-        public async UniTask ReadMethod<T>(ContractInfo contractInfo, T body, ReadMethodSuccess success, ErrorCallback errorCallback)
+        public async UniTask ReadMethod<T>(ContractInfo contractInfo, T parameters, ReadMethodSuccess success, ErrorCallback errorCallback)
         {
-            var response = await ReadMethodAsync(contractInfo, body);
+            var response = await ReadMethodAsync(contractInfo, parameters);
             if(response.Success)
                 success?.Invoke(response.Result);
             else
@@ -90,35 +90,28 @@ namespace EmergenceSDK.Internal.Services
         }
 
         public async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsync<T>(ContractInfo contractInfo,
-            string localAccountNameIn, string gasPriceIn, string value, T body)
+            string value, T parameters)
         {
-            return await WriteMethodAsyncImpl<T>(contractInfo, localAccountNameIn, gasPriceIn, value, body, 0);
+            return await WriteMethodAsyncImpl(contractInfo, value, parameters, 0);
         }
-        
+
         private async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsyncRetry<T>(SerialisedWriteRequest<T> request)
         {
             if (request.Attempt <= MaxRetryAttempts)
-                return await WriteMethodAsyncImpl(request.ContractInfo, request.LocalAccountNameIn, request.GasPriceIn, request.Value, request.Body, ++request.Attempt);
+                return await WriteMethodAsyncImpl(request.ContractInfo, request.Value, request.Body, ++request.Attempt);
             return new ServiceResponse<WriteContractResponse>(false);
         }
         
-        public async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsyncImpl<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, int attempt)
+        public async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsyncImpl<T>(ContractInfo contractInfo, string value, T body, int attempt)
         {
             var switchChainResonse = await SwitchChain(contractInfo);
             if (!switchChainResonse.IsSuccess)
-                return await HandleWriteMethodError(switchChainResonse, new SerialisedWriteRequest<T>(contractInfo, localAccountNameIn, gasPriceIn, value, body, attempt));
+                return await HandleWriteMethodError(switchChainResonse, new SerialisedWriteRequest<T>(contractInfo, value, body, attempt));
             if (!await AttemptToLoadContract(contractInfo))
                 return new ServiceResponse<WriteContractResponse>(false);
             
             string gasPrice = String.Empty;
             string localAccountName = String.Empty;
-
-            if (!string.IsNullOrEmpty(gasPriceIn) && !string.IsNullOrEmpty(localAccountNameIn))
-            {
-                gasPrice = "&gasPrice=" + gasPriceIn;
-                localAccountName = "&localAccountName=" + localAccountNameIn;
-            }
-
             string url = contractInfo.ToWriteUrl(localAccountName, gasPrice, value);
             string dataString = SerializationHelper.Serialize(body, false);
             
@@ -127,7 +120,7 @@ namespace EmergenceSDK.Internal.Services
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString, headers);
             if(response.IsSuccess == false)
                 return await HandleWriteMethodError(response,
-                    new SerialisedWriteRequest<T>(contractInfo, localAccountNameIn, gasPriceIn, value, body, attempt));
+                    new SerialisedWriteRequest<T>(contractInfo, value, body, attempt));
 
             var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response.Response);
             CheckForTransactionSuccess(contractInfo, writeContractResponse.message.transactionHash).Forget();
@@ -176,15 +169,26 @@ namespace EmergenceSDK.Internal.Services
                 EmergenceLogger.LogWarning("Transaction failed to receive any confirmations");
         }
 
-        public async UniTask WriteMethod<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, WriteMethodSuccess success, ErrorCallback errorCallback)
+        public async UniTask WriteMethod<T>(ContractInfo contractInfo, string value, T parameters, WriteMethodSuccess success, ErrorCallback errorCallback)
         {
-            var response = await WriteMethodAsync(contractInfo, localAccountNameIn, gasPriceIn, value, body);
+            var response = await WriteMethodAsync(contractInfo, value, parameters);
             if(response.Success)
                 success?.Invoke(response.Result);
             else
                 errorCallback?.Invoke("Error in WriteMethod", (long)response.Code);
         }
 
+        public UniTask WriteMethod<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T parameters, WriteMethodSuccess success,
+            ErrorCallback errorCallback)
+        {
+            return WriteMethod(contractInfo, value, parameters, success, errorCallback);
+        }
+
+        public UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsync<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T parameters)
+        {
+            return WriteMethodAsync(contractInfo, value, parameters);
+        }
+        
         private class SwitchChainRequest
         {
             public int chainId;
@@ -221,17 +225,17 @@ namespace EmergenceSDK.Internal.Services
         private class SerialisedWriteRequest<T>
         {
             public readonly ContractInfo ContractInfo;
-            public readonly string LocalAccountNameIn;
-            public readonly string GasPriceIn;
+            // public readonly string LocalAccountNameIn;
+            // public readonly string GasPriceIn;
             public readonly string Value;
             public readonly T Body;
             public int Attempt;
             
-            public SerialisedWriteRequest(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T body, int attempt)
+            public SerialisedWriteRequest(ContractInfo contractInfo, string value, T body, int attempt)
             {
                 ContractInfo = contractInfo;
-                LocalAccountNameIn = localAccountNameIn;
-                GasPriceIn = gasPriceIn;
+                // LocalAccountNameIn = "";
+                // GasPriceIn = "";
                 Value = value;
                 Body = body;
                 Attempt = attempt;

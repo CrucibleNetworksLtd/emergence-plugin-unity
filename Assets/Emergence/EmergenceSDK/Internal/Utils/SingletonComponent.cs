@@ -40,7 +40,7 @@ namespace EmergenceSDK.Internal.Utils
                             _isCreatingDefaultComponent = true;
                             GameObject singletonGameObject = new GameObject { name = typeof(T).ToString() };
                             _instance = singletonGameObject.AddComponent<T>();
-
+                            _instance.InitializeDefault();
                             _isCreatingDefaultComponent = false;
                         }
                     }
@@ -49,6 +49,8 @@ namespace EmergenceSDK.Internal.Utils
                 }
             }
         }
+
+        protected virtual void InitializeDefault() { }
 
         public static bool IsInstanced
         {

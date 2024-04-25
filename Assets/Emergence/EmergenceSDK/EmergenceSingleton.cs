@@ -8,7 +8,7 @@ using EmergenceSDK.Types;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Environment = EmergenceSDK.ScriptableObjects.Environment;
+using UnityEngine.Serialization;
 
 namespace EmergenceSDK
 {
@@ -21,7 +21,8 @@ namespace EmergenceSDK
 
         public event Action OnGameClosing;
 
-        public Environment Environment = new Environment();
+        [FormerlySerializedAs("Environment")] [SerializeField] public EmergenceEnvironment environment;
+        public EmergenceEnvironment Environment => ForcedEnvironment ?? environment;
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
         private UICursorHandler cursorHandler;
@@ -55,6 +56,9 @@ namespace EmergenceSDK
         private ReconnectionQR reconnectionQR;
         public ReconnectionQR ReconnectionQR => reconnectionQR ??= GetComponentInChildren<ReconnectionQR>(true);
 
+        /// <summary>
+        /// Opens the Emergence Overlay
+        /// </summary>
         public void OpenEmergenceUI()
         {
             if (ScreenManager.Instance == null)
@@ -74,6 +78,36 @@ namespace EmergenceSDK
             }
         }
 
+        private EmergenceEnvironment? ForcedEnvironment { get; set; }
+
+        internal void RunInForcedEnvironment(EmergenceEnvironment environment, Action action)
+        {
+            var prevForcedEnvironment = ForcedEnvironment;
+            ForcedEnvironment = environment;
+            try
+            {
+                action.Invoke();
+            }
+            finally
+            {
+                ForcedEnvironment = prevForcedEnvironment;
+            }
+        }
+
+        internal async UniTask RunInForcedEnvironmentAsync(EmergenceEnvironment environment, Func<UniTask> action)
+        {
+            var prevForcedEnvironment = ForcedEnvironment;
+            ForcedEnvironment = environment;
+            try
+            {
+                await action();
+            }
+            finally
+            {
+                ForcedEnvironment = prevForcedEnvironment;
+            }
+        }
+        
         private void OpenOverlayFirstTime()
         {
             ui.SetActive(true);
@@ -88,6 +122,9 @@ namespace EmergenceSDK
             EmergenceUIVisibilityChanged?.Invoke(true);
         }
 
+        /// <summary>
+        /// Closes the Emergence Overlay
+        /// </summary>
         public void CloseEmergenceUI()
         {
             if (ScreenManager.Instance == null)
@@ -202,5 +239,10 @@ namespace EmergenceSDK
             }
         }
 #endif
+        protected override void InitializeDefault()
+        {
+            base.InitializeDefault();
+            Configuration = Resources.Load<EmergenceConfiguration>("Configuration");
+        }
     }
 }
