@@ -253,6 +253,11 @@ namespace EmergenceSDK.Internal.Services
                 errorCallback?.Invoke("Error in GetBalance.", (long)response.Code);
         }
 
+        public UniTask<ServiceResponse<bool>> ValidateSignedMessageAsync(string message, string signedMessage, string address)
+        {
+            return ValidateSignedMessageAsync(new ValidateSignedMessageRequest(message, signedMessage, address));
+        }
+
         public async UniTask<ServiceResponse<bool>> ValidateSignedMessageAsync(ValidateSignedMessageRequest data)
         {
             string dataString = SerializationHelper.Serialize(data, false);

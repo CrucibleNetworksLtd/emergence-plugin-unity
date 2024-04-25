@@ -13,11 +13,11 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class AvatarService : IAvatarService
     {
-        public async UniTask AvatarsByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback, CancellationCallback cancellationCallback = default, CancellationToken ct = default)
+        public async UniTask AvatarsByOwner(string address, SuccessAvatars success, ErrorCallback errorCallback, CancellationCallback cancellationCallback, CancellationToken ct)
         {
-            var response = await AvatarsByOwnerAsync(address, ct);
             try
             {
+                var response = await AvatarsByOwnerAsync(address, ct);
                 if(response.Success)
                     success?.Invoke(response.Result);
                 else
@@ -29,7 +29,7 @@ namespace EmergenceSDK.Internal.Services
             }
         }
         
-        public async UniTask<ServiceResponse<List<Avatar>>> AvatarsByOwnerAsync(string address, CancellationToken ct = default)
+        public async UniTask<ServiceResponse<List<Avatar>>> AvatarsByOwnerAsync(string address, CancellationToken ct)
         {
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "byOwner?address=" + address;
 
@@ -42,27 +42,36 @@ namespace EmergenceSDK.Internal.Services
             GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response.Response);
             return new ServiceResponse<List<Avatar>>(true, avatarResponse.message);
         }
-        
-        public async UniTask<ServiceResponse<Avatar>> AvatarByIdAsync(string id)
+
+        public async UniTask<ServiceResponse<Avatar>> AvatarByIdAsync(string id, CancellationToken ct)
         {
             EmergenceLogger.LogInfo($"AvatarByIdAsync: {id}");
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "id?id=" + id;
             
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError);
+            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError, ct: ct);
             if(response.IsSuccess == false)
                 return new ServiceResponse<Avatar>(false);
+            
+            ct.ThrowIfCancellationRequested();
             
             GetAvatarResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarResponse>(response.Response);
             return new ServiceResponse<Avatar>(true, avatarResponse.message);
         }
 
-        public async UniTask AvatarById(string id, SuccessAvatar success, ErrorCallback errorCallback)
+        public async UniTask AvatarById(string id, SuccessAvatar success, ErrorCallback errorCallback, CancellationCallback cancellationCallback, CancellationToken ct)
         {
-            var response = await AvatarByIdAsync(id);
-            if(response.Success)
-                success?.Invoke(response.Result);
-            else
-                errorCallback?.Invoke("Error in AvatarById.", (long)response.Code);
+            try
+            {
+                var response = await AvatarByIdAsync(id, ct: ct);
+                if(response.Success)
+                    success?.Invoke(response.Result);
+                else
+                    errorCallback?.Invoke("Error in AvatarById.", (long)response.Code);
+            }
+            catch (OperationCanceledException)
+            {
+                cancellationCallback?.Invoke();
+            }
         }
     }
 }

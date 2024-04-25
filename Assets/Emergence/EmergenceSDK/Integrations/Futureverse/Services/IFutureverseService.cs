@@ -16,12 +16,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
     public interface IFutureverseService : IEmergenceService
     {
         /// <summary>
-        /// Retrieves the current Futureverse environment
-        /// </summary>
-        /// <returns>The current environment configured in <see cref="FutureverseSingleton"/></returns>
-        FutureverseSingleton.Environment GetEnvironment();
-        
-        /// <summary>
         /// This property is set to true when Futureverse is enabled
         /// </summary>
         bool UsingFutureverse { get; }

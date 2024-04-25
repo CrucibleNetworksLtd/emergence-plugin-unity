@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
 {
-    public interface ISessionServiceInternal : IEmergenceService
+    internal interface ISessionServiceInternal : IEmergenceService
     {
         /// <summary>
         /// Set to true when mid way through a disconnect, disconnection can take a few seconds so this is useful for disabling UI elements for example
@@ -22,11 +22,11 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         /// <summary>
         /// Attempts to get the login QR code, it will return the QR code as a texture in the success callback
         /// </summary>
-        UniTask GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback);
+        UniTask GetQrCode(QRCodeSuccess success, ErrorCallback errorCallback);
         /// <summary>
         /// Attempts to get the login QR code
         /// </summary>
-        UniTask<ServiceResponse<Texture2D>> GetQRCodeAsync();
+        UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync();
 
         /// <summary>
         /// Attempts to disconnect the user from Emergence, the success callback will fire if successful

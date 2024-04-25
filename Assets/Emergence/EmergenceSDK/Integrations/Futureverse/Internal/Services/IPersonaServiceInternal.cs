@@ -6,9 +6,9 @@ using EmergenceSDK.Types.Delegates;
 
 namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
 {
-    public interface IPersonaServiceInternal : IEmergenceService
+    internal interface IPersonaServiceInternal : IEmergenceService
     {
-                /// <summary>
+        /// <summary>
         /// Attempts to create a new persona and confirms it was successful if the SuccessCreatePersona delegate is called
         /// </summary>
         UniTask CreatePersona(Persona persona, SuccessCreatePersona success, ErrorCallback errorCallback);

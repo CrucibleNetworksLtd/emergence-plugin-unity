@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 namespace EmergenceSDK.Internal.Services
 {
     //COMING SOON: Local EVM support
-    internal class LocalSessionService : SessionService
+    internal class LocalSessionEmergenceService : SessionEmergenceService
     {
         //Local EVM only
         public async UniTask Finish(SuccessFinish success, ErrorCallback errorCallback)

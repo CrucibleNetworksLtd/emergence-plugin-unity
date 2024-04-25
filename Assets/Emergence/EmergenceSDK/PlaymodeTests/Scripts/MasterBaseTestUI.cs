@@ -57,7 +57,7 @@ namespace EmergenceSDK.InternalTesting
             if (needToGenerateQR)
             {
                 needToGenerateQR = false;
-                EmergenceServiceProvider.GetService<ISessionServiceInternal>().GetQRCode(OnGetQRCodeSuccess, EmergenceLogger.LogError);
+                EmergenceServiceProvider.GetService<ISessionServiceInternal>().GetQrCode(OnGetQRCodeSuccess, EmergenceLogger.LogError);
             }
 
             if (displayQR)

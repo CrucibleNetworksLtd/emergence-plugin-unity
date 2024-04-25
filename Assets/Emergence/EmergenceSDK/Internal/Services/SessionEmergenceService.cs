@@ -4,7 +4,6 @@ using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Services.Interfaces;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using EmergenceSDK.Types.Responses;
@@ -13,7 +12,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class SessionService : ISessionService, ISessionServiceInternal, IDisconnectable
+    internal class SessionEmergenceService : ISessionService, ISessionServiceInternal, IDisconnectableEmergenceService
     {
         public string CurrentAccessToken { get; private set; } = string.Empty;
 
@@ -21,11 +20,11 @@ namespace EmergenceSDK.Internal.Services
         public event Action OnSessionDisconnected;
         private bool disconnectInProgress = false;
         
-        public SessionService()
+        public SessionEmergenceService()
         {
             OnSessionDisconnected += () =>
             {
-                foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectable>())
+                foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectableEmergenceService>())
                 {
                     disconnectable.HandleDisconnection();
                 }
@@ -118,7 +117,7 @@ namespace EmergenceSDK.Internal.Services
                 errorCallback?.Invoke("Error in Disconnect.", (long)response.Code);
         }
 
-        public async UniTask<ServiceResponse<Texture2D>> GetQRCodeAsync()
+        public async UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync()
         {
             string url = StaticConfig.APIBase + "qrcode";
 
@@ -152,9 +151,9 @@ namespace EmergenceSDK.Internal.Services
             return new ServiceResponse<Texture2D>(true, ((DownloadHandlerTexture)request.downloadHandler).texture);
         }
 
-        public async UniTask GetQRCode(QRCodeSuccess success, ErrorCallback errorCallback)
+        public async UniTask GetQrCode(QRCodeSuccess success, ErrorCallback errorCallback)
         {
-            var response = await GetQRCodeAsync();
+            var response = await GetQrCodeAsync();
             if(response.Success)
                 success?.Invoke(response.Result);
             else
@@ -186,5 +185,7 @@ namespace EmergenceSDK.Internal.Services
             else
                 errorCallback?.Invoke("Error in GetAccessToken.", (long)response.Code);
         }
+
+        public bool IsLoggedIn() => ((ISessionServiceInternal)this).CurrentAccessToken.Length != 0;
     }
 }

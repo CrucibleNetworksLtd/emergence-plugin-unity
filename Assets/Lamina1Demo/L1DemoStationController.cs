@@ -10,7 +10,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public class L1DemoStationController : MonoBehaviour
     {
-        private bool IsLoggedIn() => sessionServiceInternal.CurrentAccessToken.Length != 0;
+        private bool IsLoggedIn() => sessionService.IsLoggedIn();
         
         public DemoStation<OpenOverlay> openOverlay;
         public DemoStation<MintAvatar> mintAvatar;
@@ -18,7 +18,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         public DemoStation<L1ReadStation> l1ReadStation;
 
         private List<IDemoStation> stationsRequiringLogin;
-        private ISessionServiceInternal sessionServiceInternal;
+        private ISessionService sessionService;
 
         public async void Awake()
         {
@@ -38,7 +38,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         public void Start()
         {
-            sessionServiceInternal = EmergenceServiceProvider.GetService<ISessionServiceInternal>();
+            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
         }
 
         private void ActivateStations()

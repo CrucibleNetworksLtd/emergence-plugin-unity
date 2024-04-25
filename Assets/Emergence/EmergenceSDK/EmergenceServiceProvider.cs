@@ -31,9 +31,9 @@ namespace EmergenceSDK
             AddService(new ContractService());
             AddService(new ChainService());
             AddService(new FutureverseService());
-            var sessionServiceInternal = (ISessionServiceInternal)AddService(new SessionService());
+            var sessionServiceInternal = (ISessionServiceInternal)AddService(new SessionEmergenceService());
             AddService(new WalletService(sessionServiceInternal));
-            AddService(new PersonaService(sessionServiceInternal));
+            AddService(new PersonaEmergenceService(sessionServiceInternal));
         }
 
         private EmergenceServiceProvider()
@@ -55,11 +55,18 @@ namespace EmergenceSDK
         /// <summary>
         /// Gets the service of the specified type.
         /// </summary>
+        /// <typeparam name="T">The type of service to request, must implement <see cref="IEmergenceService"/></typeparam>
+        /// <returns>The requested service or null if not found</returns>
         public static T GetService<T>() where T : IEmergenceService
         {
             return Instance._services.OfType<T>().FirstOrDefault();
         }
         
+        /// <summary>
+        /// Gets all the services of the specified type.
+        /// </summary>
+        /// <typeparam name="T">The type of service to request, must implement <see cref="IEmergenceService"/></typeparam>
+        /// <returns>A <see cref="List{T}"/> of the matching services</returns>
         public static List<T> GetServices<T>()
         {
             return Instance._services.OfType<T>().ToList();

@@ -69,13 +69,13 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             {
                 var curMetadata = int.Parse(item.Meta.DynamicMetadata);
                 curMetadata++;
-                dynamicMetaDataService.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
+                dynamicMetaDataService.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId, "0iKoO1V2ZG98fPETreioOyEireDTYwby",
                     curMetadata.ToString(), UpdateDynamicMetadataSuccess, EmergenceLogger.LogError);
             }
             else
             {
                 var curMetadata = 1;
-                dynamicMetaDataService.WriteNewDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
+                dynamicMetaDataService.WriteNewDynamicMetadata(item.Blockchain, item.Contract, item.TokenId, "0iKoO1V2ZG98fPETreioOyEireDTYwby",
                     curMetadata.ToString(), UpdateDynamicMetadataSuccess, EmergenceLogger.LogError);
             }
 

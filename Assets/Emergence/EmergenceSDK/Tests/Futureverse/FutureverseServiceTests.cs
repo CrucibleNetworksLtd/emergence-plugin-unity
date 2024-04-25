@@ -34,28 +34,22 @@ namespace EmergenceSDK.Tests.Futureverse
         [Test]
         public void GetEnvironment_IsDevelopment()
         {
-            var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
-            futureverseServiceInternal.RunInForcedEnvironment(FutureverseSingleton.Environment.Development,
-                () => { Assert.AreEqual(FutureverseSingleton.Environment.Development, futureverseService.GetEnvironment()); });
+            EmergenceSingleton.Instance.RunInForcedEnvironment(EmergenceEnvironment.Development,
+                () => { Assert.AreEqual(EmergenceEnvironment.Development, EmergenceSingleton.Instance.Environment); });
         }
 
         [Test]
         public void GetEnvironment_IsStaging()
         {
-            var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
-            futureverseServiceInternal.RunInForcedEnvironment(FutureverseSingleton.Environment.Staging,
-                () => { Assert.AreEqual(FutureverseSingleton.Environment.Staging, futureverseService.GetEnvironment()); });
+            EmergenceSingleton.Instance.RunInForcedEnvironment(EmergenceEnvironment.Staging,
+                () => { Assert.AreEqual(EmergenceEnvironment.Staging, EmergenceSingleton.Instance.Environment); });
         }
 
         [Test]
         public void GetEnvironment_IsProduction()
         {
-            var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
-            futureverseServiceInternal.RunInForcedEnvironment(FutureverseSingleton.Environment.Production,
-                () => { Assert.AreEqual(FutureverseSingleton.Environment.Production, futureverseService.GetEnvironment()); });
+            EmergenceSingleton.Instance.RunInForcedEnvironment(EmergenceEnvironment.Production,
+                () => { Assert.AreEqual(EmergenceEnvironment.Production, EmergenceSingleton.Instance.Environment); });
         }
     }
 }

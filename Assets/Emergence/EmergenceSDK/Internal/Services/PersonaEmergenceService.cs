@@ -5,7 +5,6 @@ using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Services.Interfaces;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using EmergenceSDK.Types.Responses;
@@ -13,10 +12,10 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class PersonaService : IPersonaServiceInternal, IPersonaService, IDisconnectable
+    internal class PersonaEmergenceService : IPersonaServiceInternal, IPersonaService, IDisconnectableEmergenceService
     {
         public readonly ISessionServiceInternal SessionServiceInternal;
-        public PersonaService(ISessionServiceInternal sessionServiceInternal)
+        public PersonaEmergenceService(ISessionServiceInternal sessionServiceInternal)
         {
             SessionServiceInternal = sessionServiceInternal;
         }

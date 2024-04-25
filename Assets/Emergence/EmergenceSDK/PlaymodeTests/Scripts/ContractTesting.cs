@@ -51,8 +51,7 @@ namespace EmergenceSDK.InternalTesting
         private void WriteMethodPressed()
         {
             var contractInfo = new ContractInfo(writeContract, writeContractMethodName);
-            EmergenceServiceProvider.GetService<IContractService>().WriteMethod(contractInfo,
-                "", "", "0", new string[] { },
+            EmergenceServiceProvider.GetService<IContractService>().WriteMethod(contractInfo, "0", new string[] { },
                 (response) => EditorUtility.DisplayDialog("Write Method Response", "Response: " + response, "OK"),
                 EmergenceLogger.LogError);
         }

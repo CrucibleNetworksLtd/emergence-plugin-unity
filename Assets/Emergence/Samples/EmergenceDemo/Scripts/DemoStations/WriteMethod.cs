@@ -50,7 +50,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void IncrementCurrentCount()
         {
             var contractInfo = new ContractInfo(deployedContract, "IncrementCount");
-            ContractService.WriteMethod(contractInfo, "", "", "0", new string[] { }, WriteMethodSuccess, EmergenceLogger.LogError);
+            ContractService.WriteMethod(contractInfo, "0", new string[] { }, WriteMethodSuccess, EmergenceLogger.LogError);
         }
 
         private void WriteMethodSuccess(WriteContractResponse response)

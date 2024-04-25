@@ -36,11 +36,10 @@ namespace EmergenceSDK.Tests.Futureverse
         public IEnumerator GetLinkedFuturepassAsync_PassesWithoutExceptions()
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
             var walletServiceInternal = EmergenceServiceProvider.GetService<IWalletServiceInternal>();
             return UniTask.ToCoroutine(async () =>
             {
-                await futureverseServiceInternal.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Staging,
+                await EmergenceSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Staging,
                     async () =>
                     {
                         await walletServiceInternal.RunWithSpoofedWalletAddressAsync("0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", "0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c", async () =>
@@ -48,7 +47,7 @@ namespace EmergenceSDK.Tests.Futureverse
                             var response = await futureverseService.GetLinkedFuturepassAsync();
                             Assert.IsTrue(response.Success);
                             Assert.IsTrue(response.Code == ServiceResponseCode.Success);
-                            Assert.AreEqual("11155111:evm:0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", response.Result.eoa);
+                            Assert.AreEqual(EmergenceSingleton.Instance.Configuration.Chain.ChainID + ":evm:0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", response.Result.eoa);
                         });
                     });
             });
@@ -58,11 +57,10 @@ namespace EmergenceSDK.Tests.Futureverse
         public IEnumerator GetFuturepassInformationAsync_PassesWithoutExceptions()
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
             var walletServiceInternal = EmergenceServiceProvider.GetService<IWalletServiceInternal>();
             return UniTask.ToCoroutine(async () =>
             {
-                await futureverseServiceInternal.RunInForcedEnvironmentAsync(FutureverseSingleton.Environment.Staging,
+                await EmergenceSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Staging,
                     async () =>
                     {
                         await walletServiceInternal.RunWithSpoofedWalletAddressAsync("0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", "0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c", async () =>

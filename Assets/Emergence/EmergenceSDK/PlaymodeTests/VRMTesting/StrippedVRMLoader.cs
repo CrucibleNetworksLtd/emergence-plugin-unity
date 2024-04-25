@@ -1,4 +1,5 @@
-using EmergenceSDK.EmergenceDemo;
+using Cysharp.Threading.Tasks;
+using EmergenceSDK.Avatars;
 using EmergenceSDK.Internal.Utils;
 using UnityEngine;
 
@@ -18,8 +19,8 @@ namespace EmergenceSDK
                 var vrmUrl = vrmUrls[i];
                 GameObject playerArmature = Instantiate(playerPrefab, new Vector3(offset * -vrmUrls.Length / 2 + offset / 2 + i * offset, 0, 0), Quaternion.identity);
                 playerArmature.name = "Model " + i;
-                DemoAvatarManager.Instance.SwapAvatars(playerArmature, Helpers.InternalIPFSURLToHTTP(vrmUrl,
-                    "http://ipfs.openmeta.xyz/ipfs/"));
+                SimpleAvatarSwapper.Instance.SwapAvatars(playerArmature, Helpers.InternalIPFSURLToHTTP(vrmUrl,
+                    "http://ipfs.openmeta.xyz/ipfs/")).Forget();
             }
         }
     }
