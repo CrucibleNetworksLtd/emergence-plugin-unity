@@ -12,7 +12,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class SessionEmergenceService : ISessionService, ISessionServiceInternal, IDisconnectableEmergenceService
+    internal class SessionService : ISessionService, ISessionServiceInternal, IDisconnectableService
     {
         public string CurrentAccessToken { get; private set; } = string.Empty;
 
@@ -20,11 +20,11 @@ namespace EmergenceSDK.Internal.Services
         public event Action OnSessionDisconnected;
         private bool disconnectInProgress = false;
         
-        public SessionEmergenceService()
+        public SessionService()
         {
             OnSessionDisconnected += () =>
             {
-                foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectableEmergenceService>())
+                foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectableService>())
                 {
                     disconnectable.HandleDisconnection();
                 }

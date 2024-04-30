@@ -151,7 +151,7 @@ namespace EmergenceSDK.Avatars
             CancelAvatarSwaps(playerArmature);
 
             SkinnedMeshRenderer originalMesh = null;
-            if (playerArmature != null && (originalMesh = _originalMeshes[playerArmature]) == null)
+            if (playerArmature != null && !_originalMeshes.TryGetValue(playerArmature, out originalMesh))
             {
                 originalMesh = _originalMeshes[playerArmature] = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
             }

@@ -21,7 +21,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
-    internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, IDisconnectableEmergenceService
+    internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, IDisconnectableService
     {
         public bool UsingFutureverse { get; private set; } = false;
 

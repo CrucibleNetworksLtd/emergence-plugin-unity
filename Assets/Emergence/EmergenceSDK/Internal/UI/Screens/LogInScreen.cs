@@ -183,6 +183,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             }
 
             rawQRImage.texture = qrResponse.Result;
+            rawQRImage.texture.filterMode = FilterMode.Point;
             return true;
         }
         

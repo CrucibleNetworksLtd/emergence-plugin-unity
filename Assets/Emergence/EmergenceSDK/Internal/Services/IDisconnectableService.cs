@@ -5,7 +5,7 @@ namespace EmergenceSDK.Internal.Services
     /// <summary>
     /// Used for services that rely on some kind of connection that can be disconnected, like a session.
     /// </summary>
-    internal interface IDisconnectableEmergenceService : IEmergenceService
+    internal interface IDisconnectableService : IEmergenceService
     {
         /// <summary>
         /// The handler for when this service should be disconnected
