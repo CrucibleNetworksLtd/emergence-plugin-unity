@@ -35,9 +35,14 @@ namespace EmergenceSDK.Types
         
         private string GenerateAvatarId(Avatar avatar)
         {
-            if(avatar == null)
-                return "";
-            return $"{avatar.chain}:{avatar.contractAddress}:{avatar.tokenId}:{avatar.GUID}";
+            var isAvatarValid = 
+                    avatar is { chain: not null }
+                    && avatar.chain.Trim() != ""
+                    && avatar.contractAddress.Trim() != ""
+                    && avatar.tokenId.Trim() != ""
+                ;
+            
+            return isAvatarValid ? $"{avatar.chain}:{avatar.contractAddress}:{avatar.tokenId}:{avatar.GUID}" : "";
         }
 
         public override string ToString()

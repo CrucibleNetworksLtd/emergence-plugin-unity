@@ -12,10 +12,10 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class PersonaEmergenceService : IPersonaServiceInternal, IPersonaService, IDisconnectableEmergenceService
+    internal class PersonaService : IPersonaServiceInternal, IPersonaService, IDisconnectableService
     {
         public readonly ISessionServiceInternal SessionServiceInternal;
-        public PersonaEmergenceService(ISessionServiceInternal sessionServiceInternal)
+        public PersonaService(ISessionServiceInternal sessionServiceInternal)
         {
             SessionServiceInternal = sessionServiceInternal;
         }
@@ -126,19 +126,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> CreatePersonaAsync(Persona persona)
         {
-            if (persona.avatarId == null)
-            {
-                persona.avatarId = "";
-            }
-            else if (persona.avatarId.Length > 3)
-            {
-                if (persona.avatar != null)
-                {
-                    var avatarResponse = await UpdateAvatarOnPersonaEdit(persona);
-                    if(avatarResponse.Success == false)
-                        return new ServiceResponse(false);
-                }
-            }
+            await UpdateAvatarOnPersonaEdit(persona);
             
             string jsonPersona = SerializationHelper.Serialize(persona);
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
@@ -161,13 +149,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> EditPersonaAsync(Persona persona)
         {
-            // Fetch the current avatar GUID and add it to the avatarId field of the persona
-            if (persona.avatar != null)
-            {
-                var avatarResponse = await UpdateAvatarOnPersonaEdit(persona);
-                if(avatarResponse.Success == false)
-                    return new ServiceResponse(false);
-            }
+            await UpdateAvatarOnPersonaEdit(persona);
 
             string jsonPersona = SerializationHelper.Serialize(persona);
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
@@ -213,6 +195,18 @@ namespace EmergenceSDK.Internal.Services
 
         private static async UniTask<ServiceResponse> UpdateAvatarOnPersonaEdit(Persona persona)
         {
+            var isAvatarValid = 
+                persona.avatar is { chain: not null }
+                && persona.avatar.chain.Trim() != ""
+                && persona.avatar.contractAddress.Trim() != ""
+                && persona.avatar.tokenId.Trim() != ""
+                ;
+            
+            if (!isAvatarValid)
+            {
+                return new ServiceResponse(false);
+            }
+                
             string personaAvatarTokenUri = Helpers.InternalIPFSURLToHTTP(persona.avatar.tokenURI);
             UnityWebRequest tokenUriRequest = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, personaAvatarTokenUri, "");
             var response = await WebRequestService.PerformAsyncWebRequest(tokenUriRequest, EmergenceLogger.LogError);

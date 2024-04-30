@@ -156,7 +156,7 @@ namespace EmergenceSDK.Internal.Services
                     else
                     {
                         errorCallback?.Invoke(request.error, request.responseCode);
-                        return new WebResponse(false, request.error, request.responseCode);
+                        return new WebResponse(false, request.error, request.responseCode, request.downloadHandler);
                     }
                 }
                 catch (TimeoutException e)
