@@ -1,6 +1,9 @@
 using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Implementations.Login;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
+using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -15,7 +18,7 @@ namespace EmergenceSDK.Internal.Services
     {
         private bool completedHandshake = false;
 
-        public bool IsLoggedIn => WalletAddress != null && WalletAddress.Trim() != string.Empty &&
+        public bool IsValidWallet => WalletAddress != null && WalletAddress.Trim() != string.Empty &&
                                   ChecksummedWalletAddress != null && ChecksummedWalletAddress.Trim() != string.Empty;
 
         public string WalletAddress { get; private set; } = string.Empty;
@@ -117,27 +120,34 @@ namespace EmergenceSDK.Internal.Services
                 errorCallback?.Invoke("Error in RequestToSign.", (long)response.Code);
         }
 
-        public async UniTask<ServiceResponse<string>> HandshakeAsync()
+        public async UniTask<ServiceResponse<string>> HandshakeAsync(float timeout, CancellationToken ct)
         {
             string url = StaticConfig.APIBase + "handshake" + "?nodeUrl=" +
                          EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL;
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-        
+
             try
             {
-                var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError, timeout, ct: ct);
+                if (!response.IsSuccess)
                 {
-                    WebRequestService.CleanupRequest(request);
+                    if (response is TimeoutWebResponse timeoutResponse)
+                    {
+                        throw timeoutResponse.Exception;
+                    }
+
                     return new ServiceResponse<string>(false);
                 }
             }
-            catch (Exception)
+            catch (Exception e) when (e is not OperationCanceledException and not TimeoutException)
+            {
+                return new ServiceResponse<string>(false);
+            }
+            finally
             {
                 WebRequestService.CleanupRequest(request);
-                return new ServiceResponse<string>(false);
             }
         
             EmergenceUtils.PrintRequestResult("Handshake", request);
@@ -199,13 +209,25 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
-        public async UniTask Handshake(HandshakeSuccess success, ErrorCallback errorCallback)
+        public async UniTask Handshake(HandshakeSuccess success, ErrorCallback errorCallback, float timeout, CancellationCallback cancellationCallback,
+            CancellationToken ct = default)
         {
-            var response = await HandshakeAsync();
-            if(response.Success)
-                success?.Invoke(response.Result);
-            else
-                errorCallback?.Invoke("Error in Handshake.", (long)response.Code);
+            try
+            {
+                var response = await HandshakeAsync(timeout, ct);
+                if (response.Success)
+                    success?.Invoke(response.Result);
+                else
+                    errorCallback?.Invoke("Error in Handshake.", (long)response.Code);
+            }
+            catch (OperationCanceledException)
+            {
+                cancellationCallback?.Invoke();
+            }
+            catch (TimeoutException)
+            {
+                errorCallback?.Invoke("Handshake timed out.", (long)ServiceResponseCode.Failure);
+            }
         }
 
         public async UniTask<ServiceResponse<string>> GetBalanceAsync()

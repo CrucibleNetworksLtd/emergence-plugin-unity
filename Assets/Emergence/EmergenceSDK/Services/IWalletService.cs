@@ -22,7 +22,7 @@ namespace EmergenceSDK.Services
         /// <summary>
         /// Whether an address is currently logged in, checks WalletAddress and ChecksummedWalletAddress to not be empty
         /// </summary>
-        bool IsLoggedIn { get; }
+        bool IsValidWallet { get; }
         
         /// <summary>
         /// Attempts to sign a message using the walletconnect protocol, the success callback will return the signed message

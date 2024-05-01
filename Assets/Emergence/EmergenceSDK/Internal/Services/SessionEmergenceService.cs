@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Implementations.Login;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
+using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -117,21 +120,21 @@ namespace EmergenceSDK.Internal.Services
                 errorCallback?.Invoke("Error in Disconnect.", (long)response.Code);
         }
 
-        public async UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync()
+        public async UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync(CancellationToken ct)
         {
             string url = StaticConfig.APIBase + "qrcode";
 
             using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             try
             {
-                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError, ct: ct);
+                if (!response.IsSuccess)
                 {
                     WebRequestService.CleanupRequest(request);
                     return new ServiceResponse<Texture2D>(false);
                 }
             }
-            catch (Exception)
+            catch (Exception e) when (e is not OperationCanceledException) 
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<Texture2D>(false);
@@ -151,13 +154,20 @@ namespace EmergenceSDK.Internal.Services
             return new ServiceResponse<Texture2D>(true, ((DownloadHandlerTexture)request.downloadHandler).texture);
         }
 
-        public async UniTask GetQrCode(QRCodeSuccess success, ErrorCallback errorCallback)
+        public async UniTask GetQrCode(QRCodeSuccess success, ErrorCallback errorCallback, CancellationCallback cancellationCallback, CancellationToken ct)
         {
-            var response = await GetQrCodeAsync();
-            if(response.Success)
-                success?.Invoke(response.Result);
-            else
-                errorCallback?.Invoke("Error in GetQRCode.", (long)response.Code);
+            try
+            {
+                var response = await GetQrCodeAsync(ct);
+                if (response.Success)
+                    success?.Invoke(response.Result);
+                else
+                    errorCallback?.Invoke("Error in GetQRCode.", (long)response.Code);
+            }
+            catch (OperationCanceledException)
+            {
+                cancellationCallback?.Invoke();
+            }
         }
         
         public async UniTask<ServiceResponse<string>> GetAccessTokenAsync()

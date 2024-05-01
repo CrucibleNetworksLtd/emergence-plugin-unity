@@ -216,7 +216,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public UniTask Restart()
         {
-            LogInScreen.Instance.FullRestart();
+            LogInScreen.Instance.Restart();
             return ChangeState(ScreenStates.LogIn);
         }
     }

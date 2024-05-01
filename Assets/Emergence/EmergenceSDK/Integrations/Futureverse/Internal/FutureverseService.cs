@@ -23,7 +23,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
     internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, IDisconnectableEmergenceService
     {
-        public bool UsingFutureverse { get; private set; } = false;
+        public bool UsingFutureverse { get; set; }
 
         private FuturepassInformationResponse FuturepassInformation { get; set; }
 
@@ -58,13 +58,13 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             };
 #endif
         }
-
+        
         public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync()
         {
             var walletService = EmergenceServiceProvider.GetService<IWalletService>();
-            if (!walletService.IsLoggedIn)
+            if (!walletService.IsValidWallet)
             {
-                throw new WalletNotConnectedException();
+                throw new InvalidWalletException();
             }
             
             var url =
@@ -94,7 +94,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
             FuturepassInformationResponse fpResponse =
                 SerializationHelper.Deserialize<FuturepassInformationResponse>(response.Response);
-            UsingFutureverse = true;
             FuturepassInformation = fpResponse;
             return new ServiceResponse<FuturepassInformationResponse>(true, fpResponse);
         }
@@ -383,9 +382,9 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         {
             var walletService = EmergenceServiceProvider.GetService<IWalletService>();
 
-            if (!walletService.IsLoggedIn)
+            if (!walletService.IsValidWallet)
             {
-                throw new WalletNotConnectedException();
+                throw new InvalidWalletException();
             }
 
             string generatedArtm;

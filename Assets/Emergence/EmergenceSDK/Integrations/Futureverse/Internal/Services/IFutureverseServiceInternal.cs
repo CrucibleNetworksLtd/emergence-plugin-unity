@@ -12,6 +12,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
 {
     internal interface IFutureverseServiceInternal : IEmergenceService
     {
+        public bool UsingFutureverse { get; set; }
         UniTask<ServiceResponse<InventoryResponse>> GetFutureverseInventory();
         UniTask<ServiceResponse<List<InventoryItem>>> GetFutureverseInventoryAsInventoryItems();
         List<FutureverseAssetTreePath> ParseGetAssetTreeJson(string json);

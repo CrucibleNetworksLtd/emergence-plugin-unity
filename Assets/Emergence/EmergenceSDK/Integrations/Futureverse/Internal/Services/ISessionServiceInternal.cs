@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -22,11 +23,11 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         /// <summary>
         /// Attempts to get the login QR code, it will return the QR code as a texture in the success callback
         /// </summary>
-        UniTask GetQrCode(QRCodeSuccess success, ErrorCallback errorCallback);
+        UniTask GetQrCode(QRCodeSuccess success, ErrorCallback errorCallback, CancellationCallback cancellationCallback = default, CancellationToken ct = default);
         /// <summary>
         /// Attempts to get the login QR code
         /// </summary>
-        UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync();
+        UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync(CancellationToken ct = default);
 
         /// <summary>
         /// Attempts to disconnect the user from Emergence, the success callback will fire if successful

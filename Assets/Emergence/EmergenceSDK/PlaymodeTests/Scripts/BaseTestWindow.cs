@@ -9,7 +9,7 @@ namespace EmergenceSDK.InternalTesting
     public abstract class BaseTestWindow : EditorWindow
     {
         protected bool needsCleanUp;
-        protected static bool IsLoggedIn() => EmergenceServiceProvider.GetService<IWalletService>().IsLoggedIn;
+        protected static bool IsLoggedIn() => EmergenceServiceProvider.GetService<IWalletService>().IsValidWallet;
 
         protected bool ReadyToTest(out string message)
         {

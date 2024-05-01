@@ -605,6 +605,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3239401303305131987}
   - component: {fileID: 3239401303305131986}
+  - component: {fileID: 8019723250692039039}
   m_Layer: 5
   m_Name: 2 - Log in
   m_TagString: Untagged
@@ -648,89 +649,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f57d611dba4d5e845b21acad9e7789fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rawQRImage: {fileID: 3239401303820466794}
+  loginManager: {fileID: 8019723250692039039}
+  rawQrImage: {fileID: 1732145247771848164}
   backButton: {fileID: 2096571863748915045}
   refreshCounterText: {fileID: 3239401304280372750}
+  refreshText: {fileID: 3239401305207420890}
   qrScreen: {fileID: 5435868443297538998}
   futureverseScreen: {fileID: 8999934848240542198}
   startupScreen: {fileID: 2412153247935832932}
-  LoginWithFV: {fileID: 617189775883837140}
-  LoginWithWC: {fileID: 8494673748350320234}
-  CreateFPass: {fileID: 1805932965639632804}
-  RetryFPassCheck: {fileID: 9153862394433474733}
---- !u!1 &3239401303820466804
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3239401303820466795}
-  - component: {fileID: 3239401303820466793}
-  - component: {fileID: 3239401303820466794}
-  m_Layer: 5
-  m_Name: QR RawImage
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &3239401303820466795
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3239401303820466804}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5303407070214721048}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -73}
-  m_SizeDelta: {x: 330, y: 330}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &3239401303820466793
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3239401303820466804}
-  m_CullTransparentMesh: 0
---- !u!114 &3239401303820466794
+  loginWithFv: {fileID: 617189775883837140}
+  loginWithWc: {fileID: 8494673748350320234}
+  createFPass: {fileID: 1805932965639632804}
+  retryFPassCheck: {fileID: 9153862394433474733}
+--- !u!114 &8019723250692039039
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3239401303820466804}
+  m_GameObject: {fileID: 3239401303305131996}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Script: {fileID: 11500000, guid: 18ef70b30d68416c88c31b173e2df606, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
+  loginStartedEvent:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 0}
-  m_UVRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+  loginCancelledEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  loginFailedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  loginSuccessfulEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  loginStepUpdatedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  loginEndedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  qrCodeTickEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3239401304280372744
 GameObject:
   m_ObjectHideFlags: 0
@@ -761,8 +724,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5303407070214721048}
-  m_RootOrder: 3
+  m_Father: {fileID: 6139309443382126376}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
@@ -1305,8 +1268,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5303407070214721048}
-  m_RootOrder: 2
+  m_Father: {fileID: 6139309443382126376}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
@@ -1439,7 +1402,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5303407070214721048}
+  - {fileID: 6139309443382126376}
   - {fileID: 3239401304903296041}
   - {fileID: 3239401304476135716}
   - {fileID: 3239401304928483319}
@@ -1696,6 +1659,79 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &5139066047510352939
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2133134478027967172}
+  - component: {fileID: 3517885301363876041}
+  - component: {fileID: 1732145247771848164}
+  m_Layer: 5
+  m_Name: QrCode
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2133134478027967172
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5139066047510352939}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2084058908897143489}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -60, y: -60}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &3517885301363876041
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5139066047510352939}
+  m_CullTransparentMesh: 1
+--- !u!114 &1732145247771848164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5139066047510352939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
 --- !u!1 &5435868443297538998
 GameObject:
   m_ObjectHideFlags: 0
@@ -1704,16 +1740,16 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5303407070214721048}
+  - component: {fileID: 6139309443382126376}
   m_Layer: 0
   m_Name: QRScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &5303407070214721048
-Transform:
+  m_IsActive: 1
+--- !u!224 &6139309443382126376
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1725,12 +1761,16 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2084058908897143489}
-  - {fileID: 3239401303820466795}
   - {fileID: 3239401305207420891}
   - {fileID: 3239401304280372751}
   m_Father: {fileID: 3239401305376179650}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &5861926417628051570
 GameObject:
   m_ObjectHideFlags: 0
@@ -1760,8 +1800,9 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5303407070214721048}
+  m_Children:
+  - {fileID: 2133134478027967172}
+  m_Father: {fileID: 6139309443382126376}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
