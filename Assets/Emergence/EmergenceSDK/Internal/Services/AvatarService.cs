@@ -34,10 +34,10 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "byOwner?address=" + address;
 
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError, ct: ct);
+            ct.ThrowIfCancellationRequested();
+            
             if(response.IsSuccess == false)
                 return new ServiceResponse<List<Avatar>>(false);
-
-            ct.ThrowIfCancellationRequested();
             
             GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response.Response);
             return new ServiceResponse<List<Avatar>>(true, avatarResponse.message);
