@@ -4,6 +4,7 @@ using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
+using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using UnityEditor;
 using UnityEngine;
@@ -54,6 +55,7 @@ namespace EmergenceSDK
         public EmergenceLogger.LogLevel LogLevel;
         
         private ReconnectionQR reconnectionQR;
+        private ISessionService sessionService;
         public ReconnectionQR ReconnectionQR => reconnectionQR ??= GetComponentInChildren<ReconnectionQR>(true);
 
         /// <summary>
@@ -70,6 +72,12 @@ namespace EmergenceSDK
                 if (!ScreenManager.Instance.IsVisible)
                 {
                     ScreenManager.Instance.gameObject.SetActive(true);
+                    
+                    if (sessionService.IsLoggedIn && ScreenManager.Instance.ScreenState < ScreenManager.ScreenStates.Dashboard)
+                    {
+                        ScreenManager.Instance.ShowDashboard().Forget();
+                    }
+                    
                     CursorHandler.SaveCursor();
                     CursorHandler.UpdateCursor();
                     EmergenceUIOpened.Invoke();
@@ -148,8 +156,9 @@ namespace EmergenceSDK
             closeAction.Disable();
         }
 
-        private new void Awake() 
+        private new void Awake()
         {
+            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
             closeAction = new InputAction("CloseAction", binding: "<Keyboard>/escape");
             closeAction.performed += _ => CloseUI();
             

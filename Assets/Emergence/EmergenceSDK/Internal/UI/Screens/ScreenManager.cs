@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using EmergenceSDK.Implementations.Login;
 using EmergenceSDK.Internal.UI.Personas;
 using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -56,7 +57,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         private InputAction escAction;
 
-        private enum ScreenStates
+        internal enum ScreenStates
         {
             WaitForServer,
             Welcome,
@@ -66,7 +67,8 @@ namespace EmergenceSDK.Internal.UI.Screens
             Collection,
         }
 
-        private ScreenStates state = ScreenStates.WaitForServer;
+        internal ScreenStates ScreenState { get; set; } = ScreenStates.WaitForServer;
+        private ISessionService sessionService;
 
         public static ScreenManager Instance { get; private set; }
 
@@ -76,6 +78,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             Instance = this;
 
+            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
             EscButton.onClick.AddListener(OnEscButtonPressed);
             EscButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
             EscButtonLogin.onClick.AddListener(() =>
@@ -126,7 +129,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             
             personaUIManager = new PersonaUIManager(DashboardScreen.GetComponent<DashboardScreen>(), PersonaButtonPool, PersonaCarousel, PersonaScrollContents);
 
-            await ChangeState(state);
+            await ChangeState(ScreenState);
         }
 
         private async UniTask ChangeState(ScreenStates newState)
@@ -138,9 +141,9 @@ namespace EmergenceSDK.Internal.UI.Screens
             DisconnectModal.SetActive(false);
             MyCollectionScreen.SetActive(false);
 
-            state = newState;
+            ScreenState = newState;
 
-            switch (state)
+            switch (ScreenState)
             {
                 case ScreenStates.WaitForServer:
                     // TODO modal
@@ -191,6 +194,12 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public async UniTask ShowWelcome()
         {
+            if (sessionService.IsLoggedIn)
+            {
+                await ShowDashboard();
+                return;
+            }
+            
             if (PlayerPrefs.GetInt(StaticConfig.HasLoggedInOnceKey, 0) > 0)
             {
                 await ShowLogIn();
