@@ -28,7 +28,7 @@ namespace EmergenceSDK.Implementations.Login.UI
             loginManager.qrCodeTickEvent.AddListener(SetTimeRemainingText);
             loginManager.loginStartedEvent.AddListener(HandleLoginStarted);
             loginManager.loginCancelledEvent.AddListener((_) => { gameObject.SetActive(false); });
-            loginManager.loginErrorEvent.AddListener((manager, container) =>
+            loginManager.loginFailedEvent.AddListener((manager, container) =>
             {
                 HandleLoginErrors(manager, container);
                 gameObject.SetActive(false);

@@ -22,7 +22,7 @@ namespace EmergenceSDK.Implementations.Login
 
         public LoginStartedEvent loginStartedEvent;
         public LoginCancelledEvent loginCancelledEvent;
-        [FormerlySerializedAs("loginFailedEvent")] public LoginFailedEvent loginErrorEvent;
+        public LoginFailedEvent loginFailedEvent;
         public LoginSuccessfulEvent loginSuccessfulEvent;
         public LoginStepUpdatedEvent loginStepUpdatedEvent;
         public LoginEndedEvent loginEndedEvent;
@@ -94,7 +94,7 @@ namespace EmergenceSDK.Implementations.Login
         {
             loginStartedEvent.RemoveAllListeners();
             loginCancelledEvent.RemoveAllListeners();
-            loginErrorEvent.RemoveAllListeners();
+            loginFailedEvent.RemoveAllListeners();
             loginSuccessfulEvent.RemoveAllListeners();
             loginStepUpdatedEvent.RemoveAllListeners();
             loginEndedEvent.RemoveAllListeners();
@@ -120,7 +120,7 @@ namespace EmergenceSDK.Implementations.Login
         private void InvokeLoginFailedEvent(Exception e)
         {
             var loginExceptionContainer = new LoginExceptionContainer(e);
-            loginErrorEvent.Invoke(this, loginExceptionContainer);
+            loginFailedEvent.Invoke(this, loginExceptionContainer);
             loginExceptionContainer.ThrowIfUnhandled();
         }
 

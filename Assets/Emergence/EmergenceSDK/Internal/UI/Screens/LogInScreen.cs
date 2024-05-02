@@ -59,7 +59,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             loginManager.loginStartedEvent.AddListener(HandleLoginStarted);
             loginManager.loginCancelledEvent.AddListener((_) => { Restart(); });
             loginManager.loginEndedEvent.AddListener((_) => { SetLoginButtonsInteractable(true); });
-            loginManager.loginErrorEvent.AddListener(HandleLoginErrors);
+            loginManager.loginFailedEvent.AddListener(HandleLoginErrors);
 
             loginManager.loginStepUpdatedEvent.AddListener((_, loginStep, stepPhase) =>
             {
