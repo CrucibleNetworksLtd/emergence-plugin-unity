@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Implementations.Login;
 using EmergenceSDK.Internal.UI.Personas;
 using EmergenceSDK.Internal.Utils;
 using UnityEngine;
@@ -77,7 +78,13 @@ namespace EmergenceSDK.Internal.UI.Screens
 
             EscButton.onClick.AddListener(OnEscButtonPressed);
             EscButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
-            EscButtonLogin.onClick.AddListener(OnEscButtonPressed);
+            EscButtonLogin.onClick.AddListener(() =>
+            {
+                if (EscButtonLogin.GetComponentInParent<LoginManager>()?.IsLoggingIn != true)
+                {
+                    OnEscButtonPressed();
+                }
+            });
 
             PersonasToggle.onValueChanged.AddListener(OnPersonaButtonPressed);
             CollectionToggle.onValueChanged.AddListener(OnCollectionButtonPressed);

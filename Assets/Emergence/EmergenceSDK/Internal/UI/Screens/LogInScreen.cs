@@ -48,7 +48,8 @@ namespace EmergenceSDK.Internal.UI.Screens
             
             loginWithFv.onClick.AddListener(LoginWithFvClicked);
             loginWithWc.onClick.AddListener(LoginWithWcClicked);
-            
+            backButton.onClick.AddListener(() => loginManager.CancelLogin());
+
             createFPass.onClick.AddListener(CreateFPassClicked);
             retryFPassCheck.onClick.AddListener(RetryFPassCheckClicked);
             
