@@ -9668,7 +9668,8 @@ MonoBehaviour:
   MyCollectionScreen: {fileID: 5832855823506862652}
   EscButton: {fileID: 5832855823994040414}
   EscButtonOnboarding: {fileID: 8168155526559776230}
-  EscButtonLogin: {fileID: 623279802713092118}
+  EscButtonLogin: {fileID: 3068381154126639833}
+  BackButtonLogin: {fileID: 623279802713092118}
   PersonasButton: {fileID: 5832855824579509528}
   CollectionButton: {fileID: 5832855823323073235}
   PersonasToggle: {fileID: 5832855823827139460}
@@ -23580,6 +23581,18 @@ PrefabInstance:
 --- !u!114 &623279802713092118 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2096571863748915045, guid: 328e981e2b21a4e1b8d2862ac3570ed3,
+    type: 3}
+  m_PrefabInstance: {fileID: 1566919162435379059}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3068381154126639833 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4551948221115411882, guid: 328e981e2b21a4e1b8d2862ac3570ed3,
     type: 3}
   m_PrefabInstance: {fileID: 1566919162435379059}
   m_PrefabAsset: {fileID: 0}

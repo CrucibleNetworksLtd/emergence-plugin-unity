@@ -6,6 +6,7 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace EmergenceSDK.Internal.UI.Screens
@@ -35,6 +36,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         public Button EscButton;
         public Button EscButtonOnboarding;
         public Button EscButtonLogin;
+        public Button BackButtonLogin;
         public Button PersonasButton;
         public Button CollectionButton;
         public Toggle PersonasToggle;
@@ -81,9 +83,10 @@ namespace EmergenceSDK.Internal.UI.Screens
             sessionService = EmergenceServiceProvider.GetService<ISessionService>();
             EscButton.onClick.AddListener(OnEscButtonPressed);
             EscButtonOnboarding.onClick.AddListener(OnEscButtonPressed);
-            EscButtonLogin.onClick.AddListener(() =>
+            EscButtonLogin.onClick.AddListener(OnEscButtonPressed);
+            BackButtonLogin.onClick.AddListener(() =>
             {
-                if (EscButtonLogin.GetComponentInParent<LoginManager>()?.IsLoggingIn != true)
+                if (BackButtonLogin.GetComponentInParent<LoginManager>()?.IsLoggingIn != true)
                 {
                     OnEscButtonPressed();
                 }
@@ -110,7 +113,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             EscButton.onClick.RemoveListener(OnEscButtonPressed);
             EscButtonOnboarding.onClick.RemoveListener(OnEscButtonPressed);
-            EscButtonLogin.onClick.RemoveListener(OnEscButtonPressed);
+            BackButtonLogin.onClick.RemoveListener(OnEscButtonPressed);
 
             PersonasToggle.onValueChanged.RemoveListener(OnPersonaButtonPressed);
             CollectionToggle.onValueChanged.RemoveListener(OnCollectionButtonPressed);
