@@ -6,6 +6,7 @@ using EmergenceSDK.Implementations.Login.Exceptions;
 using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
@@ -15,17 +16,69 @@ using UnityEngine.Serialization;
 
 namespace EmergenceSDK.Implementations.Login
 {
+    /// <summary>
+    /// This is designed to merely be a UI LoginManager, exposing the login flow for usage with custom UIs.<para/>
+    /// Performing any business logic with this class is not recommended, for connection and disconnection logic
+    /// you should take a look at <see cref="ISessionService"/>, specifically <see cref="ISessionService.OnSessionConnected"/>
+    /// and <see cref="ISessionService.OnSessionDisconnected"/>
+    /// <remarks>Note that while it is possible to configure whether the <see cref="LoginManager"/> should automatically cancel login attempts when getting disabled,
+    /// they will always be automatically cancelled when it gets destroyed.</remarks>
+    /// <seealso cref="ISessionService"/>
+    /// </summary>
     public sealed class LoginManager : MonoBehaviour
     {
-        public bool IsLoggingIn { get; private set; }
+        /// <summary>
+        /// If true, when the MonoBehaviour gets disabled the login will automatically be canceled. 
+        /// </summary>
+        public bool cancelLoginsUponDisabling = true;
+        /// <summary>
+        /// Whether the <see cref="LoginManager"/> is busy with another login session.
+        /// </summary>
+        public bool IsBusy { get; private set; }
+        /// <summary>
+        /// The currently active instance of <see cref="EmergenceQrCode"/> for the login session.
+        /// </summary>
         public EmergenceQrCode CurrentQrCode { get; internal set; }
-
+        /// <summary>
+        /// Called after <see cref="StartLogin"/> is called, if <see cref="IsBusy"/> is false.
+        /// <seealso cref="LoginStartedEvent"/>
+        /// </summary>
         public LoginStartedEvent loginStartedEvent;
+        /// <summary>
+        /// Called after <see cref="CancelLogin"/> is called, if <see cref="IsBusy"/> is true.
+        /// <seealso cref="LoginCancelledEvent"/>
+        /// </summary>
         public LoginCancelledEvent loginCancelledEvent;
+        /// <summary>
+        /// Called when an error occurs during login.
+        /// <seealso cref="LoginFailedEvent"/>
+        /// </summary>
         public LoginFailedEvent loginFailedEvent;
+        /// <summary>
+        /// Called after a successful login.<para/>
+        /// Do not use this event for business logic, as right after it is called, <see cref="ISessionService.OnSessionConnected"/> will also be called. That is where any business logic should go.
+        /// <seealso cref="LoginSuccessfulEvent"/>
+        /// </summary>
         public LoginSuccessfulEvent loginSuccessfulEvent;
+        /// <summary>
+        /// Called at each login step, useful for updating the UI. It will be called twice, when the step begins and after it succeeds.
+        /// <remarks>There isn't a built-in way to keep track of the current login step, if you need this information you should store it yourself.</remarks>
+        /// <seealso cref="LoginStepUpdatedEvent"/>
+        /// </summary>
         public LoginStepUpdatedEvent loginStepUpdatedEvent;
+        /// <summary>
+        /// Called when the login process ends, always, no matter the reason.
+        /// <seealso cref="LoginEndedEvent"/>
+        /// 
+        /// </summary>
         public LoginEndedEvent loginEndedEvent;
+        /// <summary>
+        /// Ticks every second after the QR code is retrieved. It begins ticking exactly after the <see cref="LoginStep.QrCodeRequest"/> <see cref="LoginStep"/> succeeds.
+        /// <remarks>This keeps getting called even after the handshake is completed and is no longer needed, it only stops right before <see cref="loginEndedEvent"/> gets invoked.<para/>
+        /// If you wish to stop this timer you should simply unbind from it when the handshake step is completed,
+        /// listening to the <see cref="loginStepUpdatedEvent"/> event. Alternatively you can use your own event.</remarks>
+        /// <seealso cref="QrCodeTickEvent"/>
+        /// </summary>
         public QrCodeTickEvent qrCodeTickEvent;
 
         internal const float QrCodeTimeout = 60;
@@ -33,13 +86,43 @@ namespace EmergenceSDK.Implementations.Login
         private CancellationTokenSource _cts;
         private CancellationToken _ct;
 
+        /// <summary>
+        /// Set the first-login flag to true
+        /// </summary>
+        public static void SetFirstLoginFlag()
+        {
+            PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
+        }
+
+        /// <summary>
+        /// Set the first-login flag to false
+        /// </summary>
+        public static void ResetFirstLoginFlag()
+        {
+            PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 0);
+        }
+
+        /// <summary>
+        /// Check whether the first-login flag is present and set to something different than 0
+        /// </summary>
+        /// <returns></returns>
+        public static bool GetFirstLoginFlag()
+        {
+            return PlayerPrefs.GetInt(StaticConfig.HasLoggedInOnceKey, 0) != 0;
+        }
+        
+        /// <summary>
+        /// Starts the login attempt.
+        /// <remarks>This won't start if another attempt is ongoing, you can check beforehand using <see cref="IsBusy"/> or by awaiting <see cref="WaitUntilAvailable"/> first</remarks>
+        /// </summary>
+        /// <param name="loginMode"></param>
         public async UniTask StartLogin(LoginMode loginMode)
         {
-            if (IsLoggingIn) return;
+            if (IsBusy) return;
             
             try
             {
-                IsLoggingIn = true;
+                IsBusy = true;
                 var sessionServiceInternal = EmergenceServiceProvider.GetService<ISessionServiceInternal>();
                 var walletServiceInternal = EmergenceServiceProvider.GetService<IWalletServiceInternal>();
                 var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
@@ -71,24 +154,35 @@ namespace EmergenceSDK.Implementations.Login
                 CurrentQrCode?.StopTicking();
                 CurrentQrCode = null;
                 loginEndedEvent.Invoke(this);
-                IsLoggingIn = false;
+                IsBusy = false;
             }
         }
 
+        /// <summary>
+        /// This cancels the current login attempt, and fires the appropriate events.
+        /// <remarks>Only works if there is a login attempt currently ongoing, you can check that with <see cref="IsBusy"/></remarks>
+        /// </summary>
         public void CancelLogin()
         {
-            if (!IsLoggingIn) return;
+            if (!IsBusy) return;
             _cts?.Cancel();
         }
 
-        public UniTask WaitUntilAvailable(CancellationTokenSource cts = default)
+        /// <summary>
+        /// Waits until the <see cref="IsBusy"/> property is false.
+        /// <remarks>You can provide a cancellation token to customize the wait time.</remarks>
+        /// </summary>
+        /// <param name="ct"><see cref="CancellationToken"/> for manually cancelling this.</param>
+        /// <returns></returns>
+        public UniTask WaitUntilAvailable(CancellationToken ct = default)
         {
             // ReSharper disable once MethodSupportsCancellation
-            return cts != null
-                ? UniTask.WaitUntil(() => !IsLoggingIn, cancellationToken: cts.Token)
-                : UniTask.WaitUntil(() => !IsLoggingIn);
+            return UniTask.WaitUntil(() => !IsBusy, cancellationToken: ct);
         }
 
+        /// <summary>
+        /// Helper method for clearing all the event listeners if needed.
+        /// </summary>
         public void RemoveAllListeners()
         {
             loginStartedEvent.RemoveAllListeners();
@@ -102,14 +196,17 @@ namespace EmergenceSDK.Implementations.Login
 
         #region Lifecycle
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             CancelLogin();
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
-            CancelLogin();
+            if (cancelLoginsUponDisabling)
+            {
+                CancelLogin();
+            }
         }
 
         #endregion
@@ -224,9 +321,6 @@ namespace EmergenceSDK.Implementations.Login
             }
             
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.QrCodeRequest, StepPhase.Success, _ct);
-
-            // Single QR code tick when any UI elements should first update after retrieving QR.
-            //qrCodeTickEvent.Invoke(this, CurrentQrCode);
         }
 
         #endregion

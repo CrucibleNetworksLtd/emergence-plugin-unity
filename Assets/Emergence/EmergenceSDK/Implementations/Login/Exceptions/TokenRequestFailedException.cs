@@ -3,15 +3,9 @@ using EmergenceSDK.Types;
 
 namespace EmergenceSDK.Implementations.Login.Exceptions
 {
-    public class TokenRequestFailedException : Exception
+    public sealed class TokenRequestFailedException : LoginStepRequestFailedException<string>
     {
-        public readonly ServiceResponse<string> Response;
-
-        public TokenRequestFailedException(ServiceResponse<string> response)
-        {
-            Response = response;
-        }
-
-        public TokenRequestFailedException(Exception exception) : base(null, exception) { }
+        internal TokenRequestFailedException(Exception exception) : base(null, exception) { }
+        internal TokenRequestFailedException(ServiceResponse<string> response) : base(response) { }
     }
 }

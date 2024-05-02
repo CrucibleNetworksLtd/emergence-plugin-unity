@@ -5,12 +5,25 @@ using UnityEngine.Events;
 
 namespace EmergenceSDK.Implementations.Login.Types
 {
+    /// <summary>
+    /// Class for QR codes requested by the <see cref="LoginManager"/>
+    /// This provides easy ways of getting the remaining time on the code before it expires, as well as adding an event on 
+    /// </summary>
     public class EmergenceQrCode
     {
+        /// <summary>
+        /// The <see cref="Texture2D"/> containing the image of the QR code. It is recommended to set <see cref="Texture2D.filterMode"/> to <see cref="FilterMode.Point"/>
+        /// </summary>
         public readonly Texture2D Texture;
+        /// <summary>
+        /// The time left on the QR code, as a float
+        /// </summary>
         public float TimeLeft => Math.Max(0, LoginManager.QrCodeTimeout - (Time.realtimeSinceStartup - TimeIssued));
+        /// <summary>
+        /// The time left on the QR code, as a rounded up integer
+        /// </summary>
         public int TimeLeftInt => Mathf.CeilToInt(TimeLeft);
-            
+
         internal readonly float TimeIssued;
         internal readonly string DeviceId;
         internal readonly LoginManager LoginManager;

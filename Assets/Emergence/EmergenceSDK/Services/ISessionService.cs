@@ -23,12 +23,12 @@ namespace EmergenceSDK.Services
         bool DisconnectInProgress { get; }
         
         /// <summary>
-        /// Fired when the session is disconnected
+        /// Fired when the session is disconnected, useful for handling any disconnection-related business logic.
         /// </summary>
         event Action OnSessionDisconnected;
         
         /// <summary>
-        /// Fired when the session is connected
+        /// Fired when the login flow is completed and the session is connected, useful for handling any connection-related business logic.
         /// </summary>
         event Action OnSessionConnected;
     }

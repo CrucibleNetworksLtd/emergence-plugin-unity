@@ -86,7 +86,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             EscButtonLogin.onClick.AddListener(OnEscButtonPressed);
             BackButtonLogin.onClick.AddListener(() =>
             {
-                if (BackButtonLogin.GetComponentInParent<LoginManager>()?.IsLoggingIn != true)
+                if (BackButtonLogin.GetComponentInParent<LoginManager>()?.IsBusy != true)
                 {
                     OnEscButtonPressed();
                 }

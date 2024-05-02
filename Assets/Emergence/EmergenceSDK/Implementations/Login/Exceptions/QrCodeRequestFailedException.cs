@@ -4,14 +4,9 @@ using UnityEngine;
 
 namespace EmergenceSDK.Implementations.Login.Exceptions
 {
-    internal class QrCodeRequestFailedException : Exception
+    public sealed class QrCodeRequestFailedException : LoginStepRequestFailedException<Texture2D>
     {
-        public readonly ServiceResponse<Texture2D> Response;
-        public QrCodeRequestFailedException(ServiceResponse<Texture2D> response)
-        {
-            Response = response;
-        }
-
-        public QrCodeRequestFailedException(Exception exception) : base(null, exception) { }
+        internal QrCodeRequestFailedException(Exception exception) : base(null, exception) { }
+        internal QrCodeRequestFailedException(ServiceResponse<Texture2D> response) : base(response) { }
     }
 }

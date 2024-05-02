@@ -3,15 +3,9 @@ using EmergenceSDK.Types;
 
 namespace EmergenceSDK.Implementations.Login.Exceptions
 {
-    public class HandshakeRequestFailedException : Exception
+    public sealed class HandshakeRequestFailedException : LoginStepRequestFailedException<string>
     {
-        public readonly ServiceResponse<string> Response;
-
-        public HandshakeRequestFailedException(ServiceResponse<string> response)
-        {
-            Response = response;
-        }
-
-        public HandshakeRequestFailedException(Exception exception) : base(null, exception) { }
+        internal HandshakeRequestFailedException(Exception exception) : base(null, exception) { }
+        internal HandshakeRequestFailedException(ServiceResponse<string> response) : base(response) { }
     }
 }

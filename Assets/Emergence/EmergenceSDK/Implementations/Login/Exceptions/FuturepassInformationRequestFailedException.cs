@@ -4,14 +4,9 @@ using EmergenceSDK.Types;
 
 namespace EmergenceSDK.Implementations.Login.Exceptions
 {
-    public class FuturepassInformationRequestFailedException : Exception
+    public sealed class FuturepassInformationRequestFailedException : LoginStepRequestFailedException<FuturepassInformationResponse>
     {
-        public readonly ServiceResponse<FuturepassInformationResponse> Response;
-        public FuturepassInformationRequestFailedException(ServiceResponse<FuturepassInformationResponse> response)
-        {
-            Response = response;
-        }
-
-        public FuturepassInformationRequestFailedException(Exception exception) : base(null, exception) { }
+        internal FuturepassInformationRequestFailedException(Exception exception) : base(null, exception) { }
+        internal FuturepassInformationRequestFailedException(ServiceResponse<FuturepassInformationResponse> response) : base(response) { }
     }
 }
