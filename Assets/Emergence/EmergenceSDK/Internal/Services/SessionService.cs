@@ -17,6 +17,7 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class SessionService : ISessionService, ISessionServiceInternal, IDisconnectableService
     {
+        public bool IsLoggedIn { get; set; }
         public event Action OnSessionConnected;
         public event Action OnSessionDisconnected;
         public string CurrentAccessToken { get; private set; } = string.Empty;
@@ -107,11 +108,14 @@ namespace EmergenceSDK.Internal.Services
 
         public void RunConnectionEvents()
         {
+            IsLoggedIn = true;
             OnSessionConnected?.Invoke();
         }
 
         public void RunDisconnectionEvents()
         {
+            IsLoggedIn = false;
+            
             foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectableService>())
             {
                 disconnectable.HandleDisconnection();
@@ -204,7 +208,5 @@ namespace EmergenceSDK.Internal.Services
             else
                 errorCallback?.Invoke("Error in GetAccessToken.", (long)response.Code);
         }
-
-        public bool IsLoggedIn() => ((ISessionServiceInternal)this).CurrentAccessToken.Length != 0;
     }
 }

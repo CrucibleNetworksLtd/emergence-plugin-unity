@@ -9,7 +9,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public class DemoStationController : MonoBehaviour
     {
-        private bool IsLoggedIn() => sessionService.IsLoggedIn();
+        private bool IsLoggedIn() => sessionService.IsLoggedIn;
         
         public DemoStation<OpenOverlay> openOverlay;
 
