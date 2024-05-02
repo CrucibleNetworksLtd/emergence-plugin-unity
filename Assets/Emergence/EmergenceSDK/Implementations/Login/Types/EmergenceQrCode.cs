@@ -49,12 +49,11 @@ namespace EmergenceSDK.Implementations.Login.Types
 
         private IEnumerator DoTicks()
         {
-            while (true)
+            while (_ticking)
             {
-                yield return new WaitForSecondsRealtime(1);
                 LoginManager.qrCodeTickEvent.Invoke(LoginManager, this);
+                yield return new WaitForSecondsRealtime(1);
             }
-            // ReSharper disable once IteratorNeverReturns
         }
     }
 }
