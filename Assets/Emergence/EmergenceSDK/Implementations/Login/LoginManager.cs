@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Implementations.Login.Events;
 using EmergenceSDK.Implementations.Login.Exceptions;
 using EmergenceSDK.Implementations.Login.Types;
-using EmergenceSDK.Integrations.Futureverse.Internal;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Services;
@@ -13,18 +11,18 @@ using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
+using UnityEngine.Serialization;
 
 namespace EmergenceSDK.Implementations.Login
 {
     public sealed class LoginManager : MonoBehaviour
     {
         public bool IsLoggingIn { get; private set; }
-        public EmergenceQrCode CurrentQrCode { get; internal set; } = null;
+        public EmergenceQrCode CurrentQrCode { get; internal set; }
 
         public LoginStartedEvent loginStartedEvent;
         public LoginCancelledEvent loginCancelledEvent;
-        public LoginFailedEvent loginFailedEvent;
+        [FormerlySerializedAs("loginFailedEvent")] public LoginFailedEvent loginErrorEvent;
         public LoginSuccessfulEvent loginSuccessfulEvent;
         public LoginStepUpdatedEvent loginStepUpdatedEvent;
         public LoginEndedEvent loginEndedEvent;
@@ -77,6 +75,10 @@ namespace EmergenceSDK.Implementations.Login
 
         public void CancelLogin()
         {
+            if (!IsLoggingIn) return;
+            
+            CurrentQrCode?.StopTicking();
+            CurrentQrCode = null;
             _cts?.Cancel();
         }
 
@@ -92,7 +94,7 @@ namespace EmergenceSDK.Implementations.Login
         {
             loginStartedEvent.RemoveAllListeners();
             loginCancelledEvent.RemoveAllListeners();
-            loginFailedEvent.RemoveAllListeners();
+            loginErrorEvent.RemoveAllListeners();
             loginSuccessfulEvent.RemoveAllListeners();
             loginStepUpdatedEvent.RemoveAllListeners();
             loginEndedEvent.RemoveAllListeners();
@@ -118,7 +120,7 @@ namespace EmergenceSDK.Implementations.Login
         private void InvokeLoginFailedEvent(Exception e)
         {
             var loginExceptionContainer = new LoginExceptionContainer(e);
-            loginFailedEvent.Invoke(this, loginExceptionContainer);
+            loginErrorEvent.Invoke(this, loginExceptionContainer);
             loginExceptionContainer.ThrowIfUnhandled();
         }
 
@@ -138,7 +140,7 @@ namespace EmergenceSDK.Implementations.Login
                         throw new FuturepassRequestFailedException(passResponse);
                     }
                 }
-                catch (Exception e) when (e is not OperationCanceledException)
+                catch (Exception e) when (e is not OperationCanceledException and not FuturepassRequestFailedException)
                 {
                     throw new FuturepassRequestFailedException(e);
                 }
@@ -152,7 +154,7 @@ namespace EmergenceSDK.Implementations.Login
                         throw new FuturepassInformationRequestFailedException(passInformationResponse);
                     }
                 }
-                catch (Exception e) when (e is not OperationCanceledException)
+                catch (Exception e) when (e is not OperationCanceledException and not FuturepassInformationRequestFailedException)
                 {
                     throw new FuturepassInformationRequestFailedException(e);
                 }
@@ -174,7 +176,7 @@ namespace EmergenceSDK.Implementations.Login
                     throw new TokenRequestFailedException(tokenResponse);
                 }
             }
-            catch (Exception e) when (e is not OperationCanceledException)
+            catch (Exception e) when (e is not OperationCanceledException and not TokenRequestFailedException)
             {
                 throw new TokenRequestFailedException(e);
             }
@@ -195,7 +197,7 @@ namespace EmergenceSDK.Implementations.Login
                     throw new HandshakeRequestFailedException(handshakeResponse);
                 }
             }
-            catch (Exception e) when (e is not OperationCanceledException)
+            catch (Exception e) when (e is not OperationCanceledException and not HandshakeRequestFailedException)
             {
                 throw new HandshakeRequestFailedException(e);
             }
@@ -217,7 +219,7 @@ namespace EmergenceSDK.Implementations.Login
                 }
                 CurrentQrCode = new EmergenceQrCode(this, qrCodeResponse.Result, EmergenceSingleton.Instance.CurrentDeviceId);
             }
-            catch (Exception e) when (e is not OperationCanceledException)
+            catch (Exception e) when (e is not OperationCanceledException and not QrCodeRequestFailedException)
             {
                 throw new QrCodeRequestFailedException(e);
             }
@@ -225,7 +227,7 @@ namespace EmergenceSDK.Implementations.Login
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.QrCodeRequest, StepPhase.Success, _ct);
 
             // Single QR code tick when any UI elements should first update after retrieving QR.
-            qrCodeTickEvent.Invoke(this, CurrentQrCode);
+            //qrCodeTickEvent.Invoke(this, CurrentQrCode);
         }
 
         #endregion

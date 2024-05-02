@@ -2,7 +2,7 @@
 
 namespace EmergenceSDK.Implementations.Login.Types
 {
-    public struct LoginExceptionContainer
+    public sealed class LoginExceptionContainer
     {
         public readonly Exception Exception;
         public bool Handled { get; private set; }
