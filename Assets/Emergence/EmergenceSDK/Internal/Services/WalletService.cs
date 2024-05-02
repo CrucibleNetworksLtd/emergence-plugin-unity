@@ -232,7 +232,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse<string>> GetBalanceAsync()
         {
-            if (sessionServiceInternal.DisconnectInProgress)
+            if (((ISessionService)sessionServiceInternal).DisconnectInProgress)
                 return new ServiceResponse<string>(false);
     
             string url = StaticConfig.APIBase + "getbalance" + 

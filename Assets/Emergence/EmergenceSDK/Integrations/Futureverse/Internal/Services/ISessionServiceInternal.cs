@@ -11,16 +11,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
     internal interface ISessionServiceInternal : IEmergenceService
     {
         /// <summary>
-        /// Set to true when mid way through a disconnect, disconnection can take a few seconds so this is useful for disabling UI elements for example
-        /// </summary>
-        bool DisconnectInProgress { get; }
-        
-        /// <summary>
-        /// Fired when the session is disconnected
-        /// </summary>
-        event Action OnSessionDisconnected;
-        
-        /// <summary>
         /// Attempts to get the login QR code, it will return the QR code as a texture in the success callback
         /// </summary>
         UniTask GetQrCode(QRCodeSuccess success, ErrorCallback errorCallback, CancellationCallback cancellationCallback = default, CancellationToken ct = default);
@@ -53,5 +43,9 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         /// Attempts to get an access token
         /// </summary>
         UniTask<ServiceResponse<string>> GetAccessTokenAsync();
+
+        void RunConnectionEvents();
+        
+        void RunDisconnectionEvents();
     }
 }

@@ -58,6 +58,7 @@ namespace EmergenceSDK.Implementations.Login
                 await HandleFuturepassRequests(futureverseService);
 
                 loginSuccessfulEvent.Invoke(this, ((IWalletService)walletServiceInternal).ChecksummedWalletAddress);
+                sessionServiceInternal.RunConnectionEvents();
             }
             catch (OperationCanceledException)
             {

@@ -11,6 +11,21 @@ namespace EmergenceSDK.Services
     /// </summary>
     public interface ISessionService : IEmergenceService
     {
+        /// <summary>
+        /// Set to true when mid way through a disconnect, disconnection can take a few seconds so this is useful for disabling UI elements for example
+        /// </summary>
+        bool DisconnectInProgress { get; }
+        
+        /// <summary>
+        /// Fired when the session is disconnected
+        /// </summary>
+        event Action OnSessionDisconnected;
+        
+        /// <summary>
+        /// Fired when the session is connected
+        /// </summary>
+        event Action OnSessionConnected;
+
         bool IsLoggedIn();
     }
 }

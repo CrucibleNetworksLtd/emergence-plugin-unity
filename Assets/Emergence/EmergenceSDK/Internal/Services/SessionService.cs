@@ -17,26 +17,17 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class SessionService : ISessionService, ISessionServiceInternal, IDisconnectableService
     {
-        public string CurrentAccessToken { get; private set; } = string.Empty;
-
-        public bool DisconnectInProgress => disconnectInProgress;
+        public event Action OnSessionConnected;
         public event Action OnSessionDisconnected;
-        private bool disconnectInProgress = false;
-        
+        public string CurrentAccessToken { get; private set; } = string.Empty;
+        public bool DisconnectInProgress { get; private set; }
+
         public SessionService()
         {
-            OnSessionDisconnected += () =>
-            {
-                foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectableService>())
-                {
-                    disconnectable.HandleDisconnection();
-                }
-            };
-
             EmergenceSingleton.Instance.OnGameClosing += OnGameEnd;
         }
 
-        private async void OnGameEnd() => await Disconnect(null, null);
+        private async void OnGameEnd() => await DisconnectAsync();
 
         public async UniTask<ServiceResponse<IsConnectedResponse>> IsConnected()
         {
@@ -72,9 +63,8 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> DisconnectAsync()
         {
-            disconnectInProgress = true;
-            string url = StaticConfig.APIBase + "killSession";
-            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
+            DisconnectInProgress = true;
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, StaticConfig.APIBase + "killSession");
             try
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
@@ -85,30 +75,49 @@ namespace EmergenceSDK.Internal.Services
                     WebRequestService.CleanupRequest(request);
                     return new ServiceResponse(false);
                 }
+
+                EmergenceUtils.PrintRequestResult("Disconnect request completed", request);
+
+                if (EmergenceUtils.RequestError(request))
+                {
+                    DisconnectInProgress = false;
+                    WebRequestService.CleanupRequest(request);
+                    return new ServiceResponse(false);
+                }
+
+                RunDisconnectionEvents();
+
+                return new ServiceResponse(true);
             }
             catch (ArgumentException)
             {
-                WebRequestService.CleanupRequest(request);
-                //Already disconnected
+                // Already disconnected
+                return new ServiceResponse(true);
             }
             catch (Exception)
             {
-                WebRequestService.CleanupRequest(request);
                 return new ServiceResponse(false);
             }
-            EmergenceUtils.PrintRequestResult("Disconnect request completed", request);
-
-            if (EmergenceUtils.RequestError(request))
+            finally
             {
-                disconnectInProgress = false;
                 WebRequestService.CleanupRequest(request);
-                return new ServiceResponse(false);
+                DisconnectInProgress = false;
+            }
+        }
+
+        public void RunConnectionEvents()
+        {
+            OnSessionConnected?.Invoke();
+        }
+
+        public void RunDisconnectionEvents()
+        {
+            foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectableService>())
+            {
+                disconnectable.HandleDisconnection();
             }
 
-            disconnectInProgress = false;
             OnSessionDisconnected?.Invoke();
-            WebRequestService.CleanupRequest(request);
-            return new ServiceResponse(true);
         }
 
         public async UniTask Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
