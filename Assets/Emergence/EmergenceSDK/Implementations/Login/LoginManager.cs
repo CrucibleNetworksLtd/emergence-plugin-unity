@@ -68,6 +68,8 @@ namespace EmergenceSDK.Implementations.Login
             }
             finally
             {
+                CurrentQrCode?.StopTicking();
+                CurrentQrCode = null;
                 loginEndedEvent.Invoke(this);
                 IsLoggingIn = false;
             }
@@ -76,9 +78,6 @@ namespace EmergenceSDK.Implementations.Login
         public void CancelLogin()
         {
             if (!IsLoggingIn) return;
-            
-            CurrentQrCode?.StopTicking();
-            CurrentQrCode = null;
             _cts?.Cancel();
         }
 
