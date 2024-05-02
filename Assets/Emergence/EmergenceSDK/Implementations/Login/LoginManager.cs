@@ -115,7 +115,7 @@ namespace EmergenceSDK.Implementations.Login
         /// Starts the login attempt.
         /// <remarks>This won't start if another attempt is ongoing, you can check beforehand using <see cref="IsBusy"/> or by awaiting <see cref="WaitUntilAvailable"/> first</remarks>
         /// </summary>
-        /// <param name="loginMode"></param>
+        /// <param name="loginMode">What flow to follow for the login attempt, see <see cref="LoginMode"/> for more details.</param>
         public async UniTask StartLogin(LoginMode loginMode)
         {
             if (IsBusy) return;
