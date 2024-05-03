@@ -128,13 +128,11 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 newItem.Meta.Name = $"#{node.tokenId}";
                 newItem.Meta.Description = node.collection.name;
                 var newMetaContent = new InventoryItemMetaContent();
-                newMetaContent.URL = Helpers.InternalIPFSURLToHTTP(node.metadata.properties.image,
-                    "http://ipfs.openmeta.xyz/ipfs/");
+                newMetaContent.URL = Helpers.InternalIPFSURLToHTTP(node.metadata.properties.image ?? "", "http://ipfs.openmeta.xyz/ipfs/");
                 newMetaContent.MimeType = node.metadata.properties.models?["glb"] != null ? "model/gltf-binary" : "image/png";
-                newItem.Meta.Content = new List<InventoryItemMetaContent>();
-                newItem.Meta.Content.Add(newMetaContent);
+                newItem.Meta.Content = new List<InventoryItemMetaContent> { newMetaContent };
                 newItem.Meta.Attributes = new List<InventoryItemMetaAttributes>();
-                foreach (var kvp in node.metadata.attributes)
+                foreach (var kvp in node.metadata.attributes ?? new Dictionary<string, string>())
                 {
                     var inventoryItemMetaAttributes = new InventoryItemMetaAttributes
                     {
