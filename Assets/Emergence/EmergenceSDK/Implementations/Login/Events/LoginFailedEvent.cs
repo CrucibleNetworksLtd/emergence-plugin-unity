@@ -18,5 +18,5 @@ namespace EmergenceSDK.Implementations.Login.Events
     /// <para>Otherwise, any <see cref="LoginStepRequestFailedException{T}"/> without an <see cref="Exception.InnerException"/> implies that the underlying web request has completed successfully with a failure HTTP response, for example a 404 code.</para>
     /// <para>Once the exception has been managed, you MUST call <see cref="LoginExceptionContainer.HandleException"/> on the passed <see cref="LoginExceptionContainer"/>, otherwise it will simply be rethrown</para>
     /// </summary>
-    [Serializable] public class LoginFailedEvent : UnityEvent<LoginManager, LoginExceptionContainer> {}
+    [Serializable] public sealed class LoginFailedEvent : UnityEvent<LoginManager, LoginExceptionContainer> {}
 }

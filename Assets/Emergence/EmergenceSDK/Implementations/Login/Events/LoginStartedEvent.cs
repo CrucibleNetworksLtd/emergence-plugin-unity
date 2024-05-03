@@ -9,5 +9,5 @@ namespace EmergenceSDK.Implementations.Login.Events
     /// <item><description><see cref="LoginManager"/> - The <see cref="LoginManager"/> that fired this event</description></item>
     /// </list>
     /// </summary>
-    [Serializable] public class LoginStartedEvent : UnityEvent<LoginManager> {}
+    [Serializable] public sealed class LoginStartedEvent : UnityEvent<LoginManager> {}
 }

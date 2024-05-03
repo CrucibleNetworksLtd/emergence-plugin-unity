@@ -12,5 +12,5 @@ namespace EmergenceSDK.Implementations.Login.Events
     /// </list>
     /// <seealso cref="IWalletService"/>
     /// </summary>
-    [Serializable] public class LoginSuccessfulEvent : UnityEvent<LoginManager, string> {}
+    [Serializable] public sealed class LoginSuccessfulEvent : UnityEvent<LoginManager, string> {}
 }

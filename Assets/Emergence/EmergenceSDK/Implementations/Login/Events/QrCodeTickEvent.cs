@@ -11,5 +11,5 @@ namespace EmergenceSDK.Implementations.Login.Events
     /// <item><description><see cref="EmergenceQrCode"/> - The <see cref="EmergenceQrCode"/> that fired this event</description></item>
     /// </list>
     /// </summary>
-    [Serializable] public class QrCodeTickEvent : UnityEvent<LoginManager, EmergenceQrCode> {}
+    [Serializable] public sealed class QrCodeTickEvent : UnityEvent<LoginManager, EmergenceQrCode> {}
 }

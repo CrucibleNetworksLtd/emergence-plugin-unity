@@ -14,5 +14,5 @@ namespace EmergenceSDK.Implementations.Login.Events
     /// <seealso cref="LoginStep"/>
     /// <seealso cref="StepPhase"/>
     /// </summary>
-    [Serializable] public class LoginStepUpdatedEvent : UnityEvent<LoginManager, LoginStep, StepPhase> {}
+    [Serializable] public sealed class LoginStepUpdatedEvent : UnityEvent<LoginManager, LoginStep, StepPhase> {}
 }

@@ -9,7 +9,7 @@ namespace EmergenceSDK.Implementations.Login.Types
     /// Class for QR codes requested by the <see cref="LoginManager"/>
     /// This provides easy ways of getting the remaining time on the code before it expires, as well as adding an event on 
     /// </summary>
-    public class EmergenceQrCode
+    public sealed class EmergenceQrCode
     {
         /// <summary>
         /// The <see cref="Texture2D"/> containing the image of the QR code. It is recommended to set <see cref="Texture2D.filterMode"/> to <see cref="FilterMode.Point"/>
