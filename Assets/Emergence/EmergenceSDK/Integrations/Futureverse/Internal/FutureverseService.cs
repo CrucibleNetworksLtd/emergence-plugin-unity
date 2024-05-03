@@ -124,9 +124,11 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 newItem.Blockchain = $"{node.collection.chainType}:{node.collection.chainId}";
                 newItem.Contract = $"{node.collection.location}";
                 newItem.TokenId = $"{node.tokenId}";
-                newItem.Meta = new InventoryItemMetaData();
-                newItem.Meta.Name = $"#{node.tokenId}";
-                newItem.Meta.Description = node.collection.name;
+                newItem.Meta = new InventoryItemMetaData
+                {
+                    Name = $"#{node.tokenId}",
+                    Description = node.collection.name
+                };
                 var newMetaContent = new InventoryItemMetaContent();
                 newMetaContent.URL = Helpers.InternalIPFSURLToHTTP(node.metadata.properties.image ?? "", "http://ipfs.openmeta.xyz/ipfs/");
                 newMetaContent.MimeType = node.metadata.properties.models?["glb"] != null ? "model/gltf-binary" : "image/png";
