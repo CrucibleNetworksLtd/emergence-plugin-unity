@@ -24,8 +24,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
     internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, IDisconnectableService
     {
         public bool UsingFutureverse { get; set; }
-
-        private FuturepassInformationResponse FuturepassInformation { get; set; }
+        public FuturepassInformationResponse FuturepassInformation { get; set; }
 
         private List<string> CombinedAddress => FuturepassInformation.GetCombinedAddresses();
         
@@ -94,7 +93,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
             FuturepassInformationResponse fpResponse =
                 SerializationHelper.Deserialize<FuturepassInformationResponse>(response.Response);
-            FuturepassInformation = fpResponse;
             return new ServiceResponse<FuturepassInformationResponse>(true, fpResponse);
         }
 

@@ -6,7 +6,6 @@ namespace EmergenceSDK.Implementations.Login.Exceptions
 {
     public sealed class FuturepassInformationRequestFailedException : LoginStepRequestFailedException<FuturepassInformationResponse>
     {
-        internal FuturepassInformationRequestFailedException(Exception exception) : base(null, exception) { }
-        internal FuturepassInformationRequestFailedException(ServiceResponse<FuturepassInformationResponse> response) : base(response) { }
+        internal FuturepassInformationRequestFailedException(string message, ServiceResponse<FuturepassInformationResponse> response = null, Exception exception = null) : base(message, response, exception) {}
     }
 }

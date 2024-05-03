@@ -233,26 +233,33 @@ namespace EmergenceSDK.Implementations.Login
                     _ct.ThrowIfCancellationRequested();
                     if (!passResponse.Success)
                     {
-                        throw new FuturepassRequestFailedException(passResponse);
+                        throw new FuturepassRequestFailedException("Request was not successful", passResponse);
                     }
                 }
                 catch (Exception e) when (e is not OperationCanceledException and not FuturepassRequestFailedException)
                 {
-                    throw new FuturepassRequestFailedException(e);
+                    throw new FuturepassRequestFailedException("An exception caused the request to fail", null, e);
                 }
                 
                 try
                 {
                     var passInformationResponse = await futureverseService.GetFuturepassInformationAsync(passResponse.Result.ownedFuturepass);
                     _ct.ThrowIfCancellationRequested();
-                    if (!passInformationResponse.Success)
+                    if (!passInformationResponse.Success || passInformationResponse.Result == null)
                     {
-                        throw new FuturepassInformationRequestFailedException(passInformationResponse);
+                        if (passInformationResponse.Success && passInformationResponse.Result == null)
+                        {
+                            var exception = new NullReferenceException(nameof(passInformationResponse) + '.' + nameof(passInformationResponse.Result) + "is null");
+                            throw new FuturepassInformationRequestFailedException("Request was successful but result is null!", passInformationResponse, exception);
+                        }
+                        
+                        throw new FuturepassInformationRequestFailedException("Request was not successful", passInformationResponse);
                     }
+                    ((IFutureverseServiceInternal)futureverseService).FuturepassInformation = passInformationResponse.Result;
                 }
                 catch (Exception e) when (e is not OperationCanceledException and not FuturepassInformationRequestFailedException)
                 {
-                    throw new FuturepassInformationRequestFailedException(e);
+                    throw new FuturepassInformationRequestFailedException("An exception caused the request to fail", null, e);
                 }
 
                 InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.FuturepassRequests, StepPhase.Success, _ct);
@@ -269,12 +276,12 @@ namespace EmergenceSDK.Implementations.Login
                 _ct.ThrowIfCancellationRequested();
                 if (!tokenResponse.Success)
                 {
-                    throw new TokenRequestFailedException(tokenResponse);
+                    throw new TokenRequestFailedException("Request was not successful", tokenResponse);
                 }
             }
             catch (Exception e) when (e is not OperationCanceledException and not TokenRequestFailedException)
             {
-                throw new TokenRequestFailedException(e);
+                throw new TokenRequestFailedException("An exception caused the request to fail", null, e);
             }
 
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.AccessTokenRequest, StepPhase.Success, _ct);
@@ -290,12 +297,12 @@ namespace EmergenceSDK.Implementations.Login
                 _ct.ThrowIfCancellationRequested();
                 if (!handshakeResponse.Success)
                 {
-                    throw new HandshakeRequestFailedException(handshakeResponse);
+                    throw new HandshakeRequestFailedException("Request was not successful", handshakeResponse);
                 }
             }
             catch (Exception e) when (e is not OperationCanceledException and not HandshakeRequestFailedException)
             {
-                throw new HandshakeRequestFailedException(e);
+                throw new HandshakeRequestFailedException("An exception caused the request to fail", null, e);
             }
             
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.HandshakeRequest, StepPhase.Success, _ct);
@@ -311,13 +318,13 @@ namespace EmergenceSDK.Implementations.Login
                 _ct.ThrowIfCancellationRequested();
                 if (!qrCodeResponse.Success)
                 {
-                    throw new QrCodeRequestFailedException(qrCodeResponse);
+                    throw new QrCodeRequestFailedException("Request was not successful", qrCodeResponse);
                 }
                 CurrentQrCode = new EmergenceQrCode(this, qrCodeResponse.Result, EmergenceSingleton.Instance.CurrentDeviceId);
             }
             catch (Exception e) when (e is not OperationCanceledException and not QrCodeRequestFailedException)
             {
-                throw new QrCodeRequestFailedException(e);
+                throw new QrCodeRequestFailedException("An exception caused the request to fail", null, e);
             }
             
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.QrCodeRequest, StepPhase.Success, _ct);

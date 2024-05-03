@@ -5,7 +5,6 @@ namespace EmergenceSDK.Implementations.Login.Exceptions
 {
     public sealed class TokenRequestFailedException : LoginStepRequestFailedException<string>
     {
-        internal TokenRequestFailedException(Exception exception) : base(null, exception) { }
-        internal TokenRequestFailedException(ServiceResponse<string> response) : base(response) { }
+        internal TokenRequestFailedException(string message, ServiceResponse<string> response = null, Exception exception = null) : base(message, response, exception) {}
     }
 }
