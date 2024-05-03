@@ -11,7 +11,10 @@
         Start,
         /// <summary>
         /// The very end of the step, after it has succeeded. Useful for updating UI with newly available information or to represent the current state of the login.
-        /// <remarks>There is no counterpart for failure, use <see cref="LoginManager.loginFailedEvent"/></remarks>
+        /// <remarks>
+        /// This was named "Success" to avoid any ambiguity about the fact that when a step ends, it has succeeded.
+        /// There is no counterpart for failure, use <see cref="LoginManager.loginFailedEvent"/>
+        /// </remarks>
         /// </summary>
         Success
     }
