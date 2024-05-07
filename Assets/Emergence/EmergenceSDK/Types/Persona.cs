@@ -36,7 +36,7 @@ namespace EmergenceSDK.Types
         private string GenerateAvatarId(Avatar avatar)
         {
             var isAvatarValid = 
-                    avatar is { chain: not null }
+                    avatar is { chain: not null } // Pattern matching syntax, matches the pattern where avatar has a not null chain field, also fails if avatar is null
                     && avatar.chain.Trim() != ""
                     && avatar.contractAddress.Trim() != ""
                     && avatar.tokenId.Trim() != ""
