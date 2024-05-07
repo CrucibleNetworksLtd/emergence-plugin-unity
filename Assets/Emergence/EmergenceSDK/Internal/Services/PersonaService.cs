@@ -196,7 +196,7 @@ namespace EmergenceSDK.Internal.Services
         private static async UniTask<ServiceResponse> UpdateAvatarOnPersonaEdit(Persona persona)
         {
             var isAvatarValid = 
-                persona.avatar is { chain: not null }
+                persona.avatar is { chain: not null } // Pattern matching syntax, matches the pattern where avatar has a not null chain field, also fails if avatar is null
                 && persona.avatar.chain.Trim() != ""
                 && persona.avatar.contractAddress.Trim() != ""
                 && persona.avatar.tokenId.Trim() != ""
