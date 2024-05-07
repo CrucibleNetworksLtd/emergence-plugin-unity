@@ -10,8 +10,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
 {
     internal interface ISessionServiceInternal : IEmergenceService
     {
-        bool IsLoggedIn { get; set; }
-        
         /// <summary>
         /// Attempts to get the login QR code, it will return the QR code as a texture in the success callback
         /// </summary>

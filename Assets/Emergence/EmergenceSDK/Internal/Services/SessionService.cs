@@ -17,7 +17,7 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class SessionService : ISessionService, ISessionServiceInternal, IDisconnectableService
     {
-        public bool IsLoggedIn { get; set; }
+        public bool IsLoggedIn { get; private set; }
         public event Action OnSessionConnected;
         public event Action OnSessionDisconnected;
         public string CurrentAccessToken { get; private set; } = string.Empty;
