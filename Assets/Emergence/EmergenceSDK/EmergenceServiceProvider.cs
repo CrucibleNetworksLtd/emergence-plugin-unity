@@ -31,9 +31,9 @@ namespace EmergenceSDK
             AddService(new ContractService());
             AddService(new ChainService());
             AddService(new FutureverseService());
-            var sessionServiceInternal = (ISessionServiceInternal)AddService(new SessionEmergenceService());
+            var sessionServiceInternal = (ISessionServiceInternal)AddService(new SessionService());
             AddService(new WalletService(sessionServiceInternal));
-            AddService(new PersonaEmergenceService(sessionServiceInternal));
+            AddService(new PersonaService(sessionServiceInternal));
         }
 
         private EmergenceServiceProvider()

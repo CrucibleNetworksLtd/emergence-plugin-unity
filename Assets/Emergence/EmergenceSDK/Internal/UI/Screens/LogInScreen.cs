@@ -1,60 +1,130 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Implementations.Login;
+using EmergenceSDK.Implementations.Login.Exceptions;
+using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace EmergenceSDK.Internal.UI.Screens
 {
     public class LogInScreen : MonoBehaviour
     {
+        [Header("Log-in Manager")]
+        public LoginManager loginManager;
+
         [Header("UI References")]
-        public RawImage rawQRImage;
+        public RawImage rawQrImage;
+
         public Button backButton;
         public TextMeshProUGUI refreshCounterText;
-        
+        public TextMeshProUGUI refreshText;
+
         [Header("Sub Screens")]
         public GameObject qrScreen;
         public GameObject futureverseScreen;
         public GameObject startupScreen;
-        
-        [Header("Futureverse")]
-        public Button LoginWithFV;
-        public Button LoginWithWC;
-        public Button CreateFPass;
-        public Button RetryFPassCheck;
-        
-        public void SetTimeRemainingText() => refreshCounterText.text = timeRemaining.ToString("0");
 
-        private readonly int qrRefreshTimeOut = 60;
-        private int timeRemaining;
-        
-        private bool usingFV = false;
-        
+        [Header("Futureverse")]
+        public Button loginWithFv;
+
+        public Button loginWithWc;
+        public Button createFPass;
+        public Button retryFPassCheck;
+
+        private void SetTimeRemainingText(LoginManager _, EmergenceQrCode emergenceQrCode) => refreshCounterText.text = emergenceQrCode.TimeLeftInt.ToString("0");
+
+
         public static LogInScreen Instance;
-        
-        private IWalletServiceInternal walletServiceInternal => EmergenceServiceProvider.GetService<IWalletServiceInternal>();
-        private ISessionServiceInternal sessionServiceInternal => EmergenceServiceProvider.GetService<ISessionServiceInternal>();
-        
-        private CancellationTokenSource qrCancellationToken = new CancellationTokenSource();
-        private bool hasStarted = false;
-        private bool loginComplete = false;
-        private bool timerIsRunning = false;
+
+        private static IWalletServiceInternal WalletServiceInternal => EmergenceServiceProvider.GetService<IWalletServiceInternal>();
 
         private void Awake()
         {
             Instance = this;
-            
-            LoginWithFV.onClick.AddListener(LoginWithFVClicked);
-            LoginWithWC.onClick.AddListener(LoginWithWCClicked);
-            
-            CreateFPass.onClick.AddListener(CreateFPassClicked);
-            RetryFPassCheck.onClick.AddListener(RetryFPassCheckClicked);
+
+            loginWithFv.onClick.AddListener(LoginWithFvClicked);
+            loginWithWc.onClick.AddListener(LoginWithWcClicked);
+            backButton.onClick.AddListener(() => loginManager.CancelLogin());
+
+            createFPass.onClick.AddListener(CreateFPassClicked);
+            retryFPassCheck.onClick.AddListener(RetryFPassCheckClicked);
+
+            loginManager.qrCodeTickEvent.AddListener(SetTimeRemainingText);
+            loginManager.loginStartedEvent.AddListener(HandleLoginStarted);
+            loginManager.loginCancelledEvent.AddListener((_) => { Restart(); });
+            loginManager.loginEndedEvent.AddListener((_) => { SetLoginButtonsInteractable(true); });
+            loginManager.loginFailedEvent.AddListener(HandleLoginErrors);
+
+            loginManager.loginStepUpdatedEvent.AddListener((_, loginStep, stepPhase) =>
+            {
+                if (stepPhase != StepPhase.Success) return;
+
+                switch (loginStep)
+                {
+                    case LoginStep.QrCodeRequest:
+                        var texture2D = loginManager.CurrentQrCode.Texture;
+                        texture2D.filterMode = FilterMode.Point;
+                        rawQrImage.texture = texture2D;
+                        refreshText.text = "QR expires in:";
+                        break;
+                    case LoginStep.HandshakeRequest:
+                        HeaderScreen.Instance.Refresh(((IWalletService)WalletServiceInternal).ChecksummedWalletAddress);
+                        HeaderScreen.Instance.Show();
+                        break;
+                    case LoginStep.AccessTokenRequest:
+                    case LoginStep.FuturepassRequests:
+                        // Nothing to do here in these cases
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(loginStep), loginStep, null);
+                }
+            });
+
+            loginManager.loginSuccessfulEvent.AddListener((_, _) =>
+            {
+                PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
+                ScreenManager.Instance.ShowDashboard().Forget();
+            });
+        }
+
+        private void HandleLoginErrors(LoginManager _, LoginExceptionContainer exceptionContainer)
+        {
+            HideAllScreens();
+            var e = exceptionContainer.Exception;
+            switch (e)
+            {
+                case FuturepassRequestFailedException or FuturepassInformationRequestFailedException:
+                    exceptionContainer.HandleException();
+                    EmergenceLogger.LogWarning(e);
+                    futureverseScreen.SetActive(true);
+                    break;
+                case FuturepassRequestFailedException
+                    or FuturepassInformationRequestFailedException
+                    or TokenRequestFailedException
+                    or HandshakeRequestFailedException
+                    or QrCodeRequestFailedException:
+                    exceptionContainer.HandleException();
+                    EmergenceLogger.LogWarning(e);
+                    startupScreen.SetActive(true);
+                    break;
+            }
+        }
+
+        private void HandleLoginStarted(LoginManager _)
+        {
+            rawQrImage.texture = null;
+            HideAllScreens();
+            qrScreen.SetActive(true);
+            refreshCounterText.text = "";
+            refreshText.text = "Retrieving QR code...";
         }
 
         private void HideAllScreens()
@@ -63,21 +133,33 @@ namespace EmergenceSDK.Internal.UI.Screens
             futureverseScreen.SetActive(false);
             startupScreen.SetActive(false);
         }
-        
-        private void LoginWithFVClicked()
+
+        private void LoginWithFvClicked()
         {
-            HideAllScreens();
-            usingFV = true;
-            qrScreen.SetActive(true);
+            SetLoginButtonsInteractable(false);
+            UniTask.Void(async () =>
+            {
+                await loginManager.WaitUntilAvailable();
+                await loginManager.StartLogin(LoginMode.Futurepass);
+            });
         }
-        
-        private void LoginWithWCClicked()
+
+        private void SetLoginButtonsInteractable(bool interactable)
         {
-            HideAllScreens();
-            usingFV = false;
-            qrScreen.SetActive(true);
+            loginWithFv.interactable = interactable;
+            loginWithWc.interactable = interactable;
         }
-        
+
+        private void LoginWithWcClicked()
+        {
+            SetLoginButtonsInteractable(false);
+            UniTask.Void(async () =>
+            {
+                await loginManager.WaitUntilAvailable();
+                await loginManager.StartLogin(LoginMode.WalletConnect);
+            });
+        }
+
         private void CreateFPassClicked()
         {
             Application.OpenURL("https://futurepass.futureverse.app/");
@@ -85,172 +167,14 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void RetryFPassCheckClicked()
         {
-            FullRestart();
-        }
-
-
-        private void OnDestroy()
-        {
-            LoginWithFV.onClick.RemoveListener(LoginWithFVClicked);
-            LoginWithWC.onClick.RemoveListener(LoginWithWCClicked);
-            
-            CreateFPass.onClick.RemoveListener(CreateFPassClicked);
-            RetryFPassCheck.onClick.RemoveListener(RetryFPassCheckClicked);
-        }
-
-        private void OnEnable()
-        {
-            if (!hasStarted)
-            {
-                timeRemaining = qrRefreshTimeOut;
-                refreshCounterText.text = "";
-                HandleQR(qrCancellationToken).Forget();
-                hasStarted = true;
-            }
-        }
-
-        private async UniTask HandleQR(CancellationTokenSource cts)
-        {
-            try
-            {
-                var token = cts.Token;
-
-                var refreshQR = await RefreshQR();
-                if (!refreshQR)
-                {
-                    Restart();
-                    return;
-                }
-                
-                StartCountdown(token).Forget();
-                
-                var handshake = await Handshake();
-                if (string.IsNullOrEmpty(handshake))
-                {
-                    Restart();
-                    return;
-                }
-
-                HeaderScreen.Instance.Refresh(handshake);
-                HeaderScreen.Instance.Show();
-                
-                var refreshAccessToken = await HandleRefreshAccessToken();
-                if (!refreshAccessToken)
-                {
-                    Restart();
-                    return;
-                }
-            }
-            catch (OperationCanceledException e)
-            {
-                EmergenceLogger.LogError(e.Message, e.HResult);
-                Restart();
-            }
-            loginComplete = true;
-        }
-
-        private async UniTask StartCountdown(CancellationToken cancellationToken)
-        {
-            if (timerIsRunning)
-                return;
-            try
-            {
-                timerIsRunning = true;
-                while (timeRemaining > 0 && !loginComplete)
-                {
-                    SetTimeRemainingText();
-                    await UniTask.Delay(TimeSpan.FromSeconds(1));
-                    timeRemaining--;
-                }
-            }
-            catch (Exception e)
-            {
-                EmergenceLogger.LogError(e.Message, e.HResult);
-                timerIsRunning = false;
-                return;
-            }
-            Restart();
-            timerIsRunning = false;
-        }
-        
-        private async UniTask<bool> RefreshQR()
-        {
-            var qrResponse = await sessionServiceInternal.GetQrCodeAsync();
-            if (!qrResponse.Success)
-            {
-                EmergenceLogger.LogError("Error retrieving QR code.");
-                return false;
-            }
-
-            rawQRImage.texture = qrResponse.Result;
-            return true;
-        }
-        
-        private async UniTask<string> Handshake()
-        {
-            var handshakeResponse = await walletServiceInternal.HandshakeAsync();
-            if (!handshakeResponse.Success)
-            {
-                EmergenceLogger.LogError("Error during handshake.");
-                return "";
-            }
-            return handshakeResponse.Result;
-        }
-
-        private async UniTask<bool> HandleRefreshAccessToken()
-        {
-            var tokenResponse = await sessionServiceInternal.GetAccessTokenAsync();
-            if (!tokenResponse.Success)
-                return false;
-
-            if (usingFV)
-            {
-                var loggedInWithFV = await AttemptFVLogin();
-                if (!loggedInWithFV)
-                { 
-                    HideAllScreens();
-                    futureverseScreen.SetActive(true);
-                    return true; //Bit of a hack to prevent the screen from refreshing.
-                }
-            }
-
-            PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
-            ScreenManager.Instance.ShowDashboard().Forget();
-            return true;
-        }
-
-        private async UniTask<bool> AttemptFVLogin()
-        {
-            var fvService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            var linkedPassInfo = await fvService.GetLinkedFuturepassAsync();
-            if (!linkedPassInfo.Success)
-                return false;
-            var fpass = await fvService.GetFuturepassInformationAsync(linkedPassInfo.Result.ownedFuturepass);
-            if (!fpass.Success)
-                return false;
-            EmergenceLogger.LogInfo("Logged in with Futureverse.", true);
-            return true;
-        }
-
-        public void FullRestart()
-        {
-            loginComplete = false;
             Restart();
         }
-        
+
         public void Restart()
         {
-            if(loginComplete)
-                return;
-            
             HideAllScreens();
             startupScreen.SetActive(true);
-            
-            timeRemaining = qrRefreshTimeOut;
-            qrCancellationToken.Cancel();
-            qrCancellationToken = new CancellationTokenSource();
-            qrCancellationToken.Token.ThrowIfCancellationRequested();
-            HandleQR(qrCancellationToken).Forget();
+            SetLoginButtonsInteractable(true);
         }
     }
 }

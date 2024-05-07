@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Implementations.Login;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
+using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -12,28 +15,20 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class SessionEmergenceService : ISessionService, ISessionServiceInternal, IDisconnectableEmergenceService
+    internal class SessionService : ISessionService, ISessionServiceInternal, IDisconnectableService
     {
-        public string CurrentAccessToken { get; private set; } = string.Empty;
-
-        public bool DisconnectInProgress => disconnectInProgress;
+        public bool IsLoggedIn { get; private set; }
+        public event Action OnSessionConnected;
         public event Action OnSessionDisconnected;
-        private bool disconnectInProgress = false;
-        
-        public SessionEmergenceService()
-        {
-            OnSessionDisconnected += () =>
-            {
-                foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectableEmergenceService>())
-                {
-                    disconnectable.HandleDisconnection();
-                }
-            };
+        public string CurrentAccessToken { get; private set; } = string.Empty;
+        public bool DisconnectInProgress { get; private set; }
 
+        public SessionService()
+        {
             EmergenceSingleton.Instance.OnGameClosing += OnGameEnd;
         }
 
-        private async void OnGameEnd() => await Disconnect(null, null);
+        private async void OnGameEnd() => await DisconnectAsync();
 
         public async UniTask<ServiceResponse<IsConnectedResponse>> IsConnected()
         {
@@ -69,9 +64,8 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> DisconnectAsync()
         {
-            disconnectInProgress = true;
-            string url = StaticConfig.APIBase + "killSession";
-            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
+            DisconnectInProgress = true;
+            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, StaticConfig.APIBase + "killSession");
             try
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
@@ -82,30 +76,52 @@ namespace EmergenceSDK.Internal.Services
                     WebRequestService.CleanupRequest(request);
                     return new ServiceResponse(false);
                 }
+
+                EmergenceUtils.PrintRequestResult("Disconnect request completed", request);
+
+                if (EmergenceUtils.RequestError(request))
+                {
+                    DisconnectInProgress = false;
+                    WebRequestService.CleanupRequest(request);
+                    return new ServiceResponse(false);
+                }
+
+                RunDisconnectionEvents();
+
+                return new ServiceResponse(true);
             }
             catch (ArgumentException)
             {
-                WebRequestService.CleanupRequest(request);
-                //Already disconnected
+                // Already disconnected
+                return new ServiceResponse(true);
             }
             catch (Exception)
             {
-                WebRequestService.CleanupRequest(request);
                 return new ServiceResponse(false);
             }
-            EmergenceUtils.PrintRequestResult("Disconnect request completed", request);
-
-            if (EmergenceUtils.RequestError(request))
+            finally
             {
-                disconnectInProgress = false;
                 WebRequestService.CleanupRequest(request);
-                return new ServiceResponse(false);
+                DisconnectInProgress = false;
+            }
+        }
+
+        public void RunConnectionEvents()
+        {
+            IsLoggedIn = true;
+            OnSessionConnected?.Invoke();
+        }
+
+        public void RunDisconnectionEvents()
+        {
+            IsLoggedIn = false;
+            
+            foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectableService>())
+            {
+                disconnectable.HandleDisconnection();
             }
 
-            disconnectInProgress = false;
             OnSessionDisconnected?.Invoke();
-            WebRequestService.CleanupRequest(request);
-            return new ServiceResponse(true);
         }
 
         public async UniTask Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
@@ -117,21 +133,21 @@ namespace EmergenceSDK.Internal.Services
                 errorCallback?.Invoke("Error in Disconnect.", (long)response.Code);
         }
 
-        public async UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync()
+        public async UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync(CancellationToken ct)
         {
             string url = StaticConfig.APIBase + "qrcode";
 
             using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             try
             {
-                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError, ct: ct);
+                if (!response.IsSuccess)
                 {
                     WebRequestService.CleanupRequest(request);
                     return new ServiceResponse<Texture2D>(false);
                 }
             }
-            catch (Exception)
+            catch (Exception e) when (e is not OperationCanceledException) 
             {
                 WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<Texture2D>(false);
@@ -151,13 +167,20 @@ namespace EmergenceSDK.Internal.Services
             return new ServiceResponse<Texture2D>(true, ((DownloadHandlerTexture)request.downloadHandler).texture);
         }
 
-        public async UniTask GetQrCode(QRCodeSuccess success, ErrorCallback errorCallback)
+        public async UniTask GetQrCode(QRCodeSuccess success, ErrorCallback errorCallback, CancellationCallback cancellationCallback, CancellationToken ct)
         {
-            var response = await GetQrCodeAsync();
-            if(response.Success)
-                success?.Invoke(response.Result);
-            else
-                errorCallback?.Invoke("Error in GetQRCode.", (long)response.Code);
+            try
+            {
+                var response = await GetQrCodeAsync(ct);
+                if (response.Success)
+                    success?.Invoke(response.Result);
+                else
+                    errorCallback?.Invoke("Error in GetQRCode.", (long)response.Code);
+            }
+            catch (OperationCanceledException)
+            {
+                cancellationCallback?.Invoke();
+            }
         }
         
         public async UniTask<ServiceResponse<string>> GetAccessTokenAsync()
@@ -185,7 +208,5 @@ namespace EmergenceSDK.Internal.Services
             else
                 errorCallback?.Invoke("Error in GetAccessToken.", (long)response.Code);
         }
-
-        public bool IsLoggedIn() => ((ISessionServiceInternal)this).CurrentAccessToken.Length != 0;
     }
 }

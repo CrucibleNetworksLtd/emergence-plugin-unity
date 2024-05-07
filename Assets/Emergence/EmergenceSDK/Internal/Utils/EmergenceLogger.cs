@@ -1,6 +1,7 @@
 // Comment in the following define to disable logging
 //#define DISABLE_EMERGENCE_LOGS
 
+using System;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 
@@ -34,6 +35,10 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
         
+        public static void LogWarning(Exception exception)
+        {
+            LogException(exception, LogWarning);
+        }
         
         public static void LogError(string error, long errorCode) => LogError(error, errorCode, false);
         public static void LogError(string error, long errorCode, bool alsoLogToScreen)
@@ -52,6 +57,10 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
         
+        public static void LogError(Exception exception)
+        {
+            LogException(exception, LogError);
+        }
         public static void LogInfo(string message, bool alsoLogToScreen = false)
         {
             if (IsEnabledFor(LogLevel.Info))
@@ -60,6 +69,22 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
 
+        public static void LogInfo(Exception exception)
+        {
+            LogException(exception, LogInfo);
+        }
+
+        private static void LogException(Exception exception, Action<string, bool> logFunction)
+        {
+            Exception currentException = exception;
+            var level = 0;
+            while (currentException != null) {
+                logFunction(new string('\t', level) + exception.GetType().FullName + ": " + exception.Message, false);
+                currentException = currentException.InnerException;
+                level++;
+            }
+        }
+        
         private static bool IsEnabledFor(LogLevel logLevelIn)
         {
             return logLevelIn <= logLevel;
