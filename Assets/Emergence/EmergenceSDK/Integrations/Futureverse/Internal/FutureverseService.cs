@@ -117,45 +117,49 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             var ret = new List<InventoryItem>();
             foreach (var edge in futureverseInventory.Result.data.assets.edges)
             {
-                var node = edge.node;
-                var newItem = new InventoryItem();
-                newItem.ID =
-                    $"{node.collection.chainType}:{node.collection.chainId}:{node.collection.location}:{node.tokenId}";
-                newItem.Blockchain = $"{node.collection.chainType}:{node.collection.chainId}";
-                newItem.Contract = $"{node.collection.location}";
-                newItem.TokenId = $"{node.tokenId}";
-                newItem.Meta = new InventoryItemMetaData
-                {
-                    Name = $"#{node.tokenId}",
-                    Description = node.collection.name
-                };
-                var newMetaContent = new InventoryItemMetaContent
-                {
-                    URL = Helpers.InternalIPFSURLToHTTP(node.metadata?.properties?.image ?? "", "http://ipfs.openmeta.xyz/ipfs/"),
-                    MimeType = node.metadata?.properties?.models?["glb"] != null ? "model/gltf-binary" : "image/png"
-                };
-                newItem.Meta.Content = new List<InventoryItemMetaContent> { newMetaContent };
-                newItem.Meta.Attributes = new List<InventoryItemMetaAttributes>();
-                
-                if (node.metadata?.attributes != null)
-                {
-                    foreach (var kvp in node.metadata.attributes)
-                    {
-                        var inventoryItemMetaAttributes = new InventoryItemMetaAttributes
-                        {
-                            Key = kvp.Key,
-                            Value = kvp.Value
-                        };
-                        newItem.Meta.Attributes.Add(inventoryItemMetaAttributes);
-                    }
-                }
-                
-                newItem.OriginalData = node.OriginalData;
-
-                ret.Add(newItem);
+                ret.Add(ConvertFutureverseItemToInventoryItem(edge.node));
             }
 
             return new ServiceResponse<List<InventoryItem>>(true, ret);
+        }
+
+        private static InventoryItem ConvertFutureverseItemToInventoryItem(InventoryResponse.Data.Assets.Edge.Node node)
+        {
+            var newItem = new InventoryItem
+            {
+                ID = $"{node.collection.chainType}:{node.collection.chainId}:{node.collection.location}:{node.tokenId}",
+                Blockchain = $"{node.collection.chainType}:{node.collection.chainId}",
+                Contract = $"{node.collection.location}",
+                TokenId = $"{node.tokenId}",
+                Meta = new InventoryItemMetaData
+                {
+                    Name = $"#{node.tokenId}",
+                    Description = node.collection.name
+                }
+            };
+            var newMetaContent = new InventoryItemMetaContent
+            {
+                URL = Helpers.InternalIPFSURLToHTTP(node.metadata?.properties?.image ?? "", "http://ipfs.openmeta.xyz/ipfs/"),
+                MimeType = node.metadata?.properties?.models?["glb"] != null ? "model/gltf-binary" : "image/png"
+            };
+            newItem.Meta.Content = new List<InventoryItemMetaContent> { newMetaContent };
+            newItem.Meta.Attributes = new List<InventoryItemMetaAttributes>();
+                
+            if (node.metadata?.attributes != null)
+            {
+                foreach (var kvp in node.metadata.attributes)
+                {
+                    var inventoryItemMetaAttributes = new InventoryItemMetaAttributes
+                    {
+                        Key = kvp.Key,
+                        Value = kvp.Value
+                    };
+                    newItem.Meta.Attributes.Add(inventoryItemMetaAttributes);
+                }
+            }
+                
+            newItem.OriginalData = node.OriginalData;
+            return newItem;
         }
 
         private List<FutureverseAssetTreePath> ParseGetAssetTreeResponse(WebResponse response)
