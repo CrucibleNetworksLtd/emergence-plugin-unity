@@ -20,7 +20,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         [Header("Log-in Manager")]
         public LoginManager loginManager;
 
-        [FormerlySerializedAs("rawQRImage")] [Header("UI References")]
+        [Header("UI References")]
         public RawImage rawQrImage;
 
         public Button backButton;
@@ -32,7 +32,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         public GameObject futureverseScreen;
         public GameObject startupScreen;
 
-        [FormerlySerializedAs("LoginWithFV")] [Header("Futureverse")]
+        [Header("Futureverse")]
         public Button loginWithFv;
 
         [FormerlySerializedAs("LoginWithWC")] public Button loginWithWc;
