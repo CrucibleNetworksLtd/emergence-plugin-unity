@@ -17,7 +17,8 @@ namespace EmergenceSDK.Internal.UI.Screens
 {
     public class LogInScreen : MonoBehaviour
     {
-        [Header("Log-in Manager")] public LoginManager loginManager;
+        [Header("Log-in Manager")]
+        public LoginManager loginManager;
 
         [FormerlySerializedAs("rawQRImage")] [Header("UI References")]
         public RawImage rawQrImage;
@@ -26,7 +27,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         public TextMeshProUGUI refreshCounterText;
         public TextMeshProUGUI refreshText;
 
-        [Header("Sub Screens")] public GameObject qrScreen;
+        [Header("Sub Screens")]
+        public GameObject qrScreen;
         public GameObject futureverseScreen;
         public GameObject startupScreen;
 
