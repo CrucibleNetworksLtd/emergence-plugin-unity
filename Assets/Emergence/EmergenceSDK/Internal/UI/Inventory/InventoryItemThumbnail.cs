@@ -37,14 +37,14 @@ namespace EmergenceSDK.Internal.UI.Inventory
 
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
 
-                if (!response.IsSuccess)
+                if (!response.Successful)
                 {
                     EmergenceLogger.LogWarning("File load error.\n");
                     itemImage.texture = RequestImage.Instance.DefaultThumbnail;
                     return;
                 }
 
-                byte[] imageData = response.DownloadHandler.data;
+                byte[] imageData = response.ResponseBytes;
 
                 using (var decoder = new Decoder(imageData))
                 {

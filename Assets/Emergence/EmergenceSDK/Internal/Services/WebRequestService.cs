@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -61,7 +59,6 @@ namespace EmergenceSDK.Internal.Services
         public static void CleanupRequest(UnityWebRequest request)
         {
             Instance.RemoveOpenRequest(request);
-            request.uploadHandler?.Dispose();
         }
 
         private static void SetupRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)
@@ -151,12 +148,12 @@ namespace EmergenceSDK.Internal.Services
                     var response = request.result;
                     if (response == UnityWebRequest.Result.Success)
                     {
-                        return new WebResponse(true, request.downloadHandler.text, request.responseCode, request.downloadHandler);
+                        return new WebResponse(request);
                     }
                     else
                     {
                         errorCallback?.Invoke(request.error, request.responseCode);
-                        return new WebResponse(false, request.error, request.responseCode, request.downloadHandler);
+                        return new WebResponse(request);
                     }
                 }
                 catch (TimeoutException e)
@@ -164,31 +161,18 @@ namespace EmergenceSDK.Internal.Services
                     request.Abort(); // Abort the request
 
                     errorCallback?.Invoke("Request timed out.", 0);
-                    return new TimeoutWebResponse(e);
+                    return new FailedWebResponse(e, request);
                 }
-            }
-            catch (WebException e)
-            {
-                if (e.Response is HttpWebResponse errorResponse)
-                {
-                    using (StreamReader reader = new StreamReader(errorResponse.GetResponseStream()))
-                    {
-                        string serverMessage = reader.ReadToEnd();
-                        return new WebResponse(false, serverMessage);
-                    }
-                }
-
-                return new WebResponse(false, e.Message);
             }
             catch (UnityWebRequestException e)
             {
                 errorCallback?.Invoke(e.Message, request.responseCode);
-                return new WebResponse(false, e.Message, request.responseCode);
+                return new FailedWebResponse(e, request);
             }
-            catch (Exception ex) when (ex is not OperationCanceledException)
+            catch (Exception e) when (e is not OperationCanceledException)
             {
                 errorCallback?.Invoke(request.error, request.responseCode);
-                return new WebResponse(false, ex.Message, request.responseCode);
+                return new FailedWebResponse(e, request);
             }
             finally
             {

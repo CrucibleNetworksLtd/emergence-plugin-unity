@@ -36,19 +36,11 @@ namespace EmergenceSDK.Internal.Services
             string url = StaticConfig.APIBase + "reinitializewalletconnect";
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
-            try
-            {
-                var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
-                {
-                    WebRequestService.CleanupRequest(request);
-                    return new ServiceResponse<bool>(false);
-                }
-            }
-            catch (Exception)
+            var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+            if(response.Successful == false)
             {
                 WebRequestService.CleanupRequest(request);
-                return new ServiceResponse<bool>(false);
+                return new ServiceResponse<bool>(response, false, false);
             }
             EmergenceUtils.PrintRequestResult("ReinitializeWalletConnect", request);
         
@@ -56,9 +48,9 @@ namespace EmergenceSDK.Internal.Services
             WebRequestService.CleanupRequest(request);
             if (requestSuccessful)
             {
-                return new ServiceResponse<bool>(true, processedResponse.disconnected);
+                return new ServiceResponse<bool>(response, true, processedResponse.disconnected);
             }
-            return new ServiceResponse<bool>(false);
+            return new ServiceResponse<bool>(response, false);
         }
         
         public async UniTask<ServiceResponse<string>> RequestToSignAsync(string messageToSign)
@@ -75,19 +67,11 @@ namespace EmergenceSDK.Internal.Services
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, content);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
         
-            try
-            {
-                var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
-                {
-                    WebRequestService.CleanupRequest(request);
-                    return new ServiceResponse<string>(false);
-                }
-            }
-            catch (Exception)
+            var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+            if(response.Successful == false)
             {
                 WebRequestService.CleanupRequest(request);
-                return new ServiceResponse<string>(false);
+                return new ServiceResponse<string>(response, false);
             }
             EmergenceUtils.PrintRequestResult("RequestToSignWalletConnect", request);
 
@@ -99,11 +83,11 @@ namespace EmergenceSDK.Internal.Services
                     if (processedResponse == null)
                     {
                         EmergenceLogger.LogWarning("Request was successful but processedResponse was null, response body was: `" + request.downloadHandler.text + "`");
-                        return new ServiceResponse<string>(false);
+                        return new ServiceResponse<string>(response, false);
                     }
-                    return new ServiceResponse<string>(true, processedResponse.signedMessage);
+                    return new ServiceResponse<string>(response, true, processedResponse.signedMessage);
                 }
-                return new ServiceResponse<string>(false);
+                return new ServiceResponse<string>(response, false);
             }
             finally
             {
@@ -114,8 +98,8 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask RequestToSign(string messageToSign, RequestToSignSuccess success, ErrorCallback errorCallback)
         {
             var response = await RequestToSignAsync(messageToSign);
-            if(response.Success)
-                success?.Invoke(response.Result);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in RequestToSign.", (long)response.Code);
         }
@@ -131,46 +115,42 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError, timeout, ct: ct);
-                if (!response.IsSuccess)
+                if (!response.Successful)
                 {
-                    if (response is TimeoutWebResponse timeoutResponse)
+                    if (response is FailedWebResponse failedWebResponse)
                     {
-                        throw timeoutResponse.Exception;
+                        throw failedWebResponse.Exception;
                     }
 
-                    return new ServiceResponse<string>(false);
+                    return new ServiceResponse<string>(response, false);
                 }
-            }
-            catch (Exception e) when (e is not OperationCanceledException and not TimeoutException)
-            {
-                return new ServiceResponse<string>(false);
+                
+                EmergenceUtils.PrintRequestResult("Handshake", request);
+        
+                if (EmergenceUtils.ProcessRequest<HandshakeResponse>(request, EmergenceLogger.LogError, out var processedResponse))
+                {
+                    if (processedResponse == null)
+                    {
+                        string errorMessage = completedHandshake ? "Handshake already completed." : "Handshake failed, check server status.";
+                        int errorCode = completedHandshake ? 0 : -1;
+                        EmergenceLogger.LogError(errorMessage, errorCode);
+                        WebRequestService.CleanupRequest(request);
+                        return new ServiceResponse<string>(response, false);
+                    }
+                
+                    completedHandshake = true;
+                    WalletAddress = processedResponse.address;
+                    ChecksummedWalletAddress = processedResponse.checksummedAddress;
+                    WebRequestService.CleanupRequest(request);
+                    return new ServiceResponse<string>(response, true, processedResponse.address);
+                }
+                WebRequestService.CleanupRequest(request);
+                return new ServiceResponse<string>(response, false);
             }
             finally
             {
                 WebRequestService.CleanupRequest(request);
             }
-        
-            EmergenceUtils.PrintRequestResult("Handshake", request);
-        
-            if (EmergenceUtils.ProcessRequest<HandshakeResponse>(request, EmergenceLogger.LogError, out var processedResponse))
-            {
-                if (processedResponse == null)
-                {
-                    string errorMessage = completedHandshake ? "Handshake already completed." : "Handshake failed, check server status.";
-                    int errorCode = completedHandshake ? 0 : -1;
-                    EmergenceLogger.LogError(errorMessage, errorCode);
-                    WebRequestService.CleanupRequest(request);
-                    return new ServiceResponse<string>(false);
-                }
-                
-                completedHandshake = true;
-                WalletAddress = processedResponse.address;
-                ChecksummedWalletAddress = processedResponse.checksummedAddress;
-                WebRequestService.CleanupRequest(request);
-                return new ServiceResponse<string>(true, processedResponse.address);
-            }
-            WebRequestService.CleanupRequest(request);
-            return new ServiceResponse<string>(false);
         }
 
         public void RunWithSpoofedWalletAddress(string walletAddress, string checksummedWalletAddress, Action action)
@@ -215,8 +195,8 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await HandshakeAsync(timeout, ct);
-                if (response.Success)
-                    success?.Invoke(response.Result);
+                if (response.Successful)
+                    success?.Invoke(response.Result1);
                 else
                     errorCallback?.Invoke("Error in Handshake.", (long)response.Code);
             }
@@ -240,19 +220,12 @@ namespace EmergenceSDK.Internal.Services
                          "&address=" + WalletAddress;
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
-            try
-            {
-                var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
-                {
-                    WebRequestService.CleanupRequest(request);
-                    return new ServiceResponse<string>(false);
-                }
-            }
-            catch (Exception)
+            
+            var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+            if(response.Successful == false)
             {
                 WebRequestService.CleanupRequest(request);
-                return new ServiceResponse<string>(false);
+                return new ServiceResponse<string>(response, false);
             }
         
             EmergenceUtils.PrintRequestResult("Get Balance", request);
@@ -260,17 +233,17 @@ namespace EmergenceSDK.Internal.Services
             if (EmergenceUtils.ProcessRequest<GetBalanceResponse>(request, EmergenceLogger.LogError, out var processedResponse))
             {
                 WebRequestService.CleanupRequest(request);
-                return new ServiceResponse<string>(true, processedResponse.balance);
+                return new ServiceResponse<string>(response, true, processedResponse.balance);
             }
             WebRequestService.CleanupRequest(request);
-            return new ServiceResponse<string>(false);
+            return new ServiceResponse<string>(response, false);
         }
 
         public async UniTask GetBalance(BalanceSuccess success, ErrorCallback errorCallback)
         {
             var response = await GetBalanceAsync();
-            if(response.Success)
-                success?.Invoke(response.Result);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in GetBalance.", (long)response.Code);
         }
@@ -290,7 +263,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                if(response.Successful == false)
                 {
                     WebRequestService.CleanupRequest(request);
                     return new ServiceResponse<bool>(false);
@@ -315,8 +288,8 @@ namespace EmergenceSDK.Internal.Services
             ValidateSignedMessageSuccess success, ErrorCallback errorCallback)
         {
             var response = await ValidateSignedMessageAsync(new ValidateSignedMessageRequest(message, signedMessage, address));
-            if(response.Success)
-                success?.Invoke(response.Result);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in ValidateSignedMessage.", (long)response.Code);
         }

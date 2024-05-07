@@ -54,7 +54,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                if(response.Successful == false)
                     return new ServiceResponse<List<Persona>, Persona>(false);
             }
             catch (Exception)
@@ -77,8 +77,8 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask GetPersonas(SuccessPersonas success, ErrorCallback errorCallback)
         {
             var response = await GetPersonasAsync();
-            if(response.Success)
-                success?.Invoke(response.Result0, response.Result1);
+            if(response.Successful)
+                success?.Invoke(response.Result1, response.Result2);
             else
                 errorCallback?.Invoke("Error in GetPersonas.", (long)response.Code);
         }
@@ -91,7 +91,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                if(response.Successful == false)
                 {
                     WebRequestService.CleanupRequest(request);
                     return new ServiceResponse<Persona>(false);
@@ -118,8 +118,8 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask GetCurrentPersona(SuccessGetCurrentPersona success, ErrorCallback errorCallback)
         {
             var response = await GetCurrentPersonaAsync();
-            if(response.Success)
-                success?.Invoke(response.Result);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in GetCurrentPersona.", (long)response.Code);
         }
@@ -132,7 +132,7 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
             var headers = new Dictionary<string, string> { { "deviceId", EmergenceSingleton.Instance.CurrentDeviceId } };
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, jsonPersona, headers);
-            if(response.IsSuccess == false)
+            if(response.Successful == false)
                 return new ServiceResponse(false);
             
             return new ServiceResponse(true);
@@ -141,7 +141,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask CreatePersona(Persona persona, SuccessCreatePersona success, ErrorCallback errorCallback)
         {
             var response = await CreatePersonaAsync(persona);
-            if(response.Success)
+            if(response.Successful)
                 success?.Invoke();
             else
                 errorCallback?.Invoke("Error in CreatePersona.", (long)response.Code);
@@ -163,7 +163,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                if(response.Successful == false)
                     return new ServiceResponse(false);
             }
             catch (Exception)
@@ -187,7 +187,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask EditPersona(Persona persona, SuccessEditPersona success, ErrorCallback errorCallback)
         {
             var response = await EditPersonaAsync(persona);
-            if(response.Success)
+            if(response.Successful)
                 success?.Invoke();
             else
                 errorCallback?.Invoke("Error in EditPersona.", (long)response.Code);
@@ -210,7 +210,7 @@ namespace EmergenceSDK.Internal.Services
             string personaAvatarTokenUri = Helpers.InternalIPFSURLToHTTP(persona.avatar.tokenURI);
             UnityWebRequest tokenUriRequest = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, personaAvatarTokenUri, "");
             var response = await WebRequestService.PerformAsyncWebRequest(tokenUriRequest, EmergenceLogger.LogError);
-            if(response.IsSuccess == false)
+            if(response.Successful == false)
                 return new ServiceResponse(false);
             TokenURIResponse res = SerializationHelper.Deserialize<List<TokenURIResponse>>(tokenUriRequest.downloadHandler.text)[0];
             WebRequestService.CleanupRequest(tokenUriRequest);
@@ -230,7 +230,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                if(response.Successful == false)
                     return new ServiceResponse(false);
             }
             catch (Exception)
@@ -252,7 +252,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask DeletePersona(Persona persona, SuccessDeletePersona success, ErrorCallback errorCallback)
         {
             var response = await DeletePersonaAsync(persona);
-            if(response.Success)
+            if(response.Successful)
                 success?.Invoke();
             else
                 errorCallback?.Invoke("Error in DeletePersona.", (long)response.Code);
@@ -268,7 +268,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                if(response.Successful == false)
                     return new ServiceResponse(false);
             }
             catch (Exception)
@@ -291,7 +291,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask SetCurrentPersona(Persona persona, SuccessSetCurrentPersona success, ErrorCallback errorCallback)
         {
             var response = await SetCurrentPersonaAsync(persona);
-            if(response.Success)
+            if(response.Successful)
                 success?.Invoke();
             else
                 errorCallback?.Invoke("Error in SetCurrentPersona.", (long)response.Code);

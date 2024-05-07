@@ -39,7 +39,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if(response.IsSuccess == false)
+                if(response.Successful == false)
                 {
                     WebRequestService.CleanupRequest(request);
                     return new ServiceResponse<IsConnectedResponse>(false);
@@ -71,7 +71,7 @@ namespace EmergenceSDK.Internal.Services
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
                 request.SetRequestHeader("auth", CurrentAccessToken);
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-                if (response.IsSuccess == false)
+                if (response.Successful == false)
                 {
                     WebRequestService.CleanupRequest(request);
                     return new ServiceResponse(false);
@@ -127,7 +127,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
         {
             var response = await DisconnectAsync();
-            if(response.Success)
+            if(response.Successful)
                 success?.Invoke();
             else
                 errorCallback?.Invoke("Error in Disconnect.", (long)response.Code);
@@ -141,7 +141,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError, ct: ct);
-                if (!response.IsSuccess)
+                if (!response.Successful)
                 {
                     WebRequestService.CleanupRequest(request);
                     return new ServiceResponse<Texture2D>(false);
@@ -172,8 +172,8 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await GetQrCodeAsync(ct);
-                if (response.Success)
-                    success?.Invoke(response.Result);
+                if (response.Successful)
+                    success?.Invoke(response.Result1);
                 else
                     errorCallback?.Invoke("Error in GetQRCode.", (long)response.Code);
             }
@@ -188,9 +188,9 @@ namespace EmergenceSDK.Internal.Services
             string url = StaticConfig.APIBase + "get-access-token";
             var headers = new Dictionary<string, string> { { "deviceId", EmergenceSingleton.Instance.CurrentDeviceId } };
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError, "", headers);
-            if(response.IsSuccess == false)
+            if(response.Successful == false)
                 return new ServiceResponse<string>(false);
-            var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response.Response);
+            var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response.ResponseText);
             CurrentAccessToken = SerializationHelper.Serialize(accessTokenResponse.message.AccessToken, false);
             return new ServiceResponse<string>(true, CurrentAccessToken);
         }
@@ -203,8 +203,8 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
         {
             var response = await GetAccessTokenAsync();
-            if(response.Success)
-                success?.Invoke(response.Result);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in GetAccessToken.", (long)response.Code);
         }

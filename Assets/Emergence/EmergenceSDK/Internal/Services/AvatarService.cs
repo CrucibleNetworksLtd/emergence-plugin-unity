@@ -18,8 +18,8 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await AvatarsByOwnerAsync(address, ct);
-                if(response.Success)
-                    success?.Invoke(response.Result);
+                if(response.Successful)
+                    success?.Invoke(response.Result1);
                 else
                     errorCallback?.Invoke("Error in AvatarsByOwner.", (long)response.Code);
             }
@@ -36,10 +36,10 @@ namespace EmergenceSDK.Internal.Services
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError, ct: ct);
             ct.ThrowIfCancellationRequested();
             
-            if(response.IsSuccess == false)
+            if(response.Successful == false)
                 return new ServiceResponse<List<Avatar>>(false);
             
-            GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response.Response);
+            GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response.ResponseText);
             return new ServiceResponse<List<Avatar>>(true, avatarResponse.message);
         }
 
@@ -49,12 +49,12 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "id?id=" + id;
             
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError, ct: ct);
-            if(response.IsSuccess == false)
+            if(response.Successful == false)
                 return new ServiceResponse<Avatar>(false);
             
             ct.ThrowIfCancellationRequested();
             
-            GetAvatarResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarResponse>(response.Response);
+            GetAvatarResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarResponse>(response.ResponseText);
             return new ServiceResponse<Avatar>(true, avatarResponse.message);
         }
 
@@ -63,8 +63,8 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await AvatarByIdAsync(id, ct: ct);
-                if(response.Success)
-                    success?.Invoke(response.Result);
+                if(response.Successful)
+                    success?.Invoke(response.Result1);
                 else
                     errorCallback?.Invoke("Error in AvatarById.", (long)response.Code);
             }

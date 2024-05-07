@@ -98,8 +98,8 @@ namespace EmergenceSDK.Internal.UI.Screens
             HideFVSidebars(EmergenceServiceProvider.GetService<IFutureverseService>().UsingFutureverse);
             var inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
             var updatedInventory = await inventoryService.InventoryByOwnerAsync(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible);
-            inventoryItemStore.SetItems(updatedInventory.Result);
-            if (updatedInventory.Success)
+            inventoryItemStore.SetItems(updatedInventory.Result1);
+            if (updatedInventory.Successful)
             {
                 UpdateInventoryItemListeners();
             }
@@ -107,9 +107,9 @@ namespace EmergenceSDK.Internal.UI.Screens
              
             var avatarService = EmergenceServiceProvider.GetService<IAvatarService>();
             var updatedAvatars = await avatarService.AvatarsByOwnerAsync(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress);
-            if (updatedAvatars.Success)
+            if (updatedAvatars.Successful)
             {
-                avatars = updatedAvatars.Result;
+                avatars = updatedAvatars.Result1;
             }
             Modal.Instance.Hide();
             

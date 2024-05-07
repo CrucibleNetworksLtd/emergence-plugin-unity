@@ -45,9 +45,9 @@ namespace EmergenceSDK.Tests.Futureverse
                         await walletServiceInternal.RunWithSpoofedWalletAddressAsync("0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", "0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c", async () =>
                         {
                             var response = await futureverseService.GetLinkedFuturepassAsync();
-                            Assert.IsTrue(response.Success);
+                            Assert.IsTrue(response.Successful);
                             Assert.IsTrue(response.Code == ServiceResponseCode.Success);
-                            Assert.AreEqual(EmergenceSingleton.Instance.Configuration.Chain.ChainID + ":evm:0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", response.Result.eoa);
+                            Assert.AreEqual(EmergenceSingleton.Instance.Configuration.Chain.ChainID + ":evm:0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", response.Result1.eoa);
                         });
                     });
             });
@@ -66,9 +66,9 @@ namespace EmergenceSDK.Tests.Futureverse
                         await walletServiceInternal.RunWithSpoofedWalletAddressAsync("0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", "0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c", async () =>
                         {
                             var response = await futureverseService.GetFuturepassInformationAsync("7668:root:0xffffffff0000000000000000000000000003b681");
-                            Assert.IsTrue(response.Success);
+                            Assert.IsTrue(response.Successful);
                             Assert.IsTrue(response.Code == ServiceResponseCode.Success);
-                            Assert.AreEqual("7668:root:0xffffffff0000000000000000000000000003b681", response.Result.futurepass);
+                            Assert.AreEqual("7668:root:0xffffffff0000000000000000000000000003b681", response.Result1.futurepass);
                         });
                     });
             });

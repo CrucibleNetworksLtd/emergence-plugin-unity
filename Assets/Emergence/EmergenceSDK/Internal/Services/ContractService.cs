@@ -57,7 +57,7 @@ namespace EmergenceSDK.Internal.Services
             request.downloadHandler = new DownloadHandlerBuffer();
             var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
 
-            if (response.IsSuccess && EmergenceUtils.ProcessRequest<LoadContractResponse>(request, EmergenceLogger.LogError, out var processedResponse))
+            if (response.Successful && EmergenceUtils.ProcessRequest<LoadContractResponse>(request, EmergenceLogger.LogError, out var processedResponse))
             {
                 loadedContractAddresses.Add(contractAddress);
             }
@@ -74,17 +74,17 @@ namespace EmergenceSDK.Internal.Services
             string dataString = SerializationHelper.Serialize(parameters, false);
 
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString);
-            if(response.IsSuccess == false)
+            if(response.Successful == false)
                 return new ServiceResponse<ReadContractResponse>(false);
-            var readContractResponse = SerializationHelper.Deserialize<BaseResponse<ReadContractResponse>>(response.Response);
+            var readContractResponse = SerializationHelper.Deserialize<BaseResponse<ReadContractResponse>>(response.ResponseText);
             return new ServiceResponse<ReadContractResponse>(true, readContractResponse.message);
         }
         
         public async UniTask ReadMethod<T>(ContractInfo contractInfo, T parameters, ReadMethodSuccess success, ErrorCallback errorCallback)
         {
             var response = await ReadMethodAsync(contractInfo, parameters);
-            if(response.Success)
-                success?.Invoke(response.Result);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in ReadMethod", (long)response.Code);
         }
@@ -105,7 +105,7 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsyncImpl<T>(ContractInfo contractInfo, string value, T body, int attempt)
         {
             var switchChainResonse = await SwitchChain(contractInfo);
-            if (!switchChainResonse.IsSuccess)
+            if (!switchChainResonse.Successful)
                 return await HandleWriteMethodError(switchChainResonse, new SerialisedWriteRequest<T>(contractInfo, value, body, attempt));
             if (!await AttemptToLoadContract(contractInfo))
                 return new ServiceResponse<WriteContractResponse>(false);
@@ -118,11 +118,11 @@ namespace EmergenceSDK.Internal.Services
             var headers = new Dictionary<string, string>();
             headers.Add("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString, headers);
-            if(response.IsSuccess == false)
+            if(response.Successful == false)
                 return await HandleWriteMethodError(response,
                     new SerialisedWriteRequest<T>(contractInfo, value, body, attempt));
 
-            var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response.Response);
+            var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response.ResponseText);
             CheckForTransactionSuccess(contractInfo, writeContractResponse.message.transactionHash).Forget();
             return new ServiceResponse<WriteContractResponse>(true, writeContractResponse.message);
         }
@@ -154,9 +154,9 @@ namespace EmergenceSDK.Internal.Services
                 await UniTask.Delay(timeOut);
 
                 var transactionStatus = await EmergenceServiceProvider.GetService<IChainService>().GetTransactionStatusAsync(transactionHash, contractInfo.NodeUrl);
-                if (transactionStatus.Result?.transaction?.Confirmations != null)
-                    confirmations = (int)transactionStatus.Result?.transaction?.Confirmations;
-                if(transactionStatus.Result?.transaction?.Confirmations >= desiredConfirmationCount)
+                if (transactionStatus.Result1?.transaction?.Confirmations != null)
+                    confirmations = (int)transactionStatus.Result1?.transaction?.Confirmations;
+                if(transactionStatus.Result1?.transaction?.Confirmations >= desiredConfirmationCount)
                 {
                     WriteMethodConfirmed?.Invoke(new WriteContractResponse(transactionHash));
                     break;
@@ -172,8 +172,8 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask WriteMethod<T>(ContractInfo contractInfo, string value, T parameters, WriteMethodSuccess success, ErrorCallback errorCallback)
         {
             var response = await WriteMethodAsync(contractInfo, value, parameters);
-            if(response.Success)
-                success?.Invoke(response.Result);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in WriteMethod", (long)response.Code);
         }

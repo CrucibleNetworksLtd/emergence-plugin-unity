@@ -1,3 +1,5 @@
+using EmergenceSDK.Internal.Types;
+
 namespace EmergenceSDK.Types
 {
     public enum ServiceResponseCode
@@ -8,46 +10,49 @@ namespace EmergenceSDK.Types
 
     public class ServiceResponse
     {
-        public bool Success => Code == ServiceResponseCode.Success;
+        public readonly WebResponse Response;
+        public bool Successful => Code == ServiceResponseCode.Success;
+        public ServiceResponseCode Code { get; }
 
-        public ServiceResponseCode Code => code;
-        private readonly ServiceResponseCode code;
-
-        public ServiceResponse(bool success)
+        public ServiceResponse(WebResponse response, bool successful)
         {
-            code = success ? ServiceResponseCode.Success : ServiceResponseCode.Failure;
+            Response = response;
+            Code = successful ? ServiceResponseCode.Success : ServiceResponseCode.Failure;
         }
+
+        public ServiceResponse(ServiceResponse response, bool successful) : this(response.Response, successful) {}
+        public ServiceResponse(WebResponse response) : this(response, response?.Successful ?? false) {}
+        public ServiceResponse(ServiceResponse response) : this(response, response?.Successful ?? false) {}
+        public ServiceResponse(bool successful) : this((WebResponse)null, successful) {}
     }
 
-    public class ServiceResponse<T>
+    public class ServiceResponse<T1> : ServiceResponse
     {
-        public bool Success => Code == ServiceResponseCode.Success;
-        public readonly T Result;
-
-        public ServiceResponseCode Code => code;
-        private readonly ServiceResponseCode code;
-
-        public ServiceResponse(bool success, T result = default)
+        public readonly T1 Result1;
+        
+        public ServiceResponse(WebResponse response, bool successful, T1 result1 = default) : base(response, successful)
         {
-            code = success ? ServiceResponseCode.Success : ServiceResponseCode.Failure;
-            Result = result;
-        }
-    }
-
-    public class ServiceResponse<T, U>
-    {
-        public bool Success => Code == ServiceResponseCode.Success;
-        public readonly T Result0;
-        public readonly U Result1;
-
-        public ServiceResponseCode Code => code;
-        private readonly ServiceResponseCode code;
-
-        public ServiceResponse(bool success, T result0 = default, U result1 = default)
-        {
-            code = success ? ServiceResponseCode.Success : ServiceResponseCode.Failure;
-            Result0 = result0;
             Result1 = result1;
         }
+        
+        public ServiceResponse(ServiceResponse response, bool successful, T1 result1 = default) : this(response.Response, successful, result1) { }
+        public ServiceResponse(WebResponse response, T1 result1 = default) : this(response, response?.Successful ?? false, result1) { }
+        public ServiceResponse(ServiceResponse response, T1 result1 = default) : this(response, response?.Successful ?? false, result1) { }
+        public ServiceResponse(bool successful, T1 result1 = default) : this((WebResponse)null, successful, result1) { }
+    }
+
+    public class ServiceResponse<T1, T2> : ServiceResponse<T1>
+    {
+        public readonly T2 Result2;
+        
+        public ServiceResponse(WebResponse response, bool successful, T1 result1 = default, T2 result2 = default) : base(response, successful, result1)
+        {
+            Result2 = result2;
+        }
+
+        public ServiceResponse(ServiceResponse response, bool successful, T1 result1 = default, T2 result2 = default) : this(response.Response, successful, result1, result2) { }
+        public ServiceResponse(WebResponse response, T1 result1 = default, T2 result2 = default) : this(response, response?.Successful ?? false, result1, result2) { }
+        public ServiceResponse(ServiceResponse response, T1 result1 = default, T2 result2 = default) : this(response, response?.Successful ?? false, result1, result2) { }
+        public ServiceResponse(bool successful, T1 result1 = default, T2 result2 = default) : this((WebResponse)null, successful, result1, result2) { }
     }
 }

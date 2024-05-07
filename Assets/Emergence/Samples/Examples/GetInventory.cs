@@ -26,9 +26,9 @@ namespace EmergenceSDK.Samples.Examples
             //Make the call to the service
             var response = await inventoryService.InventoryByOwnerAsync(address, InventoryChain.AnyCompatible);
             //If the call was successful, set the inventory to the result
-            if (response.Success)
+            if (response.Successful)
             {
-                inventory = response.Result;
+                inventory = response.Result1;
             }
             return inventory;
         }

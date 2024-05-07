@@ -151,7 +151,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         private async UniTask CreateNewPersona()
         {
             var response = await PersonaServiceInternal.CreatePersonaAsync(currentPersona);
-            if (response.Success)
+            if (response.Successful)
             {
                 EmergenceLogger.LogInfo($"New persona {currentPersona.name} created");
                 ClearCurrentPersona();
@@ -167,7 +167,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         private async UniTask EditPersona()
         {
             var response = await PersonaServiceInternal.EditPersonaAsync(currentPersona);
-            if (response.Success)
+            if (response.Successful)
             {
                 EmergenceLogger.LogInfo("Changes to Persona saved");
                 ClearCurrentPersona();

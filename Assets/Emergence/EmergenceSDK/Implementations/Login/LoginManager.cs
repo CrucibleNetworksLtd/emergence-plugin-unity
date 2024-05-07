@@ -231,7 +231,7 @@ namespace EmergenceSDK.Implementations.Login
                 {
                     passResponse = await futureverseService.GetLinkedFuturepassAsync();
                     _ct.ThrowIfCancellationRequested();
-                    if (!passResponse.Success)
+                    if (!passResponse.Successful)
                     {
                         throw new FuturepassRequestFailedException("Request was not successful", passResponse);
                     }
@@ -243,19 +243,19 @@ namespace EmergenceSDK.Implementations.Login
                 
                 try
                 {
-                    var passInformationResponse = await futureverseService.GetFuturepassInformationAsync(passResponse.Result.ownedFuturepass);
+                    var passInformationResponse = await futureverseService.GetFuturepassInformationAsync(passResponse.Result1.ownedFuturepass);
                     _ct.ThrowIfCancellationRequested();
-                    if (!passInformationResponse.Success || passInformationResponse.Result == null)
+                    if (!passInformationResponse.Successful || passInformationResponse.Result1 == null)
                     {
-                        if (passInformationResponse.Success && passInformationResponse.Result == null)
+                        if (passInformationResponse.Successful && passInformationResponse.Result1 == null)
                         {
-                            var exception = new NullReferenceException(nameof(passInformationResponse) + '.' + nameof(passInformationResponse.Result) + "is null");
+                            var exception = new NullReferenceException(nameof(passInformationResponse) + '.' + nameof(passInformationResponse.Result1) + "is null");
                             throw new FuturepassInformationRequestFailedException("Request was successful but result is null!", passInformationResponse, exception);
                         }
                         
                         throw new FuturepassInformationRequestFailedException("Request was not successful", passInformationResponse);
                     }
-                    ((IFutureverseServiceInternal)futureverseService).FuturepassInformation = passInformationResponse.Result;
+                    ((IFutureverseServiceInternal)futureverseService).FuturepassInformation = passInformationResponse.Result1;
                 }
                 catch (Exception e) when (e is not OperationCanceledException and not FuturepassInformationRequestFailedException)
                 {
@@ -274,7 +274,7 @@ namespace EmergenceSDK.Implementations.Login
             {
                 var tokenResponse = await sessionServiceInternal.GetAccessTokenAsync();
                 _ct.ThrowIfCancellationRequested();
-                if (!tokenResponse.Success)
+                if (!tokenResponse.Successful)
                 {
                     throw new TokenRequestFailedException("Request was not successful", tokenResponse);
                 }
@@ -295,7 +295,7 @@ namespace EmergenceSDK.Implementations.Login
             {
                 var handshakeResponse = await walletServiceInternal.HandshakeAsync(ct: _ct);
                 _ct.ThrowIfCancellationRequested();
-                if (!handshakeResponse.Success)
+                if (!handshakeResponse.Successful)
                 {
                     throw new HandshakeRequestFailedException("Request was not successful", handshakeResponse);
                 }
@@ -316,11 +316,11 @@ namespace EmergenceSDK.Implementations.Login
             {
                 var qrCodeResponse = await sessionServiceInternal.GetQrCodeAsync(_ct);
                 _ct.ThrowIfCancellationRequested();
-                if (!qrCodeResponse.Success)
+                if (!qrCodeResponse.Successful)
                 {
                     throw new QrCodeRequestFailedException("Request was not successful", qrCodeResponse);
                 }
-                CurrentQrCode = new EmergenceQrCode(this, qrCodeResponse.Result, EmergenceSingleton.Instance.CurrentDeviceId);
+                CurrentQrCode = new EmergenceQrCode(this, qrCodeResponse.Result1, EmergenceSingleton.Instance.CurrentDeviceId);
             }
             catch (Exception e) when (e is not OperationCanceledException and not QrCodeRequestFailedException)
             {

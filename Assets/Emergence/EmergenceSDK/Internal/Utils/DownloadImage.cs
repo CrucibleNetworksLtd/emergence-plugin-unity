@@ -46,14 +46,14 @@ namespace EmergenceSDK.Internal.Utils
                 return;
             }
 
-            if (!response.IsSuccess)
+            if (!response.Successful)
             {
-                failedCallback?.Invoke(url, response.Response, response.StatusCode);
+                failedCallback?.Invoke(url, response.ResponseText, response.StatusCode);
                 EmergenceLogger.LogWarning("Failed to download image at " + url);
                 return;
             }
 
-            byte[] imageBytes = response.DownloadHandler.data;
+            byte[] imageBytes = response.ResponseBytes;
             var texture = await GetTextureFromImageBytes(imageBytes, url);
             successCallback?.Invoke(url, texture, this);
         }

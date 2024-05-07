@@ -1,20 +1,27 @@
+using System;
 using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Types
 {
-    public class WebResponse
+    public class WebResponse : IDisposable
     {
-        public bool IsSuccess { get; private set; }
-        public string Response { get; private set; }
-        public long StatusCode { get; private set; } = 0;
-        public DownloadHandler DownloadHandler { get; private set; }
+        public UnityWebRequest.Result Result => WebRequest.result;
+        public string Error => WebRequest.error;
+        public virtual bool Completed => Result != UnityWebRequest.Result.InProgress;
+        public virtual bool Successful => Result == UnityWebRequest.Result.Success;
+        public string ResponseText => WebRequest.downloadHandler.text;
+        public byte[] ResponseBytes => WebRequest.downloadHandler.data;
+        public long StatusCode => WebRequest.responseCode;
+        public readonly UnityWebRequest WebRequest;
 
-        public WebResponse(bool isSuccess, string response, long statusCode = 0, DownloadHandler downloadHandler = null)
+        public WebResponse(UnityWebRequest webRequest)
         {
-            IsSuccess = isSuccess;
-            Response = response;
-            StatusCode = statusCode;
-            DownloadHandler = downloadHandler;
+            WebRequest = webRequest;
+        }
+
+        public void Dispose()
+        {
+            WebRequest?.Dispose();
         }
     }
 }
