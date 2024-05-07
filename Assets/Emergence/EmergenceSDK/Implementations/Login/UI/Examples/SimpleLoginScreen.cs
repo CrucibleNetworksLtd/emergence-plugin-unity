@@ -16,11 +16,11 @@ namespace EmergenceSDK.Implementations.Login.UI.Examples
     /// </summary>
     public class SimpleLoginScreen : MonoBehaviour
     {
-        public LoginManager loginManager; // The LoginManager MonoBehaviour
-        public LoginMode loginMode; // The chosen LoginMode
-        public RawImage rawImage; // The RawImage for the QR code
-        public TextMeshProUGUI countdownLabel; // The label for the QR code countdown
-        public Button cancelButton; // The cancel button
+        public LoginManager loginManager;
+        public LoginMode loginMode;
+        public RawImage rawImage;
+        public TextMeshProUGUI countdownLabel;
+        public Button cancelButton;
         private void SetTimeRemainingText(LoginManager _, EmergenceQrCode qrCode) => countdownLabel.text = "Expires in: " + qrCode.TimeLeftInt.ToString("0");
 
         private void Awake()
