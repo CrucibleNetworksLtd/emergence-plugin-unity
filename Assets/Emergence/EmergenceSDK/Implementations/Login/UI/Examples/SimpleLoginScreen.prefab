@@ -320,7 +320,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8532157812324145049}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f3ac75978c1c124c8e4a23fae5c3401, type: 3}
+  m_Script: {fileID: 11500000, guid: 7262cb01a4a219c45a5fde01bab932b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   loginManager: {fileID: 8532157812324145051}
@@ -340,13 +340,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18ef70b30d68416c88c31b173e2df606, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cancelLoginsUponDisabling: 1
   loginStartedEvent:
     m_PersistentCalls:
       m_Calls: []
   loginCancelledEvent:
     m_PersistentCalls:
       m_Calls: []
-  loginErrorEvent:
+  loginFailedEvent:
     m_PersistentCalls:
       m_Calls: []
   loginSuccessfulEvent:
