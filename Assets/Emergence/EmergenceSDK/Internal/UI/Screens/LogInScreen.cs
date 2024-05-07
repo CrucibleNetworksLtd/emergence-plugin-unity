@@ -99,26 +99,22 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             HideAllScreens();
             var e = exceptionContainer.Exception;
-            if (e is FuturepassRequestFailedException or FuturepassInformationRequestFailedException)
+            switch (e)
             {
-                exceptionContainer.HandleException();
-                EmergenceLogger.LogWarning(e.GetType().FullName + ": " + e.Message);
-                futureverseScreen.SetActive(true);
-            }
-            else if (e
-                is FuturepassRequestFailedException
-                or FuturepassInformationRequestFailedException
-                or TokenRequestFailedException
-                or HandshakeRequestFailedException
-                or QrCodeRequestFailedException)
-            {
-                exceptionContainer.HandleException();
-                EmergenceLogger.LogWarning(e.GetType().FullName + ": " + e.Message);
-                if (e.InnerException != null)
-                {
-                    EmergenceLogger.LogWarning("\t" + e.InnerException.GetType().FullName + ": " + e.InnerException.Message);
-                }
-                startupScreen.SetActive(true);
+                case FuturepassRequestFailedException or FuturepassInformationRequestFailedException:
+                    exceptionContainer.HandleException();
+                    EmergenceLogger.LogWarning(e);
+                    futureverseScreen.SetActive(true);
+                    break;
+                case FuturepassRequestFailedException
+                    or FuturepassInformationRequestFailedException
+                    or TokenRequestFailedException
+                    or HandshakeRequestFailedException
+                    or QrCodeRequestFailedException:
+                    exceptionContainer.HandleException();
+                    EmergenceLogger.LogWarning(e);
+                    startupScreen.SetActive(true);
+                    break;
             }
         }
 
