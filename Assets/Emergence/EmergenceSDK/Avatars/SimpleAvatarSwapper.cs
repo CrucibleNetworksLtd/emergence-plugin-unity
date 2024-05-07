@@ -12,34 +12,41 @@ namespace EmergenceSDK.Avatars
 {
     public class SimpleAvatarSwapper : SingletonComponent<SimpleAvatarSwapper>
     {
+        // Dictionary to keep track of original meshes for each game object
         private readonly Dictionary<GameObject, SkinnedMeshRenderer> _originalMeshes = new();
+        // Dictionary to manage cancellation tokens by operation IDs
         private readonly Dictionary<Guid, CancellationTokenSource> _cancellationTokenSources = new();
+        // Dictionary to keep track of operations associated with each armature
         private readonly Dictionary<GameObject, List<Guid>> _armatureOperationGuids = new();
 
+        // Public method to start avatar swapping
         public async UniTask SwapAvatars(GameObject playerArmature, string vrmURL)
         {
-            // Cancel all ongoing avatar swap operations
+            // Cancel all ongoing avatar swap operations for the player armature
             CancelAvatarSwaps(playerArmature);
 
-            // Set original mesh if it is not already set
+            // Set original mesh if it has not already been set
             if (!_originalMeshes.TryGetValue(playerArmature, out _))
             {
                 _originalMeshes[playerArmature] = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
             }
 
+            // Create a cancellation token for the new swap operation
             var cts = CreateCancellationToken(playerArmature, out var operationId);
 
-            // Start the avatar swap task with the generated operation ID and token
+            // Perform the swap operation
             await SwapAvatarTask(playerArmature, operationId, vrmURL, cts.Token);
         }
 
+        // Helper method to create a cancellation token for an operation
         private CancellationTokenSource CreateCancellationToken(GameObject playerArmature, out Guid operationId)
         {
             // Generate a unique operation ID
             operationId = Guid.NewGuid();
-            // Create a new cancellation token source for this operation
+            // Create and store the cancellation token source
             var cts = new CancellationTokenSource();
             _cancellationTokenSources[operationId] = cts;
+            // Track the operation ID under the associated armature
             if (_armatureOperationGuids.TryGetValue(playerArmature, out var guids))
             {
                 guids.Add(operationId);
@@ -52,8 +59,10 @@ namespace EmergenceSDK.Avatars
             return cts;
         }
 
+        // Method to remove all cancellation tokens, optionally canceling them
         private void RemoveAllCancellationTokens(bool cancel = false)
         {
+            // Iterate through all tokens and dispose them
             foreach (var cts in _cancellationTokenSources.Values)
             {
                 if (cancel && !cts.IsCancellationRequested)
@@ -62,12 +71,15 @@ namespace EmergenceSDK.Avatars
                 }
                 cts.Dispose();
             }
+            // Clear the collections after disposing the tokens
             _cancellationTokenSources.Clear();
             _armatureOperationGuids.Clear();
         }
 
+        // Method to cancel all swap operations for a specific armature
         private void CancelAvatarSwaps(GameObject playerArmature)
         {
+            // If there are ongoing operations for the armature, cancel them
             if (_armatureOperationGuids.TryGetValue(playerArmature, out var guids))
             {
                 for (var i = guids.Count - 1; i >= 0; i--)
@@ -78,10 +90,12 @@ namespace EmergenceSDK.Avatars
             }
         }
 
+        // Asynchronous task to handle the avatar swapping logic
         private async UniTask SwapAvatarTask(GameObject playerArmature, Guid operationId, string vrmURL, CancellationToken ct)
         {
             try
             {
+                // Start downloading the VRM file
                 var request = UnityWebRequest.Get(vrmURL);
                 byte[] response;
                 using (request.uploadHandler)
@@ -90,13 +104,17 @@ namespace EmergenceSDK.Avatars
                     response = request.downloadHandler.data;
                 }
 
+                // Check for cancellation
                 ct.ThrowIfCancellationRequested();
 
+                // Remove old VRM and load new one
                 var oldVrm = playerArmature.GetComponentInChildren<Vrm10Instance>();
                 var newVrm = await Vrm10.LoadBytesAsync(response, ct: ct);
-                
+
+                // Check again for cancellation
                 ct.ThrowIfCancellationRequested();
-                
+
+                // Replace the old VRM with the new one
                 if (newVrm.gameObject != null)
                 {
                     if (oldVrm != null)
@@ -113,23 +131,27 @@ namespace EmergenceSDK.Avatars
 
                 await UniTask.DelayFrame(1, cancellationToken: ct);
 
+                // Set the new avatar to the animator
                 Avatar vrmAvatar = newVrm.GetComponent<Animator>().avatar;
                 playerArmature.GetComponent<Animator>().avatar = vrmAvatar;
 
+                // Disable the animator on the new VRM game object
                 newVrm.gameObject.GetComponent<Animator>().enabled = false;
                 _originalMeshes[playerArmature].enabled = false;
             }
             catch (OperationCanceledException)
             {
+                // Log cancellation
                 Debug.Log("Avatar swap operation was cancelled.");
             }
             finally
             {
-                // Cleanup: Remove the CancellationTokenSource from the dictionary
+                // Cleanup after operation is done or cancelled
                 RemoveCancellationToken(operationId);
             }
         }
 
+        // Helper method to remove a cancellation token
         private void RemoveCancellationToken(Guid guid, bool cancel = false)
         {
             if (_cancellationTokenSources.Remove(guid, out var source))
@@ -139,6 +161,7 @@ namespace EmergenceSDK.Avatars
                     source.Cancel();
                 }
                 source.Dispose();
+                // Clean up operation ID tracking
                 foreach (var guids in _armatureOperationGuids.Values)
                 {
                     guids.Remove(guid);
@@ -146,27 +169,34 @@ namespace EmergenceSDK.Avatars
             }
         }
 
+        // Method to reset avatar to default state
         public void SetDefaultAvatar(GameObject playerArmature = null)
         {
+            // Cancel any ongoing swaps
             CancelAvatarSwaps(playerArmature);
 
+            // Ensure original mesh is set
             SkinnedMeshRenderer originalMesh = null;
             if (playerArmature != null && !_originalMeshes.TryGetValue(playerArmature, out originalMesh))
             {
                 originalMesh = _originalMeshes[playerArmature] = playerArmature.GetComponentInChildren<SkinnedMeshRenderer>();
             }
-            
+
+            // If no player armature is specified, instantiate a new one
             if (playerArmature == null)
             {
                 playerArmature = Instantiate(Resources.Load<GameObject>("PlayerArmature"));
                 playerArmature.name = "PlayerArmature";
             }
-            
+
+            // Assert that the original mesh is not null
             Assert.IsNotNull(originalMesh, "playerArmature must contain a SkinnedMeshRenderer");
 
+            // Enable the original mesh and set the default avatar
             originalMesh.enabled = true;
             playerArmature.GetComponent<Animator>().avatar = Resources.Load<Avatar>("ArmatureAvatar");
-            
+
+            // Find and destroy the VRM avatar game object
             GameObject FindChild(GameObject parent, string childName)
             {
                 foreach (var child in parent.transform.GetChildren())
@@ -196,6 +226,7 @@ namespace EmergenceSDK.Avatars
         // This method is called when the Unity Editor stops playing
         private void OnApplicationQuit()
         {
+            // Remove all cancellation tokens upon application quit
             RemoveAllCancellationTokens(true);
         }
 #endif
