@@ -49,6 +49,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Types.Responses
                         public string assetType { get; set; }
                         public Collection collection { get; set; }
                         public int tokenId { get; set; }
+                        public string collectionId { get; set; }
                         public Metadata metadata { get; set; }
 
                         [field: SerializationHelper.OriginalJToken]

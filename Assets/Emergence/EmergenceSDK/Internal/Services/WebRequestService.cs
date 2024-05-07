@@ -7,8 +7,8 @@ using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
+using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
-using EmergenceSDK.Services;
 using EmergenceSDK.Types.Delegates;
 using UnityEngine.Networking;
 using WebResponse = EmergenceSDK.Internal.Types.WebResponse;
@@ -23,7 +23,7 @@ namespace EmergenceSDK.Internal.Services
         private ConcurrentDictionary<UnityWebRequest, DateTime> openRequests = new();
 
         //This timeout avoids this issue: https://forum.unity.com/threads/catching-curl-error-28.1274846/
-        private const int TimeoutMilliseconds = 100000;
+        private const int DefaultTimeoutMilliseconds = 100000;
 
         internal WebRequestService()
         {
@@ -47,13 +47,13 @@ namespace EmergenceSDK.Internal.Services
         /// Performs an asynchronous UnityWebRequest and returns the result as a string.
         /// </summary>
         public static async UniTask<WebResponse> PerformAsyncWebRequest(string method, string url,
-            ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null, CancellationToken ct = default)
+            ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, CancellationToken ct = default)
         {
             UnityWebRequest request = GetRequestFromMethodType(method, url, bodyData);
             Instance.AddOpenRequest(request);
 
             SetupRequestHeaders(request, headers);
-            var ret = await PerformAsyncWebRequest(request, errorCallback, ct);
+            var ret = await PerformAsyncWebRequest(request, errorCallback, timeout, ct);
             CleanupRequest(request);
             return ret;
         }
@@ -135,7 +135,7 @@ namespace EmergenceSDK.Internal.Services
             openRequests.TryRemove(request, out _);
         }
 
-        public static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request, ErrorCallback errorCallback, CancellationToken ct = default)
+        public static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request, ErrorCallback errorCallback, float timeout = DefaultTimeoutMilliseconds, CancellationToken ct = default)
         {
             EmergenceLogger.LogInfo($"Performing {request.method} request to {request.url}, DeviceId: {EmergenceSingleton.Instance.CurrentDeviceId}");
             try
@@ -144,7 +144,7 @@ namespace EmergenceSDK.Internal.Services
 
                 try
                 {
-                    await sendTask.Timeout(TimeSpan.FromMilliseconds(TimeoutMilliseconds));
+                    await sendTask.Timeout(TimeSpan.FromMilliseconds(timeout));
 
                     // Rest of the code if the request completes within the timeout
 
@@ -159,12 +159,12 @@ namespace EmergenceSDK.Internal.Services
                         return new WebResponse(false, request.error, request.responseCode, request.downloadHandler);
                     }
                 }
-                catch (TimeoutException)
+                catch (TimeoutException e)
                 {
                     request.Abort(); // Abort the request
 
                     errorCallback?.Invoke("Request timed out.", 0);
-                    return new WebResponse(false, "Request timed out.");
+                    return new TimeoutWebResponse(e);
                 }
             }
             catch (WebException e)
@@ -185,7 +185,7 @@ namespace EmergenceSDK.Internal.Services
                 errorCallback?.Invoke(e.Message, request.responseCode);
                 return new WebResponse(false, e.Message, request.responseCode);
             }
-            catch (Exception ex) when (!(ex is OperationCanceledException))
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 errorCallback?.Invoke(request.error, request.responseCode);
                 return new WebResponse(false, ex.Message, request.responseCode);

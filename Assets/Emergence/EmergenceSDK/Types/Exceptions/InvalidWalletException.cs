@@ -2,7 +2,7 @@
 
 namespace EmergenceSDK.Types.Exceptions
 {
-    class WalletNotConnectedException : Exception
+    class InvalidWalletException : Exception
     {
     }
 }

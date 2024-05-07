@@ -23,9 +23,8 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
     internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, IDisconnectableService
     {
-        public bool UsingFutureverse { get; private set; } = false;
-
-        private FuturepassInformationResponse FuturepassInformation { get; set; }
+        public bool UsingFutureverse { get; set; }
+        public FuturepassInformationResponse FuturepassInformation { get; set; }
 
         private List<string> CombinedAddress => FuturepassInformation.GetCombinedAddresses();
         
@@ -58,13 +57,13 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             };
 #endif
         }
-
+        
         public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync()
         {
             var walletService = EmergenceServiceProvider.GetService<IWalletService>();
-            if (!walletService.IsLoggedIn)
+            if (!walletService.IsValidWallet)
             {
-                throw new WalletNotConnectedException();
+                throw new InvalidWalletException();
             }
             
             var url =
@@ -94,8 +93,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
             FuturepassInformationResponse fpResponse =
                 SerializationHelper.Deserialize<FuturepassInformationResponse>(response.Response);
-            UsingFutureverse = true;
-            FuturepassInformation = fpResponse;
             return new ServiceResponse<FuturepassInformationResponse>(true, fpResponse);
         }
 
@@ -120,23 +117,36 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             var ret = new List<InventoryItem>();
             foreach (var edge in futureverseInventory.Result.data.assets.edges)
             {
-                var node = edge.node;
-                var newItem = new InventoryItem();
-                newItem.ID =
-                    $"{node.collection.chainType}:{node.collection.chainId}:{node.collection.location}:{node.tokenId}";
-                newItem.Blockchain = $"{node.collection.chainType}:{node.collection.chainId}";
-                newItem.Contract = $"{node.collection.location}";
-                newItem.TokenId = $"{node.tokenId}";
-                newItem.Meta = new InventoryItemMetaData();
-                newItem.Meta.Name = $"#{node.tokenId}";
-                newItem.Meta.Description = node.collection.name;
-                var newMetaContent = new InventoryItemMetaContent();
-                newMetaContent.URL = Helpers.InternalIPFSURLToHTTP(node.metadata.properties.image,
-                    "http://ipfs.openmeta.xyz/ipfs/");
-                newMetaContent.MimeType = node.metadata.properties.models?["glb"] != null ? "model/gltf-binary" : "image/png";
-                newItem.Meta.Content = new List<InventoryItemMetaContent>();
-                newItem.Meta.Content.Add(newMetaContent);
-                newItem.Meta.Attributes = new List<InventoryItemMetaAttributes>();
+                ret.Add(ConvertFutureverseItemToInventoryItem(edge.node));
+            }
+
+            return new ServiceResponse<List<InventoryItem>>(true, ret);
+        }
+
+        private static InventoryItem ConvertFutureverseItemToInventoryItem(InventoryResponse.Data.Assets.Edge.Node node)
+        {
+            var newItem = new InventoryItem
+            {
+                ID = $"{node.collection.chainType}:{node.collection.chainId}:{node.collection.location}:{node.tokenId}",
+                Blockchain = $"{node.collection.chainType}:{node.collection.chainId}",
+                Contract = $"{node.collection.location}",
+                TokenId = $"{node.tokenId}",
+                Meta = new InventoryItemMetaData
+                {
+                    Name = $"#{node.tokenId}",
+                    Description = node.collection.name
+                }
+            };
+            var newMetaContent = new InventoryItemMetaContent
+            {
+                URL = Helpers.InternalIPFSURLToHTTP(node.metadata?.properties?.image ?? "", "http://ipfs.openmeta.xyz/ipfs/"),
+                MimeType = node.metadata?.properties?.models?["glb"] != null ? "model/gltf-binary" : "image/png"
+            };
+            newItem.Meta.Content = new List<InventoryItemMetaContent> { newMetaContent };
+            newItem.Meta.Attributes = new List<InventoryItemMetaAttributes>();
+                
+            if (node.metadata?.attributes != null)
+            {
                 foreach (var kvp in node.metadata.attributes)
                 {
                     var inventoryItemMetaAttributes = new InventoryItemMetaAttributes
@@ -146,12 +156,10 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     };
                     newItem.Meta.Attributes.Add(inventoryItemMetaAttributes);
                 }
-                newItem.OriginalData = node.OriginalData;
-
-                ret.Add(newItem);
             }
-
-            return new ServiceResponse<List<InventoryItem>>(true, ret);
+                
+            newItem.OriginalData = node.OriginalData;
+            return newItem;
         }
 
         private List<FutureverseAssetTreePath> ParseGetAssetTreeResponse(WebResponse response)
@@ -383,9 +391,9 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         {
             var walletService = EmergenceServiceProvider.GetService<IWalletService>();
 
-            if (!walletService.IsLoggedIn)
+            if (!walletService.IsValidWallet)
             {
-                throw new WalletNotConnectedException();
+                throw new InvalidWalletException();
             }
 
             string generatedArtm;

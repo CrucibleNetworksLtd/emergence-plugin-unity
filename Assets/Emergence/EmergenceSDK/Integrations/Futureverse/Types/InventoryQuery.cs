@@ -21,6 +21,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Types
                             name
                         }
                         tokenId
+                        collectionId
                     }
                 }
             }
