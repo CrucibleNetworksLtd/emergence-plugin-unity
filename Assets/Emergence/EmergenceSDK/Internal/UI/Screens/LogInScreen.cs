@@ -20,7 +20,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         [Header("Log-in Manager")]
         public LoginManager loginManager;
 
-        [FormerlySerializedAs("rawQRImage")] [Header("UI References")]
+        [Header("UI References")]
         public RawImage rawQrImage;
 
         public Button backButton;
@@ -32,12 +32,12 @@ namespace EmergenceSDK.Internal.UI.Screens
         public GameObject futureverseScreen;
         public GameObject startupScreen;
 
-        [FormerlySerializedAs("LoginWithFV")] [Header("Futureverse")]
+        [Header("Futureverse")]
         public Button loginWithFv;
 
-        [FormerlySerializedAs("LoginWithWC")] public Button loginWithWc;
-        [FormerlySerializedAs("CreateFPass")] public Button createFPass;
-        [FormerlySerializedAs("RetryFPassCheck")] public Button retryFPassCheck;
+        public Button loginWithWc;
+        public Button createFPass;
+        public Button retryFPassCheck;
 
         private void SetTimeRemainingText(LoginManager _, EmergenceQrCode emergenceQrCode) => refreshCounterText.text = emergenceQrCode.TimeLeftInt.ToString("0");
 
