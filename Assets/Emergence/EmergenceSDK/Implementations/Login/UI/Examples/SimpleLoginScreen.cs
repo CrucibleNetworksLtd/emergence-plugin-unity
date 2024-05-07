@@ -99,11 +99,7 @@ namespace EmergenceSDK.Implementations.Login.UI.Examples
                     or QrCodeRequestFailedException:
                 {
                     exceptionContainer.HandleException(); // Pretend we handled all of them
-                    EmergenceLogger.LogWarning(e.GetType().FullName + ": " + e.Message); // Log exception
-                    if (e.InnerException != null)
-                    {
-                        EmergenceLogger.LogWarning("\t" + e.InnerException.GetType().FullName + ": " + e.InnerException.Message); // Log inner exception
-                    }
+                    EmergenceLogger.LogWarning(e); // Log exception
 
                     break;
                 }
