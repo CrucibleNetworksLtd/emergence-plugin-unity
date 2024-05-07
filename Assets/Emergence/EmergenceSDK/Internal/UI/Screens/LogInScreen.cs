@@ -80,10 +80,8 @@ namespace EmergenceSDK.Internal.UI.Screens
                         HeaderScreen.Instance.Show();
                         break;
                     case LoginStep.AccessTokenRequest:
-                        // Nothing to do here in this case
-                        break;
                     case LoginStep.FuturepassRequests:
-                        // Nothing to do here in this case
+                        // Nothing to do here in these cases
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(loginStep), loginStep, null);
