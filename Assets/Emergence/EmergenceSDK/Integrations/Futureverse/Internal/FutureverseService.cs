@@ -136,15 +136,20 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 };
                 newItem.Meta.Content = new List<InventoryItemMetaContent> { newMetaContent };
                 newItem.Meta.Attributes = new List<InventoryItemMetaAttributes>();
-                foreach (var kvp in node.metadata?.attributes ?? new Dictionary<string, string>())
+                
+                if (node.metadata?.attributes != null)
                 {
-                    var inventoryItemMetaAttributes = new InventoryItemMetaAttributes
+                    foreach (var kvp in node.metadata.attributes)
                     {
-                        Key = kvp.Key,
-                        Value = kvp.Value
-                    };
-                    newItem.Meta.Attributes.Add(inventoryItemMetaAttributes);
+                        var inventoryItemMetaAttributes = new InventoryItemMetaAttributes
+                        {
+                            Key = kvp.Key,
+                            Value = kvp.Value
+                        };
+                        newItem.Meta.Attributes.Add(inventoryItemMetaAttributes);
+                    }
                 }
+                
                 newItem.OriginalData = node.OriginalData;
 
                 ret.Add(newItem);
