@@ -27,26 +27,22 @@ namespace EmergenceSDK.Implementations.Login.UI.Examples
         {
             // We bind all necessary events here
 
-            /*
-             Call CancelLogin when hitting the cancel button
-             Since the LoginManager on this prefab is set to automatically cancel on disable, and given that this script simply disables the gameObject in the loginCancelledEvent,
-             It would have also been possible to simply cancel the login by disabling the gameObject and not handling the loginCancelledEvent event.
-             */
+            // Call CancelLogin when hitting the cancel button
+            // Since the LoginManager on this prefab is set to automatically cancel on disable, and given that this script simply disables the gameObject in the loginCancelledEvent,
+            // It would have also been possible to simply cancel the login by disabling the gameObject and not handling the loginCancelledEvent event.
             cancelButton.onClick.AddListener(loginManager.CancelLogin);
 
-            /* Update the countdownLabel on each QR code tick */
+            // Update the countdownLabel on each QR code tick */
             loginManager.qrCodeTickEvent.AddListener(SetTimeRemainingText);
 
-            /* Update UI when the login starts, setting QR as blank and adding a placeholder text to the countdownLabel */
+            // Update UI when the login starts, setting QR as blank and adding a placeholder text to the countdownLabel */
             loginManager.loginStartedEvent.AddListener(HandleLoginStarted);
 
-            /* When login gets cancelled, disable the GameObject to hide it. Normally we would send the user to a previous screen or something similar to that. */
+            // When login gets cancelled, disable the GameObject to hide it. Normally we would send the user to a previous screen or something similar to that. */
             loginManager.loginCancelledEvent.AddListener((_) => { gameObject.SetActive(false); });
 
-            /*
-             When the login fails HandleLoginErrors is called and quickly disable and enable the Gameobject.
-             This is a hack to reset the UI upon failure given how the events have been setup.
-             */
+            // When the login fails HandleLoginErrors is called and quickly disable and enable the Gameobject.
+            // This is a hack to reset the UI upon failure given how the events have been setup.
             loginManager.loginFailedEvent.AddListener((manager, container) =>
             {
                 HandleLoginErrors(manager, container);
@@ -54,9 +50,7 @@ namespace EmergenceSDK.Implementations.Login.UI.Examples
                 gameObject.SetActive(true);
             });
 
-            /*
-             Handle the login steps, we only care about LoginStep.QrCodeRequest succeeding in this minimalist implementation
-             */
+            // Handle the login steps, we only care about LoginStep.QrCodeRequest succeeding in this minimalist implementation
             loginManager.loginStepUpdatedEvent.AddListener((_, loginStep, stepPhase) =>
             {
                 if (stepPhase != StepPhase.Success) return; // Ignore steps that have just begun
@@ -77,9 +71,7 @@ namespace EmergenceSDK.Implementations.Login.UI.Examples
                 }
             });
 
-            /*
-             Handle successful login by simply hiding the gameObject and setting the first-login flag to true
-             */
+            // Handle successful login by simply hiding the gameObject and setting the first-login flag to true
             loginManager.loginSuccessfulEvent.AddListener((_, _) =>
             {
                 LoginManager.SetFirstLoginFlag();
