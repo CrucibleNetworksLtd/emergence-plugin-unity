@@ -88,10 +88,10 @@ namespace EmergenceSDK
 
         private EmergenceEnvironment? ForcedEnvironment { get; set; }
 
-        internal void RunInForcedEnvironment(EmergenceEnvironment environment, Action action)
+        internal void RunInForcedEnvironment(EmergenceEnvironment forcedEnvironment, Action action)
         {
             var prevForcedEnvironment = ForcedEnvironment;
-            ForcedEnvironment = environment;
+            ForcedEnvironment = forcedEnvironment;
             try
             {
                 action.Invoke();
@@ -102,10 +102,10 @@ namespace EmergenceSDK
             }
         }
 
-        internal async UniTask RunInForcedEnvironmentAsync(EmergenceEnvironment environment, Func<UniTask> action)
+        internal async UniTask RunInForcedEnvironmentAsync(EmergenceEnvironment forcedEnvironment, Func<UniTask> action)
         {
             var prevForcedEnvironment = ForcedEnvironment;
-            ForcedEnvironment = environment;
+            ForcedEnvironment = forcedEnvironment;
             try
             {
                 await action();

@@ -136,8 +136,13 @@ namespace EmergenceSDK.Tests.Futureverse
         public IEnumerator GetAssetTreeAsync_PassesWithoutExceptions()
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            return EmergenceSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Development,
-                async () => { await futureverseService.GetAssetTreeAsync("473", "7672:root:303204"); }).ToCoroutine();
+            return UniTask.ToCoroutine(async () =>
+            {
+                await FutureverseSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Development, async () =>
+                {
+                    await EmergenceSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Development, async () => { await futureverseService.GetAssetTreeAsync("473", "7672:root:303204"); });
+                });
+            });
         }
 
         [Test]
@@ -184,12 +189,17 @@ namespace EmergenceSDK.Tests.Futureverse
         public IEnumerator GetArtmStatusAsync_PassesWithoutExceptions()
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            return EmergenceSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Staging,
-                async () =>
+            return UniTask.ToCoroutine(async () =>
+            {
+                await FutureverseSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Staging, async () =>
                 {
-                    var artmStatusAsync = await futureverseService.GetArtmStatusAsync("0x69c94ea3e0e7dea32d2d00813a64017dfbbd42dd18f5d56a12c907dccc7bb6d9");
-                    Assert.Pass("Passed with transaction status: " + artmStatusAsync);
-                }).ToCoroutine();
+                    await FutureverseSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Staging, async () =>
+                    {
+                        var artmStatusAsync = await futureverseService.GetArtmStatusAsync("0x69c94ea3e0e7dea32d2d00813a64017dfbbd42dd18f5d56a12c907dccc7bb6d9");
+                        Assert.Pass("Passed with transaction status: " + artmStatusAsync);
+                    });
+                });
+            });
         }
     }
 }
