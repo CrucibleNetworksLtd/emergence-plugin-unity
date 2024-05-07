@@ -57,7 +57,8 @@ namespace EmergenceSDK.Implementations.Login.Types
         {
             if (!_ticking) return;
             _ticking = false;
-            LoginManager.StopCoroutine(DoTicks());
+            
+            if (LoginManager != null) { LoginManager.StopCoroutine(DoTicks()); }
         }
 
         private IEnumerator DoTicks()
