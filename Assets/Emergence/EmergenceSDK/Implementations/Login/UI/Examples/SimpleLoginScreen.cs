@@ -32,13 +32,13 @@ namespace EmergenceSDK.Implementations.Login.UI.Examples
             // It would have also been possible to simply cancel the login by disabling the gameObject and not handling the loginCancelledEvent event.
             cancelButton.onClick.AddListener(loginManager.CancelLogin);
 
-            // Update the countdownLabel on each QR code tick */
+            // Update the countdownLabel on each QR code tick
             loginManager.qrCodeTickEvent.AddListener(SetTimeRemainingText);
 
-            // Update UI when the login starts, setting QR as blank and adding a placeholder text to the countdownLabel */
+            // Update UI when the login starts, setting QR as blank and adding a placeholder text to the countdownLabel
             loginManager.loginStartedEvent.AddListener(HandleLoginStarted);
 
-            // When login gets cancelled, disable the GameObject to hide it. Normally we would send the user to a previous screen or something similar to that. */
+            // When login gets cancelled, disable the GameObject to hide it. Normally we would send the user to a previous screen or something similar to that.
             loginManager.loginCancelledEvent.AddListener((_) => { gameObject.SetActive(false); });
 
             // When the login fails HandleLoginErrors is called and quickly disable and enable the Gameobject.
