@@ -71,6 +71,8 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> DisconnectAsync()
         {
+            if (HasLoginSettings(LoginSettings.DisableEmergenceAccessToken)) { return new ServiceResponse(true); }
+            
             DisconnectInProgress = true;
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, StaticConfig.APIBase + "killSession");
             try
