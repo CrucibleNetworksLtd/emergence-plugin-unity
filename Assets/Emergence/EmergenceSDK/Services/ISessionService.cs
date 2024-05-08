@@ -19,9 +19,9 @@ namespace EmergenceSDK.Services
         bool IsLoggedIn { get; }
         
         /// <summary>
-        /// The <see cref="LoginSettings"/> for the current session. Always null when <see cref="ISessionService.IsLoggedIn"/> is false. 
+        /// The <see cref="CurrentLoginSettings"/> for the current session. Always null when <see cref="ISessionService.IsLoggedIn"/> is false. 
         /// </summary>
-        LoginSettings? LoginSettings { get; }
+        LoginSettings? CurrentLoginSettings { get; }
         
         /// <summary>
         /// Set to true when mid way through a disconnect, disconnection can take a few seconds so this is useful for disabling UI elements for example
