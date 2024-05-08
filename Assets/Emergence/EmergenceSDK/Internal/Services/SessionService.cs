@@ -2,10 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Implementations.Login;
-using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
-using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -19,7 +16,7 @@ namespace EmergenceSDK.Internal.Services
     internal class SessionService : ISessionService, ISessionServiceInternal, ISessionConnectableService
     {
         public bool IsLoggedIn { get; private set; }
-        public LoginSettings? LoginSettings { get; private set; }
+        public LoginSettings? CurrentLoginSettings { get; private set; }
         public event Action OnSessionConnected;
         public event Action OnSessionDisconnected;
         public string EmergenceAccessToken { get; private set; } = string.Empty;
@@ -32,7 +29,7 @@ namespace EmergenceSDK.Internal.Services
         
         public bool HasLoginSettings(LoginSettings loginSettings)
         {
-            return LoginSettings != null && (LoginSettings & loginSettings) == loginSettings;
+            return CurrentLoginSettings != null && (CurrentLoginSettings & loginSettings) == loginSettings;
         }
 
         private async void OnGameEnd() => await DisconnectAsync();
@@ -118,7 +115,7 @@ namespace EmergenceSDK.Internal.Services
         public void RunConnectionEvents(LoginSettings loginSettings)
         {
             IsLoggedIn = true;
-            LoginSettings = loginSettings;
+            CurrentLoginSettings = loginSettings;
    
             foreach (var connectable in EmergenceServiceProvider.GetServices<ISessionConnectableService>())
             {
@@ -136,7 +133,7 @@ namespace EmergenceSDK.Internal.Services
             OnSessionDisconnected?.Invoke();
 
             IsLoggedIn = false;
-            LoginSettings = null;
+            CurrentLoginSettings = null;
         }
 
         public async UniTask Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
