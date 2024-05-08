@@ -56,15 +56,15 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 
         private void Update()
         {
-            if (HasBeenActivated() && IsReady && _sessionService.HasLoginSettings(LoginSettings.EnableFuturepass))
+            if (HasBeenActivated() && IsReady && _sessionService.HasLoginSetting(LoginSettings.EnableFuturepass))
             {
                 ShowInventory();
             }
-            else if (IsReady && !_sessionService.HasLoginSettings(LoginSettings.EnableFuturepass))
+            else if (IsReady && !_sessionService.HasLoginSetting(LoginSettings.EnableFuturepass))
             {
                 InstructionsText.text = "You must connect with Futurepass";
             }
-            else if (IsReady && _sessionService.HasLoginSettings(LoginSettings.EnableFuturepass))
+            else if (IsReady && _sessionService.HasLoginSetting(LoginSettings.EnableFuturepass))
             {
                 InstructionsText.text = ActiveInstructions;
             }

@@ -8,6 +8,7 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using EmergenceSDK.Types.Responses;
+using UniJSON;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -27,9 +28,9 @@ namespace EmergenceSDK.Internal.Services
             EmergenceSingleton.Instance.OnGameClosing += OnGameEnd;
         }
         
-        public bool HasLoginSettings(LoginSettings loginSettings)
+        public bool HasLoginSetting(LoginSettings loginSettings)
         {
-            return CurrentLoginSettings != null && (CurrentLoginSettings & loginSettings) == loginSettings;
+            return CurrentLoginSettings?.HasFlag(loginSettings) ?? false;
         }
 
         private async void OnGameEnd() => await DisconnectAsync();
@@ -68,7 +69,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> DisconnectAsync()
         {
-            if (HasLoginSettings(LoginSettings.DisableEmergenceAccessToken)) { return new ServiceResponse(true); }
+            if (HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) { return new ServiceResponse(true); }
             
             DisconnectInProgress = true;
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, StaticConfig.APIBase + "killSession");

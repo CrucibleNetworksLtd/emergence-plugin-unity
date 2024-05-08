@@ -16,7 +16,7 @@ namespace EmergenceSDK.Internal.Services
     {
         public async UniTask<ServiceResponse<List<InventoryItem>>> InventoryByOwnerAsync(string address, InventoryChain chain)
         {
-            if (EmergenceServiceProvider.GetService<SessionService>().HasLoginSettings(LoginSettings.EnableFuturepass))
+            if (EmergenceServiceProvider.GetService<SessionService>().HasLoginSetting(LoginSettings.EnableFuturepass))
             {
                 return await EmergenceServiceProvider.GetService<IFutureverseServiceInternal>().GetFutureverseInventoryAsInventoryItems();
             }

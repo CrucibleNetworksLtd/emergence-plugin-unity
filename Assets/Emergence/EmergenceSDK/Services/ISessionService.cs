@@ -38,6 +38,6 @@ namespace EmergenceSDK.Services
         /// </summary>
         event Action OnSessionConnected;
 
-        bool HasLoginSettings(LoginSettings enableFuturepass);
+        bool HasLoginSetting(LoginSettings enableFuturepass);
     }
 }

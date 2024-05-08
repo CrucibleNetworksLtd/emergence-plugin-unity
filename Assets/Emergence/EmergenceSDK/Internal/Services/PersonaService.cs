@@ -50,7 +50,7 @@ namespace EmergenceSDK.Internal.Services
         
         public async UniTask<ServiceResponse<List<Persona>, Persona>> GetPersonasAsync()
         {
-            if (_sessionService.HasLoginSettings(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
             
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "personas";
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
@@ -89,7 +89,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse<Persona>> GetCurrentPersonaAsync()
         {
-            if (_sessionService.HasLoginSettings(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
 
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
@@ -132,7 +132,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> CreatePersonaAsync(Persona persona)
         {
-            if (_sessionService.HasLoginSettings(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
 
             await UpdateAvatarOnPersonaEdit(persona);
             
@@ -171,7 +171,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> EditPersonaAsync(Persona persona)
         {
-            if (_sessionService.HasLoginSettings(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
 
             await UpdateAvatarOnPersonaEdit(persona);
 
@@ -236,7 +236,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> DeletePersonaAsync(Persona persona)
         {
-            if (_sessionService.HasLoginSettings(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
 
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona/" + persona.id;
 
@@ -277,7 +277,7 @@ namespace EmergenceSDK.Internal.Services
  
         public async UniTask<ServiceResponse> SetCurrentPersonaAsync(Persona persona)
         {
-            if (_sessionService.HasLoginSettings(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
 
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "setActivePersona/" + persona.id;
 

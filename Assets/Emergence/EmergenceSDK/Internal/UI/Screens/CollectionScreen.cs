@@ -97,7 +97,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         public async UniTask Refresh()
         {
-            HideFVSidebars(EmergenceServiceProvider.GetService<SessionService>().HasLoginSettings(LoginSettings.EnableFuturepass));
+            HideFVSidebars(EmergenceServiceProvider.GetService<SessionService>().HasLoginSetting(LoginSettings.EnableFuturepass));
             var inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
             var updatedInventory = await inventoryService.InventoryByOwnerAsync(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible);
             inventoryItemStore.SetItems(updatedInventory.Result1);
