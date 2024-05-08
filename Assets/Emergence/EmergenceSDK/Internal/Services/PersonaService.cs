@@ -12,7 +12,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class PersonaService : IPersonaServiceInternal, IPersonaService, IDisconnectableService
+    internal class PersonaService : IPersonaServiceInternal, IPersonaService, ISessionConnectableService
     {
         public readonly ISessionServiceInternal SessionServiceInternal;
         public PersonaService(ISessionServiceInternal sessionServiceInternal)
@@ -50,7 +50,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "personas";
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
-            request.SetRequestHeader("Authorization", SessionServiceInternal.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", SessionServiceInternal.EmergenceAccessToken);
             try
             {
                 var response  = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -87,7 +87,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
-            request.SetRequestHeader("Authorization", SessionServiceInternal.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", SessionServiceInternal.EmergenceAccessToken);
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -159,7 +159,7 @@ namespace EmergenceSDK.Internal.Services
             request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonPersona));
             request.uploadHandler.contentType = "application/json";
 
-            request.SetRequestHeader("Authorization", SessionServiceInternal.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", SessionServiceInternal.EmergenceAccessToken);
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
@@ -225,7 +225,7 @@ namespace EmergenceSDK.Internal.Services
 
             using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             request.method = "DELETE";
-            request.SetRequestHeader("Authorization", SessionServiceInternal.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", SessionServiceInternal.EmergenceAccessToken);
             
             try
             {
@@ -264,7 +264,7 @@ namespace EmergenceSDK.Internal.Services
 
             using UnityWebRequest request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url, "");
             request.method = "PATCH";
-            request.SetRequestHeader("Authorization", SessionServiceInternal.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", SessionServiceInternal.EmergenceAccessToken);
             try
             {
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);

@@ -1,3 +1,4 @@
+using System;
 using EmergenceSDK.Internal.Types;
 
 namespace EmergenceSDK.Types
@@ -8,7 +9,7 @@ namespace EmergenceSDK.Types
         Failure
     }
 
-    public class ServiceResponse
+    public class ServiceResponse : IDisposable
     {
         public readonly WebResponse Response;
         public bool Successful => Code == ServiceResponseCode.Success;
@@ -24,6 +25,11 @@ namespace EmergenceSDK.Types
         public ServiceResponse(WebResponse response) : this(response, response?.Successful ?? false) {}
         public ServiceResponse(ServiceResponse response) : this(response, response?.Successful ?? false) {}
         public ServiceResponse(bool successful) : this((WebResponse)null, successful) {}
+
+        public void Dispose()
+        {
+            Response?.Dispose();
+        }
     }
 
     public class ServiceResponse<T1> : ServiceResponse

@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.EmergenceDemo.DemoStations;
+using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
 using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using UnityEngine;
 
 namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
@@ -11,6 +14,7 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
     public class SendArtmDemo : DemoStation<SendArtmDemo>, ILoggedInDemoStation
     {
         private IFutureverseService futureverseService;
+        private ISessionService sessionService;
 
         public bool IsReady
         {
@@ -25,6 +29,7 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
         private void Start()
         {
             futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
 
             instructionsGO.SetActive(false);
             IsReady = false;
@@ -42,15 +47,16 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 
         private void Update()
         {
-            if (HasBeenActivated() && IsReady && futureverseService.UsingFutureverse)
+            var futurepassEnabled = sessionService.HasLoginSettings(LoginSettings.EnableFuturepass);
+            if (HasBeenActivated() && IsReady && futurepassEnabled)
             {
                 SendTestArtm().Forget();
             }
-            else if (IsReady && !futureverseService.UsingFutureverse)
+            else if (IsReady && !futurepassEnabled)
             {
                 InstructionsText.text = "You must connect with Futurepass";
             }
-            else if (IsReady && futureverseService.UsingFutureverse)
+            else if (IsReady && futurepassEnabled)
             {
                 InstructionsText.text = ActiveInstructions;
             }

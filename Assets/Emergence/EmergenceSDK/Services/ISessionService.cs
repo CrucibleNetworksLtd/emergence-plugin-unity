@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using UnityEngine;
@@ -18,6 +19,11 @@ namespace EmergenceSDK.Services
         bool IsLoggedIn { get; }
         
         /// <summary>
+        /// The <see cref="LoginSettings"/> for the current session. Always null when <see cref="ISessionService.IsLoggedIn"/> is false. 
+        /// </summary>
+        LoginSettings? LoginSettings { get; }
+        
+        /// <summary>
         /// Set to true when mid way through a disconnect, disconnection can take a few seconds so this is useful for disabling UI elements for example
         /// </summary>
         bool DisconnectInProgress { get; }
@@ -31,5 +37,7 @@ namespace EmergenceSDK.Services
         /// Fired when the login flow is completed and the session is connected, useful for handling any connection-related business logic.
         /// </summary>
         event Action OnSessionConnected;
+
+        bool HasLoginSettings(LoginSettings enableFuturepass);
     }
 }

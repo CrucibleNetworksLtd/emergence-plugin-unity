@@ -64,7 +64,7 @@ namespace EmergenceSDK.Internal.Services
         private static void SetupRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)
         {
             var sessionServiceInternal = EmergenceServiceProvider.GetService<ISessionServiceInternal>();
-            request.SetRequestHeader("Authorization", sessionServiceInternal.CurrentAccessToken);
+            request.SetRequestHeader("Authorization", sessionServiceInternal.EmergenceAccessToken);
 
             if (headers != null)
             {

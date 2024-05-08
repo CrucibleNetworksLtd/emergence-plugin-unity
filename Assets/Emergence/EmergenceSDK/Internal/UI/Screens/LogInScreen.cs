@@ -8,6 +8,7 @@ using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -140,7 +141,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             UniTask.Void(async () =>
             {
                 await loginManager.WaitUntilAvailable();
-                await loginManager.StartLogin(LoginMode.Futurepass);
+                await loginManager.StartLogin(LoginSettings.EnableFuturepass);
             });
         }
 
@@ -156,7 +157,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             UniTask.Void(async () =>
             {
                 await loginManager.WaitUntilAvailable();
-                await loginManager.StartLogin(LoginMode.WalletConnect);
+                await loginManager.StartLogin(LoginSettings.WalletConnect);
             });
         }
 

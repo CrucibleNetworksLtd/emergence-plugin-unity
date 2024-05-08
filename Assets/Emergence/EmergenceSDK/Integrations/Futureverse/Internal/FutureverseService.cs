@@ -21,7 +21,7 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
-    internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, IDisconnectableService
+    internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, ISessionConnectableService
     {
         public bool UsingFutureverse { get; set; }
         public FuturepassInformationResponse FuturepassInformation { get; set; }
@@ -463,10 +463,12 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             }
         }
 
-        public void HandleDisconnection()
+        public void HandleDisconnection(ISessionService sessionService)
         {
             UsingFutureverse = false;
             FuturepassInformation = null;
         }
+
+        public void HandleConnection(ISessionService sessionService) { }
     }
 }

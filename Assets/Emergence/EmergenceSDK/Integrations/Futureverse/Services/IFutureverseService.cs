@@ -16,11 +16,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
     public interface IFutureverseService : IEmergenceService
     {
         /// <summary>
-        /// This property is set to true when Futureverse is enabled
-        /// </summary>
-        bool UsingFutureverse { get; }
-
-        /// <summary>
         /// Get the Futurepass linked to the current wallet
         /// </summary>
         /// <returns>A <see cref="ServiceResponse{T}"/> object wrapping a <see cref="LinkedFuturepassResponse"/></returns>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Implementations.Login;
+using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
@@ -15,24 +16,30 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
-    internal class SessionService : ISessionService, ISessionServiceInternal, IDisconnectableService
+    internal class SessionService : ISessionService, ISessionServiceInternal, ISessionConnectableService
     {
         public bool IsLoggedIn { get; private set; }
+        public LoginSettings? LoginSettings { get; private set; }
         public event Action OnSessionConnected;
         public event Action OnSessionDisconnected;
-        public string CurrentAccessToken { get; private set; } = string.Empty;
+        public string EmergenceAccessToken { get; private set; } = string.Empty;
         public bool DisconnectInProgress { get; private set; }
 
         public SessionService()
         {
             EmergenceSingleton.Instance.OnGameClosing += OnGameEnd;
         }
+        
+        public bool HasLoginSettings(LoginSettings loginSettings)
+        {
+            return LoginSettings != null && (LoginSettings & loginSettings) == loginSettings;
+        }
 
         private async void OnGameEnd() => await DisconnectAsync();
 
         public async UniTask<ServiceResponse<IsConnectedResponse>> IsConnected()
         {
-            string url = StaticConfig.APIBase + "isConnected";
+            var url = StaticConfig.APIBase + "isConnected";
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
             request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
@@ -69,7 +76,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-                request.SetRequestHeader("auth", CurrentAccessToken);
+                request.SetRequestHeader("auth", EmergenceAccessToken);
                 var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
                 if (response.Successful == false)
                 {
@@ -106,22 +113,28 @@ namespace EmergenceSDK.Internal.Services
             }
         }
 
-        public void RunConnectionEvents()
+        public void RunConnectionEvents(LoginSettings loginSettings)
         {
             IsLoggedIn = true;
+            LoginSettings = loginSettings;
+   
+            foreach (var connectable in EmergenceServiceProvider.GetServices<ISessionConnectableService>())
+            {
+                connectable.HandleConnection(this);
+            }
             OnSessionConnected?.Invoke();
         }
 
         public void RunDisconnectionEvents()
         {
-            IsLoggedIn = false;
-            
-            foreach (var disconnectable in EmergenceServiceProvider.GetServices<IDisconnectableService>())
+            foreach (var connectable in EmergenceServiceProvider.GetServices<ISessionConnectableService>())
             {
-                disconnectable.HandleDisconnection();
+                connectable.HandleDisconnection(this);
             }
-
             OnSessionDisconnected?.Invoke();
+
+            IsLoggedIn = false;
+            LoginSettings = null;
         }
 
         public async UniTask Disconnect(DisconnectSuccess success, ErrorCallback errorCallback)
@@ -191,14 +204,16 @@ namespace EmergenceSDK.Internal.Services
             if(response.Successful == false)
                 return new ServiceResponse<string>(false);
             var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response.ResponseText);
-            CurrentAccessToken = SerializationHelper.Serialize(accessTokenResponse.message.AccessToken, false);
-            return new ServiceResponse<string>(true, CurrentAccessToken);
+            EmergenceAccessToken = SerializationHelper.Serialize(accessTokenResponse.message.AccessToken, false);
+            return new ServiceResponse<string>(true, EmergenceAccessToken);
         }
 
-        public void HandleDisconnection()
+        public void HandleDisconnection(ISessionService sessionService)
         {
-            CurrentAccessToken = "";
+            EmergenceAccessToken = "";
         }
+        
+        public void HandleConnection(ISessionService sessionService) { }
 
         public async UniTask GetAccessToken(AccessTokenSuccess success, ErrorCallback errorCallback)
         {

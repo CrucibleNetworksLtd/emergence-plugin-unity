@@ -115,8 +115,8 @@ namespace EmergenceSDK.Implementations.Login
         /// Starts the login attempt.
         /// <remarks>This won't start if another attempt is ongoing, you can check beforehand using <see cref="IsBusy"/> or by awaiting <see cref="WaitUntilAvailable"/> first</remarks>
         /// </summary>
-        /// <param name="loginMode">What flow to follow for the login attempt, see <see cref="LoginMode"/> for more details.</param>
-        public async UniTask StartLogin(LoginMode loginMode)
+        /// <param name="loginSettings">What settings to use for the login attempt, see <see cref="LoginSettings"/> for more details.</param>
+        public async UniTask StartLogin(LoginSettings loginSettings)
         {
             if (IsBusy) return;
             
@@ -125,8 +125,6 @@ namespace EmergenceSDK.Implementations.Login
                 IsBusy = true;
                 var sessionServiceInternal = EmergenceServiceProvider.GetService<ISessionServiceInternal>();
                 var walletServiceInternal = EmergenceServiceProvider.GetService<IWalletServiceInternal>();
-                var futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
-                futureverseServiceInternal.UsingFutureverse = loginMode == LoginMode.Futurepass;
                 var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
                 _cts = new CancellationTokenSource();
                 _ct = _cts.Token;
@@ -135,11 +133,11 @@ namespace EmergenceSDK.Implementations.Login
 
                 await HandleQrCodeRequest(sessionServiceInternal);
                 await HandleHandshakeRequest(walletServiceInternal);
-                await HandleAccessTokenRequest(sessionServiceInternal);
-                await HandleFuturepassRequests(futureverseService);
+                await HandleAccessTokenRequest(loginSettings, sessionServiceInternal);
+                await HandleFuturepassRequests(loginSettings, futureverseService);
 
                 loginSuccessfulEvent.Invoke(this, ((IWalletService)walletServiceInternal).ChecksummedWalletAddress);
-                sessionServiceInternal.RunConnectionEvents();
+                sessionServiceInternal.RunConnectionEvents(loginSettings);
             }
             catch (OperationCanceledException)
             {
@@ -220,9 +218,9 @@ namespace EmergenceSDK.Implementations.Login
             loginExceptionContainer.ThrowIfUnhandled();
         }
 
-        private async UniTask HandleFuturepassRequests(IFutureverseService futureverseService)
+        private async UniTask HandleFuturepassRequests(LoginSettings loginSettings, IFutureverseService futureverseService)
         {
-            if (futureverseService?.UsingFutureverse == true)
+            if ((loginSettings & LoginSettings.EnableFuturepass) == LoginSettings.EnableFuturepass)
             {
                 InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.FuturepassRequests, StepPhase.Start, _ct);
 
@@ -266,25 +264,28 @@ namespace EmergenceSDK.Implementations.Login
             }
         }
 
-        private async UniTask HandleAccessTokenRequest(ISessionServiceInternal sessionServiceInternal)
+        private async UniTask HandleAccessTokenRequest(LoginSettings loginSettings, ISessionServiceInternal sessionServiceInternal)
         {
-            InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.AccessTokenRequest, StepPhase.Start, _ct);
-                
-            try
+            if ((loginSettings & LoginSettings.DisableEmergenceAccessToken) != LoginSettings.DisableEmergenceAccessToken)
             {
-                var tokenResponse = await sessionServiceInternal.GetAccessTokenAsync();
-                _ct.ThrowIfCancellationRequested();
-                if (!tokenResponse.Successful)
-                {
-                    throw new TokenRequestFailedException("Request was not successful", tokenResponse);
-                }
-            }
-            catch (Exception e) when (e is not OperationCanceledException and not TokenRequestFailedException)
-            {
-                throw new TokenRequestFailedException("An exception caused the request to fail", null, e);
-            }
+                InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.AccessTokenRequest, StepPhase.Start, _ct);
 
-            InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.AccessTokenRequest, StepPhase.Success, _ct);
+                try
+                {
+                    var tokenResponse = await sessionServiceInternal.GetAccessTokenAsync();
+                    _ct.ThrowIfCancellationRequested();
+                    if (!tokenResponse.Successful)
+                    {
+                        throw new TokenRequestFailedException("Request was not successful", tokenResponse);
+                    }
+                }
+                catch (Exception e) when (e is not OperationCanceledException and not TokenRequestFailedException)
+                {
+                    throw new TokenRequestFailedException("An exception caused the request to fail", null, e);
+                }
+
+                InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.AccessTokenRequest, StepPhase.Success, _ct);
+            }
         }
 
         private async UniTask HandleHandshakeRequest(IWalletServiceInternal walletServiceInternal)

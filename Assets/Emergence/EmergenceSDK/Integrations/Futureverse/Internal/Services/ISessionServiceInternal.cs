@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
@@ -32,7 +33,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         /// Current Persona's access token.
         /// <remarks>This token should be kept completely private</remarks>
         /// </summary>
-        string CurrentAccessToken { get; }
+        string EmergenceAccessToken { get; }
         
         /// <summary>
         /// Attempts to get an access token, the success callback will fire with the token if successful
@@ -44,7 +45,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         /// </summary>
         UniTask<ServiceResponse<string>> GetAccessTokenAsync();
 
-        void RunConnectionEvents();
+        void RunConnectionEvents(LoginSettings loginSettings);
         
         void RunDisconnectionEvents();
     }

@@ -257,7 +257,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string dataString = SerializationHelper.Serialize(data, false);
 
-            string url = StaticConfig.APIBase + "validate-signed-message" + "?request=" + sessionServiceInternal.CurrentAccessToken;
+            string url = StaticConfig.APIBase + "validate-signed-message" + "?request=" + sessionServiceInternal.EmergenceAccessToken;
 
             var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, dataString);
             try
