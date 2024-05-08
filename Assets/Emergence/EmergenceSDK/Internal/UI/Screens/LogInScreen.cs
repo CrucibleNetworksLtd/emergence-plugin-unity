@@ -157,7 +157,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             UniTask.Void(async () =>
             {
                 await loginManager.WaitUntilAvailable();
-                await loginManager.StartLogin(LoginSettings.WalletConnect);
+                await loginManager.StartLogin(LoginSettings.Default);
             });
         }
 
