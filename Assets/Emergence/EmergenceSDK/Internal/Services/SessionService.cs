@@ -37,59 +37,49 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse<IsConnectedResponse>> IsConnected()
         {
-            var url = StaticConfig.APIBase + "isConnected";
-
-            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, url);
-            request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             try
             {
-                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+                var url = StaticConfig.APIBase + "isConnected";
+
+                var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: EmergenceSingleton.DeviceIdHeader);
                 if(response.Successful == false)
                 {
-                    WebRequestService.CleanupRequest(request);
                     return new ServiceResponse<IsConnectedResponse>(false);
                 }
+                
+                var successfulRequest = EmergenceUtils.ProcessRequest<IsConnectedResponse>(response.Request, EmergenceLogger.LogError, out var processedResponse);
+                if (successfulRequest)
+                {
+                    return new ServiceResponse<IsConnectedResponse>(true, processedResponse);
+                }
+
+                return new ServiceResponse<IsConnectedResponse>(false);
             }
             catch (Exception)
             {
-                WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<IsConnectedResponse>(false);
             }
-            
-            EmergenceUtils.PrintRequestResult("IsConnected", request);
-            var successfulRequest = EmergenceUtils.ProcessRequest<IsConnectedResponse>(request, EmergenceLogger.LogError, out var processedResponse);
-            WebRequestService.CleanupRequest(request);
-            if (successfulRequest)
-            {
-                return new ServiceResponse<IsConnectedResponse>(true, processedResponse);
-            }
-
-            return new ServiceResponse<IsConnectedResponse>(false);
         }
 
         public async UniTask<ServiceResponse> DisconnectAsync()
         {
             if (HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) { return new ServiceResponse(true); }
             
-            DisconnectInProgress = true;
-            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbGET, StaticConfig.APIBase + "killSession");
             try
             {
-                request.SetRequestHeader("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-                request.SetRequestHeader("auth", EmergenceAccessToken);
-                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+                DisconnectInProgress = true;
+
+                var headers = EmergenceSingleton.DeviceIdHeader;
+                headers.Add("auth", EmergenceAccessToken);
+                var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, StaticConfig.APIBase + "killSession", headers: headers);
                 if (response.Successful == false)
                 {
-                    WebRequestService.CleanupRequest(request);
                     return new ServiceResponse(false);
                 }
 
-                EmergenceUtils.PrintRequestResult("Disconnect request completed", request);
-
-                if (EmergenceUtils.RequestError(request))
+                if (EmergenceUtils.RequestError(response.Request))
                 {
                     DisconnectInProgress = false;
-                    WebRequestService.CleanupRequest(request);
                     return new ServiceResponse(false);
                 }
 
@@ -108,11 +98,10 @@ namespace EmergenceSDK.Internal.Services
             }
             finally
             {
-                WebRequestService.CleanupRequest(request);
                 DisconnectInProgress = false;
             }
         }
-
+        
         public void RunConnectionEvents(LoginSettings loginSettings)
         {
             IsLoggedIn = true;
@@ -148,36 +137,28 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync(CancellationToken ct)
         {
-            string url = StaticConfig.APIBase + "qrcode";
-
-            using UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
             try
             {
-                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError, ct: ct);
+                string url = StaticConfig.APIBase + "qrcode";
+                var response = await WebRequestService.DownloadTextureAsync(RequestMethod.Get, url, ct: ct);
                 if (!response.Successful)
                 {
-                    WebRequestService.CleanupRequest(request);
                     return new ServiceResponse<Texture2D>(false);
                 }
+                
+                if (EmergenceUtils.RequestError(response.Request))
+                {
+                    return new ServiceResponse<Texture2D>(false);
+                }
+
+                string deviceId = response.Headers["deviceId"];
+                EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
+                return new ServiceResponse<Texture2D>(true, ((DownloadHandlerTexture)response.Request.downloadHandler).texture);
             }
             catch (Exception e) when (e is not OperationCanceledException) 
             {
-                WebRequestService.CleanupRequest(request);
                 return new ServiceResponse<Texture2D>(false);
             }
-
-            EmergenceUtils.PrintRequestResult("GetQrCode", request);
-
-            if (EmergenceUtils.RequestError(request))
-            {
-                WebRequestService.CleanupRequest(request);
-                return new ServiceResponse<Texture2D>(false);
-            }
-
-            string deviceId = request.GetResponseHeader("deviceId");
-            EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
-            WebRequestService.CleanupRequest(request);
-            return new ServiceResponse<Texture2D>(true, ((DownloadHandlerTexture)request.downloadHandler).texture);
         }
 
         public async UniTask GetQrCode(QRCodeSuccess success, ErrorCallback errorCallback, CancellationCallback cancellationCallback, CancellationToken ct)
@@ -200,7 +181,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = StaticConfig.APIBase + "get-access-token";
             var headers = new Dictionary<string, string> { { "deviceId", EmergenceSingleton.Instance.CurrentDeviceId } };
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError, "", headers);
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, "", headers);
             if(response.Successful == false)
                 return new ServiceResponse<string>(false);
             var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response.ResponseText);

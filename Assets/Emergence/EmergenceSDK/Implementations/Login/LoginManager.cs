@@ -220,7 +220,7 @@ namespace EmergenceSDK.Implementations.Login
 
         private async UniTask HandleFuturepassRequests(LoginSettings loginSettings, IFutureverseService futureverseService)
         {
-            if ((loginSettings & LoginSettings.EnableFuturepass) == LoginSettings.EnableFuturepass)
+            if (loginSettings.HasFlag(LoginSettings.EnableFuturepass))
             {
                 InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.FuturepassRequests, StepPhase.Start, _ct);
 
@@ -266,7 +266,7 @@ namespace EmergenceSDK.Implementations.Login
 
         private async UniTask HandleAccessTokenRequest(LoginSettings loginSettings, ISessionServiceInternal sessionServiceInternal)
         {
-            if ((loginSettings & LoginSettings.DisableEmergenceAccessToken) != LoginSettings.DisableEmergenceAccessToken)
+            if (!loginSettings.HasFlag(LoginSettings.DisableEmergenceAccessToken))
             {
                 InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.AccessTokenRequest, StepPhase.Start, _ct);
 

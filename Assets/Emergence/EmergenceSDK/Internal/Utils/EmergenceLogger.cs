@@ -3,6 +3,9 @@
 
 using System;
 using System.Diagnostics;
+using System.Text;
+using EmergenceSDK.Internal.Services;
+using EmergenceSDK.Internal.Types;
 using Debug = UnityEngine.Debug;
 
 namespace EmergenceSDK.Internal.Utils
@@ -35,9 +38,9 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
         
-        public static void LogWarning(Exception exception)
+        public static void LogWarning(Exception exception, string prefix = "")
         {
-            LogException(exception, LogWarning);
+            LogException(exception, LogWarning, prefix);
         }
         
         public static void LogError(string error, long errorCode) => LogError(error, errorCode, false);
@@ -57,9 +60,9 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
         
-        public static void LogError(Exception exception)
+        public static void LogError(Exception exception, string prefix = "")
         {
-            LogException(exception, LogError);
+            LogException(exception, LogError, prefix);
         }
         public static void LogInfo(string message, bool alsoLogToScreen = false)
         {
@@ -69,17 +72,110 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
 
-        public static void LogInfo(Exception exception)
+        public static void LogInfo(Exception exception, string prefix = "")
         {
-            LogException(exception, LogInfo);
+            LogException(exception, LogInfo, prefix);
         }
 
-        private static void LogException(Exception exception, Action<string, bool> logFunction)
+        public static void LogWebResponse(WebResponse response, bool verbose = false)
+        {
+#if DISABLE_EMERGENCE_LOGS
+            return; // Early return to avoid any logic
+#endif
+            if (response == null) { return; }
+
+            var request = response.Request;
+            var info = WebRequestService.Instance.GetRequestInfo(request);
+            var requestId = (info?.Id)?.ToString() ?? "UNKNOWN";
+            var message = $"Request #{requestId}: Completed with code {request.responseCode}";
+            string requestHeaders = "";
+            string responseHeaders = "";
+            
+            if (verbose) {GetHeaders();}
+            
+            if (response is FailedWebResponse { Exception: not OperationCanceledException and not TimeoutException } failedResponse)
+            {
+                LogError(message);
+                LogError($"Request #{requestId}: {request.error}");
+                if (failedResponse.Exception != null)
+                    LogError(failedResponse.Exception, $"Request #{requestId}: ");
+                
+                if (verbose)
+                {
+                    LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{Environment.NewLine}{requestHeaders}");
+                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                    LogError($"Request #{requestId}: Response headers:{Environment.NewLine}{Environment.NewLine}{responseHeaders}");
+                    LogError($"Request #{requestId}: Response body:{Environment.NewLine}{Environment.NewLine}{response.ResponseText}");
+                }
+            }
+            else if (response is FailedWebResponse { Exception: OperationCanceledException } canceledResponse)
+            {
+                LogInfo($"Request #{requestId}: Request cancelled");
+                LogInfo(canceledResponse.Exception, $"Request #{requestId}: ");
+                if (verbose)
+                {
+                    LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{Environment.NewLine}{requestHeaders}");
+                    LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                }            }
+            else if (response is FailedWebResponse { Exception: TimeoutException } timeoutResponse)
+            {
+                LogError($"Request #{requestId}: Request timed out");
+                LogError(timeoutResponse.Exception, $"Request #{requestId}: ");
+                if (verbose)
+                {
+                    LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{Environment.NewLine}{requestHeaders}");
+                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                }            }
+            else
+            {
+                if ((int)response.StatusCode is >= 200 and < 300)
+                {
+                    LogInfo(message);
+                    if (verbose)
+                    {
+                        LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{Environment.NewLine}{requestHeaders}");
+                        LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                        LogInfo($"Request #{requestId}: Response headers:{Environment.NewLine}{Environment.NewLine}{responseHeaders}");
+                        LogInfo($"Request #{requestId}: Response body:{Environment.NewLine}{Environment.NewLine}{response.ResponseText}");
+                    }
+                }
+                else
+                {
+                    LogWarning(message);
+                    if (verbose)
+                    {
+                        LogWarning($"Request #{requestId}: Request headers:{Environment.NewLine}{Environment.NewLine}{requestHeaders}");
+                        LogWarning($"Request #{requestId}: Request body:{Environment.NewLine}{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                        LogWarning($"Request #{requestId}: Response headers:{Environment.NewLine}{Environment.NewLine}{responseHeaders}");
+                        LogWarning($"Request #{requestId}: Response body:{Environment.NewLine}{Environment.NewLine}{response.ResponseText}");
+                    }
+                }
+            }
+            
+            void GetHeaders()
+            {
+                requestHeaders = "";
+                if (info != null)
+                {
+                    foreach (var headerPair in info.Headers)
+                    {
+                        requestHeaders += $"{headerPair.Key}: {headerPair.Value}{Environment.NewLine}";
+                    }
+                }
+                responseHeaders = "";
+                foreach (var headerPair in response.Headers)
+                {
+                    responseHeaders += $"{headerPair.Key}: {headerPair.Value}{Environment.NewLine}";
+                }
+            }
+        }
+        
+        private static void LogException(Exception exception, Action<string, bool> logFunction, string prefix = "")
         {
             Exception currentException = exception;
             var level = 0;
             while (currentException != null) {
-                logFunction(new string('\t', level) + exception.GetType().FullName + ": " + exception.Message, false);
+                logFunction(new string('\t', level) + prefix + exception.GetType().FullName + ": " + exception.Message, false);
                 currentException = currentException.InnerException;
                 level++;
             }
@@ -139,5 +235,4 @@ namespace EmergenceSDK.Internal.Utils
             return callingClass;
         }
     }
-        
 }

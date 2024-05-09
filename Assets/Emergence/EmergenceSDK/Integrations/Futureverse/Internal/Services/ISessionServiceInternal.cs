@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Implementations.Login.Types;
@@ -34,7 +35,9 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         /// <remarks>This token should be kept completely private</remarks>
         /// </summary>
         string EmergenceAccessToken { get; }
-        
+
+        Dictionary<string, string> EmergenceAccessTokenHeader => new() { { "Authorization", EmergenceAccessToken } };
+
         /// <summary>
         /// Attempts to get an access token, the success callback will fire with the token if successful
         /// </summary>

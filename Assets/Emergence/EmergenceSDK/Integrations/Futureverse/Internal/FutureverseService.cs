@@ -69,9 +69,13 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             var url =
                 $"{GetFuturepassApiUrl()}linked-futurepass?eoa={EmergenceSingleton.Instance.Configuration.Chain.ChainID}:EVM:{walletService.WalletAddress}";
 
-            var response =
-                await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url,
-                    EmergenceLogger.LogError);
+            var response = await WebRequestService.SendAsyncWebRequest(
+                RequestMethod.Get,
+                url,
+                timeout: FutureverseSingleton.Instance.requestTimeout * 1000,
+                verboseLogging: true
+                );
+            
             if (response.Successful == false)
                 return new ServiceResponse<LinkedFuturepassResponse>(response);
 
@@ -84,10 +88,13 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         public async UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturepassInformationAsync(string futurepass)
         {
             var url = $"{GetFuturepassApiUrl()}linked-eoa?futurepass={futurepass}";
+            
+            var response = await WebRequestService.SendAsyncWebRequest(
+                RequestMethod.Get,
+                url,
+                timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
 
-            var response =
-                await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url,
-                    EmergenceLogger.LogError);
+            
             if (!response.Successful)
                 return new ServiceResponse<FuturepassInformationResponse>(response, false);
 
@@ -98,10 +105,13 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
         public async UniTask<ServiceResponse<InventoryResponse>> GetFutureverseInventory()
         {
-            var url = GetArApiUrl();
-            var query = SerializationHelper.Serialize(new InventoryQuery(CombinedAddress));
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url,
-                EmergenceLogger.LogError, query);
+            var body = SerializationHelper.Serialize(new InventoryQuery(CombinedAddress));
+            var response = await WebRequestService.SendAsyncWebRequest(
+                RequestMethod.Post,
+                GetArApiUrl(),
+                body,
+                timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+            
             if (!response.Successful)
                 return new ServiceResponse<InventoryResponse>(response, false, new InventoryResponse());
 
@@ -238,10 +248,12 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         public async UniTask<List<FutureverseAssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId)
         {
             var body = BuildGetAssetTreeRequestBody(tokenId, collectionId);
-            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.timeout = FutureverseSingleton.Instance.requestTimeout;
-            var response = await WebRequestService.PerformAsyncWebRequest(request, (message, code) => { });
+            var response = await WebRequestService.SendAsyncWebRequest(
+                RequestMethod.Post,
+                GetArApiUrl(),
+                body,
+                timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+            
             if (!IsArResponseValid(response, out var jObject))
             {
                 LogArResponseErrors(jObject);
@@ -330,10 +342,11 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         {
             {
                 var body = BuildGetArtmStatusRequestBody(transactionHash);
-                using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
-                request.SetRequestHeader("Content-Type", "application/json");
-                request.timeout = FutureverseSingleton.Instance.requestTimeout;
-                var response = await WebRequestService.PerformAsyncWebRequest(request, null);
+                var response = await WebRequestService.SendAsyncWebRequest(
+                    RequestMethod.Post,
+                    GetArApiUrl(),
+                    body,
+                    timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
                 
                 if (!IsArResponseValid(response, out var jObject) || !ParseStatus(jObject, out var transactionStatus))
                 {
@@ -402,11 +415,13 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             {
                 var address = walletService.ChecksummedWalletAddress;
                 var body = BuildGetNonceForChainAddressRequestBody(address);
-                using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
-                request.SetRequestHeader("Content-Type", "application/json");
-                request.timeout = FutureverseSingleton.Instance.requestTimeout;
-                var nonceResponse = await WebRequestService.PerformAsyncWebRequest(request, (_, _) => { });
-                
+                var nonceResponse = await WebRequestService.SendAsyncWebRequest(
+                    RequestMethod.Post,
+                    GetArApiUrl(),
+                    body,
+                    timeout: FutureverseSingleton.Instance.requestTimeout * 1000
+                    );
+
                 if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseNonce(jObject, out var nonce))
                 {
                     LogArResponseErrors(jObject);
@@ -426,10 +441,11 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             string transactionHash;
             {
                 var body = BuildSubmitTransactionRequestBody(generatedArtm, signature);
-                using var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, GetArApiUrl(), body);
-                request.SetRequestHeader("Content-Type", "application/json");
-                request.timeout = FutureverseSingleton.Instance.requestTimeout;
-                var submitResponse = await WebRequestService.PerformAsyncWebRequest(request, (_, _) => { });
+                var submitResponse = await WebRequestService.SendAsyncWebRequest(
+                    RequestMethod.Post,
+                    GetArApiUrl(),
+                    body,
+                    timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
                 
                 if (!IsArResponseValid(submitResponse, out var jObject) || !ParseTransactionHash(jObject, out transactionHash))
                 {

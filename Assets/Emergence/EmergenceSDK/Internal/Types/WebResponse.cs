@@ -1,27 +1,42 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using EmergenceSDK.Internal.Services;
 using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Types
 {
     public class WebResponse : IDisposable
     {
-        public UnityWebRequest.Result Result => WebRequest.result;
-        public string Error => WebRequest.error;
+        public UnityWebRequest.Result Result => Request.result;
+        public string Error => Request.error;
         public virtual bool Completed => Result != UnityWebRequest.Result.InProgress;
         public virtual bool Successful => Result == UnityWebRequest.Result.Success;
-        public string ResponseText => WebRequest.downloadHandler.text;
-        public byte[] ResponseBytes => WebRequest.downloadHandler.data;
-        public long StatusCode => WebRequest.responseCode;
-        public readonly UnityWebRequest WebRequest;
+        public string ResponseText => Request.downloadHandler?.text ?? "";
+        public byte[] ResponseBytes => Request.downloadHandler?.data ?? new byte[] {};
+        public long StatusCode => Request.responseCode;
+        public Dictionary<string, string> Headers { get; }
+        /// <summary>
+        /// We shouldn't have any permanent reference to this, as this will be disposed when the WebRequest gets Finalized or manually Disposed
+        /// </summary>
+        public readonly UnityWebRequest Request;
 
-        public WebResponse(UnityWebRequest webRequest)
+        public WebResponse(UnityWebRequest request)
         {
-            WebRequest = webRequest;
+            Request = request;
+            Headers = request.GetResponseHeaders() ?? new ();
+        }
+
+        ~WebResponse()
+        {
+            Dispose();
         }
 
         public void Dispose()
         {
-            WebRequest?.Dispose();
+            WebRequestService.Instance.RemoveRequest(Request);
+            Request?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

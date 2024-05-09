@@ -32,22 +32,6 @@ namespace EmergenceSDK
         }
 
         /// <summary>
-        /// Prints the result of a UnityWebRequest to the console.
-        /// </summary>
-        internal static void PrintRequestResult(string name, UnityWebRequest request)
-        {
-            EmergenceLogger.LogInfo(name + " completed " + request.responseCode);
-            if (RequestError(request))
-            {
-                EmergenceLogger.LogError(request.error);
-            }
-            else
-            {
-                EmergenceLogger.LogInfo(request.downloadHandler.text);
-            }
-        }
-        
-        /// <summary>
         /// Processes a UnityWebRequest response and returns the result as a response object.
         /// </summary>
         internal static bool ProcessRequest<T>(UnityWebRequest request, ErrorCallback errorCallback, out T response)

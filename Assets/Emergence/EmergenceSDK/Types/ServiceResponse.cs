@@ -26,9 +26,15 @@ namespace EmergenceSDK.Types
         public ServiceResponse(ServiceResponse response) : this(response, response?.Successful ?? false) {}
         public ServiceResponse(bool successful) : this((WebResponse)null, successful) {}
 
+        ~ServiceResponse()
+        {
+            Dispose();
+        }
+        
         public void Dispose()
         {
             Response?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 

@@ -17,9 +17,9 @@ namespace EmergenceSDK.Internal.Services
     {
         public event WriteMethodSuccess WriteMethodConfirmed;
         
-        private readonly List<string> loadedContractAddresses = new();
-        private int desiredConfirmationCount = 1;
-        private bool CheckForNewContract(ContractInfo contractInfo) => !loadedContractAddresses.Contains(contractInfo.ContractAddress);
+        private readonly List<string> _loadedContractAddresses = new();
+        private const int DesiredConfirmationCount = 1;
+        private bool CheckForNewContract(ContractInfo contractInfo) => !_loadedContractAddresses.Contains(contractInfo.ContractAddress);
 
         private const int MaxRetryAttempts = 1;
         
@@ -53,16 +53,14 @@ namespace EmergenceSDK.Internal.Services
             string dataString = SerializationHelper.Serialize(data, false);
             string url = StaticConfig.APIBase + "loadContract";
 
-            var request = WebRequestService.CreateRequest(UnityWebRequest.kHttpVerbPOST, url, dataString);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, dataString);
 
-            if (response.Successful && EmergenceUtils.ProcessRequest<LoadContractResponse>(request, EmergenceLogger.LogError, out var processedResponse))
+            if (response.Successful && EmergenceUtils.ProcessRequest<LoadContractResponse>(response.Request, EmergenceLogger.LogError, out var processedResponse))
             {
-                loadedContractAddresses.Add(contractAddress);
+                _loadedContractAddresses.Add(contractAddress);
             }
-            WebRequestService.CleanupRequest(request);
-            return loadedContractAddresses.Contains(contractAddress);
+
+            return _loadedContractAddresses.Contains(contractAddress);
         }
 
         public async UniTask<ServiceResponse<ReadContractResponse>> ReadMethodAsync<T>(ContractInfo contractInfo, T parameters)
@@ -73,7 +71,7 @@ namespace EmergenceSDK.Internal.Services
             string url = contractInfo.ToReadUrl();
             string dataString = SerializationHelper.Serialize(parameters, false);
 
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString);
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, dataString);
             if(response.Successful == false)
                 return new ServiceResponse<ReadContractResponse>(false);
             var readContractResponse = SerializationHelper.Deserialize<BaseResponse<ReadContractResponse>>(response.ResponseText);
@@ -117,7 +115,7 @@ namespace EmergenceSDK.Internal.Services
             
             var headers = new Dictionary<string, string>();
             headers.Add("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, dataString, headers);
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, dataString, headers);
             if(response.Successful == false)
                 return await HandleWriteMethodError(response,
                     new SerialisedWriteRequest<T>(contractInfo, value, body, attempt));
@@ -156,7 +154,7 @@ namespace EmergenceSDK.Internal.Services
                 var transactionStatus = await EmergenceServiceProvider.GetService<IChainService>().GetTransactionStatusAsync(transactionHash, contractInfo.NodeUrl);
                 if (transactionStatus.Result1?.transaction?.Confirmations != null)
                     confirmations = (int)transactionStatus.Result1?.transaction?.Confirmations;
-                if(transactionStatus.Result1?.transaction?.Confirmations >= desiredConfirmationCount)
+                if(transactionStatus.Result1?.transaction?.Confirmations >= DesiredConfirmationCount)
                 {
                     WriteMethodConfirmed?.Invoke(new WriteContractResponse(transactionHash));
                     break;
@@ -216,7 +214,7 @@ namespace EmergenceSDK.Internal.Services
                 currencySymbol = contractInfo.CurrencySymbol
             };
 
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError,
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url,
                 SerializationHelper.Serialize(data, false), headers);
 
             return response;

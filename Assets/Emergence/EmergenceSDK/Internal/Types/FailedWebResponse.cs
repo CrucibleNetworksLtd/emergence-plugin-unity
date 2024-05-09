@@ -8,7 +8,7 @@ namespace EmergenceSDK.Internal.Types
         public override bool Completed => false;
         public override bool Successful => false;
         public readonly Exception Exception;
-        public FailedWebResponse(Exception exception, UnityWebRequest webRequest) : base(webRequest)
+        public FailedWebResponse(Exception exception, UnityWebRequest request) : base(request)
         {
             Exception = exception;
         }

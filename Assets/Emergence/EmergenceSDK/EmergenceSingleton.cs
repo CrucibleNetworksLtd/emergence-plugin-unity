@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Internal.UI.Screens;
@@ -87,6 +88,7 @@ namespace EmergenceSDK
         }
 
         private EmergenceEnvironment? ForcedEnvironment { get; set; }
+        public static Dictionary<string, string> DeviceIdHeader => new() { { "deviceId", Instance.CurrentDeviceId } };
 
         internal void RunInForcedEnvironment(EmergenceEnvironment environment, Action action)
         {

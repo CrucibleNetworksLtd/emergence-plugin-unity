@@ -3,6 +3,7 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Types;
+using EmergenceSDK.Types;
 using MG.GIF;
 using UnityEngine.Networking;
 
@@ -33,12 +34,11 @@ namespace EmergenceSDK.Internal.Utils
 
         private async UniTask MakeRequest(string url)
         {
-            var request = UnityWebRequest.Get(url);
             WebResponse response;
 
             try
             {
-                response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+                response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
             }
             catch (Exception e)
             {

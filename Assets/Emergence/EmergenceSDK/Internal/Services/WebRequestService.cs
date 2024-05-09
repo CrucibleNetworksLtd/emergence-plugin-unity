@@ -1,13 +1,13 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
-using EmergenceSDK.Types.Delegates;
+using EmergenceSDK.Types;
 using UnityEngine.Networking;
 using WebResponse = EmergenceSDK.Internal.Types.WebResponse;
 
@@ -15,50 +15,102 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class WebRequestService
     {
-        private static WebRequestService instance;
-        public static WebRequestService Instance => instance ??= new WebRequestService();
+        internal class WebRequestInfo
+        {
+            private static int _lastId = -1;
+            public readonly DateTime Time;
+            public readonly int Id;
+            /// <summary>
+            /// The Request headers, only populated if the headers are passed to
+            /// <see cref="WebRequestService.PerformAsyncWebRequest"/>
+            /// to send the request
+            /// </summary>
+            public readonly Dictionary<string, string> Headers;
 
-        private ConcurrentDictionary<UnityWebRequest, DateTime> openRequests = new();
+            public WebRequestInfo(Dictionary<string, string> requestHeaders)
+            {
+                Id = ++_lastId;
+                Time = DateTime.Now;
+                Headers = requestHeaders ?? new();
+            }
+        }
+        
+        private static WebRequestService _instance;
+        
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static WebRequestService Instance => _instance ??= new WebRequestService();
+        private readonly ConcurrentDictionary<UnityWebRequest, WebRequestInfo> _openRequests = new();
+        private readonly ConcurrentDictionary<UnityWebRequest, WebRequestInfo> _allRequests = new();
 
         //This timeout avoids this issue: https://forum.unity.com/threads/catching-curl-error-28.1274846/
         private const int DefaultTimeoutMilliseconds = 100000;
 
-        internal WebRequestService()
+        private WebRequestService()
         {
             EmergenceSingleton.Instance.OnGameClosing += CancelAllRequests;
         }
 
         private void CancelAllRequests()
         {
-            foreach (var openRequest in openRequests)
+            foreach (var openRequest in _openRequests)
             {
                 openRequest.Key.Abort();
             }
         }
 
-        public static UnityWebRequest CreateRequest(string method, string url, string bodyData = "")
+        private static UnityWebRequest CreateRequest(RequestMethod method, string url, string bodyData = "")
         {
-            return GetRequestFromMethodType(method, url, bodyData);
+            UnityWebRequest request;
+            switch (method)
+            {
+                case RequestMethod.Get:
+                    request = UnityWebRequest.Get(url);
+                    break;
+                case RequestMethod.Head:
+                    request = UnityWebRequest.Head(url);
+                    break;
+                case RequestMethod.Post:
+                    request = UnityWebRequest.Post(url, bodyData);
+                    request.uploadHandler.contentType = "application/json"; // Default content type is JSON for POST/PUT/PATCH requests
+                    break;
+                case RequestMethod.Put:
+                    request = UnityWebRequest.Put(url, bodyData);
+                    request.uploadHandler.contentType = "application/json"; // Default content type is JSON for POST/PUT/PATCH requests
+                    break;
+                case RequestMethod.Patch:
+                    request = UnityWebRequest.Post(url, bodyData);
+                    request.method = "PATCH";
+                    request.uploadHandler.contentType = "application/json"; // Default content type is JSON for POST/PUT/PATCH requests
+                    break;
+                case RequestMethod.Delete:
+                    request = UnityWebRequest.Delete(url);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(method), "Unsupported HTTP method: " + method);
+            }
+            
+            return request;
         }
         
         /// <summary>
-        /// Performs an asynchronous UnityWebRequest and returns the result as a string.
+        /// Performs an asynchronous UnityWebRequest and returns the result as a <see cref="WebResponse"/>.
         /// </summary>
-        public static async UniTask<WebResponse> PerformAsyncWebRequest(string method, string url,
-            ErrorCallback errorCallback, string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, CancellationToken ct = default)
+        public static async UniTask<WebResponse> SendAsyncWebRequest(RequestMethod method, string url,
+            string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, CancellationToken ct = default, bool verboseLogging = false)
         {
-            UnityWebRequest request = GetRequestFromMethodType(method, url, bodyData);
-            Instance.AddOpenRequest(request);
-
-            SetupRequestHeaders(request, headers);
-            var ret = await PerformAsyncWebRequest(request, errorCallback, timeout, ct);
-            CleanupRequest(request);
-            return ret;
+            UnityWebRequest request = CreateRequest(method, url, bodyData);
+            return await PerformAsyncWebRequest(request, headers, timeout, ct, verboseLogging);
         }
-
-        public static void CleanupRequest(UnityWebRequest request)
+        
+        /// <summary>
+        /// Performs an asynchronous UnityWebRequest designed to download a texture, and returns the result as a <see cref="WebResponse"/>.
+        /// </summary>
+        public static async UniTask<WebResponse> DownloadTextureAsync(RequestMethod method, string url,
+            string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, bool nonReadable = false, CancellationToken ct = default, bool verboseLogging = false)
         {
-            Instance.RemoveOpenRequest(request);
+            UnityWebRequest request = CreateRequest(method, url, bodyData);
+            request.downloadHandler = new DownloadHandlerTexture(!nonReadable);
+            return await PerformAsyncWebRequest(request, headers, timeout, ct, verboseLogging);
         }
 
         private static void SetupRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)
@@ -71,69 +123,47 @@ namespace EmergenceSDK.Internal.Services
                 }
             }
         }
-        
-        private static UnityWebRequest GetRequestFromMethodType(string method, string url, string bodyData)
+
+        private WebRequestInfo AddRequest(UnityWebRequest request, Dictionary<string, string> headers)
         {
-            UnityWebRequest ret;
-            switch (method)
-            {
-                case UnityWebRequest.kHttpVerbGET:
-                    ret = GenerateGetRequest(url);
-                    break;
-                case UnityWebRequest.kHttpVerbPOST:
-                    ret = GeneratePostRequest(url, bodyData);
-                    break;
-                case UnityWebRequest.kHttpVerbPUT:
-                    ret = GeneratePutRequest(url, bodyData);
-                    break;
-                default:
-                    throw new Exception("Unsupported HTTP method: " + method);
-            }
-            
-            ret.disposeUploadHandlerOnDispose = true;
-            ret.disposeDownloadHandlerOnDispose = true;
-            
-            return ret;
+            var webRequestInfo = new WebRequestInfo(headers);
+            _openRequests.TryAdd(request, webRequestInfo);
+            _allRequests.TryAdd(request, webRequestInfo);
+            return webRequestInfo;
         }
 
-        private static UnityWebRequest GenerateGetRequest(string url) => UnityWebRequest.Get(url);
-
-        private static UnityWebRequest GeneratePostRequest(string url, string bodyData)
+        private void CloseRequest(UnityWebRequest request)
         {
-            var request = UnityWebRequest.Post(url, string.Empty);
-            if(bodyData.Length > 0)
-            {
-                request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyData));
-                request.uploadHandler.contentType = "application/json";
-            }
-            return request;
+            _openRequests.TryRemove(request, out _);
+        }
+
+        internal void RemoveRequest(UnityWebRequest request)
+        {
+            _openRequests.TryRemove(request, out _);
+            _allRequests.TryRemove(request, out _);
+        }
+
+        internal WebRequestInfo GetRequestInfo(UnityWebRequest request)
+        {
+            return _allRequests.GetValueOrDefault(request);
         }
         
-        private static UnityWebRequest GeneratePutRequest(string url, string bodyData)
+        private static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request,
+            Dictionary<string, string> headers = null,
+            float timeout = DefaultTimeoutMilliseconds,
+            CancellationToken ct = default,
+            bool verboseLogging = false)
         {
-            var request = UnityWebRequest.Put(url, bodyData);
-            if(bodyData.Length > 0)
-            {
-                request.uploadHandler.contentType = "application/json";
-            }
-            return request;
-        }
-
-        private void AddOpenRequest(UnityWebRequest request)
-        {
-            openRequests.TryAdd(request, DateTime.UtcNow);
-        }
-
-        private void RemoveOpenRequest(UnityWebRequest request)
-        {
-            openRequests.TryRemove(request, out _);
-        }
-
-        public static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request, ErrorCallback errorCallback, float timeout = DefaultTimeoutMilliseconds, CancellationToken ct = default)
-        {
-            EmergenceLogger.LogInfo($"Performing {request.method} request to {request.url}, DeviceId: {EmergenceSingleton.Instance.CurrentDeviceId}");
+            WebResponse response = null;
             try
             {
+                if (headers != null)
+                {
+                    SetupRequestHeaders(request, headers);
+                }
+
+                var requestInfo = Instance.AddRequest(request, headers);
+                EmergenceLogger.LogInfo($"Request #{requestInfo.Id}: Performing {request.method} request to {request.url}, DeviceId: {EmergenceSingleton.Instance.CurrentDeviceId}");
                 var sendTask = request.SendWebRequest().WithCancellation(ct);
 
                 try
@@ -142,38 +172,39 @@ namespace EmergenceSDK.Internal.Services
 
                     // Rest of the code if the request completes within the timeout
 
-                    var response = request.result;
-                    if (response == UnityWebRequest.Result.Success)
+                    var result = request.result;
+                    if (result == UnityWebRequest.Result.Success)
                     {
-                        return new WebResponse(request);
+                        return response = new WebResponse(request);
                     }
                     else
                     {
-                        errorCallback?.Invoke(request.error, request.responseCode);
-                        return new WebResponse(request);
+                        return response = new WebResponse(request);
                     }
                 }
                 catch (TimeoutException e)
                 {
                     request.Abort(); // Abort the request
-
-                    errorCallback?.Invoke("Request timed out.", 0);
-                    return new FailedWebResponse(e, request);
+                    return response = new FailedWebResponse(e, request);
                 }
             }
             catch (UnityWebRequestException e)
             {
-                errorCallback?.Invoke(e.Message, request.responseCode);
-                return new FailedWebResponse(e, request);
+                return response = new FailedWebResponse(e, request);
             }
-            catch (Exception e) when (e is not OperationCanceledException)
+            catch (OperationCanceledException e)
             {
-                errorCallback?.Invoke(request.error, request.responseCode);
-                return new FailedWebResponse(e, request);
+                response = new FailedWebResponse(e, request);
+                throw;
+            }
+            catch (Exception e)
+            {
+                return response = new FailedWebResponse(e, request);
             }
             finally
             {
-                Instance.RemoveOpenRequest(request); // Remove the request from tracking
+                EmergenceLogger.LogWebResponse(response, verboseLogging);
+                Instance.CloseRequest(request); // Remove the request from tracking
             }
         }
     }

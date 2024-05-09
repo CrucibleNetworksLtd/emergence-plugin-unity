@@ -37,6 +37,7 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
         private void Start()
         {
             _futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+            _sessionService = EmergenceServiceProvider.GetService<ISessionService>();
             _inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
             _inventoryItemStore = new InventoryItemStore();
             

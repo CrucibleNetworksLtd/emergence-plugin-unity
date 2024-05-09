@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
@@ -17,7 +16,7 @@ namespace EmergenceSDK.Internal.Services
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("Authorization-header", authorization);
             var bodyData = "{\"metadata\": \"" + metadata + "\"}";
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPUT, url, EmergenceLogger.LogError, bodyData, headers);
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Put, url, bodyData, headers);
             if(response.Successful == false)
                 return new ServiceResponse<string>(false);
             
@@ -41,7 +40,7 @@ namespace EmergenceSDK.Internal.Services
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("Authorization-header", authorization);
             var bodyData = "{\"metadata\": \"" + metadata + "\"}";
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, bodyData, headers);
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, bodyData, headers);
             if(response.Successful == false)
                 return new ServiceResponse<string>(false);
             
