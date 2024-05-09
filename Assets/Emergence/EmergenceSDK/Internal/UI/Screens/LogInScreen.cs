@@ -141,7 +141,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             UniTask.Void(async () =>
             {
                 await loginManager.WaitUntilAvailable();
-                await loginManager.StartLogin(LoginSettings.EnableFuturepass | LoginSettings.DisableEmergenceAccessToken);
+                await loginManager.StartLogin(LoginSettings.EnableFuturepass);
             });
         }
 
