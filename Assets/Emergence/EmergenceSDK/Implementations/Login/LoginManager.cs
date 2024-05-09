@@ -136,8 +136,8 @@ namespace EmergenceSDK.Implementations.Login
                 await HandleAccessTokenRequest(loginSettings, sessionServiceInternal);
                 await HandleFuturepassRequests(loginSettings, futureverseService);
 
-                loginSuccessfulEvent.Invoke(this, ((IWalletService)walletServiceInternal).ChecksummedWalletAddress);
                 sessionServiceInternal.RunConnectionEvents(loginSettings);
+                loginSuccessfulEvent.Invoke(this, ((IWalletService)walletServiceInternal).ChecksummedWalletAddress);
             }
             catch (OperationCanceledException)
             {
