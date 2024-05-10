@@ -69,8 +69,12 @@ namespace EmergenceSDK.Internal.Services
                 case RequestMethod.Head:
                     request = UnityWebRequest.Head(url);
                     break;
-                case RequestMethod.Post:
-                    request = UnityWebRequest.Post(url, bodyData);
+                case RequestMethod.Post: 
+                    request = new UnityWebRequest(url, "POST");
+                    request.downloadHandler = new DownloadHandlerBuffer();
+                    if (string.IsNullOrEmpty(bodyData))
+                        break;
+                    request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyData));
                     request.uploadHandler.contentType = "application/json"; // Default content type is JSON for POST/PUT/PATCH requests
                     break;
                 case RequestMethod.Put:
