@@ -17,19 +17,16 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class WalletService : IWalletService, IWalletServiceInternal
     {
-        private bool completedHandshake = false;
-
-        public bool IsValidWallet => WalletAddress != null && WalletAddress.Trim() != string.Empty &&
-                                  ChecksummedWalletAddress != null && ChecksummedWalletAddress.Trim() != string.Empty;
-
-        public string WalletAddress { get; private set; } = string.Empty;
-        public string ChecksummedWalletAddress { get; private set; } = string.Empty;
-
-        private ISessionServiceInternal sessionServiceInternal;
+        public IDisposable SpoofedWallet(string wallet, string checksummedWallet) => new SpoofedWalletManager(wallet, checksummedWallet);
+        public bool IsValidWallet => !string.IsNullOrEmpty(WalletAddress?.Trim()) && !string.IsNullOrEmpty(ChecksummedWalletAddress?.Trim());
+        public string WalletAddress { get; internal set; } = string.Empty;
+        public string ChecksummedWalletAddress { get; internal set; } = string.Empty;
+        private readonly ISessionServiceInternal _sessionServiceInternal;
+        private bool _completedHandshake;
 
         public WalletService(ISessionServiceInternal sessionServiceInternal)
         {
-            this.sessionServiceInternal = sessionServiceInternal;
+            this._sessionServiceInternal = sessionServiceInternal;
         }
 
         public async UniTask<ServiceResponse<bool>> ReinitializeWalletConnect()
@@ -49,7 +46,7 @@ namespace EmergenceSDK.Internal.Services
             }
             return new ServiceResponse<bool>(response, false);
         }
-        
+
         public async UniTask<ServiceResponse<string>> RequestToSignAsync(string messageToSign)
         {
             var content = SerializationHelper.Serialize(
@@ -92,78 +89,36 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask<ServiceResponse<string>> HandshakeAsync(float timeout, CancellationToken ct)
         {
             var url = StaticConfig.APIBase + "handshake" + "?nodeUrl=" + EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL;
-            
-            try
+
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: EmergenceSingleton.DeviceIdHeader, timeout: timeout, ct: ct);
+                
+            if (!response.Successful)
             {
-                var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: EmergenceSingleton.DeviceIdHeader, timeout: timeout, ct: ct);
-                
-                if (!response.Successful)
+                if (response is FailedWebResponse failedWebResponse)
                 {
-                    if (response is FailedWebResponse failedWebResponse)
-                    {
-                        throw failedWebResponse.Exception;
-                    }
-
-                    return new ServiceResponse<string>(response, false);
-                }
-
-                if (EmergenceUtils.ProcessRequest<HandshakeResponse>(response.Request, EmergenceLogger.LogError, out var processedResponse))
-                {
-                    if (processedResponse == null)
-                    {
-                        string errorMessage = completedHandshake ? "Handshake already completed." : "Handshake failed, check server status.";
-                        int errorCode = completedHandshake ? 0 : -1;
-                        EmergenceLogger.LogError(errorMessage, errorCode);
-                        return new ServiceResponse<string>(response, false);
-                    }
-                
-                    completedHandshake = true;
-                    WalletAddress = processedResponse.address;
-                    ChecksummedWalletAddress = processedResponse.checksummedAddress;
-                    return new ServiceResponse<string>(response, true, processedResponse.address);
+                    throw failedWebResponse.Exception;
                 }
 
                 return new ServiceResponse<string>(response, false);
             }
-            finally
-            {
-            }
-        }
 
-        public void RunWithSpoofedWalletAddress(string walletAddress, string checksummedWalletAddress, Action action)
-        {
-            var oldWalletAddress = WalletAddress;
-            var oldChecksummedWalletAddress = ChecksummedWalletAddress;
-            WalletAddress = walletAddress;
-            ChecksummedWalletAddress = checksummedWalletAddress;
+            if (EmergenceUtils.ProcessRequest<HandshakeResponse>(response.Request, EmergenceLogger.LogError, out var processedResponse))
+            {
+                if (processedResponse == null)
+                {
+                    string errorMessage = _completedHandshake ? "Handshake already completed." : "Handshake failed, check server status.";
+                    int errorCode = _completedHandshake ? 0 : -1;
+                    EmergenceLogger.LogError(errorMessage, errorCode);
+                    return new ServiceResponse<string>(response, false);
+                }
+                
+                _completedHandshake = true;
+                WalletAddress = processedResponse.address;
+                ChecksummedWalletAddress = processedResponse.checksummedAddress;
+                return new ServiceResponse<string>(response, true, processedResponse.address);
+            }
 
-            try
-            {
-                action.Invoke();
-            }
-            finally
-            {
-                WalletAddress = oldWalletAddress;
-                ChecksummedWalletAddress = oldChecksummedWalletAddress;
-            }
-        }
-
-        public async UniTask RunWithSpoofedWalletAddressAsync(string walletAddress, string checksummedWalletAddress, Func<UniTask> action)
-        {
-            var oldWalletAddress = WalletAddress;
-            var oldChecksummedWalletAddress = ChecksummedWalletAddress;
-            WalletAddress = walletAddress;
-            ChecksummedWalletAddress = checksummedWalletAddress;
-
-            try
-            {
-                await action();
-            }
-            finally
-            {
-                WalletAddress = oldWalletAddress;
-                ChecksummedWalletAddress = oldChecksummedWalletAddress;
-            }
+            return new ServiceResponse<string>(response, false);
         }
 
         public async UniTask Handshake(HandshakeSuccess success, ErrorCallback errorCallback, float timeout, CancellationCallback cancellationCallback,
@@ -189,7 +144,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse<string>> GetBalanceAsync()
         {
-            if (((ISessionService)sessionServiceInternal).DisconnectInProgress)
+            if (((ISessionService)_sessionServiceInternal).DisconnectInProgress)
                 return new ServiceResponse<string>(false);
     
             string url = StaticConfig.APIBase + "getbalance" + 
@@ -228,7 +183,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string dataString = SerializationHelper.Serialize(data, false);
 
-            string url = StaticConfig.APIBase + "validate-signed-message" + "?request=" + sessionServiceInternal.EmergenceAccessToken;
+            string url = StaticConfig.APIBase + "validate-signed-message" + "?request=" + _sessionServiceInternal.EmergenceAccessToken;
 
             try
             {
@@ -259,6 +214,19 @@ namespace EmergenceSDK.Internal.Services
                 success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in ValidateSignedMessage.", (long)response.Code);
+        }
+        
+        private class SpoofedWalletManager : FlagLifecycleManager<string, string>
+        {
+            public SpoofedWalletManager(string walletAddress, string checksummedWalletAddress) : base(walletAddress, checksummedWalletAddress) {}
+
+            // These are virtual and called in the constructor, so we can't store a reference to the wallet service since it will cause a NullReferenceException
+            // We can directly request a WalletService rather than IWalletService, since we're already in the WalletService class
+            // It's actually needed to be able to set WalletAddress and ChecksummedWalletAddress, whose setters aren't exposed to any interface.
+            protected override string GetCurrentFlag1Value() => EmergenceServiceProvider.GetService<WalletService>().WalletAddress;
+            protected override void SetFlag1Value(string newValue) => EmergenceServiceProvider.GetService<WalletService>().WalletAddress = newValue;
+            protected override string GetCurrentFlag2Value() => EmergenceServiceProvider.GetService<WalletService>().ChecksummedWalletAddress;
+            protected override void SetFlag2Value(string newValue) => EmergenceServiceProvider.GetService<WalletService>().ChecksummedWalletAddress = newValue;
         }
     }
 }

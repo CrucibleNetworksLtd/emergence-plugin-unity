@@ -10,6 +10,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
 {
     internal interface IWalletServiceInternal : IEmergenceService
     {
+        IDisposable SpoofedWallet(string wallet, string checksummedWallet);
         /// <summary>
         /// Attempts to handshake with the Emergence server, retrieving the wallet address if successful.
         /// </summary>
@@ -18,7 +19,5 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         /// Attempts to handshake with the Emergence server.
         /// </summary>
         UniTask<ServiceResponse<string>> HandshakeAsync(float timeout = LoginManager.QrCodeTimeout * 1000, CancellationToken ct = default);
-        void RunWithSpoofedWalletAddress(string walletAddress, string checksummedWalletAddress, Action action);
-        UniTask RunWithSpoofedWalletAddressAsync(string walletAddress, string checksummedWalletAddress, Func<UniTask> action);
     }
 }
