@@ -96,21 +96,20 @@ namespace EmergenceSDK.Internal.Services
         /// Performs an asynchronous UnityWebRequest and returns the result as a <see cref="WebResponse"/>.
         /// </summary>
         public static async UniTask<WebResponse> SendAsyncWebRequest(RequestMethod method, string url,
-            string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, CancellationToken ct = default, bool verboseLogging = false)
+            string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, CancellationToken ct = default)
         {
-            UnityWebRequest request = CreateRequest(method, url, bodyData);
-            return await PerformAsyncWebRequest(request, headers, timeout, ct, verboseLogging);
+            return await PerformAsyncWebRequest(CreateRequest(method, url, bodyData), headers, timeout, ct);
         }
         
         /// <summary>
         /// Performs an asynchronous UnityWebRequest designed to download a texture, and returns the result as a <see cref="WebResponse"/>.
         /// </summary>
         public static async UniTask<WebResponse> DownloadTextureAsync(RequestMethod method, string url,
-            string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, bool nonReadable = false, CancellationToken ct = default, bool verboseLogging = false)
+            string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, bool nonReadable = false, CancellationToken ct = default)
         {
             UnityWebRequest request = CreateRequest(method, url, bodyData);
             request.downloadHandler = new DownloadHandlerTexture(!nonReadable);
-            return await PerformAsyncWebRequest(request, headers, timeout, ct, verboseLogging);
+            return await PerformAsyncWebRequest(request, headers, timeout, ct);
         }
 
         private static void SetupRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)
@@ -151,8 +150,7 @@ namespace EmergenceSDK.Internal.Services
         private static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request,
             Dictionary<string, string> headers = null,
             float timeout = DefaultTimeoutMilliseconds,
-            CancellationToken ct = default,
-            bool verboseLogging = false)
+            CancellationToken ct = default)
         {
             WebResponse response = null;
             try
@@ -203,7 +201,7 @@ namespace EmergenceSDK.Internal.Services
             }
             finally
             {
-                EmergenceLogger.LogWebResponse(response, verboseLogging);
+                EmergenceLogger.LogWebResponse(response);
                 Instance.CloseRequest(request); // Remove the request from tracking
             }
         }
