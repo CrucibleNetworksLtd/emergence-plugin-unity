@@ -15,6 +15,25 @@ namespace EmergenceSDK.Internal.Utils
     /// </summary>
     public static class EmergenceLogger 
     {
+#if DISABLE_EMERGENCE_LOGS
+        internal static IDisposable VerboseOutput => null;
+        internal static IDisposable VerboseMarker => null;
+#else
+        /// <summary>
+        /// You MUST dispose the IDisposable created by this property, recommended with the using keyword.
+        /// It will let the <see cref="EmergenceLogger"/> also output verbose logs.
+        /// <remarks>Forgetting to <see cref="VerboseOutputManager.Dispose"/> the <see cref="VerboseOutputManager"/> will emit a warning and automatically dispose it.</remarks>
+        /// </summary>
+        internal static IDisposable VerboseOutput(bool enabled) => new VerboseOutputManager(enabled);
+        
+        /// <summary>
+        /// You MUST dispose the IDisposable created by this property, recommended with the using keyword.
+        /// It will mark any future logs logged by the <see cref="EmergenceLogger"/> as verbose logs.
+        /// <remarks>Forgetting to <see cref="MarkLogsAsVerboseManager.Dispose"/> the <see cref="MarkLogsAsVerboseManager"/> will emit a warning and automatically dispose it.</remarks>
+        /// </summary>
+        internal static IDisposable VerboseMarker(bool enabled) => new MarkLogsAsVerboseManager(enabled);
+#endif
+
         public enum LogLevel
         {
             Off = 0,
@@ -27,9 +46,8 @@ namespace EmergenceSDK.Internal.Utils
         /// <summary>
         /// Change this to change Emergence Logging level
         /// </summary>
-        private static readonly LogLevel logLevel = EmergenceSingleton.Instance.LogLevel;
+        private static readonly LogLevel MaxLogLevel = EmergenceSingleton.Instance.LogLevel;
         
-
         public static void LogWarning(string message, bool alsoLogToScreen = false)
         {
             if (IsEnabledFor(LogLevel.Warning))
@@ -42,8 +60,9 @@ namespace EmergenceSDK.Internal.Utils
         {
             LogException(exception, LogWarning, prefix);
         }
-        
+
         public static void LogError(string error, long errorCode) => LogError(error, errorCode, false);
+
         public static void LogError(string error, long errorCode, bool alsoLogToScreen)
         {
             if (IsEnabledFor(LogLevel.Error))
@@ -77,12 +96,13 @@ namespace EmergenceSDK.Internal.Utils
             LogException(exception, LogInfo, prefix);
         }
 
-        public static void LogWebResponse(WebResponse response, bool verbose = false)
+        public static void LogWebResponse(WebResponse response)
         {
 #if DISABLE_EMERGENCE_LOGS
             return; // Early return to avoid any logic
 #endif
-            if (response == null) { return; }
+            if ((MarkLogsAsVerbose && !VerboseMode) || response == null)
+                return; // Early return to avoid any logic
 
             var request = response.Request;
             var info = WebRequestService.Instance.GetRequestInfo(request);
@@ -91,7 +111,7 @@ namespace EmergenceSDK.Internal.Utils
             string requestHeaders = "";
             string responseHeaders = "";
             
-            if (verbose) {GetHeaders();}
+            if (VerboseMode) {GetHeaders();}
             
             if (response is FailedWebResponse { Exception: not OperationCanceledException and not TimeoutException } failedResponse)
             {
@@ -100,54 +120,60 @@ namespace EmergenceSDK.Internal.Utils
                 if (failedResponse.Exception != null)
                     LogError(failedResponse.Exception, $"Request #{requestId}: ");
                 
-                if (verbose)
+                using (VerboseMarker(true))
                 {
-                    LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{Environment.NewLine}{requestHeaders}");
-                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
-                    LogError($"Request #{requestId}: Response headers:{Environment.NewLine}{Environment.NewLine}{responseHeaders}");
-                    LogError($"Request #{requestId}: Response body:{Environment.NewLine}{Environment.NewLine}{response.ResponseText}");
+                    LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
+                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                    LogError($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
+                    LogError($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
                 }
             }
             else if (response is FailedWebResponse { Exception: OperationCanceledException } canceledResponse)
             {
                 LogInfo($"Request #{requestId}: Request cancelled");
                 LogInfo(canceledResponse.Exception, $"Request #{requestId}: ");
-                if (verbose)
+                
+                using (VerboseMarker(true))
                 {
-                    LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{Environment.NewLine}{requestHeaders}");
-                    LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
-                }            }
+                    LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
+                    LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                }
+            }
             else if (response is FailedWebResponse { Exception: TimeoutException } timeoutResponse)
             {
                 LogError($"Request #{requestId}: Request timed out");
                 LogError(timeoutResponse.Exception, $"Request #{requestId}: ");
-                if (verbose)
+                
+                using (VerboseMarker(true))
                 {
-                    LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{Environment.NewLine}{requestHeaders}");
-                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
-                }            }
+                    LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
+                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                }
+            }
             else
             {
                 if ((int)response.StatusCode is >= 200 and < 300)
                 {
                     LogInfo(message);
-                    if (verbose)
+                    
+                    using (VerboseMarker(true))
                     {
-                        LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{Environment.NewLine}{requestHeaders}");
-                        LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
-                        LogInfo($"Request #{requestId}: Response headers:{Environment.NewLine}{Environment.NewLine}{responseHeaders}");
-                        LogInfo($"Request #{requestId}: Response body:{Environment.NewLine}{Environment.NewLine}{response.ResponseText}");
+                        LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
+                        LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                        LogInfo($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
+                        LogInfo($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
                     }
                 }
                 else
                 {
                     LogWarning(message);
-                    if (verbose)
+                    
+                    using (VerboseMarker(true))
                     {
-                        LogWarning($"Request #{requestId}: Request headers:{Environment.NewLine}{Environment.NewLine}{requestHeaders}");
-                        LogWarning($"Request #{requestId}: Request body:{Environment.NewLine}{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
-                        LogWarning($"Request #{requestId}: Response headers:{Environment.NewLine}{Environment.NewLine}{responseHeaders}");
-                        LogWarning($"Request #{requestId}: Response body:{Environment.NewLine}{Environment.NewLine}{response.ResponseText}");
+                        LogWarning($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
+                        LogWarning($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                        LogWarning($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
+                        LogWarning($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
                     }
                 }
             }
@@ -157,10 +183,16 @@ namespace EmergenceSDK.Internal.Utils
                 requestHeaders = "";
                 if (info != null)
                 {
+                    var contentTypeFound = false;
                     foreach (var headerPair in info.Headers)
                     {
+                        if (headerPair.Key.ToLower() == "content-type")
+                            contentTypeFound = true;
+                        
                         requestHeaders += $"{headerPair.Key}: {headerPair.Value}{Environment.NewLine}";
                     }
+                    if (!contentTypeFound && request.uploadHandler != null)
+                        requestHeaders += $"Content-Type: {request.uploadHandler.contentType}{Environment.NewLine}";
                 }
                 responseHeaders = "";
                 foreach (var headerPair in response.Headers)
@@ -169,9 +201,15 @@ namespace EmergenceSDK.Internal.Utils
                 }
             }
         }
+
+        private static bool VerboseMode { get; set; }
+        private static bool MarkLogsAsVerbose { get; set; }
         
         private static void LogException(Exception exception, Action<string, bool> logFunction, string prefix = "")
         {
+            if (MarkLogsAsVerbose && !VerboseMode)
+                return;
+
             Exception currentException = exception;
             var level = 0;
             while (currentException != null) {
@@ -183,7 +221,10 @@ namespace EmergenceSDK.Internal.Utils
         
         private static bool IsEnabledFor(LogLevel logLevelIn)
         {
-            return logLevelIn <= logLevel;
+#if DISABLE_EMERGENCE_LOGS
+            return false;
+#endif
+            return logLevelIn <= MaxLogLevel;
         }
 
         private static void LogWithCode(string message, long errorCode, LogLevel logLevelIn, bool alsoLogToScreen) 
@@ -191,6 +232,9 @@ namespace EmergenceSDK.Internal.Utils
 #if DISABLE_EMERGENCE_LOGS
             return;
 #endif
+            if (MarkLogsAsVerbose && !VerboseMode)
+                return;
+            
             var callingClass = CallingClass();
             Debug.LogWarning($"{errorCode} Warning in {callingClass}: {message}");
             if(alsoLogToScreen)
@@ -203,6 +247,8 @@ namespace EmergenceSDK.Internal.Utils
 #if DISABLE_EMERGENCE_LOGS
             return;
 #endif
+            if (MarkLogsAsVerbose && !VerboseMode)
+                return;
             
             var callingClass = CallingClass();
 
@@ -233,6 +279,20 @@ namespace EmergenceSDK.Internal.Utils
             }
 
             return callingClass;
+        }
+        
+        private class VerboseOutputManager : FlagLifecycleManager<bool>
+        {
+            public VerboseOutputManager(bool newValue) : base(newValue) { }
+            protected override bool GetCurrentFlag1Value() => VerboseMode;
+            protected override void SetFlag1Value(bool newValue) => VerboseMode = newValue;
+        }
+        
+        private class MarkLogsAsVerboseManager : FlagLifecycleManager<bool>
+        {
+            public MarkLogsAsVerboseManager(bool newValue) : base(newValue) { }
+            protected override bool GetCurrentFlag1Value() => MarkLogsAsVerbose;
+            protected override void SetFlag1Value(bool newValue) => MarkLogsAsVerbose = newValue;
         }
     }
 }
