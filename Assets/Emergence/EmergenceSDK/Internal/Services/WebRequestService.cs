@@ -112,6 +112,7 @@ namespace EmergenceSDK.Internal.Services
         
         /// <summary>
         /// Performs an asynchronous UnityWebRequest and returns the result as a <see cref="WebResponse"/>.
+        /// <returns><see cref="WebResponse"/>, or <see cref="FailedWebResponse"/></returns>
         /// </summary>
         public static async UniTask<WebResponse> SendAsyncWebRequest(RequestMethod method, string url,
             string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, CancellationToken ct = default)
@@ -121,6 +122,7 @@ namespace EmergenceSDK.Internal.Services
         
         /// <summary>
         /// Performs an asynchronous UnityWebRequest designed to download a texture, and returns the result as a <see cref="WebResponse"/>.
+        /// <returns><see cref="TextureWebResponse"/>, or <see cref="FailedWebResponse"/>></returns>
         /// </summary>
         public static async UniTask<WebResponse> DownloadTextureAsync(RequestMethod method, string url,
             string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, bool nonReadable = false, CancellationToken ct = default)
