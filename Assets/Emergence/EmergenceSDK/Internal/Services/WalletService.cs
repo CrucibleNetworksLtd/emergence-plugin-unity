@@ -3,10 +3,8 @@
 #endif
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Implementations.Login;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
@@ -14,8 +12,6 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using EmergenceSDK.Types.Responses;
-using UnityEngine;
-using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
@@ -26,8 +22,8 @@ namespace EmergenceSDK.Internal.Services
 #endif
     {
         public bool IsValidWallet => !string.IsNullOrEmpty(WalletAddress?.Trim()) && !string.IsNullOrEmpty(ChecksummedWalletAddress?.Trim());
-        public string WalletAddress { get; internal set; } = string.Empty;
-        public string ChecksummedWalletAddress { get; internal set; } = string.Empty;
+        public string WalletAddress { get; private set; } = string.Empty;
+        public string ChecksummedWalletAddress { get; private set; } = string.Empty;
         private readonly ISessionServiceInternal _sessionServiceInternal;
         private bool _completedHandshake;
 
