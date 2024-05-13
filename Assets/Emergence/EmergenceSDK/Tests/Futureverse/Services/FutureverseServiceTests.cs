@@ -74,7 +74,7 @@ namespace EmergenceSDK.Tests.Futureverse
             });
         }
         
-                [UnityTest]
+        [UnityTest]
         public IEnumerator GetLinkedFuturepassAsync_PassesWithoutExceptions()
         {
             return UniTask.ToCoroutine(async () =>
