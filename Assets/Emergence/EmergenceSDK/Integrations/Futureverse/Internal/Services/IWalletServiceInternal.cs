@@ -22,6 +22,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
 
         /// <summary>
         /// Performs an action while the wallet service thinks another specified wallet address is currently cached in
+        /// <remarks>THIS IS A TEMPORARY DEVELOPER FEATURE, MEANT ONLY FOR TESTING.<para/>This will not work at all with any write requests, and has unexpected results for read requests as well.</remarks>
         /// </summary>
         /// <param name="walletAddress">Spoofed wallet address</param>
         /// <param name="checksummedWalletAddress">Spoofed checksummed wallet address</param>
@@ -31,6 +32,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
 
         /// <summary>
         /// Performs an action asynchronously while the wallet service thinks another specified wallet address is currently cached in
+        /// <remarks>THIS IS A TEMPORARY DEVELOPER FEATURE, MEANT ONLY FOR TESTING.<para/>This will not work at all with any write requests, and has unexpected results for read requests as well.</remarks>
         /// </summary>
         /// <param name="walletAddress">Spoofed wallet address</param>
         /// <param name="checksummedWalletAddress">Spoofed checksummed wallet address</param>
