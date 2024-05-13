@@ -59,7 +59,7 @@ namespace EmergenceSDK.Internal.Services
                 if(response.Successful == false)
                     return new ServiceResponse<List<Persona>, Persona>(false);
                 
-                if (EmergenceUtils.RequestError(response.Request))
+                if (EmergenceUtils.ResponseError(response))
                 {
                     return new ServiceResponse<List<Persona>, Persona>(false);
                 }
@@ -96,7 +96,7 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse<Persona>(false);
                 }
                 
-                if (EmergenceUtils.RequestError(response.Request))
+                if (EmergenceUtils.ResponseError(response))
                 {
                     return new ServiceResponse<Persona>(false);
                 }
@@ -171,7 +171,7 @@ namespace EmergenceSDK.Internal.Services
                 if(response.Successful == false)
                     return new ServiceResponse(false);
                 
-                if (EmergenceUtils.RequestError(response.Request))
+                if (EmergenceUtils.ResponseError(response))
                 {
                     return new ServiceResponse(false);
                 }
@@ -206,7 +206,7 @@ namespace EmergenceSDK.Internal.Services
                 if(response.Successful == false)
                     return new ServiceResponse(false);
                 
-                if (EmergenceUtils.RequestError(response.Request))
+                if (EmergenceUtils.ResponseError(response))
                 {
                     return new ServiceResponse(false);
                 }
@@ -235,7 +235,7 @@ namespace EmergenceSDK.Internal.Services
                 if(response.Successful == false)
                     return new ServiceResponse(false);
                 
-                if (EmergenceUtils.RequestError(response.Request))
+                if (EmergenceUtils.ResponseError(response))
                 {
                     return new ServiceResponse(false);
                 }
@@ -269,7 +269,7 @@ namespace EmergenceSDK.Internal.Services
                 if(response.Successful == false)
                     return new ServiceResponse(false);
                 
-                if (EmergenceUtils.RequestError(response.Request))
+                if (EmergenceUtils.ResponseError(response))
                 {
                     return new ServiceResponse(false);
                 }

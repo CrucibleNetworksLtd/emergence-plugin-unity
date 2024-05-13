@@ -104,10 +104,9 @@ namespace EmergenceSDK.Internal.Utils
             if ((MarkLogsAsVerbose && !VerboseMode) || response == null)
                 return; // Early return to avoid any logic
 
-            var request = response.Request;
-            var info = WebRequestService.Instance.GetRequestInfo(request);
+            var info = WebRequestService.Instance.GetRequestInfoByWebResponse(response);
             var requestId = (info?.Id)?.ToString() ?? "UNKNOWN";
-            var message = $"Request #{requestId}: Completed with code {request.responseCode}";
+            var message = $"Request #{requestId}: Completed with code {response.StatusCode}";
             string requestHeaders = "";
             string responseHeaders = "";
             
@@ -116,14 +115,14 @@ namespace EmergenceSDK.Internal.Utils
             if (response is FailedWebResponse { Exception: not OperationCanceledException and not TimeoutException } failedResponse)
             {
                 LogError(message);
-                LogError($"Request #{requestId}: {request.error}");
+                LogError($"Request #{requestId}: {response.Error}");
                 if (failedResponse.Exception != null)
                     LogError(failedResponse.Exception, $"Request #{requestId}: ");
                 
                 using (VerboseMarker(true))
                 {
                     LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
-                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
                     LogError($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
                     LogError($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
                 }
@@ -136,7 +135,7 @@ namespace EmergenceSDK.Internal.Utils
                 using (VerboseMarker(true))
                 {
                     LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
-                    LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                    LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
                 }
             }
             else if (response is FailedWebResponse { Exception: TimeoutException } timeoutResponse)
@@ -147,7 +146,7 @@ namespace EmergenceSDK.Internal.Utils
                 using (VerboseMarker(true))
                 {
                     LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
-                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
                 }
             }
             else
@@ -159,7 +158,7 @@ namespace EmergenceSDK.Internal.Utils
                     using (VerboseMarker(true))
                     {
                         LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
-                        LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                        LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
                         LogInfo($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
                         LogInfo($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
                     }
@@ -171,7 +170,7 @@ namespace EmergenceSDK.Internal.Utils
                     using (VerboseMarker(true))
                     {
                         LogWarning($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
-                        LogWarning($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(request.uploadHandler?.data ?? new byte[] {})}");
+                        LogWarning($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
                         LogWarning($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
                         LogWarning($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
                     }
@@ -183,16 +182,10 @@ namespace EmergenceSDK.Internal.Utils
                 requestHeaders = "";
                 if (info != null)
                 {
-                    var contentTypeFound = false;
                     foreach (var headerPair in info.Headers)
                     {
-                        if (headerPair.Key.ToLower() == "content-type")
-                            contentTypeFound = true;
-                        
                         requestHeaders += $"{headerPair.Key}: {headerPair.Value}{Environment.NewLine}";
                     }
-                    if (!contentTypeFound && request.uploadHandler != null)
-                        requestHeaders += $"Content-Type: {request.uploadHandler.contentType}{Environment.NewLine}";
                 }
                 responseHeaders = "";
                 foreach (var headerPair in response.Headers)

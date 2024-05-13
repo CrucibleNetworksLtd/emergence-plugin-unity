@@ -26,12 +26,26 @@ namespace EmergenceSDK.Internal.Services
             /// to send the request
             /// </summary>
             public readonly Dictionary<string, string> Headers;
+            public WebResponse Response { get; internal set; }
 
-            public WebRequestInfo(Dictionary<string, string> requestHeaders)
+            public WebRequestInfo(Dictionary<string, string> requestHeaders, UnityWebRequest request)
             {
                 Id = ++_lastId;
                 Time = DateTime.Now;
-                Headers = requestHeaders ?? new();
+                Headers = requestHeaders ?? new Dictionary<string, string>();
+                var contentTypeFound = false;
+                foreach (var key in Headers.Keys)
+                {
+                    if (key.ToLower() == "content-type")
+                    {
+                        contentTypeFound = true;
+                    }
+                }
+
+                if (!contentTypeFound && request.uploadHandler != null)
+                {
+                    Headers.Add("Content-Type", request.uploadHandler.contentType);
+                }
             }
         }
         
@@ -129,7 +143,7 @@ namespace EmergenceSDK.Internal.Services
 
         private WebRequestInfo AddRequest(UnityWebRequest request, Dictionary<string, string> headers)
         {
-            var webRequestInfo = new WebRequestInfo(headers);
+            var webRequestInfo = new WebRequestInfo(headers, request);
             _openRequests.TryAdd(request, webRequestInfo);
             _allRequests.TryAdd(request, webRequestInfo);
             return webRequestInfo;
@@ -150,6 +164,22 @@ namespace EmergenceSDK.Internal.Services
         {
             return _allRequests.GetValueOrDefault(request);
         }
+
+        internal WebRequestInfo GetRequestInfoByWebResponse(WebResponse response)
+        {
+            if (response != null)
+            {
+                foreach (var webRequestInfo in _allRequests)
+                {
+                    if (webRequestInfo.Value.Response != null && webRequestInfo.Value.Response == response)
+                    {
+                        return webRequestInfo.Value;
+                    }
+                }
+            }
+
+            return null;
+        }
         
         private static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request,
             Dictionary<string, string> headers = null,
@@ -157,14 +187,14 @@ namespace EmergenceSDK.Internal.Services
             CancellationToken ct = default)
         {
             WebResponse response = null;
+            var requestInfo = Instance.AddRequest(request, headers);
+            if (headers != null)
+            {
+                SetupRequestHeaders(request, headers);
+            }
+
             try
             {
-                if (headers != null)
-                {
-                    SetupRequestHeaders(request, headers);
-                }
-
-                var requestInfo = Instance.AddRequest(request, headers);
                 EmergenceLogger.LogInfo($"Request #{requestInfo.Id}: Performing {request.method} request to {request.url}, DeviceId: {EmergenceSingleton.Instance.CurrentDeviceId}");
                 var sendTask = request.SendWebRequest().WithCancellation(ct);
 
@@ -173,35 +203,42 @@ namespace EmergenceSDK.Internal.Services
                     await sendTask.Timeout(TimeSpan.FromMilliseconds(timeout));
 
                     // Rest of the code if the request completes within the timeout
+                    response = request.downloadHandler is DownloadHandlerTexture
+                        ? new TextureWebResponse(request)
+                        : new WebResponse(request);
+                    requestInfo.Response = response;
 
-                    var result = request.result;
-                    if (result == UnityWebRequest.Result.Success)
-                    {
-                        return response = new WebResponse(request);
-                    }
-                    else
-                    {
-                        return response = new WebResponse(request);
-                    }
+                    return response;
                 }
                 catch (TimeoutException e)
                 {
                     request.Abort(); // Abort the request
-                    return response = new FailedWebResponse(e, request);
+                    response = new FailedWebResponse(e, request);
+                    requestInfo.Response = response;
+                    
+                    return response;
                 }
             }
             catch (UnityWebRequestException e)
             {
-                return response = new FailedWebResponse(e, request);
+                response = new FailedWebResponse(e, request);
+                requestInfo.Response = response;
+                
+                return response;
             }
             catch (OperationCanceledException e)
             {
                 response = new FailedWebResponse(e, request);
+                requestInfo.Response = response;
+                
                 throw;
             }
             catch (Exception e)
             {
-                return response = new FailedWebResponse(e, request);
+                response = new FailedWebResponse(e, request);
+                requestInfo.Response = response;
+                
+                return response;
             }
             finally
             {

@@ -39,7 +39,7 @@ namespace EmergenceSDK.Internal.Services
                 return new ServiceResponse<bool>(response, false, false);
             }
 
-            var requestSuccessful = EmergenceUtils.ProcessRequest<ReinitializeWalletConnectResponse>(response.Request, EmergenceLogger.LogError, out var processedResponse);
+            var requestSuccessful = EmergenceUtils.ProcessResponse<ReinitializeWalletConnectResponse>(response, EmergenceLogger.LogError, out var processedResponse);
             if (requestSuccessful)
             {
                 return new ServiceResponse<bool>(response, true, processedResponse.disconnected);
@@ -64,7 +64,7 @@ namespace EmergenceSDK.Internal.Services
                 return new ServiceResponse<string>(response, false);
             }
 
-            var requestSuccessful = EmergenceUtils.ProcessRequest<WalletSignMessage>(response.Request, EmergenceLogger.LogError, out var processedResponse);
+            var requestSuccessful = EmergenceUtils.ProcessResponse<WalletSignMessage>(response, EmergenceLogger.LogError, out var processedResponse);
             if (requestSuccessful)
             {
                 if (processedResponse == null)
@@ -102,7 +102,7 @@ namespace EmergenceSDK.Internal.Services
                 return new ServiceResponse<string>(response, false);
             }
 
-            if (EmergenceUtils.ProcessRequest<HandshakeResponse>(response.Request, EmergenceLogger.LogError, out var processedResponse))
+            if (EmergenceUtils.ProcessResponse<HandshakeResponse>(response, EmergenceLogger.LogError, out var processedResponse))
             {
                 if (processedResponse == null)
                 {
@@ -157,7 +157,7 @@ namespace EmergenceSDK.Internal.Services
                 return new ServiceResponse<string>(response, false);
             }
 
-            if (EmergenceUtils.ProcessRequest<GetBalanceResponse>(response.Request, EmergenceLogger.LogError, out var processedResponse))
+            if (EmergenceUtils.ProcessResponse<GetBalanceResponse>(response, EmergenceLogger.LogError, out var processedResponse))
             {
                 return new ServiceResponse<string>(response, true, processedResponse.balance);
             }
@@ -193,7 +193,7 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse<bool>(false);
                 }
                 
-                if (EmergenceUtils.ProcessRequest<ValidateSignedMessageResponse>(response.Request, EmergenceLogger.LogError, out var processedResponse))
+                if (EmergenceUtils.ProcessResponse<ValidateSignedMessageResponse>(response, EmergenceLogger.LogError, out var processedResponse))
                 {
                     return new ServiceResponse<bool>(true, processedResponse.valid);
                 }

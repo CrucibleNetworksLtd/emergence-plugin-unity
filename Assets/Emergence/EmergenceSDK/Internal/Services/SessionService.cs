@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
+using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -47,7 +48,7 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse<IsConnectedResponse>(false);
                 }
                 
-                var successfulRequest = EmergenceUtils.ProcessRequest<IsConnectedResponse>(response.Request, EmergenceLogger.LogError, out var processedResponse);
+                var successfulRequest = EmergenceUtils.ProcessResponse<IsConnectedResponse>(response, EmergenceLogger.LogError, out var processedResponse);
                 if (successfulRequest)
                 {
                     return new ServiceResponse<IsConnectedResponse>(true, processedResponse);
@@ -77,7 +78,7 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse(false);
                 }
 
-                if (EmergenceUtils.RequestError(response.Request))
+                if (EmergenceUtils.ResponseError(response))
                 {
                     DisconnectInProgress = false;
                     return new ServiceResponse(false);
@@ -146,14 +147,14 @@ namespace EmergenceSDK.Internal.Services
                     return new ServiceResponse<Texture2D>(false);
                 }
                 
-                if (EmergenceUtils.RequestError(response.Request))
+                if (EmergenceUtils.ResponseError(response))
                 {
                     return new ServiceResponse<Texture2D>(false);
                 }
 
                 string deviceId = response.Headers["deviceId"];
                 EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
-                return new ServiceResponse<Texture2D>(true, ((DownloadHandlerTexture)response.Request.downloadHandler).texture);
+                return new ServiceResponse<Texture2D>(true, ((TextureWebResponse)response).Texture);
             }
             catch (Exception e) when (e is not OperationCanceledException) 
             {

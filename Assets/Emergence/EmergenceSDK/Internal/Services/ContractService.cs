@@ -55,7 +55,7 @@ namespace EmergenceSDK.Internal.Services
 
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, dataString);
 
-            if (response.Successful && EmergenceUtils.ProcessRequest<LoadContractResponse>(response.Request, EmergenceLogger.LogError, out var processedResponse))
+            if (response.Successful && EmergenceUtils.ProcessResponse<LoadContractResponse>(response, EmergenceLogger.LogError, out var processedResponse))
             {
                 _loadedContractAddresses.Add(contractAddress);
             }

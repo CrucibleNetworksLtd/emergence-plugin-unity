@@ -10,21 +10,19 @@ namespace EmergenceSDK.Internal.Types
     {
         public UnityWebRequest.Result Result => Request.result;
         public string Error => Request.error;
-        public virtual bool Completed => Result != UnityWebRequest.Result.InProgress;
+        public string Url => Request.url;
+        public virtual bool InProgress => Result == UnityWebRequest.Result.InProgress;
         public virtual bool Successful => Result == UnityWebRequest.Result.Success;
         public string ResponseText => Request.downloadHandler?.text ?? "";
         public byte[] ResponseBytes => Request.downloadHandler?.data ?? new byte[] {};
         public long StatusCode => Request.responseCode;
         public Dictionary<string, string> Headers { get; }
-        /// <summary>
-        /// We shouldn't have any permanent reference to this, as this will be disposed when the WebRequest gets Finalized or manually Disposed
-        /// </summary>
-        public readonly UnityWebRequest Request;
+        protected readonly UnityWebRequest Request;
 
         public WebResponse(UnityWebRequest request)
         {
             Request = request;
-            Headers = request.GetResponseHeaders() ?? new ();
+            Headers = request.GetResponseHeaders() ?? new Dictionary<string, string>();
         }
 
         ~WebResponse()
