@@ -1,3 +1,7 @@
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+#define INCLUDE_DEVELOPMENT_INTERFACES
+#endif
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -15,9 +19,12 @@ using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
+#if INCLUDE_DEVELOPMENT_INTERFACES
+    internal class WalletService : IWalletService, IWalletServiceDevelopmentOnly, IWalletServiceInternal
+#else
     internal class WalletService : IWalletService, IWalletServiceInternal
+#endif
     {
-        public IDisposable SpoofedWallet(string wallet, string checksummedWallet) => new SpoofedWalletManager(wallet, checksummedWallet);
         public bool IsValidWallet => !string.IsNullOrEmpty(WalletAddress?.Trim()) && !string.IsNullOrEmpty(ChecksummedWalletAddress?.Trim());
         public string WalletAddress { get; internal set; } = string.Empty;
         public string ChecksummedWalletAddress { get; internal set; } = string.Empty;
@@ -215,6 +222,9 @@ namespace EmergenceSDK.Internal.Services
             else
                 errorCallback?.Invoke("Error in ValidateSignedMessage.", (long)response.Code);
         }
+        
+#if INCLUDE_DEVELOPMENT_INTERFACES
+        public IDisposable SpoofedWallet(string wallet, string checksummedWallet) => new SpoofedWalletManager(wallet, checksummedWallet);
 
         public void RunWithSpoofedWalletAddress(string walletAddress, string checksummedWalletAddress, Action action)
         {
@@ -244,5 +254,6 @@ namespace EmergenceSDK.Internal.Services
             protected override string GetCurrentFlag2Value() => EmergenceServiceProvider.GetService<WalletService>().ChecksummedWalletAddress;
             protected override void SetFlag2Value(string newValue) => EmergenceServiceProvider.GetService<WalletService>().ChecksummedWalletAddress = newValue;
         }
+#endif
     }
 }

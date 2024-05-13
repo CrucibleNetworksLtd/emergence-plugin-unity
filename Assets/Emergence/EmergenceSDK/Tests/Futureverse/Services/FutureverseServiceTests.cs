@@ -4,17 +4,18 @@ using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 
-namespace EmergenceSDK.Tests.Futureverse
+namespace EmergenceSDK.Tests.Futureverse.Services
 {
     [TestFixture]
     public class FutureverseServiceTests
     {
         private IFutureverseService _futureverseService;
-        private IWalletServiceInternal _walletServiceInternal;
+        private IWalletServiceDevelopmentOnly _walletServiceDevelopmentOnly;
         private IDisposable _verboseOutput;
         [OneTimeSetUp]
         public void Setup()
@@ -22,7 +23,8 @@ namespace EmergenceSDK.Tests.Futureverse
             _verboseOutput = EmergenceLogger.VerboseOutput(true);
             EmergenceServiceProvider.Load();
             _futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            _walletServiceInternal = EmergenceServiceProvider.GetService<IWalletServiceInternal>();
+            EmergenceServiceProvider.GetService<IWalletServiceInternal>();
+            _walletServiceDevelopmentOnly = EmergenceServiceProvider.GetService<IWalletServiceDevelopmentOnly>();
         }
 
         [OneTimeTearDown]
@@ -80,7 +82,7 @@ namespace EmergenceSDK.Tests.Futureverse
             return UniTask.ToCoroutine(async () =>
             {
                 using var forcedEnvironment = EmergenceSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Staging);
-                using var spoofedWallet = _walletServiceInternal.SpoofedWallet("0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", "0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c");
+                using var spoofedWallet = _walletServiceDevelopmentOnly.SpoofedWallet("0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", "0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c");
 
                 var response = await _futureverseService.GetLinkedFuturepassAsync();
                 Assert.IsTrue(response.Successful);
@@ -95,7 +97,7 @@ namespace EmergenceSDK.Tests.Futureverse
             return UniTask.ToCoroutine(async () =>
             {
                 using var forcedEnvironment = EmergenceSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Staging);
-                using var spoofedWallet = _walletServiceInternal.SpoofedWallet("0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", "0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c");
+                using var spoofedWallet = _walletServiceDevelopmentOnly.SpoofedWallet("0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", "0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c");
 
                 var response = await _futureverseService.GetFuturepassInformationAsync("7668:root:0xffffffff0000000000000000000000000003b681");
                 Assert.IsTrue(response.Successful);
