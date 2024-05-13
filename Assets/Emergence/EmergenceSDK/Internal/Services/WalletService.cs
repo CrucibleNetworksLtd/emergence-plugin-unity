@@ -215,6 +215,22 @@ namespace EmergenceSDK.Internal.Services
             else
                 errorCallback?.Invoke("Error in ValidateSignedMessage.", (long)response.Code);
         }
+
+        public void RunWithSpoofedWalletAddress(string walletAddress, string checksummedWalletAddress, Action action)
+        {
+            using (SpoofedWallet(walletAddress, checksummedWalletAddress))
+            {
+                action.Invoke();
+            }
+        }
+
+        public async UniTask RunWithSpoofedWalletAddressAsync(string walletAddress, string checksummedWalletAddress, Func<UniTask> action)
+        {
+            using (SpoofedWallet(walletAddress, checksummedWalletAddress))
+            {
+                await action();
+            }
+        }
         
         private class SpoofedWalletManager : FlagLifecycleManager<string, string>
         {

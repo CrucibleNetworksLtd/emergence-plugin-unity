@@ -19,5 +19,24 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         /// Attempts to handshake with the Emergence server.
         /// </summary>
         UniTask<ServiceResponse<string>> HandshakeAsync(float timeout = LoginManager.QrCodeTimeout * 1000, CancellationToken ct = default);
+
+        /// <summary>
+        /// Performs an action while the wallet service thinks another specified wallet address is currently cached in
+        /// </summary>
+        /// <param name="walletAddress">Spoofed wallet address</param>
+        /// <param name="checksummedWalletAddress">Spoofed checksummed wallet address</param>
+        /// <param name="action">Closure to run</param>
+        [Obsolete]
+        public void RunWithSpoofedWalletAddress(string walletAddress, string checksummedWalletAddress, Action action);
+
+        /// <summary>
+        /// Performs an action asynchronously while the wallet service thinks another specified wallet address is currently cached in
+        /// </summary>
+        /// <param name="walletAddress">Spoofed wallet address</param>
+        /// <param name="checksummedWalletAddress">Spoofed checksummed wallet address</param>
+        /// <param name="action">Async closure to run</param>
+        /// <returns></returns>
+        [Obsolete]
+        public UniTask RunWithSpoofedWalletAddressAsync(string walletAddress, string checksummedWalletAddress, Func<UniTask> action);
     }
 }
