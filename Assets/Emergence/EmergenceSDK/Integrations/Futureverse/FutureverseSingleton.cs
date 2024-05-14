@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
 
@@ -9,35 +10,16 @@ namespace EmergenceSDK.Integrations.Futureverse
     {
         public int requestTimeout = 60;
         public EmergenceEnvironment environment;
-        public EmergenceEnvironment Environment => ForcedEnvironment ?? environment;
-        private EmergenceEnvironment? ForcedEnvironment { get; set; }
+        public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
+        private EmergenceEnvironment? CurrentForcedEnvironment { get; set; }
         
-        internal void RunInForcedEnvironment(EmergenceEnvironment forcedEnvironment, Action action)
+        internal IDisposable ForcedEnvironment(EmergenceEnvironment? newEnvironment) => new ForcedEnvironmentManager(newEnvironment);
+        
+        private class ForcedEnvironmentManager : FlagLifecycleManager<EmergenceEnvironment?>
         {
-            var prevForcedEnvironment = ForcedEnvironment;
-            ForcedEnvironment = forcedEnvironment;
-            try
-            {
-                action.Invoke();
-            }
-            finally
-            {
-                ForcedEnvironment = prevForcedEnvironment;
-            }
-        }
-
-        internal async UniTask RunInForcedEnvironmentAsync(EmergenceEnvironment forcedEnvironment, Func<UniTask> action)
-        {
-            var prevForcedEnvironment = ForcedEnvironment;
-            ForcedEnvironment = forcedEnvironment;
-            try
-            {
-                await action();
-            }
-            finally
-            {
-                ForcedEnvironment = prevForcedEnvironment;
-            }
+            public ForcedEnvironmentManager(EmergenceEnvironment? newValue) : base(newValue) { }
+            protected override EmergenceEnvironment? GetCurrentFlag1Value() => Instance.CurrentForcedEnvironment;
+            protected override void SetFlag1Value(EmergenceEnvironment? newValue) => Instance.CurrentForcedEnvironment = newValue;
         }
     }
 }

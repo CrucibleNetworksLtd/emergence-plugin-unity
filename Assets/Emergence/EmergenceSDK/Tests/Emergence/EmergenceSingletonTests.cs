@@ -54,7 +54,7 @@ namespace EmergenceSDK.Tests.Emergence
             {
                 Assert.AreEqual(newEnvironment, EmergenceSingleton.Instance.Environment, "Forced environment did not set");
             }
-            Assert.AreEqual(oldEnvironment, EmergenceSingleton.Instance.Environment, "ForcedEnvironment did not reset");
+            Assert.AreEqual(oldEnvironment, EmergenceSingleton.Instance.Environment, "Forced environment did not reset");
         }
         
         EmergenceEnvironment GetFirstNonMatchingEnum(EmergenceEnvironment input)
