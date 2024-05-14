@@ -53,9 +53,9 @@ namespace EmergenceSDK.Internal.UI.Screens
             while (gameObject.activeSelf && headerInformation.activeSelf)
             {
                 var balance = await walletService.GetBalanceAsync();
-                if(balance.Success)
+                if(balance.Successful)
                 {
-                    string converted = UnitConverter.Convert(balance.Result, UnitConverter.EtherUnitType.WEI, UnitConverter.EtherUnitType.ETHER, ",");
+                    string converted = UnitConverter.Convert(balance.Result1, UnitConverter.EtherUnitType.WEI, UnitConverter.EtherUnitType.ETHER, ",");
                     string[] splitted = converted.Split(new string[] { "," }, System.StringSplitOptions.None);
                     string result = splitted[0];
                     if (splitted.Length == 2)
@@ -106,7 +106,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             refreshCancellationToken?.Cancel();
             var result = await sessionServiceInternal.DisconnectAsync();
             Modal.Instance.Hide();
-            if (result.Success)
+            if (result.Successful)
             {
                 Hide();
                 ScreenManager.Instance.Restart().Forget();

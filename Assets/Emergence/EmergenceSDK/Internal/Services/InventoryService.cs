@@ -16,17 +16,17 @@ namespace EmergenceSDK.Internal.Services
     {
         public async UniTask<ServiceResponse<List<InventoryItem>>> InventoryByOwnerAsync(string address, InventoryChain chain)
         {
-            if (EmergenceServiceProvider.GetService<IFutureverseService>().UsingFutureverse)
+            if (EmergenceServiceProvider.GetService<SessionService>().HasLoginSetting(LoginSettings.EnableFuturepass))
             {
                 return await EmergenceServiceProvider.GetService<IFutureverseServiceInternal>().GetFutureverseInventoryAsInventoryItems();
             }
             
             string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address + "&chain=" + InventoryKeys.ChainToKey[chain];
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbGET, url, EmergenceLogger.LogError);
-            if(response.IsSuccess == false)
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
+            if(response.Successful == false)
                 return new ServiceResponse<List<InventoryItem>>(false);
             
-            InventoryByOwnerResponse inventoryResponse = SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.Response);
+            InventoryByOwnerResponse inventoryResponse = SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ResponseText);
 
             return new ServiceResponse<List<InventoryItem>>(true, inventoryResponse.message.items);
         }
@@ -34,8 +34,8 @@ namespace EmergenceSDK.Internal.Services
         public async UniTask InventoryByOwner(string address, InventoryChain chain, SuccessInventoryByOwner success, ErrorCallback errorCallback)
         {
             var response = await InventoryByOwnerAsync(address, chain);
-            if(response.Success)
-                success?.Invoke(response.Result);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in InventoryByOwner.", (long)response.Code);
         }

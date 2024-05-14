@@ -1,20 +1,40 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using EmergenceSDK.Internal.Services;
 using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Types
 {
-    public class WebResponse
+    public class WebResponse : IDisposable
     {
-        public bool IsSuccess { get; private set; }
-        public string Response { get; private set; }
-        public long StatusCode { get; private set; } = 0;
-        public DownloadHandler DownloadHandler { get; private set; }
+        public UnityWebRequest.Result Result => Request.result;
+        public string Error => Request.error;
+        public string Url => Request.url;
+        public virtual bool InProgress => Result == UnityWebRequest.Result.InProgress;
+        public virtual bool Successful => Result == UnityWebRequest.Result.Success;
+        public string ResponseText => Request.downloadHandler?.text ?? "";
+        public byte[] ResponseBytes => Request.downloadHandler?.data ?? new byte[] {};
+        public long StatusCode => Request.responseCode;
+        public Dictionary<string, string> Headers { get; }
+        protected readonly UnityWebRequest Request;
 
-        public WebResponse(bool isSuccess, string response, long statusCode = 0, DownloadHandler downloadHandler = null)
+        public WebResponse(UnityWebRequest request)
         {
-            IsSuccess = isSuccess;
-            Response = response;
-            StatusCode = statusCode;
-            DownloadHandler = downloadHandler;
+            Request = request;
+            Headers = request.GetResponseHeaders() ?? new Dictionary<string, string>();
+        }
+
+        ~WebResponse()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            WebRequestService.Instance.RemoveRequest(Request);
+            Request?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

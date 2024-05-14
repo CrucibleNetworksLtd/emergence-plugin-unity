@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using EmergenceSDK.Integrations.Futureverse.Internal;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
+using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -19,15 +21,20 @@ namespace EmergenceSDK.Tests.Futureverse
     [TestFixture]
     public class AssetRegistryTests
     {
+        private IDisposable _verboseOutput;
+
         [OneTimeSetUp]
         public void Setup()
         {
+            _verboseOutput = EmergenceLogger.VerboseOutput(true);
             EmergenceServiceProvider.Load();
+            EmergenceServiceProvider.GetService<IFutureverseService>();
         }
 
         [OneTimeTearDown]
         public void TearDown()
         {
+            _verboseOutput?.Dispose();
             EmergenceServiceProvider.Unload();
         }
 
@@ -132,19 +139,6 @@ namespace EmergenceSDK.Tests.Futureverse
             Assert.IsEmpty(thirdPath.Objects);
         }
 
-        [UnityTest]
-        public IEnumerator GetAssetTreeAsync_PassesWithoutExceptions()
-        {
-            var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            return UniTask.ToCoroutine(async () =>
-            {
-                await FutureverseSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Development, async () =>
-                {
-                    await EmergenceSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Development, async () => { await futureverseService.GetAssetTreeAsync("473", "7672:root:303204"); });
-                });
-            });
-        }
-
         [Test]
         public void GenerateArtm_GeneratesCorrectly()
         {
@@ -183,23 +177,6 @@ namespace EmergenceSDK.Tests.Futureverse
             }, "Address", 123456789);
 
             Assert.AreEqual(expected, result);
-        }
-
-        [UnityTest]
-        public IEnumerator GetArtmStatusAsync_PassesWithoutExceptions()
-        {
-            var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            return UniTask.ToCoroutine(async () =>
-            {
-                await FutureverseSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Staging, async () =>
-                {
-                    await FutureverseSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Staging, async () =>
-                    {
-                        var artmStatusAsync = await futureverseService.GetArtmStatusAsync("0x69c94ea3e0e7dea32d2d00813a64017dfbbd42dd18f5d56a12c907dccc7bb6d9");
-                        Assert.Pass("Passed with transaction status: " + artmStatusAsync);
-                    });
-                });
-            });
         }
     }
 }

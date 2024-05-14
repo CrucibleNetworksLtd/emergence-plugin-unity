@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
@@ -23,7 +25,7 @@ namespace EmergenceSDK
         public event Action OnGameClosing;
 
         [FormerlySerializedAs("Environment")] [SerializeField] public EmergenceEnvironment environment;
-        public EmergenceEnvironment Environment => ForcedEnvironment ?? environment;
+        public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
         private UICursorHandler cursorHandler;
@@ -86,35 +88,11 @@ namespace EmergenceSDK
             }
         }
 
-        private EmergenceEnvironment? ForcedEnvironment { get; set; }
-
-        internal void RunInForcedEnvironment(EmergenceEnvironment forcedEnvironment, Action action)
-        {
-            var prevForcedEnvironment = ForcedEnvironment;
-            ForcedEnvironment = forcedEnvironment;
-            try
-            {
-                action.Invoke();
-            }
-            finally
-            {
-                ForcedEnvironment = prevForcedEnvironment;
-            }
-        }
-
-        internal async UniTask RunInForcedEnvironmentAsync(EmergenceEnvironment forcedEnvironment, Func<UniTask> action)
-        {
-            var prevForcedEnvironment = ForcedEnvironment;
-            ForcedEnvironment = forcedEnvironment;
-            try
-            {
-                await action();
-            }
-            finally
-            {
-                ForcedEnvironment = prevForcedEnvironment;
-            }
-        }
+        internal IDisposable ForcedEnvironment(EmergenceEnvironment? newEnvironment) => new ForcedEnvironmentManager(newEnvironment);
+        
+        private EmergenceEnvironment? CurrentForcedEnvironment { get; set; }
+        
+        public static Dictionary<string, string> DeviceIdHeader => new() { { "deviceId", Instance.CurrentDeviceId } };
         
         private void OpenOverlayFirstTime()
         {
@@ -252,6 +230,13 @@ namespace EmergenceSDK
         {
             base.InitializeDefault();
             Configuration = Resources.Load<EmergenceConfiguration>("Configuration");
+        }
+        
+        private class ForcedEnvironmentManager : FlagLifecycleManager<EmergenceEnvironment?>
+        {
+            public ForcedEnvironmentManager(EmergenceEnvironment? newValue) : base(newValue) { }
+            protected override EmergenceEnvironment? GetCurrentFlag1Value() => Instance.CurrentForcedEnvironment;
+            protected override void SetFlag1Value(EmergenceEnvironment? newValue) => Instance.CurrentForcedEnvironment = newValue;
         }
     }
 }

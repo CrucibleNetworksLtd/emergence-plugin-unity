@@ -134,31 +134,31 @@ namespace EmergenceSDK.Internal.UI
         private async UniTask<bool> RefreshQR()
         {
             var qrResponse = await sessionServiceInternal.GetQrCodeAsync();
-            if (!qrResponse.Success)
+            if (!qrResponse.Successful)
             {
                 EmergenceLogger.LogError("Error retrieving QR code.");
                 return false;
             }
 
-            rawQRImage.texture = qrResponse.Result;
+            rawQRImage.texture = qrResponse.Result1;
             return true;
         }
         
         private async UniTask<string> Handshake()
         {
             var handshakeResponse = await walletServiceInternal.HandshakeAsync();
-            if (!handshakeResponse.Success)
+            if (!handshakeResponse.Successful)
             {
                 EmergenceLogger.LogError("Error during handshake.");
                 return "";
             }
-            return handshakeResponse.Result;
+            return handshakeResponse.Result1;
         }
 
         private async UniTask<bool> HandleRefreshAccessToken()
         {
             var tokenResponse = await sessionServiceInternal.GetAccessTokenAsync();
-            if (!tokenResponse.Success)
+            if (!tokenResponse.Successful)
                 return false;
 
             PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);

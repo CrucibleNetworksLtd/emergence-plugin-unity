@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Utils;
@@ -6,6 +7,7 @@ using MG.GIF;
 using UnityEngine;
 using UnityEngine.UI;
 using EmergenceSDK.Internal.Services;
+using EmergenceSDK.Types;
 
 namespace EmergenceSDK.Internal.UI.Inventory
 {
@@ -31,20 +33,18 @@ namespace EmergenceSDK.Internal.UI.Inventory
                 //Note that if you want to load a gif larger than 16MB, you will need to increase this value,
                 //this is designed to only download enough for the first frame of at most a 4k gif, so animated gifs will be much larger
                 int maxFrameSizeBytes = 16778020;
+                
+                Dictionary<string, string> headers = new() {{"Range", "bytes=0-" + (maxFrameSizeBytes - 1)}};
+                var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, imageUrl, headers: headers);
 
-                var request = UnityWebRequest.Get(imageUrl);
-                request.SetRequestHeader("Range", "bytes=0-" + (maxFrameSizeBytes - 1));
-
-                var response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
-
-                if (!response.IsSuccess)
+                if (!response.Successful)
                 {
                     EmergenceLogger.LogWarning("File load error.\n");
                     itemImage.texture = RequestImage.Instance.DefaultThumbnail;
                     return;
                 }
 
-                byte[] imageData = response.DownloadHandler.data;
+                byte[] imageData = response.ResponseBytes;
 
                 using (var decoder = new Decoder(imageData))
                 {
