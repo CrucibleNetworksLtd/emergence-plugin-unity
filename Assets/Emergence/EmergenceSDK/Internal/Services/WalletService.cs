@@ -37,7 +37,7 @@ namespace EmergenceSDK.Internal.Services
             string url = StaticConfig.APIBase + "reinitializewalletconnect";
 
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
-            if(response.Successful == false)
+            if(!response.Successful)
             {
                 return new ServiceResponse<bool>(response, false, false);
             }
@@ -62,7 +62,7 @@ namespace EmergenceSDK.Internal.Services
             string url = StaticConfig.APIBase + "request-to-sign";
             
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: EmergenceSingleton.DeviceIdHeader);
-            if(response.Successful == false)
+            if(!response.Successful)
             {
                 return new ServiceResponse<string>(response, false);
             }
@@ -155,7 +155,7 @@ namespace EmergenceSDK.Internal.Services
                          "&address=" + WalletAddress;
             
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
-            if(response.Successful == false)
+            if(!response.Successful)
             {
                 return new ServiceResponse<string>(response, false);
             }
@@ -191,7 +191,7 @@ namespace EmergenceSDK.Internal.Services
             try
             {
                 var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, dataString);
-                if(response.Successful == false)
+                if(!response.Successful)
                 {
                     return new ServiceResponse<bool>(false);
                 }

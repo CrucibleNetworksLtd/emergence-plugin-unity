@@ -15,7 +15,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = StaticConfig.APIBase + "GetTransactionStatus?transactionHash=" + transactionHash + "&nodeURL=" + nodeURL;
             WebResponse response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse<GetTransactionStatusResponse>(false);
             var transactionStatusResponse = SerializationHelper.Deserialize<BaseResponse<GetTransactionStatusResponse>>(response.ResponseText);
             return new ServiceResponse<GetTransactionStatusResponse>(true, transactionStatusResponse.message);
@@ -34,7 +34,7 @@ namespace EmergenceSDK.Internal.Services
         {
             string url = StaticConfig.APIBase + "getBlockNumber?nodeURL=" + nodeURL;
             WebResponse response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse<GetBlockNumberResponse>(false);
             var blockNumberResponse = SerializationHelper.Deserialize<BaseResponse<GetBlockNumberResponse>>(response.ResponseText);
             return new ServiceResponse<GetBlockNumberResponse>(true, blockNumberResponse.message);

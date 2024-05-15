@@ -36,7 +36,7 @@ namespace EmergenceSDK.Internal.Services
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, ct: ct);
             ct.ThrowIfCancellationRequested();
             
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse<List<Avatar>>(false);
             
             GetAvatarsResponse avatarResponse = SerializationHelper.Deserialize<GetAvatarsResponse>(response.ResponseText);
@@ -49,7 +49,7 @@ namespace EmergenceSDK.Internal.Services
             string url = EmergenceSingleton.Instance.Configuration.AvatarURL + "id?id=" + id;
             
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, ct: ct);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse<Avatar>(false);
             
             ct.ThrowIfCancellationRequested();

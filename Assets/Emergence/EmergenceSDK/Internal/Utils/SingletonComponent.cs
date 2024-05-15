@@ -65,7 +65,7 @@ namespace EmergenceSDK.Internal.Utils
         #region Initialization
         public virtual void Awake()
         {
-            if (isCreatingDefaultComponent == false && Instance != this)
+            if (!isCreatingDefaultComponent && Instance != this)
             {
                 var allcomponents = gameObject.GetComponents<Component>();
                 if (allcomponents.Length == 2)

@@ -56,7 +56,7 @@ namespace EmergenceSDK.Internal.Services
             { 
                 var url = EmergenceSingleton.Instance.Configuration.PersonaURL + "personas";
                 var response  = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: sessionServiceInternal.EmergenceAccessTokenHeader);
-                if(response.Successful == false)
+                if(!response.Successful)
                     return new ServiceResponse<List<Persona>, Persona>(false);
                 
                 if (EmergenceUtils.ResponseError(response))
@@ -91,7 +91,7 @@ namespace EmergenceSDK.Internal.Services
             {
                 string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
                 var response  = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: sessionServiceInternal.EmergenceAccessTokenHeader);
-                if(response.Successful == false)
+                if(!response.Successful)
                 {
                     return new ServiceResponse<Persona>(false);
                 }
@@ -132,7 +132,7 @@ namespace EmergenceSDK.Internal.Services
 
             
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, jsonPersona, headers);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse(false);
             
             return new ServiceResponse(true);
@@ -168,7 +168,7 @@ namespace EmergenceSDK.Internal.Services
                 string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
 
                 var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Patch, url, jsonPersona, sessionServiceInternal.EmergenceAccessTokenHeader);
-                if(response.Successful == false)
+                if(!response.Successful)
                     return new ServiceResponse(false);
                 
                 if (EmergenceUtils.ResponseError(response))
@@ -203,7 +203,7 @@ namespace EmergenceSDK.Internal.Services
                 
                 string personaAvatarTokenUri = Helpers.InternalIPFSURLToHTTP(persona.avatar.tokenURI);
                 var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, personaAvatarTokenUri);
-                if(response.Successful == false)
+                if(!response.Successful)
                     return new ServiceResponse(false);
                 
                 if (EmergenceUtils.ResponseError(response))
@@ -232,7 +232,7 @@ namespace EmergenceSDK.Internal.Services
                 string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona/" + persona.id;
 
                 var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Delete, url, headers: sessionServiceInternal.EmergenceAccessTokenHeader);
-                if(response.Successful == false)
+                if(!response.Successful)
                     return new ServiceResponse(false);
                 
                 if (EmergenceUtils.ResponseError(response))
@@ -266,7 +266,7 @@ namespace EmergenceSDK.Internal.Services
                 string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "setActivePersona/" + persona.id;
 
                 var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Patch, url, headers: sessionServiceInternal.EmergenceAccessTokenHeader);
-                if(response.Successful == false)
+                if(!response.Successful)
                     return new ServiceResponse(false);
                 
                 if (EmergenceUtils.ResponseError(response))

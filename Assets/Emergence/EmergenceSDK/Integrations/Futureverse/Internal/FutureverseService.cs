@@ -71,7 +71,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
             
-            if (response.Successful == false)
+            if (!response.Successful)
                 return new ServiceResponse<LinkedFuturepassResponse>(response);
 
             LinkedFuturepassResponse fpResponse =
@@ -117,7 +117,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         public async UniTask<ServiceResponse<List<InventoryItem>>> GetFutureverseInventoryAsInventoryItems()
         {
             var futureverseInventory = await GetFutureverseInventory();
-            if (futureverseInventory.Successful == false)
+            if (!futureverseInventory.Successful)
                 return new ServiceResponse<List<InventoryItem>>(futureverseInventory, false);
             var ret = new List<InventoryItem>();
             foreach (var edge in futureverseInventory.Result1.data.assets.edges)

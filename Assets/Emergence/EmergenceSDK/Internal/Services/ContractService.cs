@@ -72,7 +72,7 @@ namespace EmergenceSDK.Internal.Services
             string dataString = SerializationHelper.Serialize(parameters, false);
 
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, dataString);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse<ReadContractResponse>(false);
             var readContractResponse = SerializationHelper.Deserialize<BaseResponse<ReadContractResponse>>(response.ResponseText);
             return new ServiceResponse<ReadContractResponse>(true, readContractResponse.message);
@@ -116,7 +116,7 @@ namespace EmergenceSDK.Internal.Services
             var headers = new Dictionary<string, string>();
             headers.Add("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, dataString, headers);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return await HandleWriteMethodError(response,
                     new SerialisedWriteRequest<T>(contractInfo, value, body, attempt));
 
