@@ -13,16 +13,16 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 {
     public class FutureverseInventoryDemo : DemoStation<FutureverseInventoryDemo>, ILoggedInDemoStation
     {
-        private IFutureverseService _futureverseService;
-        private ISessionService _sessionService;
+        private IFutureverseService futureverseService;
+        private ISessionService sessionService;
         [SerializeField] private GameObject itemEntryPrefab;
         [SerializeField] private GameObject contentGO;
         [SerializeField] private GameObject scrollView;
 
-        private bool _isInventoryVisible;
-        private IInventoryService _inventoryService;
+        private bool isInventoryVisible;
+        private IInventoryService inventoryService;
         
-        private InventoryItemStore _inventoryItemStore;
+        private InventoryItemStore inventoryItemStore;
 
         public bool IsReady
         {
@@ -36,10 +36,10 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 
         private void Start()
         {
-            _futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            _sessionService = EmergenceServiceProvider.GetService<ISessionService>();
-            _inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
-            _inventoryItemStore = new InventoryItemStore();
+            futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
+            inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
+            inventoryItemStore = new InventoryItemStore();
             
             instructionsGO.SetActive(false);
             IsReady = false;
@@ -57,15 +57,15 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 
         private void Update()
         {
-            if (HasBeenActivated() && IsReady && _sessionService.HasLoginSetting(LoginSettings.EnableFuturepass))
+            if (HasBeenActivated() && IsReady && sessionService.HasLoginSetting(LoginSettings.EnableFuturepass))
             {
                 ShowInventory();
             }
-            else if (IsReady && !_sessionService.HasLoginSetting(LoginSettings.EnableFuturepass))
+            else if (IsReady && !sessionService.HasLoginSetting(LoginSettings.EnableFuturepass))
             {
                 InstructionsText.text = "You must connect with Futurepass";
             }
-            else if (IsReady && _sessionService.HasLoginSetting(LoginSettings.EnableFuturepass))
+            else if (IsReady && sessionService.HasLoginSetting(LoginSettings.EnableFuturepass))
             {
                 InstructionsText.text = ActiveInstructions;
             }
@@ -75,13 +75,13 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 
         public void ShowInventory()
         {
-            if (!_isInventoryVisible)
+            if (!isInventoryVisible)
             {
                 scrollView.AddTween(new AnchoredPositionTween() {
                     to = Vector2.zero,
                     duration = .25f
                 });
-                _isInventoryVisible = true;
+                isInventoryVisible = true;
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
             }
@@ -91,16 +91,16 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
                     to = new Vector2(0, -200f),
                     duration = .25f
                 });
-                _isInventoryVisible = false;
+                isInventoryVisible = false;
                 Cursor.visible = false;
             }
 
-            _inventoryService.InventoryByOwner(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible, SuccessInventoryByOwner, EmergenceLogger.LogError);
+            inventoryService.InventoryByOwner(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible, SuccessInventoryByOwner, EmergenceLogger.LogError);
         }
         
         private void SuccessInventoryByOwner(List<InventoryItem> inventoryItems)
         {
-            _inventoryItemStore.SetItems(inventoryItems);
+            inventoryItemStore.SetItems(inventoryItems);
             foreach (var inventoryItem in inventoryItems)
             {
                 var entry = CreateEntry();

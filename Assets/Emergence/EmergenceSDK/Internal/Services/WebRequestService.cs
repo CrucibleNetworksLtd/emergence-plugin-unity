@@ -17,7 +17,7 @@ namespace EmergenceSDK.Internal.Services
     {
         internal class WebRequestInfo
         {
-            private static int _lastId = -1;
+            private static int lastId = -1;
             public readonly DateTime Time;
             public readonly int Id;
             /// <summary>
@@ -31,7 +31,7 @@ namespace EmergenceSDK.Internal.Services
             public readonly bool HadDownloadHandler;
             public WebRequestInfo(Dictionary<string, string> requestHeaders, UnityWebRequest request)
             {
-                Id = ++_lastId;
+                Id = ++lastId;
                 Time = DateTime.Now;
                 Headers = requestHeaders ?? new Dictionary<string, string>();
                 HadUploadHandler = request.uploadHandler != null;

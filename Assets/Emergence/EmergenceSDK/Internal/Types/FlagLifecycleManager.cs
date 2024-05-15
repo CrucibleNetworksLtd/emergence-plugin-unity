@@ -6,7 +6,7 @@ namespace EmergenceSDK.Internal.Types
 {
     internal abstract class FlagLifecycleManager<T1> : IDisposable
     {
-        protected List<Action> ResetActions = new();
+        protected readonly List<Action> ResetActions = new();
         protected abstract T1 GetCurrentFlag1Value();
         protected abstract void SetFlag1Value(T1 newValue);
 

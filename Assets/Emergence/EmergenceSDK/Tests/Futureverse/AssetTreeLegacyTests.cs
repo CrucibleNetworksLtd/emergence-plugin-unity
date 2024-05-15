@@ -11,118 +11,118 @@ namespace EmergenceSDK.Tests.Futureverse
     [TestFixture][Obsolete]
     public class AssetTreeLegacyTests
     {
-        private IDisposable _verboseOutput;
-        private List<AssetTreePathLegacy> _parsedTree;
-        private AssetTreePathLegacy _firstPath;
-        private AssetTreePathLegacy _secondPath;
-        private AssetTreePathLegacy _thirdPath;
-        private AssetTreeObjectLegacy _firstObjectOfFirstPath;
-        private AssetTreeObjectLegacy _secondObjectOfFirstPath;
-        private AssetTreeObjectLegacy _thirdObjectOfFirstPath;
-        private JToken _additionalArray;
-        private JToken _additionalInt;
-        private JToken _additionalObject;
-        private IFutureverseServiceInternal _futureverseServiceInternal;
+        private IDisposable verboseOutput;
+        private List<AssetTreePathLegacy> parsedTree;
+        private AssetTreePathLegacy firstPath;
+        private AssetTreePathLegacy secondPath;
+        private AssetTreePathLegacy thirdPath;
+        private AssetTreeObjectLegacy firstObjectOfFirstPath;
+        private AssetTreeObjectLegacy secondObjectOfFirstPath;
+        private AssetTreeObjectLegacy thirdObjectOfFirstPath;
+        private JToken additionalArray;
+        private JToken additionalInt;
+        private JToken additionalObject;
+        private IFutureverseServiceInternal futureverseServiceInternal;
 
         [OneTimeSetUp]
         public void Setup()
         {
             EmergenceServiceProvider.Load();
-            _futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
-            _parsedTree = _futureverseServiceInternal.ParseGetAssetTreeResponseJsonLegacy(Json);
-            _verboseOutput = EmergenceLogger.VerboseOutput(true);
+            futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
+            parsedTree = futureverseServiceInternal.ParseGetAssetTreeResponseJsonLegacy(Json);
+            verboseOutput = EmergenceLogger.VerboseOutput(true);
 
-            _firstPath = _parsedTree[0];
-            _secondPath = _parsedTree[1];
-            _thirdPath = _parsedTree[2];
+            firstPath = parsedTree[0];
+            secondPath = parsedTree[1];
+            thirdPath = parsedTree[2];
 
-            _firstObjectOfFirstPath = _firstPath.Objects["http://schema.futureverse.com/fvp#sft_link_owner_0xffffffff00000000000000000000000000000524"];
-            _secondObjectOfFirstPath = _firstPath.Objects["path:equippedWith_accessoryClothing"];
-            _thirdObjectOfFirstPath = _firstPath.Objects["path:equippedWith_accessoryMouth"];
+            firstObjectOfFirstPath = firstPath.Objects["http://schema.futureverse.com/fvp#sft_link_owner_0xffffffff00000000000000000000000000000524"];
+            secondObjectOfFirstPath = firstPath.Objects["path:equippedWith_accessoryClothing"];
+            thirdObjectOfFirstPath = firstPath.Objects["path:equippedWith_accessoryMouth"];
 
-            _additionalArray = _thirdObjectOfFirstPath.AdditionalData["array"];
-            _additionalInt = _thirdObjectOfFirstPath.AdditionalData["int"];
-            _additionalObject = _thirdObjectOfFirstPath.AdditionalData["object"];
+            additionalArray = thirdObjectOfFirstPath.AdditionalData["array"];
+            additionalInt = thirdObjectOfFirstPath.AdditionalData["int"];
+            additionalObject = thirdObjectOfFirstPath.AdditionalData["object"];
         }
 
         [OneTimeTearDown]
         public void TearDown()
         {
-            _verboseOutput?.Dispose();
+            verboseOutput?.Dispose();
         }
 
         [Test]
         public void CheckTreeCount_IsThree()
         {
-            Assert.AreEqual(3, _parsedTree.Count);
+            Assert.AreEqual(3, parsedTree.Count);
         }
 
         [Test]
         public void CheckFirstPath_IsCorrect()
         {
-            Assert.AreEqual("did:fv-asset:7672:root:303204:473", _firstPath.ID);
-            Assert.AreEqual("http://schema.futureverse.cloud/pb#bear", _firstPath.RdfType);
+            Assert.AreEqual("did:fv-asset:7672:root:303204:473", firstPath.ID);
+            Assert.AreEqual("http://schema.futureverse.cloud/pb#bear", firstPath.RdfType);
         }
 
         [Test]
         public void CheckFirstObjectOfFirstPath_IsCorrect()
         {
-            Assert.NotNull(_firstObjectOfFirstPath);
-            Assert.AreEqual("did:fv-asset:7672:root:241764:0", _firstObjectOfFirstPath.ID);
-            Assert.IsEmpty(_firstObjectOfFirstPath.AdditionalData);
+            Assert.NotNull(firstObjectOfFirstPath);
+            Assert.AreEqual("did:fv-asset:7672:root:241764:0", firstObjectOfFirstPath.ID);
+            Assert.IsEmpty(firstObjectOfFirstPath.AdditionalData);
         }
 
         [Test]
         public void CheckSecondObjectOfFirstPath_IsCorrect()
         {
-            Assert.NotNull(_secondObjectOfFirstPath);
-            Assert.AreEqual("did:fv-asset:7672:root:241764:0", _secondObjectOfFirstPath.ID);
-            Assert.IsEmpty(_secondObjectOfFirstPath.AdditionalData);
+            Assert.NotNull(secondObjectOfFirstPath);
+            Assert.AreEqual("did:fv-asset:7672:root:241764:0", secondObjectOfFirstPath.ID);
+            Assert.IsEmpty(secondObjectOfFirstPath.AdditionalData);
         }
 
         [Test]
         public void CheckThirdObjectOfFirstPath_IsCorrect()
         {
-            Assert.NotNull(_thirdObjectOfFirstPath);
-            Assert.AreEqual("did:fv-asset:7672:root:275556:3", _thirdObjectOfFirstPath.ID);
-            Assert.AreEqual(3, _thirdObjectOfFirstPath.AdditionalData.Count);
+            Assert.NotNull(thirdObjectOfFirstPath);
+            Assert.AreEqual("did:fv-asset:7672:root:275556:3", thirdObjectOfFirstPath.ID);
+            Assert.AreEqual(3, thirdObjectOfFirstPath.AdditionalData.Count);
         }
 
         [Test]
         public void CheckThirdObjectOfFirstPathAdditionalArray_IsCorrect()
         {
-            Assert.IsInstanceOf<JArray>(_additionalArray);
-            Assert.AreEqual(@"[""sdfsdfsd"",""ADASDASDA"",""adasdada""]", _additionalArray.ToString(Newtonsoft.Json.Formatting.None));
+            Assert.IsInstanceOf<JArray>(additionalArray);
+            Assert.AreEqual(@"[""sdfsdfsd"",""ADASDASDA"",""adasdada""]", additionalArray.ToString(Newtonsoft.Json.Formatting.None));
         }
 
         [Test]
         public void CheckThirdObjectOfFirstPathAdditionalInt_IsCorrect()
         {
-            Assert.IsInstanceOf<JValue>(_additionalInt);
-            Assert.AreEqual("69", _additionalInt.ToString(Newtonsoft.Json.Formatting.None));
+            Assert.IsInstanceOf<JValue>(additionalInt);
+            Assert.AreEqual("69", additionalInt.ToString(Newtonsoft.Json.Formatting.None));
         }
 
         [Test]
         public void CheckThirdObjectOfFirstPathAdditionalObject_IsCorrect()
         {
-            Assert.IsInstanceOf<JObject>(_additionalObject);
-            Assert.AreEqual(@"{""test"":[""sdfsdfsd"",""ADASDASDA"",""adasdada""]}", _additionalObject.ToString(Newtonsoft.Json.Formatting.None));
+            Assert.IsInstanceOf<JObject>(additionalObject);
+            Assert.AreEqual(@"{""test"":[""sdfsdfsd"",""ADASDASDA"",""adasdada""]}", additionalObject.ToString(Newtonsoft.Json.Formatting.None));
         }
 
         [Test]
         public void CheckSecondPath_IsCorrect()
         {
-            Assert.AreEqual("did:fv-asset:7672:root:275556:3", _secondPath.ID);
-            Assert.AreEqual("http://schema.futureverse.com#None", _secondPath.RdfType);
-            Assert.IsEmpty(_secondPath.Objects);
+            Assert.AreEqual("did:fv-asset:7672:root:275556:3", secondPath.ID);
+            Assert.AreEqual("http://schema.futureverse.com#None", secondPath.RdfType);
+            Assert.IsEmpty(secondPath.Objects);
         }
 
         [Test]
         public void CheckThirdPath_IsCorrect()
         {
-            Assert.AreEqual("did:fv-asset:7672:root:241764:0", _thirdPath.ID);
-            Assert.AreEqual("http://schema.futureverse.com#None", _thirdPath.RdfType);
-            Assert.IsEmpty(_thirdPath.Objects);
+            Assert.AreEqual("did:fv-asset:7672:root:241764:0", thirdPath.ID);
+            Assert.AreEqual("http://schema.futureverse.com#None", thirdPath.RdfType);
+            Assert.IsEmpty(thirdPath.Objects);
         }
         
         const string Json = @"

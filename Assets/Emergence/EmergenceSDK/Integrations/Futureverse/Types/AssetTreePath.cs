@@ -15,12 +15,12 @@ namespace EmergenceSDK.Integrations.Futureverse.Types
         [JsonIgnore]
         public readonly Dictionary<string, Object> Objects = new();
         [JsonExtensionData]
-        private readonly Dictionary<string, JToken> _objects = new();
+        private readonly Dictionary<string, JToken> objects = new();
             
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
-            foreach (var kvp in _objects)
+            foreach (var kvp in objects)
             {
                 Objects.Add(kvp.Key, SerializationHelper.Deserialize<Object>(kvp.Value));
             }

@@ -17,9 +17,9 @@ namespace EmergenceSDK.Internal.Services
     {
         public event WriteMethodSuccess WriteMethodConfirmed;
         
-        private readonly List<string> _loadedContractAddresses = new();
+        private readonly List<string> loadedContractAddresses = new();
         private const int DesiredConfirmationCount = 1;
-        private bool CheckForNewContract(ContractInfo contractInfo) => !_loadedContractAddresses.Contains(contractInfo.ContractAddress);
+        private bool CheckForNewContract(ContractInfo contractInfo) => !loadedContractAddresses.Contains(contractInfo.ContractAddress);
 
         private const int MaxRetryAttempts = 1;
         
@@ -57,10 +57,10 @@ namespace EmergenceSDK.Internal.Services
 
             if (response.Successful && EmergenceUtils.ProcessResponse<LoadContractResponse>(response, EmergenceLogger.LogError, out var processedResponse))
             {
-                _loadedContractAddresses.Add(contractAddress);
+                loadedContractAddresses.Add(contractAddress);
             }
 
-            return _loadedContractAddresses.Contains(contractAddress);
+            return loadedContractAddresses.Contains(contractAddress);
         }
 
         public async UniTask<ServiceResponse<ReadContractResponse>> ReadMethodAsync<T>(ContractInfo contractInfo, T parameters)
