@@ -33,7 +33,7 @@ namespace EmergenceSDK.Tests.Futureverse.Services
             EmergenceServiceProvider.Unload();
         }
         
-        [UnityTest]
+        [UnityTest][Obsolete]
         public IEnumerator GetAssetTreeAsyncLegacy_PassesWithoutExceptions()
         {
             return UniTask.ToCoroutine(async () =>
