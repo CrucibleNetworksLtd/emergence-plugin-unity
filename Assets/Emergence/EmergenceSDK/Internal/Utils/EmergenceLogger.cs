@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Types;
@@ -15,6 +16,7 @@ namespace EmergenceSDK.Internal.Utils
     /// </summary>
     public static class EmergenceLogger 
     {
+        private const string DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff";
 #if DISABLE_EMERGENCE_LOGS
         internal static IDisposable VerboseOutput => null;
         internal static IDisposable VerboseMarker => null;
@@ -47,7 +49,9 @@ namespace EmergenceSDK.Internal.Utils
         /// Change this to change Emergence Logging level
         /// </summary>
         private static readonly LogLevel MaxLogLevel = EmergenceSingleton.Instance.LogLevel;
-        
+        private static bool VerboseMode { get; set; }
+        private static bool MarkLogsAsVerbose { get; set; }
+
         public static void LogWarning(string message, bool alsoLogToScreen = false)
         {
             if (IsEnabledFor(LogLevel.Warning))
@@ -105,98 +109,153 @@ namespace EmergenceSDK.Internal.Utils
                 return; // Early return to avoid any logic
 
             var info = WebRequestService.Instance.GetRequestInfoByWebResponse(response);
-            var requestId = (info?.Id)?.ToString() ?? "UNKNOWN";
-            var message = $"Request #{requestId}: Completed with code {response.StatusCode}";
-            string requestHeaders = "";
-            string responseHeaders = "";
-            
-            if (VerboseMode) {GetHeaders();}
+            string requestHeaders = "", responseHeaders = "";
+
+            if (VerboseMode)
+            {
+                FormatWebRequestHeaders(info, out requestHeaders);
+                FormatWebResponseHeaders(response, out responseHeaders);
+            }
             
             if (response is FailedWebResponse { Exception: not OperationCanceledException and not TimeoutException } failedResponse)
             {
-                LogError(message);
-                LogError($"Request #{requestId}: {response.Error}");
-                if (failedResponse.Exception != null)
-                    LogError(failedResponse.Exception, $"Request #{requestId}: ");
-                
-                using (VerboseMarker(true))
-                {
-                    LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
-                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
-                    LogError($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
-                    LogError($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
-                }
+                LogFailedWebRequest(failedResponse, info, requestHeaders);
             }
             else if (response is FailedWebResponse { Exception: OperationCanceledException } canceledResponse)
             {
-                LogInfo($"Request #{requestId}: Request cancelled");
-                LogInfo(canceledResponse.Exception, $"Request #{requestId}: ");
-                
-                using (VerboseMarker(true))
-                {
-                    LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
-                    LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
-                }
+                LogCancelledWebRequest(canceledResponse, info, requestHeaders);
             }
             else if (response is FailedWebResponse { Exception: TimeoutException } timeoutResponse)
             {
-                LogError($"Request #{requestId}: Request timed out");
-                LogError(timeoutResponse.Exception, $"Request #{requestId}: ");
-                
-                using (VerboseMarker(true))
-                {
-                    LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
-                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
-                }
+                LogTimedOutWebRequest(timeoutResponse, info, requestHeaders);
             }
             else
             {
                 if ((int)response.StatusCode is >= 200 and < 300)
                 {
-                    LogInfo(message);
-                    
-                    using (VerboseMarker(true))
-                    {
-                        LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
-                        LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
-                        LogInfo($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
-                        LogInfo($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
-                    }
+                    LogProtocolSuccessWebResponse(response, info, requestHeaders, responseHeaders);
                 }
                 else
                 {
-                    LogWarning(message);
-                    
-                    using (VerboseMarker(true))
-                    {
-                        LogWarning($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
-                        LogWarning($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
-                        LogWarning($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
-                        LogWarning($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
-                    }
-                }
-            }
-            
-            void GetHeaders()
-            {
-                requestHeaders = "";
-                if (info != null)
-                {
-                    foreach (var headerPair in info.Headers)
-                    {
-                        requestHeaders += $"{headerPair.Key}: {headerPair.Value}{Environment.NewLine}";
-                    }
-                }
-                responseHeaders = "";
-                foreach (var headerPair in response.Headers)
-                {
-                    responseHeaders += $"{headerPair.Key}: {headerPair.Value}{Environment.NewLine}";
+                    LogProtocolErrorWebResponse(response, info, requestHeaders, responseHeaders);
                 }
             }
         }
 
-        private static bool VerboseMode { get; set; }
-        private static bool MarkLogsAsVerbose { get; set; }
+        private static void LogProtocolSuccessWebResponse(WebResponse response, WebRequestService.WebRequestInfo info, string requestHeaders, string responseHeaders)
+        {
+            GetRequestIdAndDuration(info, out var requestId, out var duration);
+            LogInfo($"Request #{requestId}: Finished with code {response.StatusCode} after {duration} seconds");
+
+            using (VerboseMarker(true))
+            {
+                LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
+                
+                if (info.HadUploadHandler)
+                    LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
+                
+                LogInfo($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
+                
+                if (info.HadDownloadHandler)
+                    LogInfo($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
+            }
+        }
+
+        private static void LogProtocolErrorWebResponse(WebResponse response, WebRequestService.WebRequestInfo info, string requestHeaders, string responseHeaders)
+        {
+            GetRequestIdAndDuration(info, out var requestId, out var duration);
+            LogWarning($"Request #{requestId}: Finished with code {response.StatusCode} after {duration} seconds");
+
+            using (VerboseMarker(true))
+            {
+                LogWarning($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
+                
+                if (info.HadUploadHandler)
+                    LogWarning($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
+                
+                LogWarning($"Request #{requestId}: Response headers:{Environment.NewLine}{responseHeaders}");
+                
+                if (info.HadDownloadHandler)
+                    LogWarning($"Request #{requestId}: Response body:{Environment.NewLine}{response.ResponseText}");
+            }
+        }
+
+        private static void LogTimedOutWebRequest(FailedWebResponse response, WebRequestService.WebRequestInfo info, string requestHeaders)
+        { 
+            GetRequestIdAndDuration(info, out var requestId, out var duration);
+            LogError($"Request #{requestId}: Request timed out after {duration}");
+            LogError(response.Exception, $"Request #{requestId}: ");
+                
+            using (VerboseMarker(true))
+            {
+                LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
+                
+                if (info.HadUploadHandler)
+                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
+            }
+        }
+
+        private static void LogCancelledWebRequest(FailedWebResponse response, WebRequestService.WebRequestInfo info, string requestHeaders)
+        {
+            GetRequestIdAndDuration(info, out var requestId, out var duration);
+            LogInfo($"Request #{requestId}: Request cancelled after {duration}");
+            LogInfo(response.Exception, $"Request #{requestId}: ");
+                
+            using (VerboseMarker(true))
+            {
+                LogInfo($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
+                
+                if (info.HadUploadHandler)
+                    LogInfo($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
+            }
+        }
+
+        private static void LogFailedWebRequest(FailedWebResponse response, WebRequestService.WebRequestInfo info, string requestHeaders)
+        {
+            GetRequestIdAndDuration(info, out var requestId, out var duration);
+            LogError($"Request #{requestId}: Failed after {duration} seconds");
+            
+            if (!string.IsNullOrEmpty(response.Error))
+                LogError($"Request #{requestId} error: {response.Error}");
+            
+            if (response.Exception != null)
+                LogError(response.Exception, $"Request #{requestId}: ");
+                
+            using (VerboseMarker(true))
+            {
+                LogError($"Request #{requestId}: Request headers:{Environment.NewLine}{requestHeaders}");
+                
+                if (info.HadUploadHandler)
+                    LogError($"Request #{requestId}: Request body:{Environment.NewLine}{Encoding.UTF8.GetString(response.ResponseBytes)}");
+            }
+        }
+
+        private static void GetRequestIdAndDuration(WebRequestService.WebRequestInfo info, out string requestId, out string duration)
+        {
+            requestId = (info?.Id)?.ToString() ?? "UNKNOWN";
+            duration = info != null ? (DateTime.Now - info.Time).TotalSeconds.ToString("F2") : "UNKNOWN";
+        }
+
+        private static void FormatWebRequestHeaders(WebRequestService.WebRequestInfo info, out string requestHeaders)
+        {
+            requestHeaders = "";
+            if (info != null)
+            {
+                foreach (var headerPair in info.Headers)
+                {
+                    requestHeaders += $"{headerPair.Key}: {headerPair.Value}{Environment.NewLine}";
+                }
+            }
+        }
+        
+        private static void FormatWebResponseHeaders(WebResponse response, out string responseHeaders)
+        {
+            responseHeaders = "";
+            foreach (var headerPair in response.Headers)
+            {
+                responseHeaders += $"{headerPair.Key}: {headerPair.Value}{Environment.NewLine}";
+            }
+        }
         
         private static void LogException(Exception exception, Action<string, bool> logFunction, string prefix = "")
         {
@@ -228,6 +287,11 @@ namespace EmergenceSDK.Internal.Utils
             if (MarkLogsAsVerbose && !VerboseMode)
                 return;
             
+            if (VerboseMode)
+            {
+                message = $"[{DateTime.Now.ToString(DateTimeFormat)}] " + message;
+            }
+            
             var callingClass = CallingClass();
             Debug.LogWarning($"{errorCode} Warning in {callingClass}: {message}");
             if(alsoLogToScreen)
@@ -242,6 +306,11 @@ namespace EmergenceSDK.Internal.Utils
 #endif
             if (MarkLogsAsVerbose && !VerboseMode)
                 return;
+
+            if (VerboseMode)
+            {
+                message = $"[{DateTime.Now.ToString(DateTimeFormat)}] " + message;
+            }
             
             var callingClass = CallingClass();
 
