@@ -140,7 +140,7 @@ namespace EmergenceSDK.Tests.Futureverse
             {
                 await FutureverseSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Development, async () =>
                 {
-                    await EmergenceSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Development, async () => { await futureverseService.GetAssetTreeAsync("473", "7672:root:303204"); });
+                    await futureverseService.GetAssetTreeAsync("473", "7672:root:303204");
                 });
             });
         }
@@ -193,11 +193,8 @@ namespace EmergenceSDK.Tests.Futureverse
             {
                 await FutureverseSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Staging, async () =>
                 {
-                    await FutureverseSingleton.Instance.RunInForcedEnvironmentAsync(EmergenceEnvironment.Staging, async () =>
-                    {
-                        var artmStatusAsync = await futureverseService.GetArtmStatusAsync("0x69c94ea3e0e7dea32d2d00813a64017dfbbd42dd18f5d56a12c907dccc7bb6d9");
-                        Assert.Pass("Passed with transaction status: " + artmStatusAsync);
-                    });
+                    var artmStatusAsync = await futureverseService.GetArtmStatusAsync("0x69c94ea3e0e7dea32d2d00813a64017dfbbd42dd18f5d56a12c907dccc7bb6d9");
+                    Assert.Pass("Passed with transaction status: " + artmStatusAsync);
                 });
             });
         }
