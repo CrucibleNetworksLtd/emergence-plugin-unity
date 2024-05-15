@@ -69,11 +69,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             var url =
                 $"{GetFuturepassApiUrl()}linked-futurepass?eoa={EmergenceSingleton.Instance.Configuration.Chain.ChainID}:EVM:{walletService.WalletAddress}";
 
-            var response = await WebRequestService.SendAsyncWebRequest(
-                RequestMethod.Get,
-                url,
-                timeout: FutureverseSingleton.Instance.requestTimeout * 1000
-                );
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
             
             if (response.Successful == false)
                 return new ServiceResponse<LinkedFuturepassResponse>(response);

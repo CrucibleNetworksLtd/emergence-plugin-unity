@@ -9,9 +9,7 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using EmergenceSDK.Types.Responses;
-using UniJSON;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
