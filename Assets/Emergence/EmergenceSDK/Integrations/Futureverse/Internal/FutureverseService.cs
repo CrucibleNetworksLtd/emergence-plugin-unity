@@ -75,7 +75,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 timeout: FutureverseSingleton.Instance.requestTimeout * 1000
                 );
             
-            if (response.Successful == false)
+            if (!response.Successful)
                 return new ServiceResponse<LinkedFuturepassResponse>(response);
 
             LinkedFuturepassResponse fpResponse =
