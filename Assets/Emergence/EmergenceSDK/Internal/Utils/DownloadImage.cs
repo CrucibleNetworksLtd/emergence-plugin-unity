@@ -3,6 +3,7 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Types;
+using EmergenceSDK.Types;
 using MG.GIF;
 using UnityEngine.Networking;
 
@@ -33,12 +34,11 @@ namespace EmergenceSDK.Internal.Utils
 
         private async UniTask MakeRequest(string url)
         {
-            var request = UnityWebRequest.Get(url);
             WebResponse response;
 
             try
             {
-                response = await WebRequestService.PerformAsyncWebRequest(request, EmergenceLogger.LogError);
+                response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
             }
             catch (Exception e)
             {
@@ -46,14 +46,14 @@ namespace EmergenceSDK.Internal.Utils
                 return;
             }
 
-            if (!response.IsSuccess)
+            if (!response.Successful)
             {
-                failedCallback?.Invoke(url, response.Response, response.StatusCode);
+                failedCallback?.Invoke(url, response.ResponseText, response.StatusCode);
                 EmergenceLogger.LogWarning("Failed to download image at " + url);
                 return;
             }
 
-            byte[] imageBytes = response.DownloadHandler.data;
+            byte[] imageBytes = response.ResponseBytes;
             var texture = await GetTextureFromImageBytes(imageBytes, url);
             successCallback?.Invoke(url, texture, this);
         }

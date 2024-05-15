@@ -4,8 +4,10 @@ using EmergenceSDK.Implementations.Login.Exceptions;
 using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace EmergenceSDK.Implementations.Login.UI.Examples
@@ -17,7 +19,7 @@ namespace EmergenceSDK.Implementations.Login.UI.Examples
     public class SimpleLoginScreen : MonoBehaviour
     {
         public LoginManager loginManager;
-        public LoginMode loginMode;
+        [FormerlySerializedAs("loginMode")] public LoginSettings loginSettings;
         public RawImage rawImage;
         public TextMeshProUGUI countdownLabel;
         public Button cancelButton;
@@ -123,7 +125,7 @@ namespace EmergenceSDK.Implementations.Login.UI.Examples
             UniTask.Void(async () =>
             {
                 await loginManager.WaitUntilAvailable(); // Wait until the login is available
-                await loginManager.StartLogin(loginMode); // Start login
+                await loginManager.StartLogin(loginSettings); // Start login
             });
         }
     }

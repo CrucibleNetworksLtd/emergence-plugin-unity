@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse.Services;
+using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.UI.Inventory;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
 using TMPro;
 using Tweens;
@@ -95,11 +97,11 @@ namespace EmergenceSDK.Internal.UI.Screens
         
         public async UniTask Refresh()
         {
-            HideFVSidebars(EmergenceServiceProvider.GetService<IFutureverseService>().UsingFutureverse);
+            HideFVSidebars(EmergenceServiceProvider.GetService<SessionService>().HasLoginSetting(LoginSettings.EnableFuturepass));
             var inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
             var updatedInventory = await inventoryService.InventoryByOwnerAsync(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible);
-            inventoryItemStore.SetItems(updatedInventory.Result);
-            if (updatedInventory.Success)
+            inventoryItemStore.SetItems(updatedInventory.Result1);
+            if (updatedInventory.Successful)
             {
                 UpdateInventoryItemListeners();
             }
@@ -107,9 +109,9 @@ namespace EmergenceSDK.Internal.UI.Screens
              
             var avatarService = EmergenceServiceProvider.GetService<IAvatarService>();
             var updatedAvatars = await avatarService.AvatarsByOwnerAsync(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress);
-            if (updatedAvatars.Success)
+            if (updatedAvatars.Successful)
             {
-                avatars = updatedAvatars.Result;
+                avatars = updatedAvatars.Result1;
             }
             Modal.Instance.Hide();
             

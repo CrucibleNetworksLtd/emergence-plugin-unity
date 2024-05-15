@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
@@ -17,19 +16,19 @@ namespace EmergenceSDK.Internal.Services
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("Authorization-header", authorization);
             var bodyData = "{\"metadata\": \"" + metadata + "\"}";
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPUT, url, EmergenceLogger.LogError, bodyData, headers);
-            if(response.IsSuccess == false)
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Put, url, bodyData, headers);
+            if(response.Successful == false)
                 return new ServiceResponse<string>(false);
             
-            return new ServiceResponse<string>(true, response.Response);
+            return new ServiceResponse<string>(true, response.ResponseText);
         }
 
         public async UniTask WriteNewDynamicMetadata(string network, string contract, string tokenId, string metadata, string authorization,
             SuccessWriteDynamicMetadata success, ErrorCallback errorCallback)
         {
             var response = await WriteNewDynamicMetadataAsync(network, contract, tokenId, metadata, authorization);
-            if(response.Success)
-                success?.Invoke(response.Result);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in WriteDynamicMetadata.", (long)response.Code);
         }
@@ -41,19 +40,19 @@ namespace EmergenceSDK.Internal.Services
             Dictionary<string, string> headers = new Dictionary<string, string>();
             headers.Add("Authorization-header", authorization);
             var bodyData = "{\"metadata\": \"" + metadata + "\"}";
-            var response = await WebRequestService.PerformAsyncWebRequest(UnityWebRequest.kHttpVerbPOST, url, EmergenceLogger.LogError, bodyData, headers);
-            if(response.IsSuccess == false)
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, bodyData, headers);
+            if(response.Successful == false)
                 return new ServiceResponse<string>(false);
             
-            return new ServiceResponse<string>(true, response.Response);
+            return new ServiceResponse<string>(true, response.ResponseText);
         }
 
         public async UniTask WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, string authorization,
             SuccessWriteDynamicMetadata success, ErrorCallback errorCallback)
         {
             var response = await WriteDynamicMetadataAsync(network, contract, tokenId, metadata, authorization);
-            if(response.Success)
-                success?.Invoke(response.Result);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
             else
                 errorCallback?.Invoke("Error in WriteDynamicMetadata.", (long)response.Code);
         }
