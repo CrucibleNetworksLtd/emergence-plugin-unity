@@ -6,19 +6,19 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
     internal class ArtmBuilder
     {
-        public static string GenerateArtm(string message, List<FutureverseArtmOperation> artmOperations,
+        public static string GenerateArtm(string message, List<ArtmOperation> artmOperations,
             string address, int nonce)
         {
-            Dictionary<FutureverseArtmOperationType, string> operationTypeStrings = new(){
-                {FutureverseArtmOperationType.CreateLink, "asset-link create"},
-                {FutureverseArtmOperationType.DeleteLink, "asset-link delete"}
+            Dictionary<ArtmOperationType, string> operationTypeStrings = new(){
+                {ArtmOperationType.CreateLink, "asset-link create"},
+                {ArtmOperationType.DeleteLink, "asset-link delete"}
             };
 
             var artm = "Asset Registry transaction\n\n";
             artm += message + "\n\n";
             artm += "Operations:\n\n";
-            foreach (FutureverseArtmOperation operation in artmOperations) {
-                if (operation.OperationType == FutureverseArtmOperationType.None) {
+            foreach (ArtmOperation operation in artmOperations) {
+                if (operation.OperationType == ArtmOperationType.None) {
                     continue;
                 }
                 var array = operation.Slot.Split(":");

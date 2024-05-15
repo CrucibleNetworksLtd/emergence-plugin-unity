@@ -69,8 +69,8 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
             try
             {
                 var artmTransactionResponse = await _futureverseService.SendArtmAsync("An update is being made to your inventory",
-                    new List<FutureverseArtmOperation>
-                        { new(FutureverseArtmOperationType.DeleteLink, "equippedWith_Engines", "did:fv-asset:7672:root:358500:626", "did:fv-asset:7672:root:359524:626") }, false);
+                    new List<ArtmOperation>
+                        { new(ArtmOperationType.DeleteLink, "equippedWith_Engines", "did:fv-asset:7672:root:358500:626", "did:fv-asset:7672:root:359524:626") }, false);
                 
                 EmergenceLogger.LogInfo("ARTM successfully sent: " + artmTransactionResponse.TransactionHash, true);
                 EmergenceLogger.LogInfo("Retrieving transaction status... ", true);

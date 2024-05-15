@@ -1,6 +1,6 @@
 ﻿namespace EmergenceSDK.Integrations.Futureverse.Types
 {
-    public enum FutureverseArtmOperationType
+    public enum ArtmOperationType
     {
         CreateLink,
         DeleteLink,

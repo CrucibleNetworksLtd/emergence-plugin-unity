@@ -34,13 +34,13 @@ namespace EmergenceSDK.Tests.Futureverse.Services
         }
         
         [UnityTest]
-        public IEnumerator GetAssetTreeAsync_PassesWithoutExceptions()
+        public IEnumerator GetAssetTreeAsyncLegacy_PassesWithoutExceptions()
         {
             return UniTask.ToCoroutine(async () =>
             {
                 using var forcedEnvironmentEmergence = EmergenceSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Staging);
                 using var forcedEnvironment = FutureverseSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Staging);
-                await _futureverseService.GetAssetTreeAsync("473", "7672:root:303204");
+                await _futureverseService.GetAssetTreeAsyncLegacy("473", "7672:root:303204");
             });
         }
 

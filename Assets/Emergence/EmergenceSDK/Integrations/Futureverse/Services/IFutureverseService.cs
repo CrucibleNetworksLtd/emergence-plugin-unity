@@ -30,14 +30,25 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
         UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturepassInformationAsync(string futurepass);
         
         /// <summary>
+        /// (OBSOLETE) Retrieve the asset tree for the Token ID and Collection ID
+        /// </summary>
+        /// <param name="tokenId">Token ID for tree retrieval</param>
+        /// <param name="collectionId">Collection ID for tree retrieval</param>
+        /// <returns>A <see cref="List{T}"/> of <see cref="AssetTreePathLegacy"/> objects</returns>
+        /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
+        /// <exception cref="FutureverseInvalidJsonStructureException">Thrown if the asset tree response doesn't match the expected JSON structure</exception>
+        [Obsolete]
+        UniTask<List<AssetTreePathLegacy>> GetAssetTreeAsyncLegacy(string tokenId, string collectionId);
+        
+        /// <summary>
         /// Retrieve the asset tree for the Token ID and Collection ID
         /// </summary>
         /// <param name="tokenId">Token ID for tree retrieval</param>
         /// <param name="collectionId">Collection ID for tree retrieval</param>
-        /// <returns>A <see cref="List{T}"/> of <see cref="FutureverseAssetTreePath"/> objects</returns>
+        /// <returns>A <see cref="List{T}"/> of <see cref="AssetTreePath"/> objects</returns>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
         /// <exception cref="FutureverseInvalidJsonStructureException">Thrown if the asset tree response doesn't match the expected JSON structure</exception>
-        UniTask<List<FutureverseAssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId);
+        UniTask<List<AssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId);
 
         /// <summary>
         /// Send an ARTM from the current wallet
@@ -49,7 +60,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
         /// <exception cref="InvalidWalletException">Thrown if there is no currently connected wallet</exception>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
         /// <exception cref="SignMessageFailedException">Thrown if the needed sign message request fails</exception>
-        Task<ArtmTransactionResponse> SendArtmAsync(string message, List<FutureverseArtmOperation> artmOperations, bool retrieveStatus = true);
+        Task<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus = true);
         
         /// <summary>
         /// Get the status of a ARTM transaction by its hash
