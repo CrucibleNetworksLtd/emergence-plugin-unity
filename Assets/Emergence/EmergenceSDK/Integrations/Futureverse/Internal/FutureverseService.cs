@@ -33,7 +33,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
             return "https://ar-api.futureverse.app/graphql";
 #else
-            return EmergenceSingleton.Instance.Environment switch
+            return FutureverseSingleton.Instance.Environment switch
             {
                 EmergenceEnvironment.Production => "https://ar-api.futureverse.app/graphql",
                 EmergenceEnvironment.Development => "https://ar-api.futureverse.dev/graphql",
@@ -48,7 +48,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
             return "https://account-indexer.api.futurepass.futureverse.app/api/v1/";
 #else
-            return EmergenceSingleton.Instance.Environment switch
+            return FutureverseSingleton.Instance.Environment switch
             {
                 EmergenceEnvironment.Production => "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/",
                 EmergenceEnvironment.Development => "https://y4heevnpik.execute-api.us-west-2.amazonaws.com/api/v1/",
@@ -358,7 +358,8 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             
             bool ParseStatus(JObject jObject, out string status)
             {
-                status = jObject["data"]?["transaction"]?["status"]?.Value<string>();
+                JToken statusToken = jObject.SelectToken("data.transaction.status");
+                status = statusToken?.Value<string>();
                 return status != null;
             }
         }
