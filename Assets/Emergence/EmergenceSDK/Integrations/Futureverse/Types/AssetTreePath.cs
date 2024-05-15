@@ -13,7 +13,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Types
         [JsonIgnore]
         public string RdfType;
         [JsonIgnore]
-        public Dictionary<string, Object> Objects = new();
+        public readonly Dictionary<string, Object> Objects = new();
         [JsonExtensionData]
         private readonly Dictionary<string, JToken> _objects = new();
             
