@@ -19,7 +19,7 @@ namespace EmergenceSDK.Implementations.Login.UI.Examples
     public class SimpleLoginScreen : MonoBehaviour
     {
         public LoginManager loginManager;
-        [FormerlySerializedAs("loginMode")] public LoginSettings loginSettings;
+        public LoginSettings loginSettings;
         public RawImage rawImage;
         public TextMeshProUGUI countdownLabel;
         public Button cancelButton;

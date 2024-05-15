@@ -24,7 +24,7 @@ namespace EmergenceSDK
 
         public event Action OnGameClosing;
 
-        [FormerlySerializedAs("Environment")] [SerializeField] public EmergenceEnvironment environment;
+        [SerializeField] public EmergenceEnvironment environment;
         public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
