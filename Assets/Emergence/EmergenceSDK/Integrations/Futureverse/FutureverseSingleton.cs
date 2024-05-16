@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using EmergenceSDK.Integrations.Futureverse.Internal;
 using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
