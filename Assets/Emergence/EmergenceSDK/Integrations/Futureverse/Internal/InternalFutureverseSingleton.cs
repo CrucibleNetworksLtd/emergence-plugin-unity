@@ -3,20 +3,20 @@ using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
 
-namespace EmergenceSDK.Internal
+namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
-    public abstract class EmergenceSingletonInternal : SingletonComponent<EmergenceSingleton>
+    public abstract class InternalFutureverseSingleton : SingletonComponent<FutureverseSingleton>
     {
-        protected EmergenceEnvironment? CurrentForcedEnvironment { get; set; }
-
+        protected EmergenceEnvironment? CurrentForcedEnvironment { get; private set; }
+        
         /// <summary>
-        /// <see cref="IDisposable"/> object that will force a different Emergence environment until disposed.
+        /// <see cref="IDisposable"/> object that will force a different Futureverse environment until disposed.
         /// <remarks>THIS IS A DEVELOPER FEATURE, MEANT ONLY FOR TESTING.<para/>Use with "using" keyword is strongly recommended for easiest management</remarks>
         /// </summary>
         /// <param name="newEnvironment">Environment to force</param>
         /// <returns></returns>
         internal static IDisposable ForcedEnvironment(EmergenceEnvironment newEnvironment) => new ForcedEnvironmentManager(newEnvironment);
-
+        
         private class ForcedEnvironmentManager : FlagLifecycleManager<EmergenceEnvironment?>
         {
             public ForcedEnvironmentManager(EmergenceEnvironment? newValue) : base(newValue) { }

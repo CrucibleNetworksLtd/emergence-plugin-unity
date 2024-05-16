@@ -16,7 +16,7 @@ using UnityEngine.Serialization;
 
 namespace EmergenceSDK
 {
-    public sealed class EmergenceSingleton : EmergenceSingletonInternal
+    public sealed class EmergenceSingleton : InternalEmergenceSingleton
     {
         public EmergenceConfiguration Configuration;
 

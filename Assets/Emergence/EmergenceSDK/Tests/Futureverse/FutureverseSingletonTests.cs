@@ -32,21 +32,21 @@ namespace EmergenceSDK.Tests.Futureverse
         [Test]
         public void ForcedEnvironment_IsDevelopment()
         {
-            using var forcedEnvironment = FutureverseSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Development);
+            using var forcedEnvironment = InternalFutureverseSingleton.ForcedEnvironment(EmergenceEnvironment.Development);
             Assert.AreEqual(EmergenceEnvironment.Development, FutureverseSingleton.Instance.Environment);
         }
 
         [Test]
         public void ForcedEnvironment_IsStaging()
         {
-            using var forcedEnvironment = FutureverseSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Staging);
+            using var forcedEnvironment = InternalFutureverseSingleton.ForcedEnvironment(EmergenceEnvironment.Staging);
             Assert.AreEqual(EmergenceEnvironment.Staging, FutureverseSingleton.Instance.Environment);
         }
 
         [Test]
         public void ForcedEnvironment_IsProduction()
         {
-            using var forcedEnvironment = FutureverseSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Production);
+            using var forcedEnvironment = InternalFutureverseSingleton.ForcedEnvironment(EmergenceEnvironment.Production);
             Assert.AreEqual(EmergenceEnvironment.Production, FutureverseSingleton.Instance.Environment);
         }
         
@@ -56,7 +56,7 @@ namespace EmergenceSDK.Tests.Futureverse
             var oldEnvironment = FutureverseSingleton.Instance.Environment;
             var newEnvironment = GetFirstNonMatchingEnum(oldEnvironment);
 
-            using (FutureverseSingletonInternal.ForcedEnvironment(newEnvironment))
+            using (InternalFutureverseSingleton.ForcedEnvironment(newEnvironment))
             {
                 Assert.AreEqual(newEnvironment, FutureverseSingleton.Instance.Environment, "Forced environment did not set");
             }

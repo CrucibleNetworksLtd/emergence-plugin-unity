@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 
 namespace EmergenceSDK.Integrations.Futureverse
 {
-    public sealed class FutureverseSingleton : FutureverseSingletonInternal
+    public sealed class FutureverseSingleton : InternalFutureverseSingleton
     {
         public int RequestTimeout => requestTimeout;
         public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;

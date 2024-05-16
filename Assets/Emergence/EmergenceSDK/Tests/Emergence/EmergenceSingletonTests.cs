@@ -27,21 +27,21 @@ namespace EmergenceSDK.Tests.Emergence
         [Test]
         public void ForcedEnvironment_IsDevelopment()
         {
-            using var forcedEnvironment = EmergenceSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Development);
+            using var forcedEnvironment = InternalEmergenceSingleton.ForcedEnvironment(EmergenceEnvironment.Development);
             Assert.AreEqual(EmergenceEnvironment.Development, EmergenceSingleton.Instance.Environment, "Forced environment did not set");
         }
 
         [Test]
         public void ForcedEnvironment_IsStaging()
         {
-            using var forcedEnvironment = EmergenceSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Staging);
+            using var forcedEnvironment = InternalEmergenceSingleton.ForcedEnvironment(EmergenceEnvironment.Staging);
             Assert.AreEqual(EmergenceEnvironment.Staging, EmergenceSingleton.Instance.Environment, "Forced environment did not set");
         }
 
         [Test]
         public void ForcedEnvironment_IsProduction()
         {
-            using var forcedEnvironment = EmergenceSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Production);
+            using var forcedEnvironment = InternalEmergenceSingleton.ForcedEnvironment(EmergenceEnvironment.Production);
             Assert.AreEqual(EmergenceEnvironment.Production, EmergenceSingleton.Instance.Environment, "Forced environment did not set");
         }
 
@@ -51,7 +51,7 @@ namespace EmergenceSDK.Tests.Emergence
             var oldEnvironment = EmergenceSingleton.Instance.Environment;
             var newEnvironment = GetFirstNonMatchingEnum(oldEnvironment);
 
-            using (EmergenceSingletonInternal.ForcedEnvironment(newEnvironment))
+            using (InternalEmergenceSingleton.ForcedEnvironment(newEnvironment))
             {
                 Assert.AreEqual(newEnvironment, EmergenceSingleton.Instance.Environment, "Forced environment did not set");
             }
