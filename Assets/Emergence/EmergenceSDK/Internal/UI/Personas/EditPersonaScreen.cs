@@ -16,7 +16,7 @@ namespace EmergenceSDK.Internal.UI.Personas
         public Texture2D DefaultImage;
 
         public PersonaCreationFooter Footer;
-        [FormerlySerializedAs("AvatarDisplayScreen")] public AvatarSelectionScreen AvatarSelectionScreen;        
+        public AvatarSelectionScreen AvatarSelectionScreen;        
         public PersonaInfoPanel PersonaInfo;
         public PersonaCreationEditingStatusWidget StatusWidget;
         private Persona currentPersona;

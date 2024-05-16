@@ -15,12 +15,12 @@ namespace EmergenceSDK.Internal.Services
 {
     internal class PersonaService : IPersonaServiceInternal, IPersonaService, ISessionConnectableService
     {
-        private readonly ISessionServiceInternal _sessionServiceInternal;
-        private readonly ISessionService _sessionService;
+        private readonly ISessionServiceInternal sessionServiceInternal;
+        private readonly ISessionService sessionService;
         public PersonaService(ISessionServiceInternal sessionServiceInternal)
         {
-            _sessionServiceInternal = sessionServiceInternal;
-            _sessionService = (ISessionService)_sessionServiceInternal;
+            this.sessionServiceInternal = sessionServiceInternal;
+            sessionService = (ISessionService)this.sessionServiceInternal;
         }
         
         public event PersonaUpdated OnCurrentPersonaUpdated;
@@ -50,13 +50,13 @@ namespace EmergenceSDK.Internal.Services
         
         public async UniTask<ServiceResponse<List<Persona>, Persona>> GetPersonasAsync()
         {
-            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) { throw new EmergenceAccessTokenDisabledException(); }
+            if (sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) { throw new EmergenceAccessTokenDisabledException(); }
             
             try
             { 
                 var url = EmergenceSingleton.Instance.Configuration.PersonaURL + "personas";
-                var response  = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: _sessionServiceInternal.EmergenceAccessTokenHeader);
-                if(response.Successful == false)
+                var response  = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: sessionServiceInternal.EmergenceAccessTokenHeader);
+                if(!response.Successful)
                     return new ServiceResponse<List<Persona>, Persona>(false);
                 
                 if (EmergenceUtils.ResponseError(response))
@@ -85,13 +85,13 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse<Persona>> GetCurrentPersonaAsync()
         {
-            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
 
             try
             {
                 string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
-                var response  = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: _sessionServiceInternal.EmergenceAccessTokenHeader);
-                if(response.Successful == false)
+                var response  = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: sessionServiceInternal.EmergenceAccessTokenHeader);
+                if(!response.Successful)
                 {
                     return new ServiceResponse<Persona>(false);
                 }
@@ -121,18 +121,18 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> CreatePersonaAsync(Persona persona)
         {
-            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
 
             await UpdateAvatarOnPersonaEdit(persona);
             
             string jsonPersona = SerializationHelper.Serialize(persona);
             string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
             var headers = EmergenceSingleton.DeviceIdHeader;
-            headers.Add("Authorization", _sessionServiceInternal.EmergenceAccessToken);
+            headers.Add("Authorization", sessionServiceInternal.EmergenceAccessToken);
 
             
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, jsonPersona, headers);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse(false);
             
             return new ServiceResponse(true);
@@ -158,7 +158,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> EditPersonaAsync(Persona persona)
         {
-            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
 
             try
             {
@@ -167,8 +167,8 @@ namespace EmergenceSDK.Internal.Services
                 string jsonPersona = SerializationHelper.Serialize(persona);
                 string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona";
 
-                var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Patch, url, jsonPersona, _sessionServiceInternal.EmergenceAccessTokenHeader);
-                if(response.Successful == false)
+                var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Patch, url, jsonPersona, sessionServiceInternal.EmergenceAccessTokenHeader);
+                if(!response.Successful)
                     return new ServiceResponse(false);
                 
                 if (EmergenceUtils.ResponseError(response))
@@ -203,7 +203,7 @@ namespace EmergenceSDK.Internal.Services
                 
                 string personaAvatarTokenUri = Helpers.InternalIPFSURLToHTTP(persona.avatar.tokenURI);
                 var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, personaAvatarTokenUri);
-                if(response.Successful == false)
+                if(!response.Successful)
                     return new ServiceResponse(false);
                 
                 if (EmergenceUtils.ResponseError(response))
@@ -225,14 +225,14 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> DeletePersonaAsync(Persona persona)
         {
-            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
 
             try
             {
                 string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "persona/" + persona.id;
 
-                var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Delete, url, headers: _sessionServiceInternal.EmergenceAccessTokenHeader);
-                if(response.Successful == false)
+                var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Delete, url, headers: sessionServiceInternal.EmergenceAccessTokenHeader);
+                if(!response.Successful)
                     return new ServiceResponse(false);
                 
                 if (EmergenceUtils.ResponseError(response))
@@ -259,14 +259,14 @@ namespace EmergenceSDK.Internal.Services
  
         public async UniTask<ServiceResponse> SetCurrentPersonaAsync(Persona persona)
         {
-            if (_sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
+            if (sessionService.HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) {  throw new EmergenceAccessTokenDisabledException(); }
             
             try
             {
                 string url = EmergenceSingleton.Instance.Configuration.PersonaURL + "setActivePersona/" + persona.id;
 
-                var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Patch, url, headers: _sessionServiceInternal.EmergenceAccessTokenHeader);
-                if(response.Successful == false)
+                var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Patch, url, headers: sessionServiceInternal.EmergenceAccessTokenHeader);
+                if(!response.Successful)
                     return new ServiceResponse(false);
                 
                 if (EmergenceUtils.ResponseError(response))

@@ -23,7 +23,7 @@ namespace EmergenceSDK.Internal.Services
             
             string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address + "&chain=" + InventoryKeys.ChainToKey[chain];
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse<List<InventoryItem>>(false);
             
             InventoryByOwnerResponse inventoryResponse = SerializationHelper.Deserialize<InventoryByOwnerResponse>(response.ResponseText);

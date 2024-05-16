@@ -17,7 +17,7 @@ namespace EmergenceSDK.Internal.Services
     {
         internal class WebRequestInfo
         {
-            private static int _lastId = -1;
+            private static int lastId = -1;
             public readonly DateTime Time;
             public readonly int Id;
             /// <summary>
@@ -27,12 +27,15 @@ namespace EmergenceSDK.Internal.Services
             /// </summary>
             public readonly Dictionary<string, string> Headers;
             public WebResponse Response { get; internal set; }
-
+            public readonly bool HadUploadHandler;
+            public readonly bool HadDownloadHandler;
             public WebRequestInfo(Dictionary<string, string> requestHeaders, UnityWebRequest request)
             {
-                Id = ++_lastId;
+                Id = ++lastId;
                 Time = DateTime.Now;
                 Headers = requestHeaders ?? new Dictionary<string, string>();
+                HadUploadHandler = request.uploadHandler != null;
+                HadDownloadHandler = request.downloadHandler != null;
                 var contentTypeFound = false;
                 foreach (var key in Headers.Keys)
                 {
@@ -200,26 +203,23 @@ namespace EmergenceSDK.Internal.Services
                 EmergenceLogger.LogInfo($"Request #{requestInfo.Id}: Performing {request.method} request to {request.url}, DeviceId: {EmergenceSingleton.Instance.CurrentDeviceId}");
                 var sendTask = request.SendWebRequest().WithCancellation(ct);
 
-                try
-                {
-                    await sendTask.Timeout(TimeSpan.FromMilliseconds(timeout));
+                await sendTask.Timeout(TimeSpan.FromMilliseconds(timeout));
 
-                    // Rest of the code if the request completes within the timeout
-                    response = request.downloadHandler is DownloadHandlerTexture
-                        ? new TextureWebResponse(request)
-                        : new WebResponse(request);
-                    requestInfo.Response = response;
+                // Rest of the code if the request completes within the timeout
+                response = request.downloadHandler is DownloadHandlerTexture
+                    ? new TextureWebResponse(request)
+                    : new WebResponse(request);
+                requestInfo.Response = response;
 
-                    return response;
-                }
-                catch (TimeoutException e)
-                {
-                    request.Abort(); // Abort the request
-                    response = new FailedWebResponse(e, request);
-                    requestInfo.Response = response;
+                return response;
+            }
+            catch (TimeoutException e)
+            {
+                request.Abort(); // Abort the request
+                response = new FailedWebResponse(e, request);
+                requestInfo.Response = response;
                     
-                    return response;
-                }
+                return response;
             }
             catch (UnityWebRequestException e)
             {

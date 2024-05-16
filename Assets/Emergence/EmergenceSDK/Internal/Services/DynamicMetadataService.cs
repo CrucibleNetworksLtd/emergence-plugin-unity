@@ -17,7 +17,7 @@ namespace EmergenceSDK.Internal.Services
             headers.Add("Authorization-header", authorization);
             var bodyData = "{\"metadata\": \"" + metadata + "\"}";
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Put, url, bodyData, headers);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse<string>(false);
             
             return new ServiceResponse<string>(true, response.ResponseText);
@@ -41,7 +41,7 @@ namespace EmergenceSDK.Internal.Services
             headers.Add("Authorization-header", authorization);
             var bodyData = "{\"metadata\": \"" + metadata + "\"}";
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, bodyData, headers);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse<string>(false);
             
             return new ServiceResponse<string>(true, response.ResponseText);

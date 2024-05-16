@@ -3,14 +3,15 @@ using System.Collections.Generic;
 
 namespace EmergenceSDK.Integrations.Futureverse.Types
 {
-    public struct FutureverseAssetTreePath
+    [Obsolete]
+    public struct AssetTreePathLegacy
     {
         public readonly string ID;
         public readonly string RdfType;
-        public readonly Dictionary<string, FutureverseAssetTreeObject> Objects;
+        public readonly Dictionary<string, AssetTreeObjectLegacy> Objects;
 
-        public FutureverseAssetTreePath(string id, string rdfType,
-            Dictionary<string, FutureverseAssetTreeObject> assetTreeObjects)
+        public AssetTreePathLegacy(string id, string rdfType,
+            Dictionary<string, AssetTreeObjectLegacy> assetTreeObjects)
         {
             ID = id ?? throw new ArgumentNullException();
             RdfType = rdfType ?? throw new ArgumentNullException();

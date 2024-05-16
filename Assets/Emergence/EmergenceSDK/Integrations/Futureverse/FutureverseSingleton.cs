@@ -1,43 +1,22 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
+using System;
+using EmergenceSDK.Integrations.Futureverse.Internal;
+using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace EmergenceSDK.Integrations.Futureverse
 {
-    public class FutureverseSingleton : SingletonComponent<FutureverseSingleton>
+    public sealed class FutureverseSingleton : InternalFutureverseSingleton
     {
-        public int requestTimeout = 60;
-        public EmergenceEnvironment environment;
-        public EmergenceEnvironment Environment => ForcedEnvironment ?? environment;
-        private EmergenceEnvironment? ForcedEnvironment { get; set; }
-        
-        internal void RunInForcedEnvironment(EmergenceEnvironment forcedEnvironment, Action action)
-        {
-            var prevForcedEnvironment = ForcedEnvironment;
-            ForcedEnvironment = forcedEnvironment;
-            try
-            {
-                action.Invoke();
-            }
-            finally
-            {
-                ForcedEnvironment = prevForcedEnvironment;
-            }
-        }
+        public int RequestTimeout => requestTimeout;
+        public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
 
-        internal async UniTask RunInForcedEnvironmentAsync(EmergenceEnvironment forcedEnvironment, Func<UniTask> action)
-        {
-            var prevForcedEnvironment = ForcedEnvironment;
-            ForcedEnvironment = forcedEnvironment;
-            try
-            {
-                await action();
-            }
-            finally
-            {
-                ForcedEnvironment = prevForcedEnvironment;
-            }
-        }
+        [SerializeField]
+        private int requestTimeout = 60;
+
+        [SerializeField]
+        private EmergenceEnvironment environment;
     }
 }

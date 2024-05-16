@@ -28,7 +28,7 @@ namespace EmergenceSDK.Implementations.Login.Types
         internal readonly string DeviceId;
         internal readonly LoginManager LoginManager;
 
-        private bool _ticking = false;
+        private bool ticking = false;
 
 
         internal EmergenceQrCode(LoginManager loginManager, Texture2D texture, string deviceId)
@@ -48,22 +48,22 @@ namespace EmergenceSDK.Implementations.Login.Types
             
         internal void StartTicking()
         {
-            if (_ticking) return;
-            _ticking = true;
+            if (ticking) return;
+            ticking = true;
             LoginManager.StartCoroutine(DoTicks());
         }
 
         internal void StopTicking()
         {
-            if (!_ticking) return;
-            _ticking = false;
+            if (!ticking) return;
+            ticking = false;
             
             if (LoginManager != null) { LoginManager.StopCoroutine(DoTicks()); }
         }
 
         private IEnumerator DoTicks()
         {
-            while (_ticking)
+            while (ticking)
             {
                 LoginManager.qrCodeTickEvent.Invoke(LoginManager, this);
                 yield return new WaitForSecondsRealtime(1);

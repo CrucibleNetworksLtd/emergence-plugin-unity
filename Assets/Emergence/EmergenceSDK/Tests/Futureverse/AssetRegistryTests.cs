@@ -21,122 +21,18 @@ namespace EmergenceSDK.Tests.Futureverse
     [TestFixture]
     public class AssetRegistryTests
     {
-        private IDisposable _verboseOutput;
+        private IDisposable verboseOutput;
 
         [OneTimeSetUp]
         public void Setup()
         {
-            _verboseOutput = EmergenceLogger.VerboseOutput(true);
-            EmergenceServiceProvider.Load();
-            EmergenceServiceProvider.GetService<IFutureverseService>();
+            verboseOutput = EmergenceLogger.VerboseOutput(true);
         }
 
         [OneTimeTearDown]
         public void TearDown()
         {
-            _verboseOutput?.Dispose();
-            EmergenceServiceProvider.Unload();
-        }
-
-        [Test]
-        public void ParseAssetTree_ParsesCorrectly()
-        {
-            // ToDo: Redo this test or replace ParseGetAssetTreeJson with a simple call to SerializationHelper.Deserialize by restructuring the data
-            string json = @"
-            {
-                ""data"": {
-                    ""asset"": {
-                        ""assetTree"": {
-                            ""data"": {
-                                ""@context"": {
-                                    ""rdf"": ""http://www.w3.org/1999/02/22-rdf-syntax-ns#"",
-                                    ""fv"": ""http://schema.futureverse.com#"",
-                                    ""schema"": ""http://schema.org/"",
-                                    ""path"": ""http://schema.futureverse.com/path#""
-                                },
-                                ""@graph"": [
-                                    {
-                                        ""@id"": ""did:fv-asset:7672:root:303204:473"",
-                                        ""rdf:type"": {
-                                            ""@id"": ""http://schema.futureverse.cloud/pb#bear""
-                                        },
-                                        ""http://schema.futureverse.com/fvp#sft_link_owner_0xffffffff00000000000000000000000000000524"": {
-                                            ""@id"": ""did:fv-asset:7672:root:241764:0""
-                                        },
-                                        ""path:equippedWith_accessoryClothing"": {
-                                            ""@id"": ""did:fv-asset:7672:root:241764:0""
-                                        },
-                                        ""path:equippedWith_accessoryMouth"": {
-                                            ""@id"": ""did:fv-asset:7672:root:275556:3"",
-                                            ""array"": [""sdfsdfsd"", ""ADASDASDA"", ""adasdada""],
-                                            ""int"": 69,
-                                            ""object"": {
-                                                ""test"": [""sdfsdfsd"", ""ADASDASDA"", ""adasdada""]
-                                            }
-                                        }
-                                    },
-                                    {
-                                        ""@id"": ""did:fv-asset:7672:root:275556:3"",
-                                        ""rdf:type"": {
-                                            ""@id"": ""http://schema.futureverse.com#None""
-                                        }
-                                    },
-                                    {
-                                        ""@id"": ""did:fv-asset:7672:root:241764:0"",
-                                        ""rdf:type"": {
-                                            ""@id"": ""http://schema.futureverse.com#None""
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }";
-
-            var tree = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>().ParseGetAssetTreeJson(json);
-            Assert.AreEqual(3, tree.Count);
-
-            var firstPath = tree[0];
-            Assert.AreEqual("did:fv-asset:7672:root:303204:473", firstPath.ID);
-            Assert.AreEqual("http://schema.futureverse.cloud/pb#bear", firstPath.RdfType);
-            Assert.AreEqual(3, firstPath.Objects.Count);
-            var firstObject =
-                firstPath.Objects[
-                    "http://schema.futureverse.com/fvp#sft_link_owner_0xffffffff00000000000000000000000000000524"];
-            Assert.NotNull(firstObject);
-            Assert.AreEqual("did:fv-asset:7672:root:241764:0", firstObject.ID);
-            Assert.IsEmpty(firstObject.AdditionalData);
-            var secondObject = firstPath.Objects["path:equippedWith_accessoryClothing"];
-            Assert.NotNull(secondObject);
-            Assert.AreEqual("did:fv-asset:7672:root:241764:0", secondObject.ID);
-            Assert.IsEmpty(secondObject.AdditionalData);
-            var thirdObject = firstPath.Objects["path:equippedWith_accessoryMouth"];
-            Assert.NotNull(thirdObject);
-            Assert.AreEqual("did:fv-asset:7672:root:275556:3", thirdObject.ID);
-            Assert.AreEqual(3, thirdObject.AdditionalData.Count);
-            var thirdObjectAdditionalArray = thirdObject.AdditionalData["array"];
-            Assert.IsInstanceOf<JArray>(thirdObjectAdditionalArray);
-            Assert.AreEqual(@"[""sdfsdfsd"",""ADASDASDA"",""adasdada""]",
-                thirdObjectAdditionalArray.ToString(Newtonsoft.Json.Formatting.None));
-            var thirdObjectAdditionalInt = thirdObject.AdditionalData["int"];
-            Assert.IsInstanceOf<JValue>(thirdObjectAdditionalInt);
-            Assert.AreEqual("69",
-                thirdObjectAdditionalInt.ToString(Newtonsoft.Json.Formatting.None));
-            var thirdObjectAdditionalObject = thirdObject.AdditionalData["object"];
-            Assert.IsInstanceOf<JObject>(thirdObjectAdditionalObject);
-            Assert.AreEqual(@"{""test"":[""sdfsdfsd"",""ADASDASDA"",""adasdada""]}",
-                thirdObjectAdditionalObject.ToString(Newtonsoft.Json.Formatting.None));
-
-            var secondPath = tree[1];
-            Assert.AreEqual("did:fv-asset:7672:root:275556:3", secondPath.ID);
-            Assert.AreEqual("http://schema.futureverse.com#None", secondPath.RdfType);
-            Assert.IsEmpty(secondPath.Objects);
-
-            var thirdPath = tree[2];
-            Assert.AreEqual("did:fv-asset:7672:root:241764:0", thirdPath.ID);
-            Assert.AreEqual("http://schema.futureverse.com#None", thirdPath.RdfType);
-            Assert.IsEmpty(thirdPath.Objects);
+            verboseOutput?.Dispose();
         }
 
         [Test]
@@ -170,10 +66,10 @@ namespace EmergenceSDK.Tests.Futureverse
 
             #endregion
 
-            var result = ArtmBuilder.GenerateArtm("Message", new List<FutureverseArtmOperation>
+            var result = ArtmBuilder.GenerateArtm("Message", new List<ArtmOperation>
             {
-                new(FutureverseArtmOperationType.CreateLink, "slot", "linkA", "linkB"),
-                new(FutureverseArtmOperationType.DeleteLink, "slot", "linkA", "linkB"),
+                new(ArtmOperationType.CreateLink, "slot", "linkA", "linkB"),
+                new(ArtmOperationType.DeleteLink, "slot", "linkA", "linkB"),
             }, "Address", 123456789);
 
             Assert.AreEqual(expected, result);

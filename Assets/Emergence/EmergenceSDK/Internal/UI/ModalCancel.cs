@@ -13,7 +13,7 @@ namespace EmergenceSDK.Internal.UI
 
         public delegate void ModalPromptCancelCallback();
 
-        private ModalPromptCancelCallback _callback = null;
+        private ModalPromptCancelCallback callback = null;
 
         private void Awake()
         {
@@ -31,7 +31,7 @@ namespace EmergenceSDK.Internal.UI
         {
             label.text = message;
             gameObject.SetActive(true);
-            _callback = cancelCallback;
+            callback = cancelCallback;
         }
 
         public void Hide()
@@ -41,7 +41,7 @@ namespace EmergenceSDK.Internal.UI
 
         private void OnCancelClicked()
         {
-            _callback?.Invoke();
+            callback?.Invoke();
         }
     }
 }

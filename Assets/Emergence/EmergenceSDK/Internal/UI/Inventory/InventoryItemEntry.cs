@@ -10,9 +10,9 @@ namespace EmergenceSDK.Internal.UI.Inventory
 {
     public class InventoryItemEntry : MonoBehaviour
     {
-        [FormerlySerializedAs("itemThumbnail")] [SerializeField] 
+        [SerializeField] 
         private InventoryItemThumbnail ItemThumbnail;
-        [FormerlySerializedAs("itemName")] [SerializeField] 
+        [SerializeField] 
         private TextMeshProUGUI ItemName;
         private string url;
 

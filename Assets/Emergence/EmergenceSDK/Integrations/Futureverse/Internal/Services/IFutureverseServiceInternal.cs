@@ -15,6 +15,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         FuturepassInformationResponse FuturepassInformation { set; }
         UniTask<ServiceResponse<InventoryResponse>> GetFutureverseInventory();
         UniTask<ServiceResponse<List<InventoryItem>>> GetFutureverseInventoryAsInventoryItems();
-        List<FutureverseAssetTreePath> ParseGetAssetTreeJson(string json);
+        [Obsolete] List<AssetTreePathLegacy> ParseGetAssetTreeResponseJsonLegacy(string json);
+        List<AssetTreePath> DeserializeGetAssetTreeResponseJson(string json);
     }
 }

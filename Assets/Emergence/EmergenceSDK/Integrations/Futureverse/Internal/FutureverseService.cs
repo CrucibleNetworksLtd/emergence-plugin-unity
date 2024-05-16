@@ -69,11 +69,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             var url =
                 $"{GetFuturepassApiUrl()}linked-futurepass?eoa={EmergenceSingleton.Instance.Configuration.Chain.ChainID}:EVM:{walletService.WalletAddress}";
 
-            var response = await WebRequestService.SendAsyncWebRequest(
-                RequestMethod.Get,
-                url,
-                timeout: FutureverseSingleton.Instance.requestTimeout * 1000
-                );
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
             
             if (!response.Successful)
                 return new ServiceResponse<LinkedFuturepassResponse>(response);
@@ -91,7 +87,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             var response = await WebRequestService.SendAsyncWebRequest(
                 RequestMethod.Get,
                 url,
-                timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
 
             
             if (!response.Successful)
@@ -109,7 +105,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 RequestMethod.Post,
                 GetArApiUrl(),
                 body,
-                timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
             
             if (!response.Successful)
                 return new ServiceResponse<InventoryResponse>(response, false, new InventoryResponse());
@@ -121,7 +117,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         public async UniTask<ServiceResponse<List<InventoryItem>>> GetFutureverseInventoryAsInventoryItems()
         {
             var futureverseInventory = await GetFutureverseInventory();
-            if (futureverseInventory.Successful == false)
+            if (!futureverseInventory.Successful)
                 return new ServiceResponse<List<InventoryItem>>(futureverseInventory, false);
             var ret = new List<InventoryItem>();
             foreach (var edge in futureverseInventory.Result1.data.assets.edges)
@@ -171,20 +167,22 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return newItem;
         }
 
-        private List<FutureverseAssetTreePath> ParseGetAssetTreeResponse(WebResponse response)
+        [Obsolete]
+        private List<AssetTreePathLegacy> ParseGetAssetTreeResponseLegacy(WebResponse response)
         {
-            if (response.StatusCode == 204) return new List<FutureverseAssetTreePath>();
+            if (response.StatusCode == 204) return new List<AssetTreePathLegacy>();
             if (!response.Successful) throw new FutureverseRequestFailedException(response);
             
             return response.StatusCode is >= 200 and <= 299
-                ? ParseGetAssetTreeJson(response.ResponseText)
-                : new List<FutureverseAssetTreePath>();
+                ? ParseGetAssetTreeResponseJsonLegacy(response.ResponseText)
+                : new List<AssetTreePathLegacy>();
         }
 
-        public List<FutureverseAssetTreePath> ParseGetAssetTreeJson(string json)
+        [Obsolete]
+        public List<AssetTreePathLegacy> ParseGetAssetTreeResponseJsonLegacy(string json)
         {
             var parsed = SerializationHelper.Parse(json);
-            List<FutureverseAssetTreePath> assetTree = new();
+            List<AssetTreePathLegacy> assetTree = new();
             if (parsed is JObject obj)
             {
                 if (obj.SelectToken("data.asset.assetTree.data.@graph") is JArray dataArray)
@@ -193,10 +191,10 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     {
                         var id = (string)data.SelectToken("@id");
                         var rdfType = (string)data.SelectToken("rdf:type.@id");
-                        FutureverseAssetTreePath assetPath = new(
+                        AssetTreePathLegacy assetPathLegacy = new(
                             id,
                             rdfType,
-                            new Dictionary<string, FutureverseAssetTreeObject>()
+                            new Dictionary<string, AssetTreeObjectLegacy>()
                         );
 
                         if (data is JObject dataObject)
@@ -206,7 +204,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                                 if (property.Name is "@id" or "rdf:type") continue;
 
                                 if (property.Value is not JObject jObject) continue;
-                                var treeObject = new FutureverseAssetTreeObject(
+                                var treeObject = new AssetTreeObjectLegacy(
                                     (string)jObject.SelectToken("@id"),
                                     new Dictionary<string, JToken>()
                                 );
@@ -217,11 +215,11 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                                     treeObject.AdditionalData.Add(childProperty.Name, childProperty.Value);
                                 }
 
-                                assetPath.Objects.Add(property.Name, treeObject);
+                                assetPathLegacy.Objects.Add(property.Name, treeObject);
                             }
                         }
 
-                        assetTree.Add(assetPath);
+                        assetTree.Add(assetPathLegacy);
                     }
 
                     return assetTree;
@@ -243,15 +241,15 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             };
             return SerializationHelper.Serialize(requestBody);
         }
-
-        public async UniTask<List<FutureverseAssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId)
+        
+        public async UniTask<List<AssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId)
         {
             var body = BuildGetAssetTreeRequestBody(tokenId, collectionId);
             var response = await WebRequestService.SendAsyncWebRequest(
                 RequestMethod.Post,
                 GetArApiUrl(),
                 body,
-                timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
             
             if (!IsArResponseValid(response, out var jObject))
             {
@@ -259,9 +257,33 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 throw new FutureverseAssetRegisterErrorException(response.ResponseText);
             }
             
-            return ParseGetAssetTreeResponse(response);
+            return DeserializeGetAssetTreeResponseJson(response.ResponseText);
         }
-        
+
+        public List<AssetTreePath> DeserializeGetAssetTreeResponseJson(string json)
+        {
+            return SerializationHelper.Deserialize<List<AssetTreePath>>(SerializationHelper.Parse(json).SelectToken("data.asset.assetTree.data.@graph"));
+        }
+
+        [Obsolete]
+        public async UniTask<List<AssetTreePathLegacy>> GetAssetTreeAsyncLegacy(string tokenId, string collectionId)
+        {
+            var body = BuildGetAssetTreeRequestBody(tokenId, collectionId);
+            var response = await WebRequestService.SendAsyncWebRequest(
+                RequestMethod.Post,
+                GetArApiUrl(),
+                body,
+                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
+            
+            if (!IsArResponseValid(response, out var jObject))
+            {
+                LogArResponseErrors(jObject);
+                throw new FutureverseAssetRegisterErrorException(response.ResponseText);
+            }
+            
+            return ParseGetAssetTreeResponseLegacy(response);
+        }
+
         private static string BuildGetNonceForChainAddressRequestBody(string eoaAddress)
         {
             var requestBody = new
@@ -345,7 +367,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     RequestMethod.Post,
                     GetArApiUrl(),
                     body,
-                    timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                    timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
                 
                 if (!IsArResponseValid(response, out var jObject) || !ParseStatus(jObject, out var transactionStatus))
                 {
@@ -400,7 +422,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return ArtmStatus.Pending;
         }
         
-        public async Task<ArtmTransactionResponse> SendArtmAsync(string message, List<FutureverseArtmOperation> artmOperations, bool retrieveStatus)
+        public async Task<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus)
         {
             var walletService = EmergenceServiceProvider.GetService<IWalletService>();
 
@@ -419,7 +441,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     RequestMethod.Post,
                     GetArApiUrl(),
                     body,
-                    timeout: FutureverseSingleton.Instance.requestTimeout * 1000
+                    timeout: FutureverseSingleton.Instance.RequestTimeout * 1000
                     );
 
                 if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseNonce(jObject, out var nonce))
@@ -445,7 +467,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     RequestMethod.Post,
                     GetArApiUrl(),
                     body,
-                    timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                    timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
                 
                 if (!IsArResponseValid(submitResponse, out var jObject) || !ParseTransactionHash(jObject, out transactionHash))
                 {

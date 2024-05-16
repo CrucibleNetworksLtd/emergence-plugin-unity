@@ -9,17 +9,17 @@ namespace EmergenceSDK.Tests.Emergence.Logger
     [TestFixture]
     public class EmergenceLoggerTests
     {
-        private IDisposable _verboseOutput;
+        private IDisposable verboseOutput;
         [OneTimeSetUp]
         public void Setup()
         {
-            _verboseOutput = EmergenceLogger.VerboseOutput(true);
+            verboseOutput = EmergenceLogger.VerboseOutput(true);
         }
 
         [OneTimeTearDown]
         public void TearDown()
         {
-            _verboseOutput?.Dispose();
+            verboseOutput?.Dispose();
         }
 
         [Test]

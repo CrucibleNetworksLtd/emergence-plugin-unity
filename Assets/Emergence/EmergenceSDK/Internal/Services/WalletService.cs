@@ -24,12 +24,12 @@ namespace EmergenceSDK.Internal.Services
         public bool IsValidWallet => !string.IsNullOrEmpty(WalletAddress?.Trim()) && !string.IsNullOrEmpty(ChecksummedWalletAddress?.Trim());
         public string WalletAddress { get; private set; } = string.Empty;
         public string ChecksummedWalletAddress { get; private set; } = string.Empty;
-        private readonly ISessionServiceInternal _sessionServiceInternal;
-        private bool _completedHandshake;
+        private readonly ISessionServiceInternal sessionServiceInternal;
+        private bool completedHandshake;
 
         public WalletService(ISessionServiceInternal sessionServiceInternal)
         {
-            this._sessionServiceInternal = sessionServiceInternal;
+            this.sessionServiceInternal = sessionServiceInternal;
         }
 
         public async UniTask<ServiceResponse<bool>> ReinitializeWalletConnect()
@@ -37,7 +37,7 @@ namespace EmergenceSDK.Internal.Services
             string url = StaticConfig.APIBase + "reinitializewalletconnect";
 
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
-            if(response.Successful == false)
+            if(!response.Successful)
             {
                 return new ServiceResponse<bool>(response, false, false);
             }
@@ -62,7 +62,7 @@ namespace EmergenceSDK.Internal.Services
             string url = StaticConfig.APIBase + "request-to-sign";
             
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: EmergenceSingleton.DeviceIdHeader);
-            if(response.Successful == false)
+            if(!response.Successful)
             {
                 return new ServiceResponse<string>(response, false);
             }
@@ -109,13 +109,13 @@ namespace EmergenceSDK.Internal.Services
             {
                 if (processedResponse == null)
                 {
-                    string errorMessage = _completedHandshake ? "Handshake already completed." : "Handshake failed, check server status.";
-                    int errorCode = _completedHandshake ? 0 : -1;
+                    string errorMessage = completedHandshake ? "Handshake already completed." : "Handshake failed, check server status.";
+                    int errorCode = completedHandshake ? 0 : -1;
                     EmergenceLogger.LogError(errorMessage, errorCode);
                     return new ServiceResponse<string>(response, false);
                 }
                 
-                _completedHandshake = true;
+                completedHandshake = true;
                 WalletAddress = processedResponse.address;
                 ChecksummedWalletAddress = processedResponse.checksummedAddress;
                 return new ServiceResponse<string>(response, true, processedResponse.address);
@@ -147,7 +147,7 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse<string>> GetBalanceAsync()
         {
-            if (((ISessionService)_sessionServiceInternal).DisconnectInProgress)
+            if (((ISessionService)sessionServiceInternal).DisconnectInProgress)
                 return new ServiceResponse<string>(false);
     
             string url = StaticConfig.APIBase + "getbalance" + 
@@ -155,7 +155,7 @@ namespace EmergenceSDK.Internal.Services
                          "&address=" + WalletAddress;
             
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
-            if(response.Successful == false)
+            if(!response.Successful)
             {
                 return new ServiceResponse<string>(response, false);
             }
@@ -186,12 +186,12 @@ namespace EmergenceSDK.Internal.Services
         {
             string dataString = SerializationHelper.Serialize(data, false);
 
-            string url = StaticConfig.APIBase + "validate-signed-message" + "?request=" + _sessionServiceInternal.EmergenceAccessToken;
+            string url = StaticConfig.APIBase + "validate-signed-message" + "?request=" + sessionServiceInternal.EmergenceAccessToken;
 
             try
             {
                 var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, dataString);
-                if(response.Successful == false)
+                if(!response.Successful)
                 {
                     return new ServiceResponse<bool>(false);
                 }

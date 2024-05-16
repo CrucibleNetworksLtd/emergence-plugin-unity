@@ -2,14 +2,14 @@
 
 namespace EmergenceSDK.Integrations.Futureverse.Types
 {
-    public struct FutureverseArtmOperation
+    public struct ArtmOperation
     {
-        public readonly FutureverseArtmOperationType OperationType;
+        public readonly ArtmOperationType OperationType;
         public readonly string Slot;
         public readonly string LinkA;
         public readonly string LinkB;
 
-        public FutureverseArtmOperation(FutureverseArtmOperationType operationType, string slot, string linkA,
+        public ArtmOperation(ArtmOperationType operationType, string slot, string linkA,
             string linkB)
         {
             OperationType = operationType;

@@ -13,8 +13,8 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 {
     public class SendArtmDemo : DemoStation<SendArtmDemo>, ILoggedInDemoStation
     {
-        private IFutureverseService _futureverseService;
-        private ISessionService _sessionService;
+        private IFutureverseService futureverseService;
+        private ISessionService sessionService;
 
         public bool IsReady
         {
@@ -28,8 +28,8 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 
         private void Start()
         {
-            _futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            _sessionService = EmergenceServiceProvider.GetService<ISessionService>();
+            futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
 
             instructionsGO.SetActive(false);
             IsReady = false;
@@ -47,7 +47,7 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 
         private void Update()
         {
-            var futurepassEnabled = _sessionService.HasLoginSetting(LoginSettings.EnableFuturepass);
+            var futurepassEnabled = sessionService.HasLoginSetting(LoginSettings.EnableFuturepass);
             if (HasBeenActivated() && IsReady && futurepassEnabled)
             {
                 SendTestArtm().Forget();
@@ -68,13 +68,13 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 
             try
             {
-                var artmTransactionResponse = await _futureverseService.SendArtmAsync("An update is being made to your inventory",
-                    new List<FutureverseArtmOperation>
-                        { new(FutureverseArtmOperationType.DeleteLink, "equippedWith_Engines", "did:fv-asset:7672:root:358500:626", "did:fv-asset:7672:root:359524:626") }, false);
+                var artmTransactionResponse = await futureverseService.SendArtmAsync("An update is being made to your inventory",
+                    new List<ArtmOperation>
+                        { new(ArtmOperationType.DeleteLink, "equippedWith_Engines", "did:fv-asset:7672:root:358500:626", "did:fv-asset:7672:root:359524:626") }, false);
                 
                 EmergenceLogger.LogInfo("ARTM successfully sent: " + artmTransactionResponse.TransactionHash, true);
                 EmergenceLogger.LogInfo("Retrieving transaction status... ", true);
-                var artmStatusAsync = await _futureverseService.GetArtmStatusAsync(artmTransactionResponse.TransactionHash);
+                var artmStatusAsync = await futureverseService.GetArtmStatusAsync(artmTransactionResponse.TransactionHash);
                 EmergenceLogger.LogInfo("ARTM transaction status: " + artmStatusAsync, true);
                 if (artmStatusAsync != ArtmStatus.Success)
                 {

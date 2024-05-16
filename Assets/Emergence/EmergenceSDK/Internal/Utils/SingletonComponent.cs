@@ -6,9 +6,9 @@ namespace EmergenceSDK.Internal.Utils
     {
         #region Fields
 
-        private static T _instance;
+        private static T instance;
         private static readonly object Lock = new object();
-        private static bool _isCreatingDefaultComponent;
+        private static bool isCreatingDefaultComponent;
 
         #endregion
 
@@ -19,33 +19,33 @@ namespace EmergenceSDK.Internal.Utils
             {
                 lock (Lock)
                 {
-                    if (_instance == null)
+                    if (instance == null)
                     {
                         T[] objectsOfType = FindObjectsOfType(typeof(T)) as T[];
                         if (objectsOfType != null)
                         {
                             if (objectsOfType.Length > 0)
                             {
-                                _instance = objectsOfType[0];
+                                instance = objectsOfType[0];
                             }
 
                             if (objectsOfType.Length > 1)
                             {
-                                return _instance;
+                                return instance;
                             }
                         }
 
-                        if (_instance == null)
+                        if (instance == null)
                         {
-                            _isCreatingDefaultComponent = true;
+                            isCreatingDefaultComponent = true;
                             GameObject singletonGameObject = new GameObject { name = typeof(T).ToString() };
-                            _instance = singletonGameObject.AddComponent<T>();
-                            _instance.InitializeDefault();
-                            _isCreatingDefaultComponent = false;
+                            instance = singletonGameObject.AddComponent<T>();
+                            instance.InitializeDefault();
+                            isCreatingDefaultComponent = false;
                         }
                     }
 
-                    return _instance;
+                    return instance;
                 }
             }
         }
@@ -56,7 +56,7 @@ namespace EmergenceSDK.Internal.Utils
         {
             get
             {
-                return _instance != null;
+                return instance != null;
             }
         }
 
@@ -65,7 +65,7 @@ namespace EmergenceSDK.Internal.Utils
         #region Initialization
         public virtual void Awake()
         {
-            if (_isCreatingDefaultComponent == false && Instance != this)
+            if (!isCreatingDefaultComponent && Instance != this)
             {
                 var allcomponents = gameObject.GetComponents<Component>();
                 if (allcomponents.Length == 2)

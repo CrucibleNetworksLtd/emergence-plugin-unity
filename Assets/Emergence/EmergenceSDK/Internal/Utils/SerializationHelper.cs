@@ -40,6 +40,24 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
 
+        public static T Deserialize<T>(JToken jToken)
+        {
+            try
+            {
+                if (!typeof(T).IsDefined(typeof(StoreOriginalJTokensAttribute)))
+                {
+                    return jToken.ToObject<T>();
+                }
+                
+                return DeserializeObjectWithOriginalJTokens<T>(jToken);
+            }
+            catch (Exception e)
+            {
+                EmergenceLogger.LogError($"Error deserializing {typeof(T).Name}: {e.Message}");
+                throw;
+            }
+        }
+
         public static JToken Parse(string jsonString)
         {
             try
@@ -61,9 +79,13 @@ namespace EmergenceSDK.Internal.Utils
         
         private static T DeserializeObjectWithOriginalJTokens<T>(string serializedState)
         {
+            return DeserializeObjectWithOriginalJTokens<T>(JToken.Parse(serializedState));
+        }
+        
+        private static T DeserializeObjectWithOriginalJTokens<T>(JToken jToken)
+        {
             try
             {  
-                var jToken = JToken.Parse(serializedState);
                 var result = jToken.ToObject<T>();
 
                 PopulateOriginalJsonPropertiesAndFields(typeof(T), result, jToken);

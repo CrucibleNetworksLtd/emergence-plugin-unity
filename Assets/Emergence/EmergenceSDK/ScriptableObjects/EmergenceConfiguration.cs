@@ -10,7 +10,7 @@ namespace EmergenceSDK.ScriptableObjects
     {
         public string defaultIpfsGateway = "http://ipfs.openmeta.xyz/ipfs/";
         [SerializeField] private EmergenceChain DevelopmentChain;
-        [FormerlySerializedAs("Chain")][SerializeField] private EmergenceChain StagingChain;
+        [SerializeField] private EmergenceChain StagingChain;
         [SerializeField] private EmergenceChain ProductionChain;
 
         public EmergenceChain Chain

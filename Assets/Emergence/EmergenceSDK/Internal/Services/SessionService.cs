@@ -9,9 +9,7 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using EmergenceSDK.Types.Responses;
-using UniJSON;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace EmergenceSDK.Internal.Services
 {
@@ -43,7 +41,7 @@ namespace EmergenceSDK.Internal.Services
                 var url = StaticConfig.APIBase + "isConnected";
 
                 var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: EmergenceSingleton.DeviceIdHeader);
-                if(response.Successful == false)
+                if(!response.Successful)
                 {
                     return new ServiceResponse<IsConnectedResponse>(false);
                 }
@@ -73,7 +71,7 @@ namespace EmergenceSDK.Internal.Services
                 var headers = EmergenceSingleton.DeviceIdHeader;
                 headers.Add("auth", EmergenceAccessToken);
                 var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, StaticConfig.APIBase + "killSession", headers: headers);
-                if (response.Successful == false)
+                if (!response.Successful)
                 {
                     return new ServiceResponse(false);
                 }
@@ -183,7 +181,7 @@ namespace EmergenceSDK.Internal.Services
             string url = StaticConfig.APIBase + "get-access-token";
             var headers = new Dictionary<string, string> { { "deviceId", EmergenceSingleton.Instance.CurrentDeviceId } };
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, "", headers);
-            if(response.Successful == false)
+            if(!response.Successful)
                 return new ServiceResponse<string>(false);
             var accessTokenResponse = SerializationHelper.Deserialize<BaseResponse<AccessTokenResponse>>(response.ResponseText);
             EmergenceAccessToken = SerializationHelper.Serialize(accessTokenResponse.message.AccessToken, false);
