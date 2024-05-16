@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Internal;
 using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Internal.UI.Screens;
@@ -15,16 +16,15 @@ using UnityEngine.Serialization;
 
 namespace EmergenceSDK
 {
-    public class EmergenceSingleton : SingletonComponent<EmergenceSingleton>
+    public sealed class EmergenceSingleton : EmergenceSingletonInternal
     {
-
         public EmergenceConfiguration Configuration;
 
         public string CurrentDeviceId { get; set; }
 
         public event Action OnGameClosing;
 
-        [SerializeField] public EmergenceEnvironment environment;
+        [SerializeField] private EmergenceEnvironment environment;
         public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
@@ -88,10 +88,6 @@ namespace EmergenceSDK
             }
         }
 
-        internal IDisposable ForcedEnvironment(EmergenceEnvironment? newEnvironment) => new ForcedEnvironmentManager(newEnvironment);
-        
-        private EmergenceEnvironment? CurrentForcedEnvironment { get; set; }
-        
         public static Dictionary<string, string> DeviceIdHeader => new() { { "deviceId", Instance.CurrentDeviceId } };
         
         private void OpenOverlayFirstTime()
@@ -230,13 +226,6 @@ namespace EmergenceSDK
         {
             base.InitializeDefault();
             Configuration = Resources.Load<EmergenceConfiguration>("Configuration");
-        }
-        
-        private class ForcedEnvironmentManager : FlagLifecycleManager<EmergenceEnvironment?>
-        {
-            public ForcedEnvironmentManager(EmergenceEnvironment? newValue) : base(newValue) { }
-            protected override EmergenceEnvironment? GetCurrentFlag1Value() => Instance.CurrentForcedEnvironment;
-            protected override void SetFlag1Value(EmergenceEnvironment? newValue) => Instance.CurrentForcedEnvironment = newValue;
         }
     }
 }

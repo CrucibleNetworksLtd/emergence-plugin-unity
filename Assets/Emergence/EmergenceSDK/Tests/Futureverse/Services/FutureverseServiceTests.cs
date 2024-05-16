@@ -2,6 +2,7 @@
 using System.Collections;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse;
+using EmergenceSDK.Integrations.Futureverse.Internal;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -38,7 +39,7 @@ namespace EmergenceSDK.Tests.Futureverse.Services
         {
             return UniTask.ToCoroutine(async () =>
             {
-                using var forcedEnvironment = FutureverseSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Staging);
+                using var forcedEnvironment = FutureverseSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Staging);
                 await futureverseService.GetAssetTreeAsyncLegacy("473", "7672:root:303204");
             });
         }
@@ -48,7 +49,7 @@ namespace EmergenceSDK.Tests.Futureverse.Services
         {
             return UniTask.ToCoroutine(async () =>
             {
-                using var forcedEnvironment = FutureverseSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Staging);
+                using var forcedEnvironment = FutureverseSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Staging);
                 var artmStatusAsync = await futureverseService.GetArtmStatusAsync("0x69c94ea3e0e7dea32d2d00813a64017dfbbd42dd18f5d56a12c907dccc7bb6d9");
                 Assert.Pass("Passed with transaction status: " + artmStatusAsync);
             });
@@ -59,7 +60,7 @@ namespace EmergenceSDK.Tests.Futureverse.Services
         {
             return UniTask.ToCoroutine(async () =>
             {
-                using var forcedEnvironment = FutureverseSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Staging);
+                using var forcedEnvironment = FutureverseSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Staging);
                 using var spoofedWallet = walletServiceDevelopmentOnly.SpoofedWallet("0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", "0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c");
 
                 var response = await futureverseService.GetLinkedFuturepassAsync();
@@ -74,7 +75,7 @@ namespace EmergenceSDK.Tests.Futureverse.Services
         {
             return UniTask.ToCoroutine(async () =>
             {
-                using var forcedEnvironment = FutureverseSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Staging);
+                using var forcedEnvironment = FutureverseSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Staging);
                 using var spoofedWallet = walletServiceDevelopmentOnly.SpoofedWallet("0xec6f83b0d5ada27c68fc64cf63f1db56cb11a37c", "0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c");
 
                 var response = await futureverseService.GetFuturepassInformationAsync("7668:root:0xffffffff0000000000000000000000000003b681");

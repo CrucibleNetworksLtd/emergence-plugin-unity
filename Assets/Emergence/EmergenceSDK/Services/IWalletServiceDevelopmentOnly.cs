@@ -12,7 +12,7 @@ namespace EmergenceSDK.Services
     {
         /// <summary>
         /// <see cref="IDisposable"/> object that will keep a spoofed wallet active until disposed.
-        /// <remarks>THIS IS A TEMPORARY DEVELOPER FEATURE, MEANT ONLY FOR TESTING.<para/>Use with "using" keyword is strongly recommended for easiest management<para/>This will not work at all with any write requests, and has unexpected results for read requests as well.</remarks>
+        /// <remarks>THIS IS A DEVELOPER FEATURE, MEANT ONLY FOR TESTING.<para/>Use with "using" keyword is strongly recommended for easiest management<para/>This will not work at all with any write requests, and has unexpected results for read requests as well.</remarks>
         /// </summary>
         /// <param name="wallet">Wallet address to spoof</param>
         /// <param name="checksummedWallet">Checksummed wallet address to spoof</param>
@@ -21,7 +21,7 @@ namespace EmergenceSDK.Services
 
         /// <summary>
         /// Performs an action while the wallet service thinks another specified wallet address is currently cached in
-        /// <remarks>OBSOLETE. SEE <see cref="SpoofedWallet"/>.<para/>THIS IS A TEMPORARY DEVELOPER FEATURE, MEANT ONLY FOR TESTING.<para/>This will not work at all with any write requests, and has unexpected results for read requests as well.</remarks>
+        /// <remarks>OBSOLETE. SEE <see cref="SpoofedWallet"/>.<para/>THIS IS A DEVELOPER FEATURE, MEANT ONLY FOR TESTING.<para/>This will not work at all with any write requests, and has unexpected results for read requests as well.</remarks>
         /// </summary>
         /// <param name="walletAddress">Spoofed wallet address</param>
         /// <param name="checksummedWalletAddress">Spoofed checksummed wallet address</param>
@@ -31,7 +31,7 @@ namespace EmergenceSDK.Services
 
         /// <summary>
         /// Performs an action asynchronously while the wallet service thinks another specified wallet address is currently cached in
-        /// <remarks>OBSOLETE. SEE <see cref="SpoofedWallet"/>.<para/>THIS IS A TEMPORARY DEVELOPER FEATURE, MEANT ONLY FOR TESTING.<para/>This will not work at all with any write requests, and has unexpected results for read requests as well.</remarks>
+        /// <remarks>OBSOLETE. SEE <see cref="SpoofedWallet"/>.<para/>THIS IS A DEVELOPER FEATURE, MEANT ONLY FOR TESTING.<para/>This will not work at all with any write requests, and has unexpected results for read requests as well.</remarks>
         /// </summary>
         /// <param name="walletAddress">Spoofed wallet address</param>
         /// <param name="checksummedWalletAddress">Spoofed checksummed wallet address</param>

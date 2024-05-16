@@ -2,6 +2,7 @@
 using System.Collections;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse;
+using EmergenceSDK.Integrations.Futureverse.Internal;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Internal.Utils;
@@ -31,21 +32,21 @@ namespace EmergenceSDK.Tests.Futureverse
         [Test]
         public void ForcedEnvironment_IsDevelopment()
         {
-            using var forcedEnvironment = FutureverseSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Development);
+            using var forcedEnvironment = FutureverseSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Development);
             Assert.AreEqual(EmergenceEnvironment.Development, FutureverseSingleton.Instance.Environment);
         }
 
         [Test]
         public void ForcedEnvironment_IsStaging()
         {
-            using var forcedEnvironment = FutureverseSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Staging);
+            using var forcedEnvironment = FutureverseSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Staging);
             Assert.AreEqual(EmergenceEnvironment.Staging, FutureverseSingleton.Instance.Environment);
         }
 
         [Test]
         public void ForcedEnvironment_IsProduction()
         {
-            using var forcedEnvironment = FutureverseSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Production);
+            using var forcedEnvironment = FutureverseSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Production);
             Assert.AreEqual(EmergenceEnvironment.Production, FutureverseSingleton.Instance.Environment);
         }
         
@@ -55,7 +56,7 @@ namespace EmergenceSDK.Tests.Futureverse
             var oldEnvironment = FutureverseSingleton.Instance.Environment;
             var newEnvironment = GetFirstNonMatchingEnum(oldEnvironment);
 
-            using (FutureverseSingleton.Instance.ForcedEnvironment(newEnvironment))
+            using (FutureverseSingletonInternal.ForcedEnvironment(newEnvironment))
             {
                 Assert.AreEqual(newEnvironment, FutureverseSingleton.Instance.Environment, "Forced environment did not set");
             }

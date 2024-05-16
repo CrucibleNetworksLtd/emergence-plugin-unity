@@ -1,4 +1,5 @@
 ﻿using System;
+using EmergenceSDK.Internal;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Types;
 using NUnit.Framework;
@@ -26,21 +27,21 @@ namespace EmergenceSDK.Tests.Emergence
         [Test]
         public void ForcedEnvironment_IsDevelopment()
         {
-            using var forcedEnvironment = EmergenceSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Development);
+            using var forcedEnvironment = EmergenceSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Development);
             Assert.AreEqual(EmergenceEnvironment.Development, EmergenceSingleton.Instance.Environment, "Forced environment did not set");
         }
 
         [Test]
         public void ForcedEnvironment_IsStaging()
         {
-            using var forcedEnvironment = EmergenceSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Staging);
+            using var forcedEnvironment = EmergenceSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Staging);
             Assert.AreEqual(EmergenceEnvironment.Staging, EmergenceSingleton.Instance.Environment, "Forced environment did not set");
         }
 
         [Test]
         public void ForcedEnvironment_IsProduction()
         {
-            using var forcedEnvironment = EmergenceSingleton.Instance.ForcedEnvironment(EmergenceEnvironment.Production);
+            using var forcedEnvironment = EmergenceSingletonInternal.ForcedEnvironment(EmergenceEnvironment.Production);
             Assert.AreEqual(EmergenceEnvironment.Production, EmergenceSingleton.Instance.Environment, "Forced environment did not set");
         }
 
@@ -50,7 +51,7 @@ namespace EmergenceSDK.Tests.Emergence
             var oldEnvironment = EmergenceSingleton.Instance.Environment;
             var newEnvironment = GetFirstNonMatchingEnum(oldEnvironment);
 
-            using (EmergenceSingleton.Instance.ForcedEnvironment(newEnvironment))
+            using (EmergenceSingletonInternal.ForcedEnvironment(newEnvironment))
             {
                 Assert.AreEqual(newEnvironment, EmergenceSingleton.Instance.Environment, "Forced environment did not set");
             }

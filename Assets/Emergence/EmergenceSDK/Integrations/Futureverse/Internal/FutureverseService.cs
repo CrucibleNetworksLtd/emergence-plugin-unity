@@ -69,7 +69,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             var url =
                 $"{GetFuturepassApiUrl()}linked-futurepass?eoa={EmergenceSingleton.Instance.Configuration.Chain.ChainID}:EVM:{walletService.WalletAddress}";
 
-            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
             
             if (!response.Successful)
                 return new ServiceResponse<LinkedFuturepassResponse>(response);
@@ -87,7 +87,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             var response = await WebRequestService.SendAsyncWebRequest(
                 RequestMethod.Get,
                 url,
-                timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
 
             
             if (!response.Successful)
@@ -105,7 +105,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 RequestMethod.Post,
                 GetArApiUrl(),
                 body,
-                timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
             
             if (!response.Successful)
                 return new ServiceResponse<InventoryResponse>(response, false, new InventoryResponse());
@@ -249,7 +249,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 RequestMethod.Post,
                 GetArApiUrl(),
                 body,
-                timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
             
             if (!IsArResponseValid(response, out var jObject))
             {
@@ -273,7 +273,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 RequestMethod.Post,
                 GetArApiUrl(),
                 body,
-                timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
             
             if (!IsArResponseValid(response, out var jObject))
             {
@@ -367,7 +367,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     RequestMethod.Post,
                     GetArApiUrl(),
                     body,
-                    timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                    timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
                 
                 if (!IsArResponseValid(response, out var jObject) || !ParseStatus(jObject, out var transactionStatus))
                 {
@@ -441,7 +441,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     RequestMethod.Post,
                     GetArApiUrl(),
                     body,
-                    timeout: FutureverseSingleton.Instance.requestTimeout * 1000
+                    timeout: FutureverseSingleton.Instance.RequestTimeout * 1000
                     );
 
                 if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseNonce(jObject, out var nonce))
@@ -467,7 +467,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                     RequestMethod.Post,
                     GetArApiUrl(),
                     body,
-                    timeout: FutureverseSingleton.Instance.requestTimeout * 1000);
+                    timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
                 
                 if (!IsArResponseValid(submitResponse, out var jObject) || !ParseTransactionHash(jObject, out transactionHash))
                 {
