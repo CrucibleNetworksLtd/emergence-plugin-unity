@@ -208,9 +208,9 @@ namespace EmergenceSDK
             }
         }
 
-        private void OnApplicationQuit()
+        private async void OnApplicationQuit()
         {
-            OnGameClosing?.Invoke();
+            await OnGameClosing.Invoke();
         }
         
 #if UNITY_EDITOR
@@ -226,6 +226,60 @@ namespace EmergenceSDK
         {
             base.InitializeDefault();
             Configuration = Resources.Load<EmergenceConfiguration>("Configuration");
+        }
+        
+        public class GameEvents
+        {
+            public event Action SyncHandlers;
+            public event Func<UniTask> AsyncHandlers;
+
+            public static GameEvents operator +(GameEvents events, Action syncHandler)
+            {
+                events.SyncHandlers += syncHandler;
+                return events;
+            }
+
+            public static GameEvents operator -(GameEvents events, Action syncHandler)
+            {
+                events.SyncHandlers -= syncHandler;
+                return events;
+            }
+
+            public static GameEvents operator +(GameEvents events, Func<UniTask> asyncHandler)
+            {
+                events.AsyncHandlers += asyncHandler;
+                return events;
+            }
+
+            public static GameEvents operator -(GameEvents events, Func<UniTask> asyncHandler)
+            {
+                events.AsyncHandlers -= asyncHandler;
+                return events;
+            }
+
+            private void TriggerSyncHandlers()
+            {
+                SyncHandlers?.Invoke();
+                EmergenceLogger.LogInfo("Ran synchronous event handlers");
+            }
+
+            private async UniTask TriggerAsyncEventHandlers()
+            {
+                if (AsyncHandlers != null)
+                {
+                    foreach (var handler in AsyncHandlers.GetInvocationList())
+                    {
+                        await ((Func<UniTask>)handler).Invoke();
+                    }
+                }
+                EmergenceLogger.LogInfo("Ran asynchronous event handlers");
+            }
+
+            public async UniTask Invoke()
+            {
+                TriggerSyncHandlers();
+                await TriggerAsyncEventHandlers();
+            }
         }
     }
 }
