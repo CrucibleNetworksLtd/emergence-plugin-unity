@@ -103,7 +103,7 @@ namespace EmergenceSDK
             return services;
         }
 
-        internal static void Load(ServiceProfile profile)
+        public static void Load(ServiceProfile profile)
         {
             using (Lock.WriteLock())
             {
@@ -122,7 +122,7 @@ namespace EmergenceSDK
             OnServicesLoaded?.Invoke(profile);
         }
 
-        internal static void Unload()
+        public static void Unload()
         {
             using (Lock.WriteLock())
             {
