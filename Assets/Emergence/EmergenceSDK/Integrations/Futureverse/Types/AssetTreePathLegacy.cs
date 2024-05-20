@@ -14,8 +14,8 @@ namespace EmergenceSDK.Integrations.Futureverse.Types
             Dictionary<string, AssetTreeObjectLegacy> assetTreeObjects)
         {
             ID = id ?? throw new ArgumentNullException();
-            RdfType = rdfType ?? throw new ArgumentNullException();
-            Objects = assetTreeObjects ?? throw new ArgumentNullException();
+            RdfType = rdfType;
+            Objects = assetTreeObjects; 
         }
     }
 }
