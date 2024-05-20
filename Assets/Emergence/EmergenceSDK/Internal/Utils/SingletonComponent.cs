@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace EmergenceSDK.Internal.Utils
 {
@@ -6,86 +7,52 @@ namespace EmergenceSDK.Internal.Utils
     {
         #region Fields
 
-        private static T instance;
-        private static readonly object Lock = new object();
-        private static bool isCreatingDefaultComponent;
+        private static readonly Lazy<T> LazyInstance = new(() =>
+        {
+            if (FindObjectsOfType(typeof(T)) is T[] { Length: > 0 } objectsOfType)
+            {
+                return objectsOfType[0];
+            }
+            
+            var singletonGameObject = new GameObject { name = typeof(T).ToString() };
+            var instance = singletonGameObject.AddComponent<T>();
+            instance.InitializeDefault();
+            return instance;
+        });
 
         #endregion
 
         #region Properties
-        public static T Instance
-        {
-            get
-            {
-                lock (Lock)
-                {
-                    if (instance == null)
-                    {
-                        T[] objectsOfType = FindObjectsOfType(typeof(T)) as T[];
-                        if (objectsOfType != null)
-                        {
-                            if (objectsOfType.Length > 0)
-                            {
-                                instance = objectsOfType[0];
-                            }
 
-                            if (objectsOfType.Length > 1)
-                            {
-                                return instance;
-                            }
-                        }
-
-                        if (instance == null)
-                        {
-                            isCreatingDefaultComponent = true;
-                            GameObject singletonGameObject = new GameObject { name = typeof(T).ToString() };
-                            instance = singletonGameObject.AddComponent<T>();
-                            instance.InitializeDefault();
-                            isCreatingDefaultComponent = false;
-                        }
-                    }
-
-                    return instance;
-                }
-            }
-        }
+        public static T Instance => LazyInstance.Value;
 
         protected virtual void InitializeDefault() { }
 
-        public static bool IsInstanced
-        {
-            get
-            {
-                return instance != null;
-            }
-        }
+        public static bool IsInstanced => LazyInstance.IsValueCreated;
 
         #endregion
 
         #region Initialization
+
         public virtual void Awake()
         {
-            if (!isCreatingDefaultComponent && Instance != this)
+            if (Instance == this) return;
+            var allComponents = gameObject.GetComponents<Component>();
+            if (allComponents.Length == 2)
             {
-                var allcomponents = gameObject.GetComponents<Component>();
-                if (allcomponents.Length == 2)
-                {
-                    Destroy(gameObject);
-                }
-                else
-                {
-                    Destroy(this);
-
-                }
+                Destroy(gameObject);
+            }
+            else
+            {
+                Destroy(this);
             }
         }
+
         #endregion
 
         public static T Get()
         {
             return Instance;
         }
-
-
     }
 }
