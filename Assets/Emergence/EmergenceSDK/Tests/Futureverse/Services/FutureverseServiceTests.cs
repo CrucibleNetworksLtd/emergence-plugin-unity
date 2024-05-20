@@ -22,7 +22,7 @@ namespace EmergenceSDK.Tests.Futureverse.Services
         public void Setup()
         {
             verboseOutput = EmergenceLogger.VerboseOutput(true);
-            EmergenceServiceProvider.Load();
+            EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
             futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
             walletServiceDevelopmentOnly = EmergenceServiceProvider.GetService<IWalletServiceDevelopmentOnly>();
         }

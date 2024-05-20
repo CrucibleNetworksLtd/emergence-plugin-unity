@@ -181,6 +181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   requestTimeout: 60
+  environment: 0
 --- !u!1 &3562524072171691921
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,7 +422,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3621d27f4d229c646aae8cea4aa420de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Configuration: {fileID: 11400000, guid: 59ea788f73e88824c8d4aa8afe83df38, type: 2}
+  Configuration: {fileID: 11400000, guid: c50dee9d33f04446fb471a2b7bac7278, type: 2}
   environment: 0
   Key: 9
   Shift: 1

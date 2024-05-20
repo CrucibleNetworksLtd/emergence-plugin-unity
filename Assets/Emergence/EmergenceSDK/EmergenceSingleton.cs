@@ -18,16 +18,16 @@ namespace EmergenceSDK
 {
     public sealed class EmergenceSingleton : InternalEmergenceSingleton
     {
-        public EmergenceConfiguration Configuration;
-
         public string CurrentDeviceId { get; set; }
+        
+        public GameEvents OnGameClosing = new();
 
-        public event Action OnGameClosing;
-
-        [SerializeField] private EmergenceEnvironment environment;
+        public ReconnectionQr ReconnectionQr => reconnectionQR ??= GetComponentInChildren<ReconnectionQr>(true);
         public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
+        public EmergenceConfiguration Configuration;
+        [SerializeField] private EmergenceEnvironment environment;
         private UICursorHandler cursorHandler;
         private GameObject ui;
         private string accessToken;
@@ -56,9 +56,8 @@ namespace EmergenceSDK
         [Header("Set the emergence SDK log level")]
         public EmergenceLogger.LogLevel LogLevel;
         
-        private ReconnectionQR reconnectionQR;
+        private ReconnectionQr reconnectionQR;
         private ISessionService sessionService;
-        public ReconnectionQR ReconnectionQR => reconnectionQR ??= GetComponentInChildren<ReconnectionQR>(true);
 
         /// <summary>
         /// Opens the Emergence Overlay
@@ -132,7 +131,8 @@ namespace EmergenceSDK
 
         private new void Awake()
         {
-            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
+            EmergenceServiceProvider.OnServicesLoaded += _ => sessionService = EmergenceServiceProvider.GetService<ISessionService>();
+            
             closeAction = new InputAction("CloseAction", binding: "<Keyboard>/escape");
             closeAction.performed += _ => CloseUI();
             

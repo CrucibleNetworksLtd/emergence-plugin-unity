@@ -138,6 +138,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private void LoginWithFvClicked()
         {
             SetLoginButtonsInteractable(false);
+            EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
             UniTask.Void(async () =>
             {
                 await loginManager.WaitUntilAvailable();
@@ -153,6 +154,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void LoginWithWcClicked()
         {
+            EmergenceServiceProvider.Load(ServiceProfile.Default);
             SetLoginButtonsInteractable(false);
             UniTask.Void(async () =>
             {

@@ -197,7 +197,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public async UniTask ShowWelcome()
         {
-            if (sessionService.IsLoggedIn)
+            if (sessionService is { IsLoggedIn: true })
             {
                 await ShowDashboard();
                 return;

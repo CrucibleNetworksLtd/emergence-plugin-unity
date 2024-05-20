@@ -134,7 +134,7 @@ namespace EmergenceSDK.Internal.Services
                 case 500: 
                 case 504:
                 {
-                    await ReconnectionQR.FireEventOnReconnection(async () => ret = await WriteMethodAsyncRetry(serialisedWriteRequest));
+                    await ReconnectionQr.FireEventOnReconnection(async () => ret = await WriteMethodAsyncRetry(serialisedWriteRequest));
                     break;
                 }
             }

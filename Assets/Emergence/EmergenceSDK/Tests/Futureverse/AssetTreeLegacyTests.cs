@@ -27,7 +27,7 @@ namespace EmergenceSDK.Tests.Futureverse
         [OneTimeSetUp]
         public void Setup()
         {
-            EmergenceServiceProvider.Load();
+            EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
             futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
             parsedTree = futureverseServiceInternal.ParseGetAssetTreeResponseJsonLegacy(Json);
             verboseOutput = EmergenceLogger.VerboseOutput(true);

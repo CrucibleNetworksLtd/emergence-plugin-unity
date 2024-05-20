@@ -17,7 +17,7 @@ namespace EmergenceSDK.Tests.Emergence.Services.WalletService
         public void Setup()
         {
             verboseOutput = EmergenceLogger.VerboseOutput(true);
-            EmergenceServiceProvider.Load();
+            EmergenceServiceProvider.Load(ServiceProfile.Default);
             walletService = EmergenceServiceProvider.GetService<IWalletService>();
             walletServiceDevelopmentOnly = EmergenceServiceProvider.GetService<IWalletServiceDevelopmentOnly>();
         }
