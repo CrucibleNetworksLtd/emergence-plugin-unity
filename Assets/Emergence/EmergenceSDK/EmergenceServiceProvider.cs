@@ -6,6 +6,7 @@ using EmergenceSDK.Integrations.Futureverse.Internal;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Services;
+using EmergenceSDK.Types;
 
 namespace EmergenceSDK
 {
@@ -132,12 +133,5 @@ namespace EmergenceSDK
             AddService(new ChainService());
             AddService(new PersonaService(sessionService));
         }
-    }
-
-    public enum ServiceProfile
-    {
-        Default,
-        Futureverse
-        // Add more profiles as needed
     }
 }
