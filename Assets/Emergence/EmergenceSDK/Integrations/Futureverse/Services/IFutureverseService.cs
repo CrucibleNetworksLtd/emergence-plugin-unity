@@ -15,6 +15,20 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
 {
     public interface IFutureverseService : IEmergenceService
     {
+        public FuturepassInformationResponse FuturepassInformation { get; }
+        
+        /// <summary>
+        /// Get the API Url for the asset register API
+        /// </summary>
+        /// <returns>The API Url for the Asset Register API</returns>
+        public string GetArApiUrl();
+        
+        /// <summary>
+        /// Get the API url for the futurepass API
+        /// </summary>
+        /// <returns>The API url for the Futurepass API</returns>
+        public string GetFuturepassApiUrl();
+        
         /// <summary>
         /// Get the Futurepass linked to the current wallet
         /// </summary>
