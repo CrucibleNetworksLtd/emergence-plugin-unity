@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
@@ -14,21 +13,24 @@ using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Exceptions;
-using EmergenceSDK.Types.Inventory;
 using EmergenceSDK.Types.Responses;
 using Newtonsoft.Json.Linq;
-using UnityEngine.Networking;
 
 namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
     internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, ISessionConnectableService
     {
-        public bool UsingFutureverse { get; set; }
+        private readonly IWalletService walletService;
         public FuturepassInformationResponse FuturepassInformation { get; set; }
 
         private List<string> CombinedAddress => FuturepassInformation.GetCombinedAddresses();
+
+        public FutureverseService(IWalletService walletService)
+        {
+            this.walletService = walletService;
+        }
         
-        private string GetArApiUrl()
+        public string GetArApiUrl()
         {
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
             return "https://ar-api.futureverse.app/graphql";
@@ -43,7 +45,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 #endif
         }
         
-        private string GetFuturepassApiUrl()
+        public string GetFuturepassApiUrl()
         {
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
             return "https://account-indexer.api.futurepass.futureverse.app/api/v1/";
@@ -60,7 +62,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         
         public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync()
         {
-            var walletService = EmergenceServiceProvider.GetService<IWalletService>();
             if (!walletService.IsValidWallet)
             {
                 throw new InvalidWalletException();
@@ -96,75 +97,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             FuturepassInformationResponse fpResponse =
                 SerializationHelper.Deserialize<FuturepassInformationResponse>(response.ResponseText);
             return new ServiceResponse<FuturepassInformationResponse>(response, true, fpResponse);
-        }
-
-        public async UniTask<ServiceResponse<InventoryResponse>> GetFutureverseInventory()
-        {
-            var body = SerializationHelper.Serialize(new InventoryQuery(CombinedAddress));
-            var response = await WebRequestService.SendAsyncWebRequest(
-                RequestMethod.Post,
-                GetArApiUrl(),
-                body,
-                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
-            
-            if (!response.Successful)
-                return new ServiceResponse<InventoryResponse>(response, false, new InventoryResponse());
-
-            InventoryResponse fpResponse = SerializationHelper.Deserialize<InventoryResponse>(response.ResponseText);
-            return new ServiceResponse<InventoryResponse>(response, true, fpResponse);
-        }
-
-        public async UniTask<ServiceResponse<List<InventoryItem>>> GetFutureverseInventoryAsInventoryItems()
-        {
-            var futureverseInventory = await GetFutureverseInventory();
-            if (!futureverseInventory.Successful)
-                return new ServiceResponse<List<InventoryItem>>(futureverseInventory, false);
-            var ret = new List<InventoryItem>();
-            foreach (var edge in futureverseInventory.Result1.data.assets.edges)
-            {
-                ret.Add(ConvertFutureverseItemToInventoryItem(edge.node));
-            }
-
-            return new ServiceResponse<List<InventoryItem>>(futureverseInventory, true, ret);
-        }
-
-        private static InventoryItem ConvertFutureverseItemToInventoryItem(InventoryResponse.Data.Assets.Edge.Node node)
-        {
-            var newItem = new InventoryItem
-            {
-                ID = $"{node.collection.chainType}:{node.collection.chainId}:{node.collection.location}:{node.tokenId}",
-                Blockchain = $"{node.collection.chainType}:{node.collection.chainId}",
-                Contract = $"{node.collection.location}",
-                TokenId = $"{node.tokenId}",
-                Meta = new InventoryItemMetaData
-                {
-                    Name = $"#{node.tokenId}",
-                    Description = node.collection.name
-                }
-            };
-            var newMetaContent = new InventoryItemMetaContent
-            {
-                URL = Helpers.InternalIPFSURLToHTTP(node.metadata?.properties?.image ?? "", "http://ipfs.openmeta.xyz/ipfs/"),
-                MimeType = node.metadata?.properties?.models?["glb"] != null ? "model/gltf-binary" : "image/png"
-            };
-            newItem.Meta.Content = new List<InventoryItemMetaContent> { newMetaContent };
-            newItem.Meta.Attributes = new List<InventoryItemMetaAttributes>();
-                
-            if (node.metadata?.attributes != null)
-            {
-                foreach (var kvp in node.metadata.attributes)
-                {
-                    var inventoryItemMetaAttributes = new InventoryItemMetaAttributes
-                    {
-                        Key = kvp.Key,
-                        Value = kvp.Value
-                    };
-                    newItem.Meta.Attributes.Add(inventoryItemMetaAttributes);
-                }
-            }
-                
-            newItem.OriginalData = node.OriginalData;
-            return newItem;
         }
 
         [Obsolete]
@@ -424,8 +356,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         
         public async Task<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus)
         {
-            var walletService = EmergenceServiceProvider.GetService<IWalletService>();
-
             if (!walletService.IsValidWallet)
             {
                 throw new InvalidWalletException();
@@ -503,7 +433,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
         public void HandleDisconnection(ISessionService sessionService)
         {
-            UsingFutureverse = false;
             FuturepassInformation = null;
         }
 

@@ -28,8 +28,12 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 
         private void Start()
         {
-            futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
+            EmergenceServiceProvider.OnServicesLoaded += profile =>
+            {
+                if (profile != ServiceProfile.Futureverse) return;
+                futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+                sessionService = EmergenceServiceProvider.GetService<ISessionService>();
+            };
 
             instructionsGO.SetActive(false);
             IsReady = false;
@@ -47,7 +51,7 @@ namespace EmergenceSDK.Samples.FutureverseTestScene.DemoStations
 
         private void Update()
         {
-            var futurepassEnabled = sessionService.HasLoginSetting(LoginSettings.EnableFuturepass);
+            var futurepassEnabled = sessionService != null && sessionService.HasLoginSetting(LoginSettings.EnableFuturepass);
             if (HasBeenActivated() && IsReady && futurepassEnabled)
             {
                 SendTestArtm().Forget();

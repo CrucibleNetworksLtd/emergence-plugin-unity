@@ -14,14 +14,12 @@ namespace EmergenceSDK.Tests.Emergence
         public void Setup()
         {
             verboseOutput = EmergenceLogger.VerboseOutput(true);
-            EmergenceServiceProvider.Load();
         }
 
         [OneTimeTearDown]
         public void TearDown()
         {
             verboseOutput?.Dispose();
-            EmergenceServiceProvider.Unload();
         }
 
         [Test]

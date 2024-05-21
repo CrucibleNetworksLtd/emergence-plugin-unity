@@ -32,7 +32,7 @@ namespace EmergenceSDK.Internal.Services
             return CurrentLoginSettings?.HasFlag(loginSettings) ?? false;
         }
 
-        private async void OnGameEnd() => await DisconnectAsync();
+        private UniTask OnGameEnd() => DisconnectAsync();
 
         public async UniTask<ServiceResponse<IsConnectedResponse>> IsConnected()
         {
@@ -62,7 +62,8 @@ namespace EmergenceSDK.Internal.Services
 
         public async UniTask<ServiceResponse> DisconnectAsync()
         {
-            if (HasLoginSetting(LoginSettings.DisableEmergenceAccessToken)) { return new ServiceResponse(true); }
+            if (!IsLoggedIn || HasLoginSetting(LoginSettings.DisableEmergenceAccessToken) || string.IsNullOrEmpty(EmergenceAccessToken))
+                return new ServiceResponse(true);
             
             try
             {

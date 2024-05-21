@@ -56,8 +56,8 @@ namespace EmergenceSDK.Internal.Services
         
         // ReSharper disable once MemberCanBePrivate.Global
         public static WebRequestService Instance => _instance ??= new WebRequestService();
-        private readonly ConcurrentDictionary<UnityWebRequest, WebRequestInfo> _openRequests = new();
-        private readonly ConcurrentDictionary<UnityWebRequest, WebRequestInfo> _allRequests = new();
+        private readonly ConcurrentDictionary<UnityWebRequest, WebRequestInfo> openRequests = new();
+        private readonly ConcurrentDictionary<UnityWebRequest, WebRequestInfo> allRequests = new();
 
         //This timeout avoids this issue: https://forum.unity.com/threads/catching-curl-error-28.1274846/
         private const int DefaultTimeoutMilliseconds = 100000;
@@ -69,7 +69,7 @@ namespace EmergenceSDK.Internal.Services
 
         private void CancelAllRequests()
         {
-            foreach (var openRequest in _openRequests)
+            foreach (var openRequest in openRequests)
             {
                 openRequest.Key.Abort();
             }
@@ -86,22 +86,14 @@ namespace EmergenceSDK.Internal.Services
                 case RequestMethod.Head:
                     request = UnityWebRequest.Head(url);
                     break;
-                case RequestMethod.Post: 
-                    request = new UnityWebRequest(url, "POST");
-                    request.downloadHandler = new DownloadHandlerBuffer();
-                    if (string.IsNullOrEmpty(bodyData))
-                        break;
-                    request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyData));
-                    request.uploadHandler.contentType = "application/json"; // Default content type is JSON for POST/PUT/PATCH requests
+                case RequestMethod.Post:
+                    request = RequestWithJsonBody(url, "POST", bodyData);
                     break;
                 case RequestMethod.Put:
-                    request = UnityWebRequest.Put(url, bodyData);
-                    request.uploadHandler.contentType = "application/json"; // Default content type is JSON for POST/PUT/PATCH requests
+                    request = RequestWithJsonBody(url, "PUT", bodyData);
                     break;
                 case RequestMethod.Patch:
-                    request = UnityWebRequest.Post(url, bodyData);
-                    request.method = "PATCH";
-                    request.uploadHandler.contentType = "application/json"; // Default content type is JSON for POST/PUT/PATCH requests
+                    request = RequestWithJsonBody(url, "PATCH", bodyData);
                     break;
                 case RequestMethod.Delete:
                     request = UnityWebRequest.Delete(url);
@@ -112,7 +104,7 @@ namespace EmergenceSDK.Internal.Services
             
             return request;
         }
-        
+
         /// <summary>
         /// Performs an asynchronous UnityWebRequest and returns the result as a <see cref="WebResponse"/>.
         /// <returns><see cref="WebResponse"/>, or <see cref="FailedWebResponse"/></returns>
@@ -122,7 +114,7 @@ namespace EmergenceSDK.Internal.Services
         {
             return await PerformAsyncWebRequest(CreateRequest(method, url, bodyData), headers, timeout, ct);
         }
-        
+
         /// <summary>
         /// Performs an asynchronous UnityWebRequest designed to download a texture, and returns the result as a <see cref="WebResponse"/>.
         /// <returns><see cref="TextureWebResponse"/>, or <see cref="FailedWebResponse"/>></returns>
@@ -133,6 +125,17 @@ namespace EmergenceSDK.Internal.Services
             UnityWebRequest request = CreateRequest(method, url, bodyData);
             request.downloadHandler = new DownloadHandlerTexture(!nonReadable);
             return await PerformAsyncWebRequest(request, headers, timeout, ct);
+        }
+
+        private static UnityWebRequest RequestWithJsonBody(string url, string method, string bodyData)
+        {
+            var request = new UnityWebRequest(url, method);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            if (string.IsNullOrEmpty(bodyData))
+                return request;
+            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(bodyData));
+            request.uploadHandler.contentType = "application/json"; // Default content type is JSON for POST/PUT/PATCH requests
+            return request;
         }
 
         private static void SetupRequestHeaders(UnityWebRequest request, Dictionary<string, string> headers)
@@ -149,32 +152,32 @@ namespace EmergenceSDK.Internal.Services
         private WebRequestInfo AddRequest(UnityWebRequest request, Dictionary<string, string> headers)
         {
             var webRequestInfo = new WebRequestInfo(headers, request);
-            _openRequests.TryAdd(request, webRequestInfo);
-            _allRequests.TryAdd(request, webRequestInfo);
+            openRequests.TryAdd(request, webRequestInfo);
+            allRequests.TryAdd(request, webRequestInfo);
             return webRequestInfo;
         }
 
         private void CloseRequest(UnityWebRequest request)
         {
-            _openRequests.TryRemove(request, out _);
+            openRequests.TryRemove(request, out _);
         }
 
         internal void RemoveRequest(UnityWebRequest request)
         {
-            _openRequests.TryRemove(request, out _);
-            _allRequests.TryRemove(request, out _);
+            openRequests.TryRemove(request, out _);
+            allRequests.TryRemove(request, out _);
         }
 
         internal WebRequestInfo GetRequestInfo(UnityWebRequest request)
         {
-            return _allRequests.GetValueOrDefault(request);
+            return allRequests.GetValueOrDefault(request);
         }
 
         internal WebRequestInfo GetRequestInfoByWebResponse(WebResponse response)
         {
             if (response != null)
             {
-                foreach (var webRequestInfo in _allRequests)
+                foreach (var webRequestInfo in allRequests)
                 {
                     if (webRequestInfo.Value.Response != null && webRequestInfo.Value.Response == response)
                     {

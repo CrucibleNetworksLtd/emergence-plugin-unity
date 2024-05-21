@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Internal;
-using EmergenceSDK.Internal.Types;
 using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
@@ -12,22 +10,21 @@ using EmergenceSDK.Types;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 
 namespace EmergenceSDK
 {
     public sealed class EmergenceSingleton : InternalEmergenceSingleton
     {
-        public EmergenceConfiguration Configuration;
-
         public string CurrentDeviceId { get; set; }
+        
+        public GameEvents OnGameClosing = new();
 
-        public event Action OnGameClosing;
-
-        [SerializeField] private EmergenceEnvironment environment;
+        public ReconnectionQR ReconnectionQR => reconnectionQR ??= GetComponentInChildren<ReconnectionQR>(true);
         public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
+        public EmergenceConfiguration Configuration;
+        [SerializeField] private EmergenceEnvironment environment;
         private UICursorHandler cursorHandler;
         private GameObject ui;
         private string accessToken;
@@ -58,7 +55,6 @@ namespace EmergenceSDK
         
         private ReconnectionQR reconnectionQR;
         private ISessionService sessionService;
-        public ReconnectionQR ReconnectionQR => reconnectionQR ??= GetComponentInChildren<ReconnectionQR>(true);
 
         /// <summary>
         /// Opens the Emergence Overlay
@@ -132,7 +128,8 @@ namespace EmergenceSDK
 
         private new void Awake()
         {
-            sessionService = EmergenceServiceProvider.GetService<ISessionService>();
+            EmergenceServiceProvider.OnServicesLoaded += _ => sessionService = EmergenceServiceProvider.GetService<ISessionService>();
+            
             closeAction = new InputAction("CloseAction", binding: "<Keyboard>/escape");
             closeAction.performed += _ => CloseUI();
             
@@ -208,9 +205,9 @@ namespace EmergenceSDK
             }
         }
 
-        private void OnApplicationQuit()
+        private async void OnApplicationQuit()
         {
-            OnGameClosing?.Invoke();
+            await OnGameClosing.Invoke();
         }
         
 #if UNITY_EDITOR

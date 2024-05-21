@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Types;
 using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.Types;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
@@ -27,7 +28,7 @@ namespace EmergenceSDK.Tests.Futureverse
         [OneTimeSetUp]
         public void Setup()
         {
-            EmergenceServiceProvider.Load();
+            EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
             futureverseServiceInternal = EmergenceServiceProvider.GetService<IFutureverseServiceInternal>();
             parsedTree = futureverseServiceInternal.ParseGetAssetTreeResponseJsonLegacy(Json);
             verboseOutput = EmergenceLogger.VerboseOutput(true);
