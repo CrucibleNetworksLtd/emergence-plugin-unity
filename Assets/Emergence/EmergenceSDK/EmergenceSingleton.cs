@@ -19,7 +19,7 @@ namespace EmergenceSDK
         
         public GameEvents OnGameClosing = new();
 
-        public ReconnectionQr ReconnectionQr => reconnectionQR ??= GetComponentInChildren<ReconnectionQr>(true);
+        public ReconnectionQR ReconnectionQr => reconnectionQR ??= GetComponentInChildren<ReconnectionQR>(true);
         public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
@@ -53,7 +53,7 @@ namespace EmergenceSDK
         [Header("Set the emergence SDK log level")]
         public EmergenceLogger.LogLevel LogLevel;
         
-        private ReconnectionQr reconnectionQR;
+        private ReconnectionQR reconnectionQR;
         private ISessionService sessionService;
 
         /// <summary>

@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace EmergenceSDK.Internal.UI
 {
-    public class ReconnectionQr : MonoBehaviour
+    public class ReconnectionQR : MonoBehaviour
     {
         [Header("UI References")]
         public RawImage rawQRImage;
@@ -34,7 +34,7 @@ namespace EmergenceSDK.Internal.UI
         private bool timerIsRunning = false;
         private bool loginComplete = false;
         
-        private static ReconnectionQr instance;
+        private static ReconnectionQR instance;
         
         private List<Action> reconnectionEvents = new List<Action>();
 
