@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using EmergenceSDK.Extensions.Threading;
 using EmergenceSDK.Integrations.Futureverse.Internal;
-using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -25,20 +23,16 @@ namespace EmergenceSDK
 
         public static void Load(ServiceProfile profile)
         {
-            using (Lock.WriteLock())
-            {
-                Services.Clear();
+            Services.Clear();
 
-                if (profile == ServiceProfile.Default)
-                    LoadDefaultServices();
-                else if (profile == ServiceProfile.Futureverse)
-                    LoadFutureverseServices();
-                else
-                    throw new ArgumentOutOfRangeException(nameof(profile), profile, null);
+            if (profile == ServiceProfile.Default)
+                LoadDefaultServices();
+            else if (profile == ServiceProfile.Futureverse)
+                LoadFutureverseServices();
+            else
+                throw new ArgumentOutOfRangeException(nameof(profile), profile, null);
 
-                LoadedProfile = profile;
-            }
-
+            LoadedProfile = profile;
             OnServicesLoaded?.Invoke(profile);
         }
 
@@ -49,7 +43,6 @@ namespace EmergenceSDK
         /// <returns>The requested service or null if not found.</returns>
         public static T GetService<T>() where T : class, IEmergenceService
         {
-            using IDisposable readLock = Lock.ReadLock();
             foreach (var service in Services)
             {
                 if (service is T typedService)
@@ -62,12 +55,8 @@ namespace EmergenceSDK
 
         public static void Unload()
         {
-            using (Lock.WriteLock())
-            {
-                Services.Clear();
-                LoadedProfile = null;
-            }
-
+            Services.Clear();
+            LoadedProfile = null;
             OnServicesUnloaded?.Invoke();
         }
 
@@ -78,7 +67,6 @@ namespace EmergenceSDK
         /// <returns>A <see cref="List{T}"/> of the matching services.</returns>
         internal static List<T> GetServices<T>() where T : class, IEmergenceService
         {
-            using IDisposable readLock = Lock.ReadLock();
             List<T> services = new List<T>();
             foreach (var service in Services)
             {
