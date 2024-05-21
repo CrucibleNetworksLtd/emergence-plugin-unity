@@ -19,7 +19,7 @@ namespace EmergenceSDK
         
         public GameEvents OnGameClosing = new();
 
-        public ReconnectionQR ReconnectionQr => reconnectionQR ??= GetComponentInChildren<ReconnectionQR>(true);
+        public ReconnectionQR ReconnectionQR => reconnectionQR ??= GetComponentInChildren<ReconnectionQR>(true);
         public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         

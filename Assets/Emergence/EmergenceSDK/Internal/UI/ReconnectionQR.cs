@@ -42,7 +42,7 @@ namespace EmergenceSDK.Internal.UI
         public static async UniTask<bool> FireEventOnReconnection(Action action)
         {
             if (instance == null)
-                instance = EmergenceSingleton.Instance.ReconnectionQr;
+                instance = EmergenceSingleton.Instance.ReconnectionQR;
             instance.gameObject.SetActive(true);
             instance.reconnectionEvents.Add(action);
             instance.closeButton.onClick.RemoveAllListeners();
