@@ -5,8 +5,6 @@ namespace EmergenceSDK.Internal.Utils
 {
     public abstract class SingletonComponent<T> : MonoBehaviour where T : SingletonComponent<T>
     {
-        #region Fields
-
         private static readonly Lazy<T> LazyInstance = new(() =>
         {
             if (FindObjectsOfType(typeof(T)) is T[] { Length: > 0 } objectsOfType)
@@ -20,20 +18,14 @@ namespace EmergenceSDK.Internal.Utils
             return instance;
         });
 
-        #endregion
 
-        #region Properties
 
         public static T Instance => LazyInstance.Value;
 
         protected virtual void InitializeDefault() { }
 
         public static bool IsInstanced => LazyInstance.IsValueCreated;
-
-        #endregion
-
-        #region Initialization
-
+        
         public virtual void Awake()
         {
             if (Instance == this) return;
@@ -47,9 +39,7 @@ namespace EmergenceSDK.Internal.Utils
                 Destroy(this);
             }
         }
-
-        #endregion
-
+        
         public static T Get()
         {
             return Instance;
