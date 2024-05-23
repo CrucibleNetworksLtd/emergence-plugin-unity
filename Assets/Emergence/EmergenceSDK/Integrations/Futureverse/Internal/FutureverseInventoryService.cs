@@ -65,7 +65,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
         {
             var newItem = new InventoryItem
             {
-                ID = $"{node.collection.chainType}:{node.collection.chainId}:{node.collection.location}:{node.tokenId}",
+                ID = $"{node.collectionId}:{node.tokenId}",
                 Blockchain = $"{node.collection.chainType}:{node.collection.chainId}",
                 Contract = $"{node.collection.location}",
                 TokenId = $"{node.tokenId}",
