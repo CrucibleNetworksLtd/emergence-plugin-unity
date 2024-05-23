@@ -22,12 +22,12 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
     {
         public FuturepassInformationResponse CurrentFuturepassInformation { get; set; }
 
+        private readonly IWalletService walletService;
+
         public FutureverseService(IWalletService walletService)
         {
             this.walletService = walletService;
         }
-
-        private readonly IWalletService walletService;
 
         public string GetArApiUrl()
         {
