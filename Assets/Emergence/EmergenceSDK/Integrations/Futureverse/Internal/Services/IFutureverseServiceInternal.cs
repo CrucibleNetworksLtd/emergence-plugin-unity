@@ -12,7 +12,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
 {
     internal interface IFutureverseServiceInternal : IEmergenceService
     {
-        FuturepassInformationResponse FuturepassInformation { set; }
+        FuturepassInformationResponse CurrentFuturepassInformation { set; }
         [Obsolete] List<AssetTreePathLegacy> ParseGetAssetTreeResponseJsonLegacy(string json);
         List<AssetTreePath> DeserializeGetAssetTreeResponseJson(string json);
     }

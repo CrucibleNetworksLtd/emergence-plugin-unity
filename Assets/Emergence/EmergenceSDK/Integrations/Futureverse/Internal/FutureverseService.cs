@@ -20,16 +20,15 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 {
     internal class FutureverseService : IFutureverseService, IFutureverseServiceInternal, ISessionConnectableService
     {
-        private readonly IWalletService walletService;
-        public FuturepassInformationResponse FuturepassInformation { get; set; }
-
-        private List<string> CombinedAddress => FuturepassInformation.GetCombinedAddresses();
+        public FuturepassInformationResponse CurrentFuturepassInformation { get; set; }
 
         public FutureverseService(IWalletService walletService)
         {
             this.walletService = walletService;
         }
-        
+
+        private readonly IWalletService walletService;
+
         public string GetArApiUrl()
         {
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
@@ -433,7 +432,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
         public void HandleDisconnection(ISessionService sessionService)
         {
-            FuturepassInformation = null;
+            CurrentFuturepassInformation = null;
         }
 
         public void HandleConnection(ISessionService sessionService) { }

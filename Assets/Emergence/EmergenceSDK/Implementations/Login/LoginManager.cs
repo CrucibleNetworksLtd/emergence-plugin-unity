@@ -253,7 +253,7 @@ namespace EmergenceSDK.Implementations.Login
                         
                         throw new FuturepassInformationRequestFailedException("Request was not successful", passInformationResponse);
                     }
-                    ((IFutureverseServiceInternal)futureverseService).FuturepassInformation = passInformationResponse.Result1;
+                    ((IFutureverseServiceInternal)futureverseService).CurrentFuturepassInformation = passInformationResponse.Result1;
                 }
                 catch (Exception e) when (e is not OperationCanceledException and not FuturepassInformationRequestFailedException)
                 {
