@@ -15,7 +15,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
 {
     public interface IFutureverseService : IEmergenceService
     {
-        public FuturepassInformationResponse FuturepassInformation { get; }
+        public FuturepassInformationResponse CurrentFuturepassInformation { get; }
         
         /// <summary>
         /// Get the API Url for the asset register API

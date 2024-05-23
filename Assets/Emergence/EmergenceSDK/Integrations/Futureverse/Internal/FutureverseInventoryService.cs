@@ -15,7 +15,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
     internal class FutureverseInventoryService : IInventoryService
     {
         private readonly IFutureverseService futureverseService;
-        private List<string> CombinedAddress => futureverseService.FuturepassInformation.GetCombinedAddresses();
+        private List<string> CombinedAddress => futureverseService.CurrentFuturepassInformation.GetCombinedAddresses();
 
         public FutureverseInventoryService(IFutureverseService futureverseService)
         {
