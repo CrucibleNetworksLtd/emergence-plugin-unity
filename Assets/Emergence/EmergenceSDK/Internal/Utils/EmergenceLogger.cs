@@ -117,15 +117,15 @@ namespace EmergenceSDK.Internal.Utils
                 FormatWebResponseHeaders(response, out responseHeaders);
             }
             
-            if (response is FailedWebResponse { Exception: not OperationCanceledException and not TimeoutException } failedResponse)
+            if (response is FailedWebResponse { Canceled: false, TimedOut: false } failedResponse)
             {
                 LogFailedWebRequest(failedResponse, info, requestHeaders);
             }
-            else if (response is FailedWebResponse { Exception: OperationCanceledException } canceledResponse)
+            else if (response is FailedWebResponse { Canceled: true } canceledResponse)
             {
                 LogCancelledWebRequest(canceledResponse, info, requestHeaders);
             }
-            else if (response is FailedWebResponse { Exception: TimeoutException } timeoutResponse)
+            else if (response is FailedWebResponse { TimedOut: true } timeoutResponse)
             {
                 LogTimedOutWebRequest(timeoutResponse, info, requestHeaders);
             }
