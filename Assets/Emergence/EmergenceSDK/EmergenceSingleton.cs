@@ -71,7 +71,7 @@ namespace EmergenceSDK
                 {
                     ScreenManager.Instance.gameObject.SetActive(true);
                     
-                    if (sessionService.IsLoggedIn && ScreenManager.Instance.ScreenState < ScreenManager.ScreenStates.Dashboard)
+                    if (sessionService is {IsLoggedIn: true} && ScreenManager.Instance.ScreenState < ScreenManager.ScreenStates.Dashboard)
                     {
                         ScreenManager.Instance.ShowDashboard().Forget();
                     }

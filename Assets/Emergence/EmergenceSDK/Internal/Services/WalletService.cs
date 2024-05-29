@@ -61,7 +61,7 @@ namespace EmergenceSDK.Internal.Services
 
             string url = StaticConfig.APIBase + "request-to-sign";
             
-            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: EmergenceSingleton.DeviceIdHeader);
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, content, EmergenceSingleton.DeviceIdHeader);
             if(!response.Successful)
             {
                 return new ServiceResponse<string>(response, false);
