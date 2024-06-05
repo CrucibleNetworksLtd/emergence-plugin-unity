@@ -184,8 +184,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             
             if (!IsArResponseValid(response, out var jObject))
             {
-                LogArResponseErrors(jObject);
-                throw new FutureverseAssetRegisterErrorException(response.ResponseText);
+                throw BuildAssetRegistryException(response, jObject);
             }
             
             return DeserializeGetAssetTreeResponseJson(response.ResponseText);
@@ -208,8 +207,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             
             if (!IsArResponseValid(response, out var jObject))
             {
-                LogArResponseErrors(jObject);
-                throw new FutureverseAssetRegisterErrorException(response.ResponseText);
+                throw BuildAssetRegistryException(response, jObject);
             }
             
             return ParseGetAssetTreeResponseLegacy(response);
@@ -267,16 +265,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return response.Successful && response.StatusCode is >= 200 and <= 299 && (jToken = SerializationHelper.Parse(response.ResponseText) as JObject) != null;
         }
 
-        private static void LogArResponseErrors(JObject jObject)
-        {
-            if (jObject?["errors"] is not JArray errors) return;
-            
-            foreach (var error in errors)
-            {
-                EmergenceLogger.LogError((string)error["message"]);
-            }
-        }
-
         struct GetArtmStatusResult
         {
             public readonly bool Success;
@@ -302,8 +290,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 
                 if (!IsArResponseValid(response, out var jObject) || !ParseStatus(jObject, out var transactionStatus))
                 {
-                    LogArResponseErrors(jObject);
-                    throw new FutureverseAssetRegisterErrorException(response.ResponseText);
+                    throw BuildAssetRegistryException(response, jObject);
                 }
 
                 return new(true, transactionStatus);
@@ -316,7 +303,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 return status != null;
             }
         }
-        
+
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
         public async UniTask<ArtmStatus> GetArtmStatusAsync(string transactionHash, int initialDelay, int refetchInterval, int maxRetries)
@@ -352,7 +339,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
             return ArtmStatus.Pending;
         }
-        
+
         public async Task<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus)
         {
             if (!walletService.IsValidWallet)
@@ -375,8 +362,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
                 if (!IsArResponseValid(nonceResponse, out var jObject) || !ParseNonce(jObject, out var nonce))
                 {
-                    LogArResponseErrors(jObject);
-                    throw new FutureverseAssetRegisterErrorException(nonceResponse.ResponseText);
+                    throw BuildAssetRegistryException(nonceResponse, jObject);
                 }
 
                 generatedArtm = ArtmBuilder.GenerateArtm(message, artmOperations, address, nonce);
@@ -400,8 +386,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
                 
                 if (!IsArResponseValid(submitResponse, out var jObject) || !ParseTransactionHash(jObject, out transactionHash))
                 {
-                    LogArResponseErrors(jObject);
-                    throw new FutureverseAssetRegisterErrorException(submitResponse.ResponseText);
+                    throw BuildAssetRegistryException(submitResponse, jObject);
                 }
             }
 
@@ -428,6 +413,24 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             {
                 return (hash = (string)jObject.SelectToken("data.submitTransaction.transactionHash")) != null && hash.Trim() != "";
             }
+        }
+
+        private static JArray GetAndLogArResponseErrors(JObject responseObject)
+        {
+            if (responseObject?["errors"] is not JArray errors) return null;
+            
+            foreach (var error in errors)
+            {
+                EmergenceLogger.LogError((string)error["message"]);
+            }
+
+            return errors;
+        }
+
+        private static FutureverseAssetRegisterErrorException BuildAssetRegistryException(WebResponse response, JObject responseObject)
+        {
+            var errors = GetAndLogArResponseErrors(responseObject);
+            return new FutureverseAssetRegisterErrorException(response.ResponseText, errors);
         }
 
         public void HandleDisconnection(ISessionService sessionService)
