@@ -321,7 +321,7 @@ namespace EmergenceSDK.Implementations.Login
                 {
                     throw new QrCodeRequestFailedException("Request was not successful", qrCodeResponse);
                 }
-                CurrentQrCode = new EmergenceQrCode(this, qrCodeResponse.Result1, EmergenceSingleton.Instance.CurrentDeviceId);
+                CurrentQrCode = new EmergenceQrCode(this, qrCodeResponse.Result1, qrCodeResponse.Result2, EmergenceSingleton.Instance.CurrentDeviceId);
             }
             catch (Exception e) when (e is not OperationCanceledException and not QrCodeRequestFailedException)
             {

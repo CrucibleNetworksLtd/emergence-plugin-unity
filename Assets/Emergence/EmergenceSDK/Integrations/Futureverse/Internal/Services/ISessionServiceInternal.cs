@@ -19,7 +19,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         /// <summary>
         /// Attempts to get the login QR code
         /// </summary>
-        UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync(CancellationToken ct = default);
+        UniTask<ServiceResponse<Texture2D, string>> GetQrCodeAsync(CancellationToken ct = default);
 
         /// <summary>
         /// Attempts to disconnect the user from Emergence, the success callback will fire if successful

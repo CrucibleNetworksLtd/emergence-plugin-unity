@@ -1,17 +1,14 @@
 using System;
-using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Implementations.Login;
 using EmergenceSDK.Implementations.Login.Exceptions;
 using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
-using EmergenceSDK.Integrations.Futureverse.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace EmergenceSDK.Internal.UI.Screens
@@ -25,6 +22,9 @@ namespace EmergenceSDK.Internal.UI.Screens
         public RawImage rawQrImage;
 
         public Button backButton;
+        public GameObject urlContainer;
+        public TMP_InputField urlInputField;
+        public Button copyUrlButton;
         public TextMeshProUGUI refreshCounterText;
         public TextMeshProUGUI refreshText;
 
@@ -42,8 +42,8 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void SetTimeRemainingText(LoginManager _, EmergenceQrCode emergenceQrCode) => refreshCounterText.text = emergenceQrCode.TimeLeftInt.ToString("0");
 
-
         public static LogInScreen Instance;
+        private LoginSettings loginSettings;
 
         private static IWalletServiceInternal WalletServiceInternal => EmergenceServiceProvider.GetService<IWalletServiceInternal>();
 
@@ -75,6 +75,8 @@ namespace EmergenceSDK.Internal.UI.Screens
                         texture2D.filterMode = FilterMode.Point;
                         rawQrImage.texture = texture2D;
                         refreshText.text = "QR expires in:";
+                        urlInputField.text = loginManager.CurrentQrCode.WalletConnectUrl;
+                        copyUrlButton.interactable = true;
                         break;
                     case LoginStep.HandshakeRequest:
                         HeaderScreen.Instance.Refresh(((IWalletService)WalletServiceInternal).ChecksummedWalletAddress);
@@ -121,6 +123,17 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void HandleLoginStarted(LoginManager _)
         {
+            if (loginSettings.HasFlag(LoginSettings.EnableFuturepass))
+            {
+                urlContainer.SetActive(false);
+            }
+            else
+            {
+                urlContainer.SetActive(true);
+                copyUrlButton.interactable = false;
+                urlInputField.text = "";
+            }
+            
             rawQrImage.texture = null;
             HideAllScreens();
             qrScreen.SetActive(true);
@@ -142,7 +155,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             UniTask.Void(async () =>
             {
                 await loginManager.WaitUntilAvailable();
-                await loginManager.StartLogin(LoginSettings.EnableFuturepass);
+                await loginManager.StartLogin(loginSettings = LoginSettings.EnableFuturepass);
             });
         }
 
@@ -159,7 +172,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             UniTask.Void(async () =>
             {
                 await loginManager.WaitUntilAvailable();
-                await loginManager.StartLogin(LoginSettings.Default);
+                await loginManager.StartLogin(loginSettings = LoginSettings.Default);
             });
         }
 

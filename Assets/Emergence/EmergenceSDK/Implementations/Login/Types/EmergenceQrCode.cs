@@ -16,6 +16,10 @@ namespace EmergenceSDK.Implementations.Login.Types
         /// </summary>
         public readonly Texture2D Texture;
         /// <summary>
+        /// The <see cref="string"/> containing the WalletConnect Url.
+        /// </summary>
+        public readonly string WalletConnectUrl;
+        /// <summary>
         /// The time left on the QR code, as a float
         /// </summary>
         public float TimeLeft => Math.Max(0, LoginManager.QrCodeTimeout - (Time.realtimeSinceStartup - TimeIssued));
@@ -31,10 +35,11 @@ namespace EmergenceSDK.Implementations.Login.Types
         private bool ticking = false;
 
 
-        internal EmergenceQrCode(LoginManager loginManager, Texture2D texture, string deviceId)
+        internal EmergenceQrCode(LoginManager loginManager, Texture2D texture, string walletConnectUrl, string deviceId)
         {
             LoginManager = loginManager;
             Texture = texture;
+            WalletConnectUrl = walletConnectUrl;
             DeviceId = deviceId;
             TimeIssued = Time.realtimeSinceStartup;
                 

@@ -135,29 +135,29 @@ namespace EmergenceSDK.Internal.Services
                 errorCallback?.Invoke("Error in Disconnect.", (long)response.Code);
         }
 
-        public async UniTask<ServiceResponse<Texture2D>> GetQrCodeAsync(CancellationToken ct)
+        public async UniTask<ServiceResponse<Texture2D, string>> GetQrCodeAsync(CancellationToken ct)
         {
             try
             {
-                string url = StaticConfig.APIBase + "qrcode";
+                var url = StaticConfig.APIBase + "qrcode";
                 var response = await WebRequestService.DownloadTextureAsync(RequestMethod.Get, url, ct: ct);
                 if (!response.Successful)
                 {
-                    return new ServiceResponse<Texture2D>(false);
+                    return new ServiceResponse<Texture2D, string>(false);
                 }
                 
                 if (EmergenceUtils.ResponseError(response))
                 {
-                    return new ServiceResponse<Texture2D>(false);
+                    return new ServiceResponse<Texture2D, string>(false);
                 }
 
-                string deviceId = response.Headers["deviceId"];
+                var deviceId = response.Headers["deviceId"];
                 EmergenceSingleton.Instance.CurrentDeviceId = deviceId;
-                return new ServiceResponse<Texture2D>(true, ((TextureWebResponse)response).Texture);
+                return new ServiceResponse<Texture2D, string>(true, ((TextureWebResponse)response).Texture, response.Headers["walletconnecturi"]);
             }
             catch (Exception e) when (e is not OperationCanceledException) 
             {
-                return new ServiceResponse<Texture2D>(false);
+                return new ServiceResponse<Texture2D, string>(false);
             }
         }
 
