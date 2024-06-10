@@ -21,6 +21,7 @@ namespace EmergenceSDK
 
         public ReconnectionQR ReconnectionQR => reconnectionQR ??= GetComponentInChildren<ReconnectionQR>(true);
         public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
+        
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
         public EmergenceConfiguration Configuration;
@@ -53,6 +54,9 @@ namespace EmergenceSDK
         [Header("Set the emergence SDK log level")]
         public EmergenceLogger.LogLevel LogLevel;
         
+        [Header("Settings for the default Emergence UI")]
+        public LoginFlow DefaultLoginFlow = LoginFlow.WalletConnect;
+
         private ReconnectionQR reconnectionQR;
         private ISessionService sessionService;
 
@@ -71,7 +75,7 @@ namespace EmergenceSDK
                 {
                     ScreenManager.Instance.gameObject.SetActive(true);
                     
-                    if (sessionService is {IsLoggedIn: true} && ScreenManager.Instance.ScreenState < ScreenManager.ScreenStates.Dashboard)
+                    if (sessionService is { IsLoggedIn: true } && ScreenManager.Instance.ScreenState < ScreenManager.ScreenStates.Dashboard)
                     {
                         ScreenManager.Instance.ShowDashboard().Forget();
                     }

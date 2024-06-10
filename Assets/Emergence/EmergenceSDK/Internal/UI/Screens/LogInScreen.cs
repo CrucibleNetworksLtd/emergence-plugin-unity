@@ -176,7 +176,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             });
         }
 
-        private void CreateFPassClicked()
+        private static void CreateFPassClicked()
         {
             Application.OpenURL("https://futurepass.futureverse.app/");
         }
@@ -190,7 +190,20 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             HideAllScreens();
             startupScreen.SetActive(true);
-            SetLoginButtonsInteractable(true);
+            switch (EmergenceSingleton.Instance.DefaultLoginFlow)
+            {
+                case LoginFlow.Futurepass:
+                    LoginWithFvClicked();
+                    break;
+                case LoginFlow.WalletConnect:
+                    LoginWithWcClicked();
+                    break;
+                case LoginFlow.Both:
+                    SetLoginButtonsInteractable(true);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.DefaultLoginFlow));
+            }
         }
     }
 }
