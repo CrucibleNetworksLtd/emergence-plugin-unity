@@ -74,7 +74,6 @@ namespace EmergenceSDK.Internal.UI.Personas
             ModalCancel.Instance.Show("Retrieving avatar data...", () => {
                 cts.Cancel();
                 ModalCancel.Instance.Hide();
-                ScreenManager.Instance.ShowDashboard();
             });
 
             // Default avatar
@@ -91,7 +90,6 @@ namespace EmergenceSDK.Internal.UI.Personas
                         {
                             cts.Cancel();
                             ModalCancel.Instance.Hide();
-                            ScreenManager.Instance.ShowDashboard();
                         });
                         
                         requestingInProgress = true;
