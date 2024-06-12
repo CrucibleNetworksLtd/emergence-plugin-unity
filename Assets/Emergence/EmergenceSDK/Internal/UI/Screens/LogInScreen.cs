@@ -32,12 +32,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         [Header("Sub Screens")]
         public GameObject qrScreen;
         public GameObject futureverseScreen;
-        public GameObject startupScreen;
 
-        [Header("Futureverse")]
-        public Button loginWithFv;
-
-        public Button loginWithWc;
         public Button createFPass;
         public Button retryFPassCheck;
 
@@ -45,6 +40,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public static LogInScreen Instance;
         private LoginSettings loginSettings;
+        private bool wasEnabled = false;
 
         private static IWalletServiceInternal WalletServiceInternal => EmergenceServiceProvider.GetService<IWalletServiceInternal>();
 
@@ -52,8 +48,6 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             Instance = this;
 
-            loginWithFv.onClick.AddListener(LoginWithFvClicked);
-            loginWithWc.onClick.AddListener(LoginWithWcClicked);
             backButton.onClick.AddListener(() => loginManager.CancelLogin());
 
             createFPass.onClick.AddListener(CreateFPassClicked);
@@ -61,8 +55,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
             loginManager.qrCodeTickEvent.AddListener(SetTimeRemainingText);
             loginManager.loginStartedEvent.AddListener(HandleLoginStarted);
-            loginManager.loginCancelledEvent.AddListener((_) => { Restart(); });
-            loginManager.loginEndedEvent.AddListener((_) => { SetLoginButtonsInteractable(true); });
+            loginManager.loginCancelledEvent.AddListener((_) => { loginManager.CancelLogin(); EmergenceSingleton.Instance.CloseEmergenceUI(); });
             loginManager.loginFailedEvent.AddListener(HandleLoginErrors);
 
             loginManager.loginStepUpdatedEvent.AddListener((_, loginStep, stepPhase) =>
@@ -94,7 +87,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
             loginManager.loginSuccessfulEvent.AddListener((_, _) =>
             {
-                PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
+                LoginManager.SetFirstLoginFlag();
                 ScreenManager.Instance.ShowDashboard().Forget();
             });
         }
@@ -117,7 +110,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                     or QrCodeRequestFailedException:
                     exceptionContainer.HandleException();
                     EmergenceLogger.LogWarning(e);
-                    startupScreen.SetActive(true);
                     break;
             }
         }
@@ -146,12 +138,10 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             qrScreen.SetActive(false);
             futureverseScreen.SetActive(false);
-            startupScreen.SetActive(false);
         }
 
-        private void LoginWithFvClicked()
+        private void ShowLoginWithFv()
         {
-            SetLoginButtonsInteractable(false);
             EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
             UniTask.Void(async () =>
             {
@@ -160,16 +150,9 @@ namespace EmergenceSDK.Internal.UI.Screens
             });
         }
 
-        private void SetLoginButtonsInteractable(bool interactable)
-        {
-            loginWithFv.interactable = interactable;
-            loginWithWc.interactable = interactable;
-        }
-
-        private void LoginWithWcClicked()
+        private void ShowLoginWithWc()
         {
             EmergenceServiceProvider.Load(ServiceProfile.Default);
-            SetLoginButtonsInteractable(false);
             UniTask.Void(async () =>
             {
                 await loginManager.WaitUntilAvailable();
@@ -186,23 +169,28 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void RetryFPassCheckClicked()
         {
-            Restart();
+            SetupLogin();
         }
 
-        public void Restart()
+        private void OnEnable()
         {
+            if (!loginManager.IsBusy)
+            {
+                SetupLogin();
+            }
+        }
+
+        private void SetupLogin()
+        {
+            Debug.Log("Setup Login");
             HideAllScreens();
-            startupScreen.SetActive(true);
             switch (EmergenceSingleton.Instance.DefaultLoginFlow)
             {
                 case LoginFlow.Futurepass:
-                    LoginWithFvClicked();
+                    ShowLoginWithFv();
                     break;
                 case LoginFlow.WalletConnect:
-                    LoginWithWcClicked();
-                    break;
-                case LoginFlow.Both:
-                    SetLoginButtonsInteractable(true);
+                    ShowLoginWithWc();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.DefaultLoginFlow));

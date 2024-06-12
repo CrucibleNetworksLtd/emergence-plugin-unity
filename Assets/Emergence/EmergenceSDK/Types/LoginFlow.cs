@@ -2,7 +2,6 @@
 {
     public enum LoginFlow
     {
-        Both,
         Futurepass,
         WalletConnect
     }

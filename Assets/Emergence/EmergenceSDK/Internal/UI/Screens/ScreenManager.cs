@@ -159,7 +159,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                 case ScreenStates.LogIn:
                     LOGInScreen.SetActive(true);
                     ScreensRoot.SetActive(false);
-                    LOGInScreen.GetComponent<LogInScreen>().Restart();
                     break;
                 case ScreenStates.Dashboard:
                     ScreensRoot.SetActive(true);
@@ -236,7 +235,6 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public UniTask Restart()
         {
-            LogInScreen.Instance.Restart();
             return ChangeState(ScreenStates.LogIn);
         }
     }
