@@ -73,8 +73,6 @@ namespace EmergenceSDK.Internal.UI.Personas
             var cts = new CancellationTokenSource();
             ModalCancel.Instance.Show("Retrieving avatar data...", () => {
                 cts.Cancel();
-                ModalCancel.Instance.Hide();
-                ScreenManager.Instance.ShowDashboard();
             });
 
             // Default avatar
@@ -90,8 +88,6 @@ namespace EmergenceSDK.Internal.UI.Personas
                         ModalCancel.Instance.Show("Retrieving avatar images...", () =>
                         {
                             cts.Cancel();
-                            ModalCancel.Instance.Hide();
-                            ScreenManager.Instance.ShowDashboard();
                         });
                         
                         requestingInProgress = true;
