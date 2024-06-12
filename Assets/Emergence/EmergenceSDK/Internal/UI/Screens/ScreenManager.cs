@@ -20,8 +20,8 @@ namespace EmergenceSDK.Internal.UI.Screens
         [SerializeField]
         private GameObject ScreensRoot;
 
-        [SerializeField]
-        private GameObject LOGInScreen;
+        [FormerlySerializedAs("LOGInScreen")] [SerializeField]
+        private GameObject LogInScreen;
 
         [SerializeField]
         private GameObject DashboardScreen;
@@ -138,7 +138,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private async UniTask ChangeState(ScreenStates newState)
         {
             WelcomeScreen.SetActive(false);
-            LOGInScreen.SetActive(false);
+            LogInScreen.SetActive(false);
             DashboardScreen.SetActive(false);
             EditPersonaScreen.SetActive(false);
             DisconnectModal.SetActive(false);
@@ -157,7 +157,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     ScreensRoot.SetActive(false);
                     break;
                 case ScreenStates.LogIn:
-                    LOGInScreen.SetActive(true);
+                    LogInScreen.SetActive(true);
                     ScreensRoot.SetActive(false);
                     break;
                 case ScreenStates.Dashboard:
