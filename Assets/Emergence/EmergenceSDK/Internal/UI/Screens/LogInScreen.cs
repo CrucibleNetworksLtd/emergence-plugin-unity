@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using EmergenceSDK.Implementations.Login;
 using EmergenceSDK.Implementations.Login.Exceptions;
 using EmergenceSDK.Implementations.Login.Types;
+using EmergenceSDK.Integrations.Futureverse;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -178,7 +179,9 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private static void CreateFPassClicked()
         {
-            Application.OpenURL("https://futurepass.futureverse.app/");
+            Application.OpenURL(FutureverseSingleton.Instance.Environment == EmergenceEnvironment.Production
+                ? "https://futurepass.futureverse.app/"
+                : "https://identity-dashboard.futureverse.cloud/");
         }
 
         private void RetryFPassCheckClicked()
