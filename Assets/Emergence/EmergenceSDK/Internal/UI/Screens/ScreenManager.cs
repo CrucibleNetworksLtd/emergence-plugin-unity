@@ -20,7 +20,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         [SerializeField]
         private GameObject ScreensRoot;
 
-        [FormerlySerializedAs("LOGInScreen")] [SerializeField]
+        [SerializeField]
         private GameObject LogInScreen;
 
         [SerializeField]
