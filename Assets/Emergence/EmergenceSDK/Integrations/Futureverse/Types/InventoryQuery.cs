@@ -35,7 +35,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Types
             Variables = new QueryVariables
             {
                 Addresses = combinedAddress,
-                First = 100
+                First = 1000
             };
         }
 
