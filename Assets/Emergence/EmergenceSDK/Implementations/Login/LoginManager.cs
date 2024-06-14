@@ -81,7 +81,7 @@ namespace EmergenceSDK.Implementations.Login
         /// </summary>
         public QrCodeTickEvent qrCodeTickEvent;
 
-        internal const float QrCodeTimeout = 60;
+        public float qrCodeTimeout = 60;
 
         private CancellationTokenSource cts;
         private CancellationToken ct;
@@ -294,7 +294,7 @@ namespace EmergenceSDK.Implementations.Login
                 
             try
             {
-                var handshakeResponse = await walletServiceInternal.HandshakeAsync(ct: ct);
+                var handshakeResponse = await walletServiceInternal.HandshakeAsync(ct: ct, timeout: qrCodeTimeout * 1000);
                 ct.ThrowIfCancellationRequested();
                 if (!handshakeResponse.Successful)
                 {
