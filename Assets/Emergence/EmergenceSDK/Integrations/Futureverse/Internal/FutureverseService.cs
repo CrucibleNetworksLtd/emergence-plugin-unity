@@ -340,6 +340,53 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return ArtmStatus.Pending;
         }
 
+        public async UniTask<ServiceResponse<InventoryResponse>> GetFuturepassInventoryByCollectionAndOwnerAsync(List<string> addresses, List<string> collectionIds)
+        {
+            var queryObject = new 
+            {
+                query = @"query Asset($addresses: [ChainAddress!]!, $first: Float, $collectionIds: [CollectionId!]) {
+                    assets(addresses: $addresses, first: $first, collectionIds: $collectionIds) {
+                        edges {
+                            node {
+                                metadata {
+                                    properties
+                                    attributes
+                                }
+                                collection {
+                                    chainId
+                                    chainType
+                                    location
+                                    name
+                                }
+                                tokenId
+                                collectionId
+                            }
+                        }
+                    }
+                }",
+                variables = new 
+                {
+                    addresses,
+                    first = 1000,
+                    collectionIds
+                }
+            };
+            
+            var body = SerializationHelper.Serialize(queryObject);
+            var response = await WebRequestService.SendAsyncWebRequest(
+                RequestMethod.Post,
+                GetArApiUrl(),
+                body,
+                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
+            
+            if (!response.Successful)
+                return new ServiceResponse<InventoryResponse>(response, false, new InventoryResponse());
+
+            var fpResponse = SerializationHelper.Deserialize<InventoryResponse>(response.ResponseText);
+            return new ServiceResponse<InventoryResponse>(response, true, fpResponse);
+
+        }
+
         public async Task<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus)
         {
             if (!walletService.IsValidWallet)
