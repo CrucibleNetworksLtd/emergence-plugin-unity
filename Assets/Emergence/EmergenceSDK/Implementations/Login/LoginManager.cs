@@ -81,7 +81,7 @@ namespace EmergenceSDK.Implementations.Login
         /// </summary>
         public QrCodeTickEvent qrCodeTickEvent;
 
-        internal const float QrCodeTimeout = 60;
+        internal const float QrCodeTimeout = 3;
 
         private CancellationTokenSource cts;
         private CancellationToken ct;

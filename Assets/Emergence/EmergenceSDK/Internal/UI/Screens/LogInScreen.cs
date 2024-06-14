@@ -110,6 +110,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     or QrCodeRequestFailedException:
                     exceptionContainer.HandleException();
                     EmergenceLogger.LogWarning(e);
+                    SetupLogin().Forget();
                     break;
             }
         }
@@ -145,7 +146,6 @@ namespace EmergenceSDK.Internal.UI.Screens
             EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
             UniTask.Void(async () =>
             {
-                await loginManager.WaitUntilAvailable();
                 await loginManager.StartLogin(loginSettings = LoginSettings.EnableFuturepass);
             });
         }
@@ -155,7 +155,6 @@ namespace EmergenceSDK.Internal.UI.Screens
             EmergenceServiceProvider.Load(ServiceProfile.Default);
             UniTask.Void(async () =>
             {
-                await loginManager.WaitUntilAvailable();
                 await loginManager.StartLogin(loginSettings = LoginSettings.Default);
             });
         }
@@ -169,20 +168,13 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void RetryFPassCheckClicked()
         {
-            SetupLogin();
+            SetupLogin().Forget();
         }
-
-        private void OnEnable()
+        
+        public async UniTask SetupLogin()
         {
-            if (!loginManager.IsBusy)
-            {
-                SetupLogin();
-            }
-        }
-
-        private void SetupLogin()
-        {
-            Debug.Log("Setup Login");
+            loginManager.CancelLogin();
+            await loginManager.WaitUntilAvailable();
             HideAllScreens();
             switch (EmergenceSingleton.Instance.DefaultLoginFlow)
             {
@@ -194,6 +186,14 @@ namespace EmergenceSDK.Internal.UI.Screens
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.DefaultLoginFlow));
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (!loginManager.IsBusy)
+            {
+                SetupLogin().Forget();
             }
         }
     }

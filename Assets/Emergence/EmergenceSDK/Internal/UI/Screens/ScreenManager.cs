@@ -131,8 +131,6 @@ namespace EmergenceSDK.Internal.UI.Screens
             }
             
             personaUIManager = new PersonaUIManager(DashboardScreen.GetComponent<DashboardScreen>(), PersonaButtonPool, PersonaCarousel, PersonaScrollContents);
-
-            await ChangeState(ScreenState);
         }
 
         private async UniTask ChangeState(ScreenStates newState)
@@ -159,6 +157,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                 case ScreenStates.LogIn:
                     LogInScreen.SetActive(true);
                     ScreensRoot.SetActive(false);
+                    LogInScreen.GetComponent<LogInScreen>().SetupLogin().Forget();
                     break;
                 case ScreenStates.Dashboard:
                     ScreensRoot.SetActive(true);
