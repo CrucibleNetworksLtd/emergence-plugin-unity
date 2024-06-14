@@ -40,7 +40,6 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public static LogInScreen Instance;
         private LoginSettings loginSettings;
-        private bool wasEnabled = false;
 
         private static IWalletServiceInternal WalletServiceInternal => EmergenceServiceProvider.GetService<IWalletServiceInternal>();
 
