@@ -42,7 +42,7 @@ namespace EmergenceSDK.Samples.Examples
         private void OnWriteSuccess(BaseResponse<string> response)
         {
             // Logs the response to the console
-            Debug.Log($"{response}");
+            EmergenceLogger.LogInfo($"{response}");
         }
     }
 }
