@@ -157,7 +157,6 @@ namespace EmergenceSDK.Internal.UI.Screens
                 case ScreenStates.LogIn:
                     LogInScreen.SetActive(true);
                     ScreensRoot.SetActive(false);
-                    LogInScreen.GetComponent<LogInScreen>().SetupLogin().Forget();
                     break;
                 case ScreenStates.Dashboard:
                     ScreensRoot.SetActive(true);

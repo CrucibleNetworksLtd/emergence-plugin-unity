@@ -118,6 +118,7 @@ namespace EmergenceSDK.Implementations.Login
         /// <param name="loginSettings">What settings to use for the login attempt, see <see cref="LoginSettings"/> for more details.</param>
         public async UniTask StartLogin(LoginSettings loginSettings)
         {
+            Debug.Log("StartLogin");
             if (IsBusy) return;
             
             try

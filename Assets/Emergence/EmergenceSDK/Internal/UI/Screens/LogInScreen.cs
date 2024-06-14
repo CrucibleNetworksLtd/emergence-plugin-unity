@@ -151,6 +151,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void ShowLoginWithWc()
         {
+            Debug.Log("ShowLoginWithWc");
             EmergenceServiceProvider.Load(ServiceProfile.Default);
             UniTask.Void(async () =>
             {
@@ -169,9 +170,10 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             SetupLogin().Forget();
         }
-        
-        public async UniTask SetupLogin()
+
+        private async UniTask SetupLogin()
         {
+            Debug.Log("SetupLogin");
             loginManager.CancelLogin();
             await loginManager.WaitUntilAvailable();
             HideAllScreens();
