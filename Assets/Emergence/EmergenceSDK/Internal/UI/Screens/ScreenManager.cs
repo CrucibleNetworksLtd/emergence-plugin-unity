@@ -21,7 +21,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         private GameObject ScreensRoot;
 
         [SerializeField]
-        private GameObject LOGInScreen;
+        private GameObject LogInScreen;
 
         [SerializeField]
         private GameObject DashboardScreen;
@@ -131,14 +131,12 @@ namespace EmergenceSDK.Internal.UI.Screens
             }
             
             personaUIManager = new PersonaUIManager(DashboardScreen.GetComponent<DashboardScreen>(), PersonaButtonPool, PersonaCarousel, PersonaScrollContents);
-
-            await ChangeState(ScreenState);
         }
 
         private async UniTask ChangeState(ScreenStates newState)
         {
             WelcomeScreen.SetActive(false);
-            LOGInScreen.SetActive(false);
+            LogInScreen.SetActive(false);
             DashboardScreen.SetActive(false);
             EditPersonaScreen.SetActive(false);
             DisconnectModal.SetActive(false);
@@ -157,7 +155,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     ScreensRoot.SetActive(false);
                     break;
                 case ScreenStates.LogIn:
-                    LOGInScreen.SetActive(true);
+                    LogInScreen.SetActive(true);
                     ScreensRoot.SetActive(false);
                     break;
                 case ScreenStates.Dashboard:
@@ -235,7 +233,6 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         public UniTask Restart()
         {
-            LogInScreen.Instance.Restart();
             return ChangeState(ScreenStates.LogIn);
         }
     }

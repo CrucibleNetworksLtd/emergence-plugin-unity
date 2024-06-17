@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Implementations.Login;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
@@ -161,7 +162,7 @@ namespace EmergenceSDK.Internal.UI
             if (!tokenResponse.Successful)
                 return false;
 
-            PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
+            LoginManager.SetFirstLoginFlag();
             ScreenManager.Instance.ShowDashboard().Forget();
             return true;
         }

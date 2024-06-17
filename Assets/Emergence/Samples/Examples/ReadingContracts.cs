@@ -38,7 +38,7 @@ namespace EmergenceSDK.Samples.Examples
         private void ReadSuccess<T>(T response)
         {
             // Logs the response to the console
-            Debug.Log($"{response}");
+            EmergenceLogger.LogInfo($"{response}");
         }
     }
 }

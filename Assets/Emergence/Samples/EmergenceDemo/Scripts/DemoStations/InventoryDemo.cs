@@ -31,7 +31,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Start()
         {
-            inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
+            EmergenceServiceProvider.OnServicesLoaded += _ => inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
             inventoryItemStore = new InventoryItemStore();
             
             instructionsGO.SetActive(false);

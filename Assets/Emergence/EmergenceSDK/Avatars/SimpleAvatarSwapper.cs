@@ -142,7 +142,7 @@ namespace EmergenceSDK.Avatars
             catch (OperationCanceledException)
             {
                 // Log cancellation
-                Debug.Log("Avatar swap operation was cancelled.");
+                EmergenceLogger.LogInfo("Avatar swap operation was cancelled.");
             }
             finally
             {
