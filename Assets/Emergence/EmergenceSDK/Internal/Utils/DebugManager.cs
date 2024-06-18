@@ -47,7 +47,11 @@ namespace EmergenceSDK.Internal.Utils
                 if (sessionService != null && walletService != null)
                 {                
                     bool isWalletConnected = sessionService.IsLoggedIn;
-                    walletInfo = string.Format("Wallet Connected: {0} WalletAddress: {1}", isWalletConnected.ToString(), isWalletConnected ? "N/A" : walletService.WalletAddress);
+                    walletInfo = string.Format("Wallet Connected: {0} WalletAddress: {1}", isWalletConnected.ToString(), isWalletConnected ? walletService.WalletAddress : "N/A");
+                }
+                else
+                {
+                    walletInfo = "Wallet Connected: False";
                 }
 
                 cachedDebugInfo = BuildInfoGenerator.GetBuildInfo() + walletInfo;
