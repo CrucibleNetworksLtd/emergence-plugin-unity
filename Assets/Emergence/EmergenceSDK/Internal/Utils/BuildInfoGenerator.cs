@@ -75,7 +75,7 @@ namespace EmergenceSDK.Internal.Utils
                 gitInfo = "Unable to Parse Git Info";
             }
 
-            output = string.Format("Build Info | UTC Date/Time: {0} | Unity{1}\n{2}", utcNow, unityVersion, gitInfo);
+            output = string.Format("UTC Date/Time: {0} | Emergence SDK Build Info | Unity{1}\n{2}", utcNow, unityVersion, gitInfo);
             return output;
         }
 

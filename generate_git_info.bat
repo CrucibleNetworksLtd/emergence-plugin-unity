@@ -15,6 +15,6 @@ rem Create the Resources directory if it doesn't exist
 if not exist "Assets\YourPlugin\Resources" mkdir "Assets\Emergence\Resources"
 
 rem Write the Git information to a text file
-echo Branch: !GIT_BRANCH! / Commit: !GIT_COMMIT! > Assets\Emergence\Resources\git_info.txt
+echo Branch: !GIT_BRANCH! ^| Commit: !GIT_COMMIT! > Assets\Emergence\Resources\git_info.txt
 
 echo "Git info generated successfully."
