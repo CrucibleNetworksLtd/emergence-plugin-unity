@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using EmergenceSDK.Implementations.Login;
 using EmergenceSDK.Implementations.Login.Exceptions;
 using EmergenceSDK.Implementations.Login.Types;
+using EmergenceSDK.Integrations.Futureverse;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
@@ -31,12 +32,7 @@ namespace EmergenceSDK.Internal.UI.Screens
         [Header("Sub Screens")]
         public GameObject qrScreen;
         public GameObject futureverseScreen;
-        public GameObject startupScreen;
 
-        [Header("Futureverse")]
-        public Button loginWithFv;
-
-        public Button loginWithWc;
         public Button createFPass;
         public Button retryFPassCheck;
 
@@ -51,8 +47,6 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             Instance = this;
 
-            loginWithFv.onClick.AddListener(LoginWithFvClicked);
-            loginWithWc.onClick.AddListener(LoginWithWcClicked);
             backButton.onClick.AddListener(() => loginManager.CancelLogin());
 
             createFPass.onClick.AddListener(CreateFPassClicked);
@@ -60,8 +54,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
             loginManager.qrCodeTickEvent.AddListener(SetTimeRemainingText);
             loginManager.loginStartedEvent.AddListener(HandleLoginStarted);
-            loginManager.loginCancelledEvent.AddListener((_) => { Restart(); });
-            loginManager.loginEndedEvent.AddListener((_) => { SetLoginButtonsInteractable(true); });
+            loginManager.loginCancelledEvent.AddListener((_) => { loginManager.CancelLogin(); EmergenceSingleton.Instance.CloseEmergenceUI(); });
             loginManager.loginFailedEvent.AddListener(HandleLoginErrors);
 
             loginManager.loginStepUpdatedEvent.AddListener((_, loginStep, stepPhase) =>
@@ -93,7 +86,7 @@ namespace EmergenceSDK.Internal.UI.Screens
 
             loginManager.loginSuccessfulEvent.AddListener((_, _) =>
             {
-                PlayerPrefs.SetInt(StaticConfig.HasLoggedInOnceKey, 1);
+                LoginManager.SetFirstLoginFlag();
                 ScreenManager.Instance.ShowDashboard().Forget();
             });
         }
@@ -116,7 +109,7 @@ namespace EmergenceSDK.Internal.UI.Screens
                     or QrCodeRequestFailedException:
                     exceptionContainer.HandleException();
                     EmergenceLogger.LogWarning(e);
-                    startupScreen.SetActive(true);
+                    SetupLogin().Forget();
                     break;
             }
         }
@@ -145,52 +138,62 @@ namespace EmergenceSDK.Internal.UI.Screens
         {
             qrScreen.SetActive(false);
             futureverseScreen.SetActive(false);
-            startupScreen.SetActive(false);
         }
 
-        private void LoginWithFvClicked()
+        private void ShowLoginWithFv()
         {
-            SetLoginButtonsInteractable(false);
             EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
             UniTask.Void(async () =>
             {
-                await loginManager.WaitUntilAvailable();
                 await loginManager.StartLogin(loginSettings = LoginSettings.EnableFuturepass);
             });
         }
 
-        private void SetLoginButtonsInteractable(bool interactable)
-        {
-            loginWithFv.interactable = interactable;
-            loginWithWc.interactable = interactable;
-        }
-
-        private void LoginWithWcClicked()
+        private void ShowLoginWithWc()
         {
             EmergenceServiceProvider.Load(ServiceProfile.Default);
-            SetLoginButtonsInteractable(false);
             UniTask.Void(async () =>
             {
-                await loginManager.WaitUntilAvailable();
                 await loginManager.StartLogin(loginSettings = LoginSettings.Default);
             });
         }
 
-        private void CreateFPassClicked()
+        private static void CreateFPassClicked()
         {
-            Application.OpenURL("https://futurepass.futureverse.app/");
+            Application.OpenURL(FutureverseSingleton.Instance.Environment == EmergenceEnvironment.Production
+                ? "https://futurepass.futureverse.app/"
+                : "https://identity-dashboard.futureverse.cloud/");
         }
 
         private void RetryFPassCheckClicked()
         {
-            Restart();
+            SetupLogin().Forget();
         }
 
-        public void Restart()
+        private async UniTask SetupLogin()
         {
+            loginManager.CancelLogin();
+            await loginManager.WaitUntilAvailable();
             HideAllScreens();
-            startupScreen.SetActive(true);
-            SetLoginButtonsInteractable(true);
+            switch (EmergenceSingleton.Instance.DefaultLoginFlow)
+            {
+                case LoginFlow.Futurepass:
+                    ShowLoginWithFv();
+                    break;
+                case LoginFlow.WalletConnect:
+                    ShowLoginWithWc();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.DefaultLoginFlow));
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (!loginManager.IsBusy)
+            {
+                SetupLogin().Forget();
+            }
         }
     }
 }

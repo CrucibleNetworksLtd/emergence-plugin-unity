@@ -9662,7 +9662,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WelcomeScreen: {fileID: 5832855823895415639}
   ScreensRoot: {fileID: 5832855823725391494}
-  LOGInScreen: {fileID: 4128247246838171823}
+  LogInScreen: {fileID: 4128247246838171823}
   DashboardScreen: {fileID: 5832855823538712321}
   EditPersonaScreen: {fileID: 5832855823978190688}
   MyCollectionScreen: {fileID: 5832855823506862652}
@@ -13250,7 +13250,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 32700
+  m_SortingOrder: 32767
   m_TargetDisplay: 0
 --- !u!114 &5832855823554781170
 MonoBehaviour:
@@ -13836,7 +13836,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5832855822627826034}
   m_HandleRect: {fileID: 5832855822627826033}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -15046,7 +15046,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5832855824203081859}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -16461,8 +16461,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5832855823803862095}
   m_HandleRect: {fileID: 5832855823803862094}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.9999997
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

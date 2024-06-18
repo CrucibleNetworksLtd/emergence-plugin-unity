@@ -252,7 +252,7 @@ Making sure that the UI is displayed correctly and that the user can login to th
 - [ ] The user can scan the QR code with their wallet app and get a sign in request.
 - [ ] The user can sign the request and be logged in to their Emergence account.
 - [ ] If the user declines the sign in request the QR code is refreshed.
-- [ ] The QR code is refreshed every 60 seconds.
+- [ ] The QR code is refreshed every time the countdown reaches 0, if it hasn't been scanned yet.
 - [ ] The QR code time to refresh is displayed on the screen under the QR code.
 
 
