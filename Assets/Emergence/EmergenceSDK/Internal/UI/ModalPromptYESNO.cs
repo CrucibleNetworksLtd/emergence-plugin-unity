@@ -10,7 +10,6 @@ namespace EmergenceSDK.Internal.UI
         public TextMeshProUGUI label;
         public Button yesButton;
         public Button noButton;
-        public Image bgBlurredImage;
 
         public static ModalPromptYESNO Instance;
 
@@ -39,13 +38,11 @@ namespace EmergenceSDK.Internal.UI
             gameObject.SetActive(true);
             this.yesCallback = yesCallback;
             this.noCallback = noCallback;
-            bgBlurredImage.enabled = false;
         }
 
         public void Hide()
         {
             gameObject.SetActive(false);
-            bgBlurredImage.enabled = true;
         }
 
         private void OnYesClicked()
