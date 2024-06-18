@@ -53,6 +53,12 @@ namespace EmergenceSDK
 
         [Header("Set the emergence SDK log level")]
         public EmergenceLogger.LogLevel LogLevel;
+
+        /// <summary>
+        /// Debug key to Log build info  and display the Debug Overlay.
+        /// </summary>
+        [SerializeField] 
+        private KeyCode DebugOverlayKeyCode = KeyCode.P;
         
         [Header("Settings for the default Emergence UI")]
         public LoginFlow DefaultLoginFlow = LoginFlow.WalletConnect;
@@ -172,6 +178,11 @@ namespace EmergenceSDK
                 }
                 ToggleUI();
             }
+
+            if (Input.GetKeyDown(DebugOverlayKeyCode))
+            {
+                ToggleDebugOverlay();
+            }
         }
         
         private void ToggleUI()
@@ -198,6 +209,17 @@ namespace EmergenceSDK
                 {
                     CloseEmergenceUI();
                 }
+            }
+        }
+
+        private void ToggleDebugOverlay()
+        {
+            switch (environment)
+            {
+                case EmergenceEnvironment.Development:
+                case EmergenceEnvironment.Staging:
+                    DebugManager.Instance.ToggleDebugOverlay();
+                    break;
             }
         }
         
