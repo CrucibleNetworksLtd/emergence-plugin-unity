@@ -67,7 +67,7 @@ namespace EmergenceSDK.Internal.Utils
         public void CopyToClipboard()
         {
             GUIUtility.systemCopyBuffer = cachedDebugInfo;
-            Debug.Log("Build info copied to clipboard.");
+            Debug.Log("Debug info copied to clipboard.");
         }
     }
 }
