@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b788b53a5f437c0489c8bd8b4b4a8fc6, type: 3}
   m_Name: Ethereum
   m_EditorClassIdentifier: 
-  DefaultNodeURL: https://mainnet.infura.io/v3/https://mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134
+  DefaultNodeURL: https://mainnet.infura.io/v3/cb3531f01dcf4321bbde11cd0dd25134
   ChainID: 1
   NetworkName: Ethereum
   CurrencySymbol: ETH
