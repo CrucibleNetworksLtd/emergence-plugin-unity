@@ -1,13 +1,10 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Implementations.Login;
-using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 
-namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
+namespace EmergenceSDK.Internal.Services
 {
     internal interface IWalletServiceInternal : IEmergenceService
     {

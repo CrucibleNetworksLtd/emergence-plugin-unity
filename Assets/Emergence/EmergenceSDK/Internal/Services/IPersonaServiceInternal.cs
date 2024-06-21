@@ -4,7 +4,7 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 
-namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
+namespace EmergenceSDK.Internal.Services
 {
     internal interface IPersonaServiceInternal : IEmergenceService
     {

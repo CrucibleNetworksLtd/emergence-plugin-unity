@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
+using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEditor;

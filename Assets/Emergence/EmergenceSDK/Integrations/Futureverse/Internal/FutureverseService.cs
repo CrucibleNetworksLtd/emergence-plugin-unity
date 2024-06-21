@@ -295,13 +295,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
                 return new(true, transactionStatus);
             }
-            
-            bool ParseStatus(JObject jObject, out string status)
-            {
-                JToken statusToken = jObject.SelectToken("data.transaction.status");
-                status = statusToken?.Value<string>();
-                return status != null;
-            }
         }
 
         /// <exception cref="ArgumentOutOfRangeException"></exception>
@@ -384,7 +377,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
 
             var fpResponse = SerializationHelper.Deserialize<InventoryResponse>(response.ResponseText);
             return new ServiceResponse<InventoryResponse>(response, true, fpResponse);
-
         }
 
         public async Task<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus)
@@ -442,24 +434,31 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             return retrieveStatus
                 ? new ArtmTransactionResponse(await ((IFutureverseService)this).GetArtmStatusAsync(transactionHash, maxRetries: 5), transactionHash)
                 : new ArtmTransactionResponse(transactionHash);
-
-            bool ParseNonce(JObject jObject, out int nonce)
+        }
+        
+        private bool ParseNonce(JObject jObject, out int nonce)
+        {
+            var tempNonce = (int?)jObject.SelectToken("data.getNonceForChainAddress");
+            if (tempNonce != null)
             {
-                var tempNonce = (int?)jObject.SelectToken("data.getNonceForChainAddress");
-                if (tempNonce != null)
-                {
-                    nonce = (int)tempNonce;
-                    return true;
-                }
-
-                nonce = default;
-                return false;
+                nonce = (int)tempNonce;
+                return true;
             }
+
+            nonce = default;
+            return false;
+        }
             
-            bool ParseTransactionHash(JObject jObject, out string hash)
-            {
-                return (hash = (string)jObject.SelectToken("data.submitTransaction.transactionHash")) != null && hash.Trim() != "";
-            }
+        private bool ParseTransactionHash(JObject jObject, out string hash)
+        {
+            return (hash = (string)jObject.SelectToken("data.submitTransaction.transactionHash")) != null && hash.Trim() != "";
+        }
+        
+        private bool ParseStatus(JObject jObject, out string status)
+        {
+            JToken statusToken = jObject.SelectToken("data.transaction.status");
+            status = statusToken?.Value<string>();
+            return status != null;
         }
 
         private static JArray GetAndLogArResponseErrors(JObject responseObject)

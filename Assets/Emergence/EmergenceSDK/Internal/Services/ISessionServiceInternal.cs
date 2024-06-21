@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
 using UnityEngine;
 
-namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
+namespace EmergenceSDK.Internal.Services
 {
     internal interface ISessionServiceInternal : IEmergenceService
     {

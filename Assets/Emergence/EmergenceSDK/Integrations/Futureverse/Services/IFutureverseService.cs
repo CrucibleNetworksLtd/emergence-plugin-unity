@@ -61,7 +61,6 @@ namespace EmergenceSDK.Integrations.Futureverse.Services
         /// <param name="collectionId">Collection ID for tree retrieval</param>
         /// <returns>A <see cref="List{T}"/> of <see cref="AssetTreePath"/> objects</returns>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
-        /// <exception cref="FutureverseInvalidJsonStructureException">Thrown if the asset tree response doesn't match the expected JSON structure</exception>
         UniTask<List<AssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId);
 
         /// <summary>

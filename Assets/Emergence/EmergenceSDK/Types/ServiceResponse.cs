@@ -23,7 +23,6 @@ namespace EmergenceSDK.Types
 
         public ServiceResponse(ServiceResponse response, bool successful) : this(response.Response, successful) {}
         public ServiceResponse(WebResponse response) : this(response, response?.Successful ?? false) {}
-        public ServiceResponse(ServiceResponse response) : this(response, response?.Successful ?? false) {}
         public ServiceResponse(bool successful) : this((WebResponse)null, successful) {}
 
         ~ServiceResponse()
@@ -49,7 +48,6 @@ namespace EmergenceSDK.Types
         
         public ServiceResponse(ServiceResponse response, bool successful, T1 result1 = default) : this(response.Response, successful, result1) { }
         public ServiceResponse(WebResponse response, T1 result1 = default) : this(response, response?.Successful ?? false, result1) { }
-        public ServiceResponse(ServiceResponse response, T1 result1 = default) : this(response, response?.Successful ?? false, result1) { }
         public ServiceResponse(bool successful, T1 result1 = default) : this((WebResponse)null, successful, result1) { }
     }
 
@@ -64,7 +62,6 @@ namespace EmergenceSDK.Types
 
         public ServiceResponse(ServiceResponse response, bool successful, T1 result1 = default, T2 result2 = default) : this(response.Response, successful, result1, result2) { }
         public ServiceResponse(WebResponse response, T1 result1 = default, T2 result2 = default) : this(response, response?.Successful ?? false, result1, result2) { }
-        public ServiceResponse(ServiceResponse response, T1 result1 = default, T2 result2 = default) : this(response, response?.Successful ?? false, result1, result2) { }
         public ServiceResponse(bool successful, T1 result1 = default, T2 result2 = default) : this((WebResponse)null, successful, result1, result2) { }
     }
 }

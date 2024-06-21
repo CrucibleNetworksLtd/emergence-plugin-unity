@@ -6,6 +6,7 @@ using EmergenceSDK.Implementations.Login.Exceptions;
 using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Integrations.Futureverse.Services;
+using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;

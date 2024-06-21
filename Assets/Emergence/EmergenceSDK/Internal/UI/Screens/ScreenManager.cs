@@ -119,7 +119,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             CollectionToggle.onValueChanged.RemoveListener(OnCollectionButtonPressed);
         }
 
-        private async void Start()
+        private void Start()
         {
             // Get all the content size fitters in scroll areas and enable them for runtime
             // Disabling them on edit time avoids dirtying the scene as soon as it loads

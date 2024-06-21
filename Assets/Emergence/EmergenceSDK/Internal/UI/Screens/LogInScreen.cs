@@ -5,6 +5,7 @@ using EmergenceSDK.Implementations.Login.Exceptions;
 using EmergenceSDK.Implementations.Login.Types;
 using EmergenceSDK.Integrations.Futureverse;
 using EmergenceSDK.Integrations.Futureverse.Internal.Services;
+using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
@@ -39,7 +40,6 @@ namespace EmergenceSDK.Internal.UI.Screens
         private void SetTimeRemainingText(LoginManager _, EmergenceQrCode emergenceQrCode) => refreshCounterText.text = emergenceQrCode.TimeLeftInt.ToString("0");
 
         public static LogInScreen Instance;
-        private LoginSettings loginSettings;
 
         private static IWalletServiceInternal WalletServiceInternal => EmergenceServiceProvider.GetService<IWalletServiceInternal>();
 
@@ -137,7 +137,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
             UniTask.Void(async () =>
             {
-                await loginManager.StartLogin(loginSettings = LoginSettings.EnableFuturepass);
+                await loginManager.StartLogin(LoginSettings.EnableFuturepass);
             });
         }
 
@@ -146,7 +146,7 @@ namespace EmergenceSDK.Internal.UI.Screens
             EmergenceServiceProvider.Load(ServiceProfile.Default);
             UniTask.Void(async () =>
             {
-                await loginManager.StartLogin(loginSettings = LoginSettings.Default);
+                await loginManager.StartLogin(LoginSettings.Default);
             });
         }
 
