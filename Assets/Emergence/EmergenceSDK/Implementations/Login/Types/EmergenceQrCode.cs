@@ -22,7 +22,7 @@ namespace EmergenceSDK.Implementations.Login.Types
         /// <summary>
         /// The time left on the QR code, as a float
         /// </summary>
-        public float TimeLeft => Math.Max(0, LoginManager.QrCodeTimeout - (Time.realtimeSinceStartup - TimeIssued));
+        public float TimeLeft => Math.Max(0, LoginManager.qrCodeTimeout - (Time.realtimeSinceStartup - TimeIssued));
         /// <summary>
         /// The time left on the QR code, as a rounded up integer
         /// </summary>
