@@ -28,6 +28,11 @@ namespace EmergenceSDK.Implementations.Login
     public sealed class LoginManager : MonoBehaviour
     {
         /// <summary>
+        /// The timeout in seconds that will be used for each QR code shown to the user.
+        /// </summary>
+        [SerializeField]
+        internal float qrCodeTimeout = 60;
+        /// <summary>
         /// If true, when the MonoBehaviour gets disabled the login will automatically be canceled. 
         /// </summary>
         public bool cancelLoginsUponDisabling = true;
@@ -80,9 +85,7 @@ namespace EmergenceSDK.Implementations.Login
         /// <seealso cref="QrCodeTickEvent"/>
         /// </summary>
         public QrCodeTickEvent qrCodeTickEvent;
-
-        internal const float QrCodeTimeout = 60;
-
+        
         private CancellationTokenSource cts;
         private CancellationToken ct;
 
@@ -294,7 +297,7 @@ namespace EmergenceSDK.Implementations.Login
                 
             try
             {
-                var handshakeResponse = await walletServiceInternal.HandshakeAsync(ct: ct);
+                var handshakeResponse = await walletServiceInternal.HandshakeAsync(ct: ct, timeout: qrCodeTimeout * 1000);
                 ct.ThrowIfCancellationRequested();
                 if (!handshakeResponse.Successful)
                 {

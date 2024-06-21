@@ -57,7 +57,7 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal
             if (!response.Successful)
                 return new ServiceResponse<InventoryResponse>(response, false, new InventoryResponse());
 
-            InventoryResponse fpResponse = SerializationHelper.Deserialize<InventoryResponse>(response.ResponseText);
+            var fpResponse = SerializationHelper.Deserialize<InventoryResponse>(response.ResponseText);
             return new ServiceResponse<InventoryResponse>(response, true, fpResponse);
         }
 

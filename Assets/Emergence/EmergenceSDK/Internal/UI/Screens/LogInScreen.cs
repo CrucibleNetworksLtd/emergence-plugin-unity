@@ -116,17 +116,9 @@ namespace EmergenceSDK.Internal.UI.Screens
 
         private void HandleLoginStarted(LoginManager _)
         {
-            if (loginSettings.HasFlag(LoginSettings.EnableFuturepass))
-            {
-                urlContainer.SetActive(false);
-            }
-            else
-            {
-                urlContainer.SetActive(true);
-                copyUrlButton.interactable = false;
-                urlInputField.text = "";
-            }
-            
+            urlContainer.SetActive(true);
+            copyUrlButton.interactable = false;
+            urlInputField.text = "";
             rawQrImage.texture = null;
             HideAllScreens();
             qrScreen.SetActive(true);

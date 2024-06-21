@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Implementations.Login;
+using EmergenceSDK.Internal.Services;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using EmergenceSDK.Types.Delegates;
@@ -13,10 +14,10 @@ namespace EmergenceSDK.Integrations.Futureverse.Internal.Services
         /// <summary>
         /// Attempts to handshake with the Emergence server, retrieving the wallet address if successful.
         /// </summary>
-        UniTask Handshake(HandshakeSuccess success, ErrorCallback errorCallback, float timeout = LoginManager.QrCodeTimeout * 1000, CancellationCallback cancellationCallback = default, CancellationToken ct = default);
+        UniTask Handshake(HandshakeSuccess success, ErrorCallback errorCallback, float timeout = WebRequestService.DefaultTimeoutMilliseconds, CancellationCallback cancellationCallback = default, CancellationToken ct = default);
         /// <summary>
         /// Attempts to handshake with the Emergence server.
         /// </summary>
-        UniTask<ServiceResponse<string>> HandshakeAsync(float timeout = LoginManager.QrCodeTimeout * 1000, CancellationToken ct = default);
+        UniTask<ServiceResponse<string>> HandshakeAsync(float timeout = WebRequestService.DefaultTimeoutMilliseconds, CancellationToken ct = default);
     }
 }

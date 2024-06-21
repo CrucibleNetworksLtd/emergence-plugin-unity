@@ -18,18 +18,18 @@ namespace EmergenceSDK.Internal.Services
         internal class WebRequestInfo
         {
             private static int lastId = -1;
-            public readonly DateTime Time;
-            public readonly int Id;
+            internal readonly DateTime Time;
+            internal readonly int Id;
             /// <summary>
             /// The Request headers, only populated if the headers are passed to
             /// <see cref="WebRequestService.PerformAsyncWebRequest"/>
             /// to send the request
             /// </summary>
-            public readonly Dictionary<string, string> Headers;
-            public WebResponse Response { get; internal set; }
-            public readonly bool HadUploadHandler;
-            public readonly bool HadDownloadHandler;
-            public WebRequestInfo(Dictionary<string, string> requestHeaders, UnityWebRequest request)
+            internal readonly Dictionary<string, string> Headers;
+            internal WebResponse Response { get; set; }
+            internal readonly bool HadUploadHandler;
+            internal readonly bool HadDownloadHandler;
+            internal WebRequestInfo(Dictionary<string, string> requestHeaders, UnityWebRequest request)
             {
                 Id = ++lastId;
                 Time = DateTime.Now;
@@ -52,15 +52,15 @@ namespace EmergenceSDK.Internal.Services
             }
         }
         
-        private static WebRequestService _instance;
+        private static WebRequestService instance;
         
         // ReSharper disable once MemberCanBePrivate.Global
-        public static WebRequestService Instance => _instance ??= new WebRequestService();
+        internal static WebRequestService Instance => instance ??= new WebRequestService();
         private readonly ConcurrentDictionary<UnityWebRequest, WebRequestInfo> openRequests = new();
         private readonly ConcurrentDictionary<UnityWebRequest, WebRequestInfo> allRequests = new();
 
         //This timeout avoids this issue: https://forum.unity.com/threads/catching-curl-error-28.1274846/
-        private const int DefaultTimeoutMilliseconds = 100000;
+        internal const int DefaultTimeoutMilliseconds = 100000;
 
         private WebRequestService()
         {
@@ -109,7 +109,7 @@ namespace EmergenceSDK.Internal.Services
         /// Performs an asynchronous UnityWebRequest and returns the result as a <see cref="WebResponse"/>.
         /// <returns><see cref="WebResponse"/>, or <see cref="FailedWebResponse"/></returns>
         /// </summary>
-        public static async UniTask<WebResponse> SendAsyncWebRequest(RequestMethod method, string url,
+        internal static async UniTask<WebResponse> SendAsyncWebRequest(RequestMethod method, string url,
             string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, CancellationToken ct = default)
         {
             return await PerformAsyncWebRequest(CreateRequest(method, url, bodyData), headers, timeout, ct);
@@ -119,7 +119,7 @@ namespace EmergenceSDK.Internal.Services
         /// Performs an asynchronous UnityWebRequest designed to download a texture, and returns the result as a <see cref="WebResponse"/>.
         /// <returns><see cref="TextureWebResponse"/>, or <see cref="FailedWebResponse"/>></returns>
         /// </summary>
-        public static async UniTask<WebResponse> DownloadTextureAsync(RequestMethod method, string url,
+        internal static async UniTask<WebResponse> DownloadTextureAsync(RequestMethod method, string url,
             string bodyData = "", Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, bool nonReadable = false, CancellationToken ct = default)
         {
             UnityWebRequest request = CreateRequest(method, url, bodyData);
