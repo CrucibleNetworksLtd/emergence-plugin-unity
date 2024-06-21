@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Integrations.Futureverse.Internal.Services;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using UnityEngine;
@@ -8,34 +9,30 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
     public class DemoStationController : MonoBehaviour
     {
-        private bool IsLoggedIn() => personaService.CurrentAccessToken.Length != 0;
+        private bool IsLoggedIn() => sessionService is { IsLoggedIn: true };
         
         public DemoStation<OpenOverlay> openOverlay;
-        
-        public DemoStation<DynamicMetadataController> dynamicMetadataController;
-        public DemoStation<InventoryDemo> inventoryService;
-        public DemoStation<MintAvatar> mintAvatar;
-        public DemoStation<ReadMethod> readMethod;
-        public DemoStation<SignMessage> signMessage;
-        public DemoStation<WriteMethod> writeMethod;
 
-        private List<IDemoStation> stationsRequiringLogin;
-        private IPersonaService personaService;
+        private readonly List<ILoggedInDemoStation> stationsRequiringLogin = new ();
+        private IDemoStation[] stations;
+        private ISessionService sessionService;
 
         public async void Awake()
         {
-            stationsRequiringLogin = new List<IDemoStation>()
+            stations = gameObject.GetComponentsInChildren<IDemoStation>();
+            foreach (var station in stations)
             {
-                dynamicMetadataController as IDemoStation,
-                inventoryService as IDemoStation,
-                mintAvatar as IDemoStation,
-                readMethod as IDemoStation,
-                signMessage as IDemoStation,
-                writeMethod as IDemoStation
-            };
-
-            //OpenOverlay is the first station, so we can set it to ready here
-            (openOverlay as IDemoStation).IsReady = true;
+                if (station is ILoggedInDemoStation loggedInDemoStation)
+                {
+                    stationsRequiringLogin.Add(loggedInDemoStation);
+                }
+                
+                //OpenOverlay is the first station, so we can set it to ready here
+                if (station is DemoStation<OpenOverlay>)
+                {
+                    station.IsReady = true;
+                }
+            }
             
             await UniTask.WaitUntil(IsLoggedIn);
             ActivateStations();
@@ -43,7 +40,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         public void Start()
         {
-            personaService = EmergenceServices.GetService<IPersonaService>();
+            EmergenceServiceProvider.OnServicesLoaded += _ => sessionService = EmergenceServiceProvider.GetService<ISessionService>();
         }
 
         private void ActivateStations()

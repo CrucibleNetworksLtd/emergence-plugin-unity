@@ -3,13 +3,12 @@ using System.Linq;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class ReadMethod : DemoStation<ReadMethod>, IDemoStation
+    public class ReadMethod : DemoStation<ReadMethod>, ILoggedInDemoStation
     {
         public DeployedSmartContract deployedContract;
 
@@ -23,7 +22,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             }
         }
         
-        private IContractService ContractService => contractService ??= EmergenceServices.GetService<IContractService>();
+        private IContractService ContractService => contractService ??= EmergenceServiceProvider.GetService<IContractService>();
         private IContractService contractService;
         
         private void Start()
@@ -53,7 +52,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void ReadCurrentCount()
         {
             ContractInfo contractInfo = new ContractInfo(deployedContract, "GetCurrentCount");
-            ContractService.ReadMethod<string[]>(contractInfo, new string[] { EmergenceSingleton.Instance.GetCachedAddress() }, ReadMethodSuccess, EmergenceLogger.LogError);
+            ContractService.ReadMethod<string[]>(contractInfo, new string[] { EmergenceServiceProvider.GetService<IWalletService>().WalletAddress }, ReadMethodSuccess, EmergenceLogger.LogError);
         }
 
         public class ContractResponse

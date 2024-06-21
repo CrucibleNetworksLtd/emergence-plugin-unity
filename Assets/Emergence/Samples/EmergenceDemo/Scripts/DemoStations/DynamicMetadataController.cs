@@ -3,13 +3,12 @@ using EmergenceSDK.Internal.UI.Screens;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
 using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class DynamicMetadataController : DemoStation<DynamicMetadataController>, IDemoStation
+    public class DynamicMetadataController : DemoStation<DynamicMetadataController>, ILoggedInDemoStation
     {
         public DeployedSmartContract deployedContract;
         private IDynamicMetadataService dynamicMetaDataService;
@@ -26,7 +25,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Start()
         {
-            dynamicMetaDataService = EmergenceServices.GetService<IDynamicMetadataService>();
+            dynamicMetaDataService = EmergenceServiceProvider.GetService<IDynamicMetadataService>();
             
             instructionsGO.SetActive(false);
             IsReady = false;
@@ -70,13 +69,13 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             {
                 var curMetadata = int.Parse(item.Meta.DynamicMetadata);
                 curMetadata++;
-                dynamicMetaDataService.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
+                dynamicMetaDataService.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId, "0iKoO1V2ZG98fPETreioOyEireDTYwby",
                     curMetadata.ToString(), UpdateDynamicMetadataSuccess, EmergenceLogger.LogError);
             }
             else
             {
                 var curMetadata = 1;
-                dynamicMetaDataService.WriteNewDynamicMetadata(item.Blockchain, item.Contract, item.TokenId,
+                dynamicMetaDataService.WriteNewDynamicMetadata(item.Blockchain, item.Contract, item.TokenId, "0iKoO1V2ZG98fPETreioOyEireDTYwby",
                     curMetadata.ToString(), UpdateDynamicMetadataSuccess, EmergenceLogger.LogError);
             }
 

@@ -20,7 +20,7 @@ namespace EmergenceSDK.Samples.Examples
         
         public void Awake()
         {
-            contractService = EmergenceServices.GetService<IContractService>();
+            contractService = EmergenceServiceProvider.GetService<IContractService>();
         }
 
         public void Start()
@@ -35,14 +35,14 @@ namespace EmergenceSDK.Samples.Examples
             var contractInfo = new ContractInfo(deployedContract, "[METHOD NAME]");
 
             // Calls the ReadMethod method to execute the smart contract method defined in the ABI with an empty input parameter
-            contractService.WriteMethod(contractInfo, "", "", value, body,
+            contractService.WriteMethod(contractInfo, value, body,
                 OnWriteSuccess, EmergenceLogger.LogError);
         }
 
         private void OnWriteSuccess(BaseResponse<string> response)
         {
             // Logs the response to the console
-            Debug.Log($"{response}");
+            EmergenceLogger.LogInfo($"{response}");
         }
     }
 }

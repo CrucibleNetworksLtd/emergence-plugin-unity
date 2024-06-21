@@ -29,6 +29,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1163817330179909673}
   m_RootOrder: 2
@@ -114,6 +115,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1163817330179909673}
   m_RootOrder: 1
@@ -248,6 +250,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1163817330179909673}
   m_RootOrder: 0
@@ -323,6 +326,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5141654706897496852}
   - {fileID: 3945880897676391290}
@@ -347,8 +351,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7236fe33fc2f79a46a47f394d14925c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemThumbnail: {fileID: 5174696321106667403}
-  itemName: {fileID: 8550393152874442505}
+  ItemThumbnail: {fileID: 5174696321106667403}
+  ItemName: {fileID: 8550393152874442505}
 --- !u!114 &3746371676100956360
 MonoBehaviour:
   m_ObjectHideFlags: 0

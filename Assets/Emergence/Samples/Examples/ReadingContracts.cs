@@ -1,7 +1,6 @@
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types.Responses;
 using UnityEngine;
 
 namespace EmergenceSDK.Samples.Examples
@@ -18,7 +17,7 @@ namespace EmergenceSDK.Samples.Examples
         
         public void Awake()
         {
-            contractService = EmergenceServices.GetService<IContractService>();
+            contractService = EmergenceServiceProvider.GetService<IContractService>();
         }
 
         public void Start()
@@ -39,7 +38,7 @@ namespace EmergenceSDK.Samples.Examples
         private void ReadSuccess<T>(T response)
         {
             // Logs the response to the console
-            Debug.Log($"{response}");
+            EmergenceLogger.LogInfo($"{response}");
         }
     }
 }

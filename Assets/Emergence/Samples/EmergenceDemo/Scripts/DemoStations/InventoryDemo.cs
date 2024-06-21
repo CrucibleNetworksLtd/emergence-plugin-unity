@@ -1,16 +1,14 @@
 using System.Collections.Generic;
-using EmergenceSDK.Internal.UI;
 using EmergenceSDK.Internal.UI.Inventory;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using EmergenceSDK.Types.Inventory;
 using Tweens;
 using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class InventoryDemo : DemoStation<InventoryDemo>, IDemoStation
+    public class InventoryDemo : DemoStation<InventoryDemo>, ILoggedInDemoStation
     {
         [SerializeField] private GameObject itemEntryPrefab;
         [SerializeField] private GameObject contentGO;
@@ -33,7 +31,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         private void Start()
         {
-            inventoryService = EmergenceServices.GetService<IInventoryService>();
+            EmergenceServiceProvider.OnServicesLoaded += _ => inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
             inventoryItemStore = new InventoryItemStore();
             
             instructionsGO.SetActive(false);
@@ -82,7 +80,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
                 Cursor.visible = false;
             }
 
-            inventoryService.InventoryByOwner(EmergenceSingleton.Instance.GetCachedAddress(), InventoryChain.AnyCompatible, SuccessInventoryByOwner, EmergenceLogger.LogError);
+            inventoryService.InventoryByOwner(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible, SuccessInventoryByOwner, EmergenceLogger.LogError);
         }
         
         private void SuccessInventoryByOwner(List<InventoryItem> inventoryItems)

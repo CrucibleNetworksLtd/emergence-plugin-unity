@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class MintAvatar : DemoStation<MintAvatar>, IDemoStation
+    public class MintAvatar : DemoStation<MintAvatar>, ILoggedInDemoStation
     {
         public DeployedSmartContract deployedContract;
 
@@ -20,7 +20,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             }
         }
 
-        private IContractService ContractService => contractService ??= EmergenceServices.GetService<IContractService>();
+        private IContractService ContractService => contractService ??= EmergenceServiceProvider.GetService<IContractService>();
         private IContractService contractService;
         
         private void Start()
@@ -44,7 +44,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             if (HasBeenActivated() && IsReady)
             {
                 var contractInfo = new ContractInfo(deployedContract, "mint");
-                ContractService.WriteMethod(contractInfo, "", "", "0", new string[] { }, OnWriteSuccess, EmergenceLogger.LogError);
+                ContractService.WriteMethod(contractInfo, "0", new string[] { }, OnWriteSuccess, EmergenceLogger.LogError);
             }
         }
         

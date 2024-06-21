@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using EmergenceSDK.EmergenceDemo.DemoStations;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.ScriptableObjects;
@@ -7,7 +5,7 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types.Responses;
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Lamina1Demo
 {
     public class L1MintStation : DemoStation<L1MintStation>, IDemoStation
     {
@@ -23,7 +21,7 @@ namespace EmergenceSDK
             }
         }
         
-        private IContractService ContractService => contractService ??= EmergenceServices.GetService<IContractService>();
+        private IContractService ContractService => contractService ??= EmergenceServiceProvider.GetService<IContractService>();
         private IContractService contractService;
 
         private void Start()
@@ -55,7 +53,7 @@ namespace EmergenceSDK
             
             var contractInfo = new ContractInfo(deployedContract, "mint");
             
-            ContractService.WriteMethod(contractInfo, "", "", "1000000000000000000", new string[] { }, OnWriteSuccess, EmergenceLogger.LogError);
+            ContractService.WriteMethod(contractInfo, "1000000000000000000", new string[] { }, OnWriteSuccess, EmergenceLogger.LogError);
         }
         
         private void OnWriteSuccess(BaseResponse<string> response)

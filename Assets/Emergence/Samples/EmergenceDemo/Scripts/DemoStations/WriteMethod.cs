@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace EmergenceSDK.EmergenceDemo.DemoStations
 {
-    public class WriteMethod : DemoStation<WriteMethod>, IDemoStation
+    public class WriteMethod : DemoStation<WriteMethod>, ILoggedInDemoStation
     {
         public DeployedSmartContract deployedContract;
 
@@ -20,7 +20,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
             }
         }
         
-        private IContractService ContractService => contractService ??= EmergenceServices.GetService<IContractService>();
+        private IContractService ContractService => contractService ??= EmergenceServiceProvider.GetService<IContractService>();
         private IContractService contractService;
 
         private void Start()
@@ -50,7 +50,7 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
         private void IncrementCurrentCount()
         {
             var contractInfo = new ContractInfo(deployedContract, "IncrementCount");
-            ContractService.WriteMethod(contractInfo, "", "", "0", new string[] { }, WriteMethodSuccess, EmergenceLogger.LogError);
+            ContractService.WriteMethod(contractInfo, "0", new string[] { }, WriteMethodSuccess, EmergenceLogger.LogError);
         }
 
         private void WriteMethodSuccess(WriteContractResponse response)
