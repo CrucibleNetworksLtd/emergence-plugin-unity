@@ -10,6 +10,9 @@ namespace EmergenceSDK.Integrations.Futureverse
 {
     public sealed class FutureverseSingleton : InternalFutureverseSingleton
     {
+        /// <summary>
+        /// Timeout in seconds for all requests to Futureverse-owned endpoints
+        /// </summary>
         public int RequestTimeout => requestTimeout;
         public EmergenceEnvironment Environment => CurrentForcedEnvironment ?? environment;
 

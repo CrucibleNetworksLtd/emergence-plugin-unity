@@ -178,7 +178,6 @@ namespace EmergenceSDK.Implementations.Login
         /// <returns></returns>
         public UniTask WaitUntilAvailable(CancellationToken ct = default)
         {
-            // ReSharper disable once MethodSupportsCancellation
             return UniTask.WaitUntil(() => !IsBusy, cancellationToken: ct);
         }
 
@@ -195,9 +194,7 @@ namespace EmergenceSDK.Implementations.Login
             loginEndedEvent.RemoveAllListeners();
             qrCodeTickEvent.RemoveAllListeners();
         }
-
-        #region Lifecycle
-
+        
         private void OnDestroy()
         {
             CancelLogin();
@@ -210,10 +207,6 @@ namespace EmergenceSDK.Implementations.Login
                 CancelLogin();
             }
         }
-
-        #endregion
-        
-        #region Helpers
 
         private void InvokeLoginFailedEvent(Exception e)
         {
@@ -335,10 +328,6 @@ namespace EmergenceSDK.Implementations.Login
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.QrCodeRequest, StepPhase.Success, ct);
         }
 
-        #endregion
-        
-        #region EventInvokers
-
         private void InvokeEventAndCheckCancellationToken(UnityEvent unityEvent, CancellationToken ct)
         {
             unityEvent.Invoke();
@@ -362,7 +351,5 @@ namespace EmergenceSDK.Implementations.Login
             unityEvent.Invoke(arg0, arg1, arg2);
             ct.ThrowIfCancellationRequested();
         }
-
-        #endregion
     }
 }

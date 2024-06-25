@@ -22,6 +22,13 @@ namespace EmergenceSDK.Internal.Utils
             }
         }
 
+        /// <summary>
+        /// This function will deserialize a JSON string to an object. If the object to deserialize to has the <see cref="StoreOriginalJTokensAttribute"/>, it will
+        /// find any JToken member field or property with a <see cref="OriginalJTokenAttribute"/> within the class structure, and populate it with the original JToken that was used for deserialization.
+        /// </summary>
+        /// <param name="serializedState">Serialized JSON string</param>
+        /// <typeparam name="T">Type to deserialize to</typeparam>
+        /// <returns></returns>
         public static T Deserialize<T>(string serializedState)
         {
             try

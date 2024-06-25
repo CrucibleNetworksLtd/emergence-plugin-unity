@@ -13,25 +13,60 @@ using WebResponse = EmergenceSDK.Internal.Types.WebResponse;
 
 namespace EmergenceSDK.Internal.Services
 {
+    /// <summary>
+    /// This class handles all web requests and provides a debugging layer by monitoring all requests and storing their creation parameters.
+    /// It should be used for all internally created web requests, as it allows us to easily understand and monitor the web flow within the SDK.
+    /// <remarks>
+    /// Even though this class has the same naming pattern and namespace of all Services, it is not managed by the ServiceProvider.
+    /// </remarks>
+    /// </summary>
     internal class WebRequestService
     {
+        /// <summary>
+        /// Class containing the information of the UnityWebRequest that was created
+        /// </summary>
         internal class WebRequestInfo
         {
-            private static int lastId = -1;
-            internal readonly DateTime Time;
-            internal readonly int Id;
             /// <summary>
-            /// The Request headers, only populated if the headers are passed to
+            /// Stores the next key for the next web request, incremental.
+            /// </summary>
+            private static ulong nextId;
+            
+            /// <summary>
+            /// Time when the request was created.
+            /// </summary>
+            internal readonly DateTime Time;
+            
+            /// <summary>
+            /// Unique key for this web request
+            /// </summary>
+            internal readonly ulong Id;
+            
+            /// <summary>
+            /// The Request headers, only populated if the headers are passed to.
             /// <see cref="WebRequestService.PerformAsyncWebRequest"/>
             /// to send the request
             /// </summary>
             internal readonly Dictionary<string, string> Headers;
+            
+            /// <summary>
+            /// Reference to the WebResponse that the UnityWebRequest will produce.
+            /// </summary>
             internal WebResponse Response { get; set; }
+            
+            /// <summary>
+            /// Whether the request had an UploadHandler upon creation.
+            /// </summary>
             internal readonly bool HadUploadHandler;
+            
+            /// <summary>
+            /// Whether the request had a DownloadHandler upon creation.
+            /// </summary>
             internal readonly bool HadDownloadHandler;
+            
             internal WebRequestInfo(Dictionary<string, string> requestHeaders, UnityWebRequest request)
             {
-                Id = ++lastId;
+                Id = nextId++;
                 Time = DateTime.Now;
                 Headers = requestHeaders ?? new Dictionary<string, string>();
                 HadUploadHandler = request.uploadHandler != null;
@@ -52,11 +87,17 @@ namespace EmergenceSDK.Internal.Services
             }
         }
         
-        private static WebRequestService instance;
+        private static readonly Lazy<WebRequestService> LazyInstance = new(() => new WebRequestService());
+        internal static WebRequestService Instance => LazyInstance.Value;
         
-        // ReSharper disable once MemberCanBePrivate.Global
-        internal static WebRequestService Instance => instance ??= new WebRequestService();
+        /// <summary>
+        /// ConcurrentDictionary containing all open requests
+        /// </summary>
         private readonly ConcurrentDictionary<UnityWebRequest, WebRequestInfo> openRequests = new();
+        
+        /// <summary>
+        /// ConcurrentDictionary containing all requests that have not been disposed yet
+        /// </summary>
         private readonly ConcurrentDictionary<UnityWebRequest, WebRequestInfo> allRequests = new();
 
         //This timeout avoids this issue: https://forum.unity.com/threads/catching-curl-error-28.1274846/
@@ -189,10 +230,7 @@ namespace EmergenceSDK.Internal.Services
             return null;
         }
         
-        private static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request,
-            Dictionary<string, string> headers = null,
-            float timeout = DefaultTimeoutMilliseconds,
-            CancellationToken ct = default)
+        private static async UniTask<WebResponse> PerformAsyncWebRequest(UnityWebRequest request, Dictionary<string, string> headers = null, float timeout = DefaultTimeoutMilliseconds, CancellationToken ct = default)
         {
             WebResponse response = null;
             var requestInfo = Instance.AddRequest(request, headers);
@@ -212,44 +250,39 @@ namespace EmergenceSDK.Internal.Services
                 response = request.downloadHandler is DownloadHandlerTexture
                     ? new TextureWebResponse(request)
                     : new WebResponse(request);
-                requestInfo.Response = response;
-
-                return response;
-            }
-            catch (TimeoutException e)
-            {
-                request.Abort(); // Abort the request
-                response = new FailedWebResponse(e, request);
-                requestInfo.Response = response;
-                    
-                return response;
-            }
-            catch (UnityWebRequestException e)
-            {
-                response = new FailedWebResponse(e, request);
-                requestInfo.Response = response;
-                
-                return response;
-            }
-            catch (OperationCanceledException e)
-            {
-                response = new FailedWebResponse(e, request);
-                requestInfo.Response = response;
-                
-                throw;
             }
             catch (Exception e)
             {
-                response = new FailedWebResponse(e, request);
-                requestInfo.Response = response;
-                
-                return response;
+                response = HandleRequestException(e, request);
+
+                if (e is OperationCanceledException)
+                {
+                    throw;
+                }
             }
             finally
             {
-                EmergenceLogger.LogWebResponse(response);
-                Instance.CloseRequest(request); // Remove the request from tracking
+                FinalizeRequest(requestInfo, request, response);
             }
+
+            return response;
+        }
+
+        private static WebResponse HandleRequestException(Exception e, UnityWebRequest request)
+        {
+            if (e is TimeoutException)
+            {
+                request.Abort(); // Abort the request in case of timeout
+            }
+
+            return new FailedWebResponse(e, request);
+        }
+
+        private static void FinalizeRequest(WebRequestInfo requestInfo, UnityWebRequest request, WebResponse response)
+        {
+            requestInfo.Response = response;
+            EmergenceLogger.LogWebResponse(response);
+            Instance.CloseRequest(request); // Remove the request from tracking
         }
     }
 }

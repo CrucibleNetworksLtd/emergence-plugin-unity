@@ -6,6 +6,9 @@ using System.Text.RegularExpressions;
 
 namespace EmergenceSDK.Internal.Utils
 {
+    /// <summary>
+    /// This class can be used for generating lists of all assembly members for documentation purposes.
+    /// </summary>
     public class AssemblyInspector
     {
         public enum VisibilityLevel
