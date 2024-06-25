@@ -27,6 +27,9 @@ namespace EmergenceSDK.Implementations.Login.UI.Examples
 
         private void Awake()
         {
+            // We need to load a service provider profile before we can actually log in. 
+            EmergenceServiceProvider.Load(ServiceProfile.Default);
+
             // We bind all necessary events here
 
             // Call CancelLogin when hitting the cancel button
