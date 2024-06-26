@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace EmergenceSDK
+namespace EmergenceSDK.Lamina1Demo
 {
     public class TrophyAnim : MonoBehaviour
     {

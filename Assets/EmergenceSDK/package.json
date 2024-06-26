@@ -1,0 +1,9 @@
+﻿{
+  "name": "com.crucible.emergence",
+  "version": "1.0.0",
+  "displayName": "Emergence SDK",
+  "description": "Emergence is a Web3 SDK for game developers, which empowers game developers to take advantage of building interoperable game worlds for the Open Metaverse.",
+  "unity": "2021.3LTS",
+  "dependencies": {
+  }
+}

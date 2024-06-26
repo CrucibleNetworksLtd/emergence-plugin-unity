@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Integrations.Futureverse.Internal.Services;
-using EmergenceSDK.Internal.Utils;
-using EmergenceSDK.Lamina1Demo;
-using EmergenceSDK.Services;
+using EmergenceSDK.Runtime.Internal.Utils;
+using EmergenceSDK.Runtime.Services;
+using EmergenceSDK.Samples.CoreSamples.DemoStations;
 using UnityEngine;
 
-namespace EmergenceSDK.EmergenceDemo.DemoStations
+namespace EmergenceSDK.Lamina1Demo
 {
     public class L1DemoStationController : MonoBehaviour
     {

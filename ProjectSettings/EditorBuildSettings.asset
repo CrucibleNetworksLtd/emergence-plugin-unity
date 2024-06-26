@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Lamina1Demo/L1 Demo Scene/L1 Demo Scene.unity
     guid: 475502d8a67604bed853d5ad54646504
   - enabled: 1
-    path: Assets/Emergence/Samples/EmergenceDemo/Scenes/Futurepass Emergence Demo
+    path: Assets/EmergenceSDK/Samples/CoreSamples/Scenes/Futurepass Emergence Demo
       Scene.unity
     guid: 7f08e558efba3b54ab6302ddbdb7c283
   m_configObjects:

@@ -1,8 +1,8 @@
-using EmergenceSDK.EmergenceDemo.DemoStations;
-using EmergenceSDK.Internal.Utils;
-using EmergenceSDK.ScriptableObjects;
-using EmergenceSDK.Services;
-using EmergenceSDK.Types.Responses;
+using EmergenceSDK.Runtime.Internal.Utils;
+using EmergenceSDK.Samples.CoreSamples.DemoStations;
+using EmergenceSDK.Runtime.ScriptableObjects;
+using EmergenceSDK.Runtime.Services;
+using EmergenceSDK.Runtime.Types.Responses;
 using UnityEngine;
 
 namespace EmergenceSDK.Lamina1Demo
