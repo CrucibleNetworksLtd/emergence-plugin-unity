@@ -71,7 +71,7 @@ jobs:
       - name: Checkout the package repository
         uses: actions/checkout@v2
         with:
-          repository: CrucibleNetworksLtd/EmergenceUnityPackage
+          repository: CrucibleNetworksLtd/EmergenceSDKUnity
           token: ${{ secrets.PACKAGE_REPO_TOKEN }}     # It uses a personal access token stored in repo secrets for authentication
           ref: main
       
