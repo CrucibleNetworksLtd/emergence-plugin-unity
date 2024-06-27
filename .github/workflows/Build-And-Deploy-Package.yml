@@ -14,7 +14,7 @@ jobs:
       
       # Step 2: Set up Unity using the game-ci/unity-setup action
       - name: Set up Unity
-        uses: game-ci/unity-setup@v2
+        uses: game-ci/unity-builder@v2
         with:
           unityVersion: 2022.3.32f1
       
