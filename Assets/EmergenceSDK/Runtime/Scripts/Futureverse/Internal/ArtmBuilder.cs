@@ -4,7 +4,7 @@ using EmergenceSDK.Runtime.Futureverse.Types;
 
 namespace EmergenceSDK.Runtime.Futureverse.Internal
 {
-    internal class ArtmBuilder
+    internal static class ArtmBuilder
     {
         public static string GenerateArtm(string message, List<ArtmOperation> artmOperations,
             string address, int nonce)

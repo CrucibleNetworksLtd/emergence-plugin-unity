@@ -12,6 +12,7 @@ namespace EmergenceSDK.Runtime.Internal.Types
 
         protected FlagLifecycleManager(T1 newValue1)
         {
+            // Be mindful of these virtual member calls in constructor when writing derived classes.
             var previousFlag1State = GetCurrentFlag1Value();
             SetFlag1Value(newValue1);
             ResetActions.Add(() => { SetFlag1Value(previousFlag1State);});
@@ -48,6 +49,7 @@ namespace EmergenceSDK.Runtime.Internal.Types
 
         protected FlagLifecycleManager(T1 newValue1, T2 newValue2) : base(newValue1)
         {
+            // Be mindful of these virtual member calls in constructor when writing derived classes.
             var previousFlag2State = GetCurrentFlag2Value();
             SetFlag2Value(newValue2);
             ResetActions.Add(() => { SetFlag2Value(previousFlag2State);});
