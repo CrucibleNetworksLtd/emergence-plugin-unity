@@ -7,7 +7,7 @@ namespace EmergenceSDK.Internal.Utils
     {
         private static readonly Lazy<T> LazyInstance = new(() =>
         {
-            if (FindObjectsOfType(typeof(T)) is T[] { Length: > 0 } objectsOfType)
+            if (FindObjectsByType<T>(FindObjectsSortMode.None) is { Length: > 0 } objectsOfType)
             {
                 return objectsOfType[0];
             }
