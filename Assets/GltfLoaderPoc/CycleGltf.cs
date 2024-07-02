@@ -65,8 +65,9 @@ namespace EmergenceSDK.GltfLoaderPoc
 
                     var assetBytes = Resources.Load<TextAsset>(assetsUris[currentIndex]).bytes;
                     currentIndex++;
-                    currentIndex %= assetsUris.Length;
+                    currentIndex %= assetsUris.Length;                                    
 
+                    EmergenceLogger.LogInfo($"Loaded {assetBytes.Length/1000f/1000f:F2}MB", alsoLogToScreen: true);
 
                     if (networkSpeedMbps > 0)
                     {
@@ -86,7 +87,7 @@ namespace EmergenceSDK.GltfLoaderPoc
                     var parser = new GlbBinaryParser(assetBytes, null);
                     using var parsed = parser.Parse();
                     using var importer = new ImporterContext(parsed);
-                    var instance = await importer.LoadAsync(new RuntimeOnlyAwaitCaller());
+                    var instance = importer.Load();
                     var o = instance.gameObject;
                     o.transform.parent = spawnPoint;
                     o.transform.localPosition = Vector3.zero;

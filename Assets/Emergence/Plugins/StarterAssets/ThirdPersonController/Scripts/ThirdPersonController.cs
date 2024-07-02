@@ -1,4 +1,5 @@
-﻿using EmergenceSDK.StarterAssets.InputSystem;
+﻿using EmergenceSDK.Internal.Utils;
+using EmergenceSDK.StarterAssets.InputSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
