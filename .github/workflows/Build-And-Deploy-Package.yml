@@ -20,31 +20,8 @@ jobs:
           key: ${{ runner.os }}-Library-${{ hashFiles('**/Packages.lock') }}
           restore-keys: |
             ${{ runner.os }}-Library-
-      
-      # Step 3: Run Unit Tests
-      - name: Run Unit Tests
-        run: |
-          xvfb-run --auto-servernum --server-args="-screen 0 640x480x24" \
-          unity-editor \
-            -projectPath . \ # Modify if your Unity project is not at the root of the repo
-            -runTests \
-            -testResults Assets/EmergenceSDK/Test/test-results.xml \ # Adjust path to store test results in your package directory
-            -testPlatform editmode # or playmode, depending on your tests
-            -logFile
-      
-      # Step 4: Verify Unit Test Results
-      - name: Verify Unit Test Results
-        if: always()
-        run: |
-          cat Assets/EmergenceSDK/Test/test-results.xml
-          if grep '<failure' Assets/EmergenceSDK/Test/test-results.xml; then
-            echo "Tests failed"
-            exit 1
-          else
-            echo "Tests passed"
-          fi
-      
-      # Step 5: Build Unity Package
+
+      # Step 3: Build Unity Package
       - name: Build Unity Package
         run: |
           mkdir -p build
@@ -53,53 +30,27 @@ jobs:
             -exportPackage "Assets/EmergenceSDK" "build/EmergenceSDK.unitypackage" \
             -logFile
       
-      # Step 6: Include package.json
+      # Step 4: Include package.json
       - name: Include package.json
         run: |
           cp Assets/EmergenceSDK/package.json build/package.json # Adjust the path to your package.json file
       
-      # Step 7: Upload the built Unity package and the package.json
+      # Step 5: Upload the built Unity package and the package.json
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: unity-package
           path: build/
-
-  deploy:
-    needs: test-and-build
-    runs-on: ubuntu-latest
-
-    steps:
-      # Step 8: Check out the package repository
-      - name: Checkout the package repository
-        uses: actions/checkout@v2
+            
+      # Step 6: Run Unit Tests
+      - name: Run Unit Tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          repository: CrucibleNetworksLtd/EmergenceSDKUnity
-          token: ${{ secrets.PACKAGE_REPO_TOKEN }}     # It uses a personal access token stored in repo secrets for authentication
-          ref: main
-      
-      # Step 9: Download the Unity package
-      - name: Download the Unity package
-        uses: actions/download-artifact@v2
-        with:
-          name: unity-package
-          path: build
-      
-      # Step 10: Commit and push the Unity package
-      - name: Commit and push the Unity package
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Copy the downloaded package and package.json to the root directory
-          cp build/EmergenceSDK.unitypackage .
-          cp build/package.json .
-          
-          # Add the files to the Git index
-          git add EmergenceSDK.unitypackage package.json 
-          
-          # Commit the changes with a message
-          git commit -m "Updated Unity Package"
-          
-          # Push the changes to the main branch
-          git push origin develop 
+          projectPath: Assets/EmergenceSDK
+          unityVersion: 2021.3.11f1
+          packageMode: true
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
