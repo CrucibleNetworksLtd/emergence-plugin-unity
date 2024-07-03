@@ -9,10 +9,12 @@ using EmergenceSDK.Types;
 using Newtonsoft.Json;
 using UniGLTF;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
 using VRMShaders;
 using Debug = UnityEngine.Debug;
+using TouchPhase = UnityEngine.TouchPhase;
 
 namespace EmergenceSDK.GltfLoaderPoc
 {
@@ -47,6 +49,11 @@ namespace EmergenceSDK.GltfLoaderPoc
         private void OnTriggerExit(Collider other)
         {
             instructionsGO.SetActive(false);
+        }
+
+        protected override bool HasBeenActivated()
+        {
+            return (Keyboard.current.eKey.wasPressedThisFrame && instructionsGO.activeSelf) || (Input.touches.Length > 0 && Input.touches[0].phase == TouchPhase.Ended);
         }
 
         private void Update()

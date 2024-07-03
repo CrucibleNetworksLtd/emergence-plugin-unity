@@ -19,6 +19,6 @@ namespace EmergenceSDK.EmergenceDemo.DemoStations
 
         protected bool isReady;
         
-        protected bool HasBeenActivated() => Keyboard.current.eKey.wasPressedThisFrame && instructionsGO.activeSelf;
+        protected virtual bool HasBeenActivated() => Keyboard.current.eKey.wasPressedThisFrame && instructionsGO.activeSelf;
     }
 }
