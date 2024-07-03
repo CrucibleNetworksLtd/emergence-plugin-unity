@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "com.crucible.emergence",
   "version": "0.0.1-pre.1",
   "displayName": "Emergence SDK",
@@ -12,5 +12,9 @@
     "metaverse",
     "game development"
   ],
-  "type": "tool"
+  "author": {
+    "name": "Crucible",
+    "email": "support@crucible.network",
+    "url": "https://www.emergence.site/"
+  }
 }
