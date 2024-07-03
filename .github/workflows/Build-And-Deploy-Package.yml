@@ -11,17 +11,8 @@ jobs:
       # Step 1: Check out the repository containing Unity project
       - name: Checkout repository
         uses: actions/checkout@v2
-      
-      # Step 2: Cache Unity Packages
-      - name: Cache Unity Packages
-        uses: actions/cache@v2
-        with:
-          path: Library
-          key: ${{ runner.os }}-Library-${{ hashFiles('**/Packages.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-Library-
             
-      # Step 3: Run Unit Tests
+      # Step 2: Run Unit Tests
       - name: Run Unit Tests
         uses: game-ci/unity-test-runner@v4
         env:
