@@ -20,29 +20,8 @@ jobs:
           key: ${{ runner.os }}-Library-${{ hashFiles('**/Packages.lock') }}
           restore-keys: |
             ${{ runner.os }}-Library-
-
-      # Step 3: Build Unity Package
-      - name: Build Unity Package
-        run: |
-          mkdir -p build
-          unity-editor \
-            -projectPath . \
-            -exportPackage "Assets/EmergenceSDK" "build/EmergenceSDK.unitypackage" \
-            -logFile
-      
-      # Step 4: Include package.json
-      - name: Include package.json
-        run: |
-          cp Assets/EmergenceSDK/package.json build/package.json # Adjust the path to your package.json file
-      
-      # Step 5: Upload the built Unity package and the package.json
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: unity-package
-          path: build/
             
-      # Step 6: Run Unit Tests
+      # Step 3: Run Unit Tests
       - name: Run Unit Tests
         uses: game-ci/unity-test-runner@v4
         env:
