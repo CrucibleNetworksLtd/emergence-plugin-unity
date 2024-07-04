@@ -6,7 +6,7 @@ namespace VRMShaders
 {
     public class TextureBytesTests
     {
-        static string AssetPath = "Assets/VRMShaders/GLTF/IO/Tests";
+        static string AssetPath = "Assets/EmergenceSDK/Plugins/VRMShaders/GLTF/IO/Tests";
 
         [Test]
         public void NonReadablePng()

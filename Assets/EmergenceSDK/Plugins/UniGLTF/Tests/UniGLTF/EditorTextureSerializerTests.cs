@@ -10,7 +10,7 @@ namespace UniGLTF
 {
     public sealed class EditorTextureSerializerTests
     {
-        private static readonly string AssetPath = "Assets/UniGLTF/Tests/UniGLTF";
+        private static readonly string AssetPath = "Assets/EmergenceSDK/Plugins/UniGLTF/Tests/UniGLTF";
         private static readonly string SrgbGrayImageName = "4x4_gray_import_as_srgb";
         private static readonly string LinearGrayImageName = "4x4_gray_import_as_linear";
         private static readonly string NormalMapGrayImageName = "4x4_gray_import_as_normal_map";

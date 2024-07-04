@@ -7,7 +7,7 @@ namespace VRMShaders
 {
     public sealed class CopyTextureTests
     {
-        private static string AssetPath = "Assets/VRMShaders/GLTF/IO/Tests";
+        private static string AssetPath = "Assets/EmergenceSDK/Plugins/VRMShaders/GLTF/IO/Tests";
 
         private static readonly Color32 Black = new Color32(0, 0, 0, 255);
         private static readonly Color32 Gray = new Color32(127, 127, 127, 255);

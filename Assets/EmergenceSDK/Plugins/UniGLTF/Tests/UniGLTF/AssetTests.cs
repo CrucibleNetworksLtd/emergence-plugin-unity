@@ -30,6 +30,7 @@ namespace UniGLTF
             {
                 // remove assetPath
                 UnityEngine.Object.DestroyImmediate(loaded, true);
+                AssetDatabase.DeleteAsset(assetPath);
 
                 var tmp = AssetDatabase.LoadAssetAtPath<Mesh>(assetPath);
                 Assert.Null(tmp);
