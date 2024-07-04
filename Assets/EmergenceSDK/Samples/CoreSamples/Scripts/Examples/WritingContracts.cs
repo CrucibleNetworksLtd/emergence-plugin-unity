@@ -4,7 +4,7 @@ using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types.Responses;
 using UnityEngine;
 
-namespace EmergenceSDK.Samples.CoreSamples
+namespace EmergenceSDK.Samples.CoreSamples.Examples
 {
     public class WritingContracts : MonoBehaviour
     {

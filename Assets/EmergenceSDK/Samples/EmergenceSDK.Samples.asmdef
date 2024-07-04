@@ -1,0 +1,25 @@
+{
+    "name": "EmergenceSDK.Samples",
+    "rootNamespace": "",
+    "references": [
+        "UniTask",
+        "MG.GIF",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "nl.jeffreylanters.tweens",
+        "VRM10",
+        "VRMShaders.GLTF.IO.Runtime",
+        "UniGLTF",
+        "EmergenceSDK.Plugins",
+        "EmergenceSDK.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

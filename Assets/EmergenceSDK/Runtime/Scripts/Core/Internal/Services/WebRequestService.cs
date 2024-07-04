@@ -213,6 +213,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
             return allRequests.GetValueOrDefault(request);
         }
 
+        //TODO Whats purpose here? We ID a request based on the response. Why do we cache every request we ever make? This is only used for logging seems memory intense for no real reason
         internal WebRequestInfo GetRequestInfoByWebResponse(WebResponse response)
         {
             if (response != null)

@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Samples.CoreSamples.DemoStations;
 using EmergenceSDK.Runtime.Futureverse.Services;
 using EmergenceSDK.Runtime.Futureverse.Types;
 using EmergenceSDK.Runtime.Internal.Utils;
 using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types;
+using EmergenceSDK.Samples.CoreSamples.DemoStations;
 using UnityEngine;
 
-namespace EmergenceSDK.EmergenceSDK.Samples.FutureverseSamples
+namespace EmergenceSDK.Samples.FutureverseSamples
 {
     public class SendArtmDemo : DemoStation<SendArtmDemo>, ILoggedInDemoStation
     {

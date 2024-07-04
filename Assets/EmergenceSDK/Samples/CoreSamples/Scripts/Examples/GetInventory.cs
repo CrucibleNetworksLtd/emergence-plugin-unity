@@ -4,7 +4,7 @@ using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types.Inventory;
 using UnityEngine;
 
-namespace EmergenceSDK.Samples.CoreSamples
+namespace EmergenceSDK.Samples.CoreSamples.Examples
 {
     public class GetInventory : MonoBehaviour
     {
