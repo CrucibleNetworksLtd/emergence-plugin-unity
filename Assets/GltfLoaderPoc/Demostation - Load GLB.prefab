@@ -369,6 +369,9 @@ MonoBehaviour:
   - BinaryModels/FunkMast
   - BinaryModels/GOLFCART
   - BinaryModels/URBAN-4k-png
+  - BinaryModels/ALL_BAKED_2kHYPERFY_uncompressed
+  - BinaryModels/ALL_joinedatlased_uncompressed
+  - BinaryModels/V_FINAL2_uncompressed
   networkSpeedMbps: 0
 --- !u!4 &8052294470690796685 stripped
 Transform:
