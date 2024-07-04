@@ -8,6 +8,7 @@ using EmergenceSDK.Services;
 using EmergenceSDK.Types;
 using Newtonsoft.Json;
 using UniGLTF;
+using UniGLTF.MeshUtility;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Networking;
@@ -98,6 +99,11 @@ namespace EmergenceSDK.GltfLoaderPoc
                     var o = instance.gameObject;
                     o.transform.parent = spawnPoint;
                     o.transform.localPosition = Vector3.zero;
+                    foreach (var meshRenderer in instance.MeshRenderers)
+                    {
+                        var meshCollider = meshRenderer.gameObject.AddComponent<MeshCollider>();
+                        meshCollider.sharedMesh = meshRenderer.GetMesh();
+                    }
                     instance.ShowMeshes();
                     sw.Stop();
                     
