@@ -24,15 +24,23 @@ namespace EmergenceSDK.GltfLoaderPoc
 {
     public class CycleGltf : DemoStation<CycleGltf>, IDemoStation
     {
+        [Serializable]
+        public struct GltfModel
+        {
+            public TextAsset textAsset;
+            public GltfLibrary compatibleLibraries;
+        }
+        
+        [Flags]
         public enum GltfLibrary
         {
-            UniGltf,
-            GltFast
+            UniGltf = 1,
+            GltFast = 2
         }
 
         public GltfLibrary gltfLibrary = GltfLibrary.UniGltf;
         public Transform spawnPoint;
-        public string[] assetsUris;
+        public GltfModel[] binaryModels;
         public float networkSpeedMbps;
         private int currentIndex;
         private string loadedMeshName;
@@ -65,7 +73,7 @@ namespace EmergenceSDK.GltfLoaderPoc
 
         protected override bool HasBeenActivated()
         {
-            return (Keyboard.current.eKey.wasPressedThisFrame && instructionsGO.activeSelf) || (Input.touches.Length > 0 && Input.touches[0].phase == TouchPhase.Ended);
+            return (Keyboard.current.eKey.wasPressedThisFrame && instructionsGO.activeSelf) || (Input.touches.Length > 0 && Input.touches[0].phase == TouchPhase.Ended) || Input.GetKeyDown(KeyCode.Return);
         }
 
         private void Update()
@@ -93,11 +101,19 @@ namespace EmergenceSDK.GltfLoaderPoc
 
         private byte[] LoadGltfFile()
         {
-            loadedMeshName = Path.GetFileName(assetsUris[currentIndex]);
-            var assetBytes = Resources.Load<TextAsset>(assetsUris[currentIndex]).bytes;
+            GltfModel binaryModel;
+            int maxAttempts = binaryModels.Length;
+            while (((binaryModel = binaryModels[currentIndex]).compatibleLibraries & gltfLibrary) != gltfLibrary && maxAttempts > 0)
+            {
+                currentIndex++;
+                currentIndex %= binaryModels.Length;
+                maxAttempts--;
+            }
+
+            var textAssetBytes = binaryModel.textAsset.bytes;
             currentIndex++;
-            currentIndex %= assetsUris.Length;
-            return assetBytes;
+            currentIndex %= binaryModels.Length;
+            return textAssetBytes;
         }
 
         private void ClearSpawnedGltf()
