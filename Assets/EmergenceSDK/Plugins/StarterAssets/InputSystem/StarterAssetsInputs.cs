@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.InputSystem
+namespace EmergenceSDK.Plugins.StarterAssets.InputSystem
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{

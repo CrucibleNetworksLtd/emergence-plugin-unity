@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-namespace EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.Mobile.Scripts.VirtualInputs
+namespace EmergenceSDK.Plugins.StarterAssets.Mobile.Scripts.VirtualInputs
 {
     public class UIVirtualButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
     {

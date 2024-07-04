@@ -1,7 +1,7 @@
-using EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.InputSystem;
+using EmergenceSDK.Plugins.StarterAssets.InputSystem;
 using UnityEngine;
 
-namespace EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.Mobile.Scripts.CanvasInputs
+namespace EmergenceSDK.Plugins.StarterAssets.Mobile.Scripts.CanvasInputs
 {
     public class UICanvasControllerInput : MonoBehaviour
     {

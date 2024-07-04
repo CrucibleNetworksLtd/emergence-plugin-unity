@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using System.Reflection;
-using EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.TutorialInfo.Scripts;
 using UnityEditor;
 using UnityEngine;
 
-namespace StarterAssets.Editor
+namespace EmergenceSDK.Plugins.StarterAssets.TutorialInfo.Scripts.Editor
 {
 	[CustomEditor(typeof(Readme))]
 	[InitializeOnLoad]

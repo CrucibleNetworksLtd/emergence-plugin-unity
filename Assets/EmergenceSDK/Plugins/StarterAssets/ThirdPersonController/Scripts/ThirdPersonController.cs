@@ -1,11 +1,11 @@
-﻿using EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.InputSystem;
+﻿using EmergenceSDK.Plugins.StarterAssets.InputSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
  */
 
-namespace EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.ThirdPersonController.Scripts
+namespace EmergenceSDK.Plugins.StarterAssets.ThirdPersonController.Scripts
 {
     [RequireComponent(typeof(CharacterController))]
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
@@ -141,7 +141,7 @@ namespace EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.ThirdPersonController.
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
             _playerInput = GetComponent<PlayerInput>();
 #else
-			EmergenceLogger.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
+			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
 
             AssignAnimationIDs();
