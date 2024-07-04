@@ -369,7 +369,7 @@ MonoBehaviour:
   - textAsset: {fileID: 4900000, guid: d113f55bc9273e842ab7cd111548196f, type: 3}
     compatibleLibraries: -1
   - textAsset: {fileID: 4900000, guid: c758c69b400e7c04191eb0b7c30d5bb9, type: 3}
-    compatibleLibraries: 0
+    compatibleLibraries: -1
   - textAsset: {fileID: 4900000, guid: 5628b20a71abd49458bc4a00059641c9, type: 3}
     compatibleLibraries: -1
   - textAsset: {fileID: 4900000, guid: bb8da6a53fe88f0429caad7cf55d89fd, type: 3}
