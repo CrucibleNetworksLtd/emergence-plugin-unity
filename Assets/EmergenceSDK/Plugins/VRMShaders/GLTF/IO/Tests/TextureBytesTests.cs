@@ -6,12 +6,11 @@ namespace VRMShaders
 {
     public class TextureBytesTests
     {
-        static string AssetPath = "Assets/EmergenceSDK/Plugins/VRMShaders/GLTF/IO/Tests";
 
         [Test]
         public void NonReadablePng()
         {
-            var nonReadableTex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{AssetPath}/4x4_non_readable.png");
+            var nonReadableTex = Resources.Load("4x4_non_readable") as Texture2D;
             Assert.False(nonReadableTex.isReadable);
             var (bytes, mime) = new EditorTextureSerializer().ExportBytesWithMime(nonReadableTex, ColorSpace.sRGB);
             Assert.NotNull(bytes);
@@ -20,7 +19,7 @@ namespace VRMShaders
         [Test]
         public void NonReadableDds()
         {
-            var readonlyTexture = AssetDatabase.LoadAssetAtPath<Texture2D>($"{AssetPath}/4x4_non_readable_compressed.dds");
+            var readonlyTexture = Resources.Load("4x4_non_readable_compressed") as Texture2D;
             Assert.False(readonlyTexture.isReadable);
             var (bytes, mime) = new EditorTextureSerializer().ExportBytesWithMime(readonlyTexture, ColorSpace.sRGB);
             Assert.NotNull(bytes);

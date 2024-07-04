@@ -10,13 +10,12 @@ namespace UniGLTF
 {
     public sealed class EditorTextureSerializerTests
     {
-        private static readonly string AssetPath = "Assets/EmergenceSDK/Plugins/UniGLTF/Tests/UniGLTF";
         private static readonly string SrgbGrayImageName = "4x4_gray_import_as_srgb";
         private static readonly string LinearGrayImageName = "4x4_gray_import_as_linear";
         private static readonly string NormalMapGrayImageName = "4x4_gray_import_as_normal_map";
-        private static readonly Texture2D SrgbGrayTex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{AssetPath}/{SrgbGrayImageName}.png");
-        private static readonly Texture2D LinearGrayTex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{AssetPath}/{LinearGrayImageName}.png");
-        private static readonly Texture2D NormalMapGrayTex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{AssetPath}/{NormalMapGrayImageName}.png");
+        private static readonly Texture2D SrgbGrayTex = Resources.Load(SrgbGrayImageName) as Texture2D;
+        private static readonly Texture2D LinearGrayTex = Resources.Load(LinearGrayImageName) as Texture2D;
+        private static readonly Texture2D NormalMapGrayTex = Resources.Load(NormalMapGrayImageName) as Texture2D;
         private static readonly Color32 JustGray = new Color32(127, 127, 127, 255);
         private static readonly Color32 SrgbGrayInSrgb = JustGray;
         private static readonly Color32 SrgbGrayInLinear = ((Color)SrgbGrayInSrgb).linear;
