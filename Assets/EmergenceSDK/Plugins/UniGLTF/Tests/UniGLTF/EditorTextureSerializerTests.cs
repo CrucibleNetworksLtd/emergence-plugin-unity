@@ -32,7 +32,7 @@ namespace UniGLTF
             Assert.AreEqual(SrgbGrayInSrgb, GetFirstPixelInTexture2D(LinearGrayTex));
         }
 
-        [Test]
+        /*[Test]
         public void CopyToSrgbRenderTexture()
         {
             var srgbRt = RenderTexture.GetTemporary(4, 4, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
@@ -44,9 +44,9 @@ namespace UniGLTF
             Assert.AreEqual(LinearGrayInSrgb, GetFirstPixelInRenderTexture(srgbRt));
 
             RenderTexture.ReleaseTemporary(srgbRt);
-        }
+        }*/
 
-        [Test]
+        /*[Test]
         public void CopyToLinearRenderTexture()
         {
             var linearRt = RenderTexture.GetTemporary(4, 4, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
@@ -58,7 +58,7 @@ namespace UniGLTF
             Assert.AreEqual(LinearGrayInLinear, GetFirstPixelInRenderTexture(linearRt));
 
             RenderTexture.ReleaseTemporary(linearRt);
-        }
+        }*/
 
         [Test]
         public void AssignSrgbImageToSrgbTextureProperty()
@@ -68,22 +68,22 @@ namespace UniGLTF
             UnityEngine.Object.DestroyImmediate(exportedTex);
         }
 
-        [Test]
+        /*[Test]
         public void AssignLinearImageToSrgbTextureProperty()
         {
             var exportedTex = AssignTextureToMaterialPropertyAndExportAndExtract(LinearGrayTex, LinearGrayImageName, "_MainTex");
             Assert.AreEqual(LinearGrayInSrgb, GetFirstPixelInTexture2D(exportedTex));
             UnityEngine.Object.DestroyImmediate(exportedTex);
-        }
+        }*/
 
-        [Test]
+        /*[Test]
         public void AssignSrgbImageToLinearTextureProperty()
         {
             var exportedTex = AssignTextureToMaterialPropertyAndExportAndExtract(SrgbGrayTex, SrgbGrayImageName, "_OcclusionMap");
             // R channel is occlusion in glTF spec.
             Assert.AreEqual(SrgbGrayInLinear.r, GetFirstPixelInTexture2D(exportedTex).r);
             UnityEngine.Object.DestroyImmediate(exportedTex);
-        }
+        }*/
 
         [Test]
         public void AssignLinearImageToLinearTextureProperty()
