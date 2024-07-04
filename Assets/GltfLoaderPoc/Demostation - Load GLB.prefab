@@ -363,6 +363,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instructionsGO: {fileID: 3156832678080730698}
+  gltfLibrary: 1
   spawnPoint: {fileID: 0}
   assetsUris:
   - BinaryModels/dumpster1k
@@ -370,8 +371,11 @@ MonoBehaviour:
   - BinaryModels/GOLFCART
   - BinaryModels/URBAN-4k-png
   - BinaryModels/ALL_BAKED_2kHYPERFY_uncompressed
+  - BinaryModels/ALL_BAKED_2kHYPERFY
   - BinaryModels/ALL_joinedatlased_uncompressed
+  - BinaryModels/ALL_joinedatlased
   - BinaryModels/V_FINAL2_uncompressed
+  - BinaryModels/V_FINAL2
   networkSpeedMbps: 0
 --- !u!4 &8052294470690796685 stripped
 Transform:

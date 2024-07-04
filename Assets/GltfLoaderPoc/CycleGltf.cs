@@ -1,11 +1,14 @@
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Avatars;
 using EmergenceSDK.EmergenceDemo.DemoStations;
 using EmergenceSDK.Internal.Utils;
 using EmergenceSDK.Services;
 using EmergenceSDK.Types;
+using GLTFast;
 using Newtonsoft.Json;
 using UniGLTF;
 using UniGLTF.MeshUtility;
@@ -21,10 +24,18 @@ namespace EmergenceSDK.GltfLoaderPoc
 {
     public class CycleGltf : DemoStation<CycleGltf>, IDemoStation
     {
+        public enum GltfLibrary
+        {
+            UniGltf,
+            GltFast
+        }
+
+        public GltfLibrary gltfLibrary = GltfLibrary.UniGltf;
         public Transform spawnPoint;
         public string[] assetsUris;
         public float networkSpeedMbps;
         private int currentIndex;
+        private string loadedMeshName;
         private bool busy;
         
         public bool IsReady
@@ -66,52 +77,103 @@ namespace EmergenceSDK.GltfLoaderPoc
                 {
                     busy = true;
 
-                    foreach (var child in spawnPoint.GetChildren())
-                    {
-                        Destroy(child.gameObject);
-                    }
+                    ClearSpawnedGltf();
 
-                    var assetBytes = Resources.Load<TextAsset>(assetsUris[currentIndex]).bytes;
-                    currentIndex++;
-                    currentIndex %= assetsUris.Length;                                    
-
+                    var assetBytes = LoadGltfFile();
                     EmergenceLogger.LogInfo($"Loaded {assetBytes.Length/1000f/1000f:F2}MB", alsoLogToScreen: true);
 
-                    if (networkSpeedMbps > 0)
-                    {
-                        var bits = assetBytes.Length * 8;
-                        var bitrate = networkSpeedMbps * 1000000;
-                        var delay = (int)(bits / bitrate * 1000);
-                        EmergenceLogger.LogInfo($"Simulated net delay: {delay / 1000f:F2}s", alsoLogToScreen: true);
-                        await UniTask.Delay(delay);
-                    }
-                    else
-                    {
-                        EmergenceLogger.LogInfo($"No net delay.", alsoLogToScreen: true);
-                    }
+                    await NetworkDownloadDelay(assetBytes);
                     
-                    var sw = new Stopwatch();
-                    sw.Start();
-                    var parser = new GlbBinaryParser(assetBytes, null);
-                    using var parsed = parser.Parse();
-                    using var importer = new ImporterContext(parsed);
-                    var instance = importer.Load();
-                    var o = instance.gameObject;
-                    o.transform.parent = spawnPoint;
-                    o.transform.localPosition = Vector3.zero;
-                    foreach (var meshRenderer in instance.MeshRenderers)
-                    {
-                        var meshCollider = meshRenderer.gameObject.AddComponent<MeshCollider>();
-                        meshCollider.sharedMesh = meshRenderer.GetMesh();
-                    }
-                    instance.ShowMeshes();
-                    sw.Stop();
-                    
-                    EmergenceLogger.LogInfo($"Loading the mesh took {sw.ElapsedMilliseconds / 1000f:F2}s.", alsoLogToScreen: true);
+                    await SpawnGltf(assetBytes);
                         
                     busy = false;
                 });
             }
+        }
+
+        private byte[] LoadGltfFile()
+        {
+            loadedMeshName = Path.GetFileName(assetsUris[currentIndex]);
+            var assetBytes = Resources.Load<TextAsset>(assetsUris[currentIndex]).bytes;
+            currentIndex++;
+            currentIndex %= assetsUris.Length;
+            return assetBytes;
+        }
+
+        private void ClearSpawnedGltf()
+        {
+            foreach (var child in spawnPoint.GetChildren())
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        private async UniTask NetworkDownloadDelay(byte[] assetBytes)
+        {
+            if (networkSpeedMbps > 0)
+            {
+                var bits = assetBytes.Length * 8;
+                var bitrate = networkSpeedMbps * 1000000;
+                var delay = (int)(bits / bitrate * 1000);
+                EmergenceLogger.LogInfo($"Simulated net delay: {delay / 1000f:F2}s", alsoLogToScreen: true);
+                await UniTask.Delay(delay);
+            }
+            else
+            {
+                EmergenceLogger.LogInfo($"No net delay.", alsoLogToScreen: true);
+            }
+        }
+
+        private async UniTask SpawnGltf(byte[] gltfBytes)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            switch (gltfLibrary)
+            {
+                case GltfLibrary.UniGltf:
+                    LoadWithUniGltf(gltfBytes);
+                    break;
+                case GltfLibrary.GltFast:
+                    await LoadWithGltFast(gltfBytes);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            
+            sw.Stop();
+            EmergenceLogger.LogInfo($"Loading the mesh '{loadedMeshName}' took {sw.ElapsedMilliseconds / 1000f:F2}s with {gltfLibrary.ToString()}", alsoLogToScreen: true);
+        }
+
+        private async UniTask LoadWithGltFast(byte[] gltfBytes)
+        {
+            var gltf = new GltfImport();
+            await gltf.LoadGltfBinary(
+                gltfBytes
+            ).AsUniTask();
+            await gltf.InstantiateMainSceneAsync(spawnPoint).AsUniTask();
+            foreach (var meshFilter in spawnPoint.GetComponentsInChildren<MeshFilter>())
+            {
+                var meshCollider = meshFilter.gameObject.AddComponent<MeshCollider>();
+                meshCollider.sharedMesh = meshFilter.sharedMesh;
+            }
+        }
+
+        private void LoadWithUniGltf(byte[] gltfBytes)
+        {
+            var parser = new GlbBinaryParser(gltfBytes, null);
+            using var parsed = parser.Parse();
+            using var importer = new ImporterContext(parsed);
+            var instance = importer.Load();
+            var o = instance.gameObject;
+            o.transform.parent = spawnPoint;
+            o.transform.localPosition = Vector3.zero;
+            foreach (var meshRenderer in instance.MeshRenderers)
+            {
+                var meshCollider = meshRenderer.gameObject.AddComponent<MeshCollider>();
+                meshCollider.sharedMesh = meshRenderer.GetMesh();
+            }
+            instance.ShowMeshes();
         }
     }
 }
