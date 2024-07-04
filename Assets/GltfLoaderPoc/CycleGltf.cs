@@ -1,23 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using EmergenceSDK.Avatars;
 using EmergenceSDK.EmergenceDemo.DemoStations;
 using EmergenceSDK.Internal.Utils;
-using EmergenceSDK.Services;
-using EmergenceSDK.Types;
 using GLTFast;
-using Newtonsoft.Json;
 using UniGLTF;
 using UniGLTF.MeshUtility;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Networking;
-using UnityEngine.Serialization;
-using VRMShaders;
-using Debug = UnityEngine.Debug;
 using TouchPhase = UnityEngine.TouchPhase;
 
 namespace EmergenceSDK.GltfLoaderPoc
@@ -38,6 +34,9 @@ namespace EmergenceSDK.GltfLoaderPoc
             GltFast = 2
         }
 
+#if UNITY_EDITOR
+        [SerializeField,SingleEnumFlagSelect(EnumType = typeof(GltfLibrary))]
+#endif
         public GltfLibrary gltfLibrary = GltfLibrary.UniGltf;
         public Transform spawnPoint;
         public GltfModel[] binaryModels;
@@ -192,4 +191,59 @@ namespace EmergenceSDK.GltfLoaderPoc
             instance.ShowMeshes();
         }
     }
+    
+#if UNITY_EDITOR
+    public class SingleEnumFlagSelectAttribute : PropertyAttribute
+    {
+        private Type enumType;
+
+        public Type EnumType
+        {
+            get => enumType;
+            set
+            {
+                if (value == null)
+                {
+                    EmergenceLogger.LogError($"{GetType().Name}: EnumType cannot be null");
+                    return;
+                }
+                if (!value.IsEnum)
+                {
+                    EmergenceLogger.LogError($"{GetType().Name}: EnumType is {value.Name} this is not an enum");
+                    return;
+                }
+                enumType = value;
+                IsValid = true;
+            }
+        }
+    
+        public bool IsValid { get; private set; }
+    }
+
+    [CustomPropertyDrawer(typeof(SingleEnumFlagSelectAttribute))]
+    public class SingleEnumFlagSelectAttributeEditor : PropertyDrawer
+    {
+        public override void OnGUI(Rect position, 
+            SerializedProperty property, GUIContent label)
+        {
+            var singleEnumFlagSelectAttribute = 
+                (SingleEnumFlagSelectAttribute)attribute;
+            if (!singleEnumFlagSelectAttribute.IsValid)
+            {
+                return;
+            }
+            var displayTexts = new List<GUIContent>();
+            var enumValues = new List<int>();
+            foreach (var displayText in 
+                     Enum.GetValues(singleEnumFlagSelectAttribute.EnumType))
+            {
+                displayTexts.Add(new GUIContent(displayText.ToString()));
+                enumValues.Add((int)displayText);
+            }
+
+            property.intValue = EditorGUI.IntPopup(position, label, property.intValue,
+                displayTexts.ToArray(), enumValues.ToArray());
+        }
+    }
+#endif
 }

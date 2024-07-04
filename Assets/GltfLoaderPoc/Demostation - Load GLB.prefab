@@ -363,19 +363,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instructionsGO: {fileID: 3156832678080730698}
-  gltfLibrary: 1
+  gltfLibrary: 2
   spawnPoint: {fileID: 0}
   binaryModels:
-  - {fileID: 4900000, guid: d113f55bc9273e842ab7cd111548196f, type: 3}
-  - {fileID: 4900000, guid: c758c69b400e7c04191eb0b7c30d5bb9, type: 3}
-  - {fileID: 4900000, guid: 5628b20a71abd49458bc4a00059641c9, type: 3}
-  - {fileID: 4900000, guid: bb8da6a53fe88f0429caad7cf55d89fd, type: 3}
-  - {fileID: 4900000, guid: fcdea58cb7ba66e4a9247dfffe5f774d, type: 3}
-  - {fileID: 4900000, guid: 8ddb940d607cdb445a3b848dbfd9ed24, type: 3}
-  - {fileID: 4900000, guid: ec76fa3b6ce223c4f9eace4c9d387d89, type: 3}
-  - {fileID: 4900000, guid: 7b96382b02608934baea06dcc62ebae2, type: 3}
-  - {fileID: 4900000, guid: e760c93b2cc3fbd4f85745bc7cf0a7f5, type: 3}
-  - {fileID: 4900000, guid: 506a66a24ac46404ea3527264d60596b, type: 3}
+  - textAsset: {fileID: 4900000, guid: d113f55bc9273e842ab7cd111548196f, type: 3}
+    compatibleLibraries: -1
+  - textAsset: {fileID: 4900000, guid: c758c69b400e7c04191eb0b7c30d5bb9, type: 3}
+    compatibleLibraries: 0
+  - textAsset: {fileID: 4900000, guid: 5628b20a71abd49458bc4a00059641c9, type: 3}
+    compatibleLibraries: -1
+  - textAsset: {fileID: 4900000, guid: bb8da6a53fe88f0429caad7cf55d89fd, type: 3}
+    compatibleLibraries: -1
+  - textAsset: {fileID: 4900000, guid: fcdea58cb7ba66e4a9247dfffe5f774d, type: 3}
+    compatibleLibraries: 2
+  - textAsset: {fileID: 4900000, guid: 8ddb940d607cdb445a3b848dbfd9ed24, type: 3}
+    compatibleLibraries: -1
+  - textAsset: {fileID: 4900000, guid: ec76fa3b6ce223c4f9eace4c9d387d89, type: 3}
+    compatibleLibraries: 2
+  - textAsset: {fileID: 4900000, guid: 7b96382b02608934baea06dcc62ebae2, type: 3}
+    compatibleLibraries: -1
+  - textAsset: {fileID: 4900000, guid: e760c93b2cc3fbd4f85745bc7cf0a7f5, type: 3}
+    compatibleLibraries: 2
+  - textAsset: {fileID: 4900000, guid: 506a66a24ac46404ea3527264d60596b, type: 3}
+    compatibleLibraries: -1
   networkSpeedMbps: 0
 --- !u!4 &8052294470690796685 stripped
 Transform:
