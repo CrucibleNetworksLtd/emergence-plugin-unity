@@ -9,7 +9,7 @@ For the time-being; this script will disable a PlayerInput's auto switch control
 
 using UnityEngine;
 
-namespace EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.Mobile.Scripts.Utilities
+namespace EmergenceSDK.Plugins.StarterAssets.Mobile.Scripts.Utilities
 {
     public class MobileDisableAutoSwitchControls : MonoBehaviour
     {

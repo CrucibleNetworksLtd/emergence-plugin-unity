@@ -97,13 +97,17 @@ namespace VRMShaders
 
             {
                 var roughnessFactor = 0.5f;
-                Assert.That(
-                    ImportPixel(new Color32(255, 127, 255, 255), 1.0f, roughnessFactor, default),
-                    // r <- 255 : metallic (metallicRoughness.b * metallicFactor)
-                    // g <- 0 : occlusion (occlusion.r)
-                    // b <- 0   : (Unused)
-                    // a <- 191 : smoothness (1.0 - (metallicRoughness.g * roughnessFactor))
-                    Is.EqualTo(new Color32(255, 0, 0, 191))); // A:smoothness = 1.0 - (0.5 * 0.5) = 0.75
+                float tolerance = 1.0f;
+                Color32 expectedColor = new Color32(255, 0, 0, 191);
+                Color32 actualColor = ImportPixel(new Color32(255, 127, 255, 255), 1.0f, roughnessFactor, default);
+                // r <- 255 : metallic (metallicRoughness.b * metallicFactor)
+                // g <- 0 : occlusion (occlusion.r)
+                // b <- 0   : (Unused)
+                // a <- 191 : smoothness (1.0 - (metallicRoughness.g * roughnessFactor)) Sometimes this triggers floating point errors, so we have a tolerance
+                Assert.AreEqual(expectedColor.r, actualColor.r);
+                Assert.AreEqual(expectedColor.g, actualColor.g);
+                Assert.AreEqual(expectedColor.b, actualColor.b);
+                Assert.That(actualColor.a, Is.InRange(expectedColor.a - tolerance, expectedColor.a + tolerance));
             }
 
             {

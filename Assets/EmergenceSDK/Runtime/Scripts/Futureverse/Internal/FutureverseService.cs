@@ -51,9 +51,9 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
 #else
             return FutureverseSingleton.Instance.Environment switch
             {
-                EmergenceEnvironment.Production => "https://4yzj264is3.execute-api.us-west-2.amazonaws.com/api/v1/",
-                EmergenceEnvironment.Development => "https://y4heevnpik.execute-api.us-west-2.amazonaws.com/api/v1/",
-                EmergenceEnvironment.Staging => "https://y4heevnpik.execute-api.us-west-2.amazonaws.com/api/v1/",
+                EmergenceEnvironment.Production => "https://account-indexer.api.futurepass.futureverse.app/api/v1",
+                EmergenceEnvironment.Development => "https://account-indexer.api.futurepass.futureverse.dev/api/v1",
+                EmergenceEnvironment.Staging => "https://account-indexer.api.futurepass.futureverse.dev/api/v1",
                 _ => throw new ArgumentOutOfRangeException()
             };
 #endif

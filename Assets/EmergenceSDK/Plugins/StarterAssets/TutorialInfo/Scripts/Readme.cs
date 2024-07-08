@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.TutorialInfo.Scripts
+namespace EmergenceSDK.Plugins.StarterAssets.TutorialInfo.Scripts
 {
 	public class Readme : ScriptableObject {
 		public Texture2D icon;

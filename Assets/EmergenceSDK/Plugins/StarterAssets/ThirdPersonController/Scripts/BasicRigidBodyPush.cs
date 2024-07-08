@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace EmergenceSDK.EmergenceSDK.Plugins.StarterAssets.ThirdPersonController.Scripts
+namespace EmergenceSDK.Plugins.StarterAssets.ThirdPersonController.Scripts
 {
 	public class BasicRigidBodyPush : MonoBehaviour
 	{

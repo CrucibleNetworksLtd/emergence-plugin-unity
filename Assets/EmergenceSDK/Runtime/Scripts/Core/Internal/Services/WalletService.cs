@@ -61,6 +61,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
 
             string url = StaticConfig.APIBase + "request-to-sign";
             
+            //TODO spoof a response for tests here
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, content, EmergenceSingleton.DeviceIdHeader);
             if(!response.Successful)
             {
@@ -93,6 +94,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
         {
             var url = StaticConfig.APIBase + "handshake" + "?nodeUrl=" + EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL;
 
+            //TODO need to spoof something here in support of testing.
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, headers: EmergenceSingleton.DeviceIdHeader, timeout: timeout, ct: ct);
                 
             if (!response.Successful)
@@ -154,6 +156,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
                          "?nodeUrl=" + EmergenceSingleton.Instance.Configuration.Chain.DefaultNodeURL +
                          "&address=" + WalletAddress;
             
+            // TODO once again spoof our response here, this time for balance
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
             if(!response.Successful)
             {
@@ -220,6 +223,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
         }
         
 #if INCLUDE_DEVELOPMENT_INTERFACES
+        //TODO, this old spoofing stuff needs to be scrapped. Beter to spoof responses to toest full capability.
         public IDisposable SpoofedWallet(string wallet, string checksummedWallet) => new SpoofedWalletManager(wallet, checksummedWallet);
 
         public void RunWithSpoofedWalletAddress(string walletAddress, string checksummedWalletAddress, Action action)

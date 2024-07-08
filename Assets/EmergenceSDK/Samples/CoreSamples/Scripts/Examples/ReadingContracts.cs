@@ -3,7 +3,7 @@ using EmergenceSDK.Runtime.ScriptableObjects;
 using EmergenceSDK.Runtime.Services;
 using UnityEngine;
 
-namespace EmergenceSDK.Samples.CoreSamples
+namespace EmergenceSDK.Samples.CoreSamples.Examples
 {
     public class ReadingContracts : MonoBehaviour
     {

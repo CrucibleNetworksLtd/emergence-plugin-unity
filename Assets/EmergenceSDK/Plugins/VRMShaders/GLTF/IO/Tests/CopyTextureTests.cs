@@ -7,7 +7,6 @@ namespace VRMShaders
 {
     public sealed class CopyTextureTests
     {
-        private static string AssetPath = "Assets/VRMShaders/GLTF/IO/Tests";
 
         private static readonly Color32 Black = new Color32(0, 0, 0, 255);
         private static readonly Color32 Gray = new Color32(127, 127, 127, 255);
@@ -33,7 +32,7 @@ namespace VRMShaders
         [Test]
         public void CopyFromNonReadableSRgbPng()
         {
-            var nonReadableTex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{AssetPath}/4x4_non_readable.png");
+            var nonReadableTex = Resources.Load("4x4_non_readable") as Texture2D;
             Assert.False(nonReadableTex.isReadable);
             var copiedTex = TextureConverter.CopyTexture(nonReadableTex, ColorSpace.sRGB, true, null);
             var pixels = copiedTex.GetPixels32(miplevel: 0);
@@ -47,7 +46,7 @@ namespace VRMShaders
         [Test]
         public void CopyFromNonReadableSRgbDds()
         {
-            var compressedTex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{AssetPath}/4x4_non_readable_compressed.dds");
+            var compressedTex = Resources.Load("4x4_non_readable_compressed") as Texture2D;
             Assert.False(compressedTex.isReadable);
             var copiedTex = TextureConverter.CopyTexture(compressedTex, ColorSpace.sRGB, true, null);
             var pixels = copiedTex.GetPixels32(miplevel: 0);
@@ -61,7 +60,7 @@ namespace VRMShaders
         [Test]
         public void CopyAttributes()
         {
-            var src = AssetDatabase.LoadAssetAtPath<Texture2D>($"{AssetPath}/4x4_non_readable.png");
+            var src = Resources.Load("4x4_non_readable") as Texture2D;
             var dst = TextureConverter.CopyTexture(src, ColorSpace.sRGB, false, null);
             Assert.AreEqual(src.name, dst.name);
             Assert.AreEqual(src.anisoLevel, dst.anisoLevel);

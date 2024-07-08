@@ -1,15 +1,15 @@
 using System.Collections.Generic;
-using EmergenceSDK.Samples.CoreSamples.DemoStations;
 using EmergenceSDK.Runtime.Futureverse.Services;
 using EmergenceSDK.Runtime.Internal.UI;
 using EmergenceSDK.Runtime.Internal.Utils;
 using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types;
 using EmergenceSDK.Runtime.Types.Inventory;
+using EmergenceSDK.Samples.CoreSamples.DemoStations;
 using Tweens;
 using UnityEngine;
 
-namespace EmergenceSDK.EmergenceSDK.Samples.FutureverseSamples
+namespace EmergenceSDK.Samples.FutureverseSamples
 {
     public class FutureverseInventoryDemo : DemoStation<FutureverseInventoryDemo>, ILoggedInDemoStation
     {
