@@ -26,8 +26,6 @@ namespace EmergenceSDK.Samples.CoreSamples.DemoStations
 
         private void Start()
         {
-            dynamicMetaDataService = EmergenceServiceProvider.GetService<IDynamicMetadataService>();
-            
             instructionsGO.SetActive(false);
             IsReady = false;
         }
@@ -65,19 +63,35 @@ namespace EmergenceSDK.Samples.CoreSamples.DemoStations
         
         private void UpdateDynamicMetadata(InventoryItem item)
         {
+            if (dynamicMetaDataService == null)
+            {
+                dynamicMetaDataService = EmergenceServiceProvider.GetService<IDynamicMetadataService>();
+            }
             EmergenceLogger.LogInfo("Updating Dynamic metadata", true);
             if (!string.IsNullOrEmpty(item.Meta.DynamicMetadata))
             {
                 var curMetadata = int.Parse(item.Meta.DynamicMetadata);
                 curMetadata++;
-                dynamicMetaDataService.WriteDynamicMetadata(item.Blockchain, item.Contract, item.TokenId, "0iKoO1V2ZG98fPETreioOyEireDTYwby",
-                    curMetadata.ToString(), UpdateDynamicMetadataSuccess, EmergenceLogger.LogError);
+                dynamicMetaDataService.WriteDynamicMetadata(
+                    item.Blockchain,
+                    item.Contract,
+                    item.TokenId,
+                    curMetadata.ToString(),
+                    "0iKoO1V2ZG98fPETreioOyEireDTYwby",
+                    UpdateDynamicMetadataSuccess,
+                    EmergenceLogger.LogError);
             }
             else
             {
                 var curMetadata = 1;
-                dynamicMetaDataService.WriteNewDynamicMetadata(item.Blockchain, item.Contract, item.TokenId, "0iKoO1V2ZG98fPETreioOyEireDTYwby",
-                    curMetadata.ToString(), UpdateDynamicMetadataSuccess, EmergenceLogger.LogError);
+                dynamicMetaDataService.WriteNewDynamicMetadata(
+                    item.Blockchain,
+                    item.Contract,
+                    item.TokenId,
+                    curMetadata.ToString(),
+                    "0iKoO1V2ZG98fPETreioOyEireDTYwby",
+                    UpdateDynamicMetadataSuccess,
+                    EmergenceLogger.LogError);
             }
 
             void UpdateDynamicMetadataSuccess(string response)
