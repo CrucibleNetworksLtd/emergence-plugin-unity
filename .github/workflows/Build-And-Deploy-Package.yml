@@ -23,7 +23,7 @@ jobs:
           projectPath: Assets/EmergenceSDK
           unityVersion: 2021.3.11f1
           packageMode: true
-          githubToken: ${{ secrets.DISTRO_TOKEN }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       # Step 3: Checkout Distro repo
       - name: Checkout Distribution Repository
@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: CrucibleNetworksLtd/EmergenceSDKUnity
-          token: ${{ secrets.DISTRO_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           path: distribution-repo
 
       # Step 4: Copy package to Distro Repo
@@ -51,4 +51,4 @@ jobs:
           git commit -m "Update Unity package"
           git push
         env:
-          GITHUB_TOKEN: ${{ secrets.DISTRO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
