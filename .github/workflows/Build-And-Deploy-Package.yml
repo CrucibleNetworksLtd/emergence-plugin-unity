@@ -23,4 +23,32 @@ jobs:
           projectPath: Assets/EmergenceSDK
           unityVersion: 2021.3.11f1
           packageMode: true
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          githubToken: ${{ secrets.DISTRO_TOKEN }}
+
+      # Step 3: Checkout Distro repo
+      - name: Checkout Distribution Repository
+        if: success()
+        uses: actions/checkout@v2
+        with:
+          repository: CrucibleNetworksLtd/EmergenceSDKUnity
+          token: ${{ secrets.DISTRO_TOKEN }}
+          path: distribution-repo
+
+      # Step 4: Copy package to Distro Repo
+      - name: Copy Package to Distribution Repository
+        if: success()
+        run: |
+          rsync -av --progress Assets/EmergenceSDK/ distribution-repo/
+
+      # Step 5: Publish Package
+      - name: Commit and Push Package
+        if: success()
+        run: |
+          cd distribution-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update Unity package"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.DISTRO_TOKEN }}
