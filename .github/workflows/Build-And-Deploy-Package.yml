@@ -11,8 +11,19 @@ jobs:
       # Step 1: Check out the repository containing Unity project
       - name: Checkout repository
         uses: actions/checkout@v2
-            
-      # Step 2: Run Unit Tests
+
+      # Step 2: Install Git LFS
+      - name: Install Git LFS
+        run: |
+          sudo apt-get install git-lfs
+          git lfs install
+
+      # Step 3: Pull LFS files
+      - name: Pull LFS files
+        run: |
+          git lfs pull
+
+      # Step 4: Run Unit Tests
       - name: Run Unit Tests
         uses: game-ci/unity-test-runner@v4
         env:
@@ -25,17 +36,17 @@ jobs:
           packageMode: true
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 3: Get the latest commit message
+      # Step 5: Get the latest commit message
       - name: Get Latest Commit Message
         run: echo "LATEST_COMMIT_MSG=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
 
-      # Step 4: Rename Samples Folder
+      # Step 6: Rename Samples Folder
       - name: Rename Samples Folder
         if: success()
         run: |
           mv Assets/EmergenceSDK/Samples Assets/EmergenceSDK/Samples~
 
-      # Step 5: Checkout Distro repo
+      # Step 7: Checkout Distro repo
       - name: Checkout Distribution Repository
         if: success()
         uses: actions/checkout@v2
@@ -45,13 +56,28 @@ jobs:
           token: ${{ secrets.DISTRO_TOKEN }}
           path: distribution-repo
 
-      # Step 6: Copy package to Distro Repo
+      # Step 8: Install Git LFS in Distribution Repo
+      - name: Install Git LFS in Distribution Repo
+        if: success()
+        run: |
+          sudo apt-get install git-lfs
+          git lfs install
+        working-directory: distribution-repo
+
+      # Step 9: Pull LFS files in Distribution Repo
+      - name: Pull LFS files in Distribution Repo
+        if: success()
+        run: |
+          git lfs pull
+        working-directory: distribution-repo
+
+      # Step 10: Copy package to Distro Repo
       - name: Copy Package to Distribution Repository
         if: success()
         run: |
-          rsync -av --progress Assets/EmergenceSDK/ distribution-repo/
+          cp -r Assets/EmergenceSDK/* distribution-repo/
 
-      # Step 7: Publish Package
+      # Step 11: Publish Package
       - name: Commit and Push Package
         if: success()
         run: |
