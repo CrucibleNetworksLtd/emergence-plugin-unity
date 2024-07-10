@@ -29,7 +29,13 @@ jobs:
       - name: Get Latest Commit Message
         run: echo "LATEST_COMMIT_MSG=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
 
-      # Step 4: Checkout Distro repo
+      # Step 4: Rename Samples Folder
+      - name: Rename Samples Folder
+        if: success()
+        run: |
+          mv Assets/EmergenceSDK/Samples Assets/EmergenceSDK/Samples~
+
+      # Step 5: Checkout Distro repo
       - name: Checkout Distribution Repository
         if: success()
         uses: actions/checkout@v2
@@ -39,13 +45,13 @@ jobs:
           token: ${{ secrets.DISTRO_TOKEN }}
           path: distribution-repo
 
-      # Step 5: Copy package to Distro Repo
+      # Step 6: Copy package to Distro Repo
       - name: Copy Package to Distribution Repository
         if: success()
         run: |
           rsync -av --progress Assets/EmergenceSDK/ distribution-repo/
 
-      # Step 6: Publish Package
+      # Step 7: Publish Package
       - name: Commit and Push Package
         if: success()
         run: |
