@@ -14,7 +14,7 @@
   "samples": [
     {
       "displayName": "Core Samples",
-      "description": "A collection of samples demonstrating implementation fo the core Emergence Capabilities",
+      "description": "A collection of samples demonstrating implementation of the core Emergence Capabilities",
       "path": "Samples/CoreSamples"
     },
     {
