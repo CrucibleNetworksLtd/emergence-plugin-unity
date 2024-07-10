@@ -15,12 +15,12 @@
     {
       "displayName": "Core Samples",
       "description": "A collection of samples demonstrating implementation of the core Emergence Capabilities",
-      "path": "Samples/CoreSamples"
+      "path": "Samples~/CoreSamples"
     },
     {
       "displayName": "Futureverse Samples",
       "description": "A collection of samples demonstrating implementation of Futureverse capabilities",
-      "path": "Samples/FutureverseSamples"
+      "path": "Samples~/FutureverseSamples"
     }
   ],
   "keywords": [
