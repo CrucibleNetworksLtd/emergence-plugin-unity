@@ -11,6 +11,18 @@
     "com.unity.textmeshpro" :  "3.0.6",
     "com.unity.test-framework" :  "1.1.33"
   },
+  "samples": [
+    {
+      "displayName": "Core Samples",
+      "description": "A collection of samples demonstrating implementation fo the core Emergence Capabilities",
+      "path": "Samples/CoreSamples"
+    },
+    {
+      "displayName": "Futureverse Samples",
+      "description": "A collection of samples demonstrating implementation of Futureverse capabilities",
+      "path": "Samples/FutureverseSamples"
+    }
+  ],
   "keywords": [
     "web3",
     "sdk",
