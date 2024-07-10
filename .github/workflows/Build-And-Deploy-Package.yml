@@ -25,7 +25,11 @@ jobs:
           packageMode: true
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 3: Checkout Distro repo
+      # Step 3: Get the latest commit message
+      - name: Get Latest Commit Message
+        run: echo "LATEST_COMMIT_MSG=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+
+      # Step 4: Checkout Distro repo
       - name: Checkout Distribution Repository
         if: success()
         uses: actions/checkout@v2
@@ -35,13 +39,13 @@ jobs:
           token: ${{ secrets.DISTRO_TOKEN }}
           path: distribution-repo
 
-      # Step 4: Copy package to Distro Repo
+      # Step 5: Copy package to Distro Repo
       - name: Copy Package to Distribution Repository
         if: success()
         run: |
           rsync -av --progress Assets/EmergenceSDK/ distribution-repo/
 
-      # Step 5: Publish Package
+      # Step 6: Publish Package
       - name: Commit and Push Package
         if: success()
         run: |
@@ -49,7 +53,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Update Unity package"
+          git commit -m "${{ env.LATEST_COMMIT_MSG }}"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.DISTRO_TOKEN }}
