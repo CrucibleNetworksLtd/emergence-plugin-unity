@@ -4,14 +4,14 @@ on:
   workflow_dispatch: #Manual trigger
 
 jobs:
-  test:
+  test-and-build:
     runs-on: ubuntu-latest
 
     steps:
       # Step 1: Check out the repository containing Unity project
       - name: Checkout repository
         uses: actions/checkout@v2
-
+            
       # Step 2: Run Unit Tests
       - name: Run Unit Tests
         uses: game-ci/unity-test-runner@v4
@@ -21,30 +21,23 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           projectPath: Assets/EmergenceSDK
-          unityVersion: 2021.3.11f1
+          unityVersion: 2022.3.32f1
           packageMode: true
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      # Step 1: Check out the repository containing Unity project
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      # Step 2: Get the latest commit message
+      # Step 3: Get the latest commit message
       - name: Get Latest Commit Message
         run: echo "LATEST_COMMIT_MSG=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
 
-      # Step 3: Rename Samples Folder
+      # Step 4: Rename Samples Folder
       - name: Rename Samples Folder
+        if: success()
         run: |
           mv Assets/EmergenceSDK/Samples Assets/EmergenceSDK/Samples~
 
-      # Step 4: Checkout Distro repo
+      # Step 5: Checkout Distro repo
       - name: Checkout Distribution Repository
+        if: success()
         uses: actions/checkout@v2
         with:
           repository: CrucibleNetworksLtd/EmergenceSDKUnity
@@ -52,13 +45,15 @@ jobs:
           token: ${{ secrets.DISTRO_TOKEN }}
           path: distribution-repo
 
-      # Step 5: Copy package to Distro Repo
+      # Step 6: Copy package to Distro Repo
       - name: Copy Package to Distribution Repository
+        if: success()
         run: |
           rsync -av --progress Assets/EmergenceSDK/ distribution-repo/
 
-      # Step 6: Publish Package
+      # Step 7: Publish Package
       - name: Commit and Push Package
+        if: success()
         run: |
           cd distribution-repo
           git config user.name "github-actions[bot]"
