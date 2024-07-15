@@ -1,6 +1,6 @@
 {
   "name": "com.crucible.emergence",
-  "version": "1.2.0-pre-3",
+  "version": "1.2.0-pre-4",
   "displayName": "Emergence SDK",
   "description": "Emergence is a Web3 SDK for game developers, which empowers game developers to take advantage of building interoperable game worlds for the Open Metaverse.",
   "unity": "2021.3",
@@ -21,6 +21,11 @@
       "displayName": "Futureverse Samples",
       "description": "A collection of samples demonstrating implementation of Futureverse capabilities",
       "path": "Samples~/FutureverseSamples"
+    },
+    {
+      "displayName": "Lamina1 Samples",
+      "description": "A collection of samples demonstrating implementation of Lamina1 capabilities",
+      "path": "Samples~/Lamina1Samples"
     }
   ],
   "keywords": [
