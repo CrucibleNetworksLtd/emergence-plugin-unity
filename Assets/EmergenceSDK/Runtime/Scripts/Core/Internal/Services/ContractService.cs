@@ -128,17 +128,6 @@ namespace EmergenceSDK.Runtime.Internal.Services
         private async UniTask<ServiceResponse<WriteContractResponse>> HandleWriteMethodError<T>(WebResponse response, SerialisedWriteRequest<T> serialisedWriteRequest)
         {
             var ret = new ServiceResponse<WriteContractResponse>(false);
-            switch (response.StatusCode)
-            {
-                case 502:
-                case 500: 
-                case 504:
-                {
-                    await ReconnectionQR.FireEventOnReconnection(async () => ret = await WriteMethodAsyncRetry(serialisedWriteRequest));
-                    break;
-                }
-            }
-
             return ret;
         }
 

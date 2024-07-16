@@ -9,13 +9,13 @@ namespace EmergenceSDK.Samples.CoreSamples.DemoStations
     public class WriteMethod : DemoStation<WriteMethod>, ILoggedInDemoStation
     {
         public DeployedSmartContract deployedContract;
-
+        private static string activeInstruction = "Press 'E' to Write";
         public bool IsReady
         {
             get => isReady;
             set
             {
-                InstructionsText.text = value ? ActiveInstructions : InactiveInstructions;
+                InstructionsText.text = value ? activeInstruction : InactiveInstructions;
                 isReady = value;
             }
         }
