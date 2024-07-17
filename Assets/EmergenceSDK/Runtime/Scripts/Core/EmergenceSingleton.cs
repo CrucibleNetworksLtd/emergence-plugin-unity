@@ -24,7 +24,10 @@ namespace EmergenceSDK.Runtime
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
         public EmergenceConfiguration Configuration;
-        [SerializeField] private EmergenceEnvironment environment;
+        
+        [SerializeField] 
+        private EmergenceEnvironment environment;
+        
         private UICursorHandler cursorHandler;
         private GameObject ui;
         private string accessToken;
@@ -61,6 +64,11 @@ namespace EmergenceSDK.Runtime
         
         [Header("Settings for the default Emergence UI")]
         public LoginFlow DefaultLoginFlow = LoginFlow.WalletConnect;
+
+        [SerializeField] 
+        private int qrCodeTimeout = 60;
+
+        public int QrCodeTimeout => qrCodeTimeout;
 
         private ReconnectionQR reconnectionQR;
         private ISessionService sessionService;

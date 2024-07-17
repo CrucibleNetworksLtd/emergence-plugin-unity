@@ -66,6 +66,11 @@ namespace EmergenceSDK.Runtime.Internal.Utils
         /// </summary>
         public void AskForImage(string url, ImageReady imageReadyCallback, ImageFailed imageFailedCallback)
         {
+            if (string.IsNullOrEmpty(url))
+            {
+                HandleImageDownloadFailure(url,"No Image url associated with this item",404);
+            }
+            
             if (cachedTextures.ContainsKey(url) && cachedTextures[url] != null)
             {
                 imageReadyCallback?.Invoke(url, cachedTextures[url]);

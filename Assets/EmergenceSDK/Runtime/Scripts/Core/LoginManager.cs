@@ -29,8 +29,7 @@ namespace EmergenceSDK.Runtime
         /// <summary>
         /// The timeout in seconds that will be used for each QR code shown to the user.
         /// </summary>
-        [SerializeField]
-        internal float qrCodeTimeout = 60;
+        internal float qrCodeTimeout => EmergenceSingleton.Instance.QrCodeTimeout;
         /// <summary>
         /// If true, when the MonoBehaviour gets disabled the login will automatically be canceled. 
         /// </summary>
