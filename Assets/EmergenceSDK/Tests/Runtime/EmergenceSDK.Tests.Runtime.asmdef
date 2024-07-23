@@ -1,5 +1,5 @@
 {
-    "name": "EmergenceSDK.Tests",
+    "name": "EmergenceSDK.Tests.Runtime",
     "rootNamespace": "",
     "references": [
         "GUID:0acc523941302664db1f4e527237feb3",
@@ -8,10 +8,29 @@
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
         "GUID:160c0891eed3eab45aef308c85a9d385"
     ],
-    "includePlatforms": [
-        "Editor"
+    "includePlatforms": [],
+    "excludePlatforms": [
+        "Android",
+        "EmbeddedLinux",
+        "GameCoreScarlett",
+        "GameCoreXboxOne",
+        "iOS",
+        "LinuxStandalone64",
+        "CloudRendering",
+        "macOSStandalone",
+        "PS4",
+        "PS5",
+        "QNX",
+        "Stadia",
+        "Switch",
+        "tvOS",
+        "WSA",
+        "VisionOS",
+        "WebGL",
+        "WindowsStandalone32",
+        "WindowsStandalone64",
+        "XboxOne"
     ],
-    "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [

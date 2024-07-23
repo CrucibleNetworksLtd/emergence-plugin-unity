@@ -21,11 +21,6 @@
       "displayName": "Futureverse Samples",
       "description": "A collection of samples demonstrating implementation of Futureverse capabilities",
       "path": "Samples~/FutureverseSamples"
-    },
-    {
-      "displayName": "Lamina1 Samples",
-      "description": "A collection of samples demonstrating implementation of Lamina1 capabilities",
-      "path": "Samples~/Lamina1Samples"
     }
   ],
   "keywords": [

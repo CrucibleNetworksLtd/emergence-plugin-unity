@@ -12,6 +12,23 @@ namespace EmergenceSDK.Samples.FutureverseSamples
 {
     public class SendArtmDemo : DemoStation<SendArtmDemo>, ILoggedInDemoStation
     {
+        [Header("Transaction Details")]
+        [SerializeField] [Tooltip("Slot for link to occupy")]
+        private string slot = "equippedWith_Engines";
+
+        [SerializeField] [Tooltip("First NFT to link")]
+        private string linkA = "did:fv-asset:7672:root:358500:626";
+
+        [SerializeField] [Tooltip("Second NFT to link")]
+        private string linkB = "did:fv-asset:7672:root:359524:626";
+        
+        /// <summary>
+        /// This bool is used to determine whether a transaction has been made during this session.
+        /// If true the next transaction will be a "Link".
+        /// if false the next transaction will be a "Delete Link".
+        /// </summary>
+        private bool isFirstTransactionOfSession = true;
+        
         private IFutureverseService futureverseService;
         private ISessionService sessionService;
 
@@ -65,15 +82,30 @@ namespace EmergenceSDK.Samples.FutureverseSamples
             }
         }
 
+        /// <summary>
+        /// Using the variables we Generate a transaction request which is associated with the currently connected wallet
+        /// </summary>
         private async UniTask SendTestArtm()
         {
             EmergenceLogger.LogInfo("Sending ARTM...", true);
 
+            ArtmTransactionResponse artmTransactionResponse;
             try
             {
-                var artmTransactionResponse = await futureverseService.SendArtmAsync("An update is being made to your inventory",
-                    new List<ArtmOperation>
-                        { new(ArtmOperationType.DeleteLink, "equippedWith_Engines", "did:fv-asset:7672:root:358500:626", "did:fv-asset:7672:root:359524:626") }, false);
+                if (isFirstTransactionOfSession)
+                {
+                    artmTransactionResponse = await futureverseService.SendArtmAsync("An update is being made to your inventory",
+                        new List<ArtmOperation>
+                            { new(ArtmOperationType.CreateLink, slot, linkA, linkB) }, false);
+                }
+                else
+                {
+                    artmTransactionResponse = await futureverseService.SendArtmAsync("An update is being made to your inventory",
+                        new List<ArtmOperation>
+                            { new(ArtmOperationType.DeleteLink, slot, linkA, linkB) }, false);
+                }
+
+                isFirstTransactionOfSession = !isFirstTransactionOfSession;
                 
                 EmergenceLogger.LogInfo("ARTM successfully sent: " + artmTransactionResponse.TransactionHash, true);
                 EmergenceLogger.LogInfo("Retrieving transaction status... ", true);
