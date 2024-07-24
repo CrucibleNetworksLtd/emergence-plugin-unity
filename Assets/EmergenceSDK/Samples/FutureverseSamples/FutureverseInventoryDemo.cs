@@ -75,8 +75,6 @@ namespace EmergenceSDK.Samples.FutureverseSamples
             }
         }
 
-        private GameObject CreateEntry() => Instantiate(itemEntryPrefab, contentGO.transform, false);
-
         public void ShowInventory()
         {
             if (!isInventoryVisible)
@@ -110,6 +108,11 @@ namespace EmergenceSDK.Samples.FutureverseSamples
                 var entry = CreateEntry();
                 entry.GetComponent<InventoryItemEntry>().SetItem(inventoryItem);
             }
+        }
+        
+        private GameObject CreateEntry()
+        {
+            return Instantiate(itemEntryPrefab, contentGO.transform, false);
         }
     }
 }

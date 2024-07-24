@@ -25,7 +25,7 @@ namespace EmergenceSDK.Samples.FutureverseSamples
         /// <summary>
         /// This bool is used to determine whether a transaction has been made during this session.
         /// If true the next transaction will be a "Link".
-        /// if false the next transaction will be a "Delete Link".
+        /// If false the next transaction will be a "Delete Link".
         /// </summary>
         private bool isFirstTransactionOfSession = true;
         
