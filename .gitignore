@@ -3,6 +3,7 @@
 Library/
 Temp/
 obj/
+CodeCoverage/
 Server/
 *.csproj
 .vs/
