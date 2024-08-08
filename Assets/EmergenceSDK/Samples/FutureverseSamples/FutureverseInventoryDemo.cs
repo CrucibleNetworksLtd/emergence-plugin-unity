@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using EmergenceSDK.Runtime.Futureverse.Internal;
 using EmergenceSDK.Runtime.Futureverse.Services;
 using EmergenceSDK.Runtime.Internal.UI;
 using EmergenceSDK.Runtime.Internal.Utils;
@@ -19,8 +20,10 @@ namespace EmergenceSDK.Samples.FutureverseSamples
         [SerializeField] private GameObject contentGO;
         [SerializeField] private GameObject scrollView;
 
+        [SerializeField] private string fvCollectionID = "17672:root:360548";
+
         private bool isInventoryVisible;
-        private IInventoryService inventoryService;
+        private IFutureverseInventoryService fvInventoryService;
         
         private InventoryItemStore inventoryItemStore;
 
@@ -40,7 +43,7 @@ namespace EmergenceSDK.Samples.FutureverseSamples
             {
                 futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
                 sessionService = EmergenceServiceProvider.GetService<ISessionService>();
-                inventoryService = EmergenceServiceProvider.GetService<IInventoryService>();
+                fvInventoryService = EmergenceServiceProvider.GetService<IFutureverseInventoryService>();
             };
             
             inventoryItemStore = new InventoryItemStore();
@@ -97,7 +100,11 @@ namespace EmergenceSDK.Samples.FutureverseSamples
                 Cursor.visible = false;
             }
 
-            inventoryService.InventoryByOwner(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible, SuccessInventoryByOwner, EmergenceLogger.LogError);
+            // Inventory By Owner
+            fvInventoryService.InventoryByOwner(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible, SuccessInventoryByOwner, EmergenceLogger.LogError);
+            
+            // Inventory By Owner And collection
+            //fvInventoryService.InventoryByOwnerAndCollection(new List<string>{fvCollectionID}, SuccessInventoryByOwner, EmergenceLogger.LogError);
         }
         
         private void SuccessInventoryByOwner(List<InventoryItem> inventoryItems)

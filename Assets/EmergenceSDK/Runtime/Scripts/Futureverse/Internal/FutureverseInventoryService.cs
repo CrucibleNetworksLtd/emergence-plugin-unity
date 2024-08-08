@@ -12,7 +12,7 @@ using EmergenceSDK.Runtime.Types.Inventory;
 
 namespace EmergenceSDK.Runtime.Futureverse.Internal
 {
-    internal class FutureverseInventoryService : IInventoryService
+    internal class FutureverseInventoryService : IFutureverseInventoryService
     {
         private readonly IFutureverseService futureverseService;
         private List<string> CombinedAddress => futureverseService.CurrentFuturepassInformation.GetCombinedAddresses();
@@ -21,7 +21,17 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
         {
             this.futureverseService = futureverseService;
         }
-
+        
+                
+        public async UniTask InventoryByOwner(string address, InventoryChain chain, SuccessInventoryByOwner success, ErrorCallback errorCallback)
+        {
+            var response = await InventoryByOwnerAsync(address, chain);
+            if(response.Successful)
+                success?.Invoke(response.Result1);
+            else
+                errorCallback?.Invoke("Error in InventoryByOwner.", (long)response.Code);
+        }
+        
         public async UniTask<ServiceResponse<List<InventoryItem>>> InventoryByOwnerAsync(string address, InventoryChain chain)
         {
             var futureverseInventory = await GetFutureverseInventory();
@@ -35,14 +45,40 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
 
             return new ServiceResponse<List<InventoryItem>>(futureverseInventory, true, ret);
         }
-
-        public async UniTask InventoryByOwner(string address, InventoryChain chain, SuccessInventoryByOwner success, ErrorCallback errorCallback)
+        
+        public async UniTask InventoryByOwnerAndCollection(List<string> collectionIds, SuccessInventoryByOwner success, ErrorCallback errorCallback)
         {
-            var response = await InventoryByOwnerAsync(address, chain);
-            if(response.Successful)
+            var response = await InventoryByOwnerAndCollectionAsync(collectionIds);
+            if (response.Successful)
+            {
                 success?.Invoke(response.Result1);
+            }
             else
-                errorCallback?.Invoke("Error in InventoryByOwner.", (long)response.Code);
+            {
+                errorCallback?.Invoke("Error in InventoryByOwnerAndCollection.", (long)response.Code);
+            }
+        }
+
+        public async UniTask<ServiceResponse<List<InventoryItem>>> InventoryByOwnerAndCollectionAsync(List<string> collectionIds)
+        {
+            var futureverseInventoryResponse = await GetFutureverseInventory();
+
+            if (!futureverseInventoryResponse.Successful)
+            {
+                return new ServiceResponse<List<InventoryItem>>(futureverseInventoryResponse, false, new List<InventoryItem>());
+            }
+
+            var inventoryItems = new List<InventoryItem>();
+
+            foreach (var edge in futureverseInventoryResponse.Result1.data.assets.edges)
+            {
+                if (edge.node.collectionId != null && collectionIds.Contains(edge.node.collectionId))
+                {
+                    inventoryItems.Add(ConvertFutureverseItemToInventoryItem(edge.node));
+                }
+            }
+
+            return new ServiceResponse<List<InventoryItem>>(futureverseInventoryResponse, true, inventoryItems);
         }
 
         private async UniTask<ServiceResponse<InventoryResponse>> GetFutureverseInventory()

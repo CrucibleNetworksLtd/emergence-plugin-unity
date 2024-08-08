@@ -17,6 +17,7 @@ namespace EmergenceSDK.Tests.UnitTests.Futureverse.Services
     public class FutureverseServiceTests
     {
         private IFutureverseService futureverseService;
+        private FutureverseInventoryService futureverseInventoryService;
         private IWalletServiceDevelopmentOnly walletServiceDevelopmentOnly;
         private IDisposable verboseOutput;
         [OneTimeSetUp]
@@ -25,6 +26,7 @@ namespace EmergenceSDK.Tests.UnitTests.Futureverse.Services
             verboseOutput = EmergenceLogger.VerboseOutput(true);
             EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
             futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+            futureverseInventoryService = EmergenceServiceProvider.GetService<IInventoryService>() as FutureverseInventoryService;
             walletServiceDevelopmentOnly = EmergenceServiceProvider.GetService<IWalletServiceDevelopmentOnly>();
         }
 
@@ -83,18 +85,6 @@ namespace EmergenceSDK.Tests.UnitTests.Futureverse.Services
                 Assert.IsTrue(response.Successful);
                 Assert.IsTrue(response.Code == ServiceResponseCode.Success);
                 Assert.AreEqual("7668:root:0xffffffff0000000000000000000000000003b681", response.Result1.futurepass);
-            });
-        }
-
-        [UnityTest]
-        public IEnumerator GetFuturepassInventoryByCollectionAndOwnerAsync_PassesWithoutExceptions()
-        {
-            return UniTask.ToCoroutine(async () =>
-            {
-                using var forcedEnvironment = InternalFutureverseSingleton.ForcedEnvironment(EmergenceEnvironment.Staging);
-                var response = await futureverseService.GetFuturepassInventoryByCollectionAndOwnerAsync(new List<string>{"0xeC6F83b0d5Ada27c68FC64Cf63f1Db56CB11A37c"}, new List<string>{"5:evm:0x1cac32d9893deca7769a2e64edc186163125d43b"});
-                Assert.IsTrue(response.Successful);
-                Assert.IsTrue(response.Code == ServiceResponseCode.Success);
             });
         }
     }
