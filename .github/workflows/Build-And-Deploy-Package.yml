@@ -1,7 +1,7 @@
 name: Build and Deploy Unity Package
 
 on:
-  workflow_dispatch: #Manual trigger
+  workflow_dispatch: # Manual trigger
 
 jobs:
   test-and-build:
@@ -71,13 +71,19 @@ jobs:
           git lfs pull
         working-directory: distribution-repo
 
-      # Step 10: Copy package to Distro Repo
+      # Step 10: Clean up the Distribution Repo
+      - name: Clean up Distribution Repository
+        if: success()
+        run: |
+          rm -rf distribution-repo/*
+
+      # Step 11: Copy package to Distro Repo
       - name: Copy Package to Distribution Repository
         if: success()
         run: |
           cp -r Assets/EmergenceSDK/* distribution-repo/
 
-      # Step 11: Publish Package
+      # Step 12: Publish Package
       - name: Commit and Push Package
         if: success()
         run: |
