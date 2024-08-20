@@ -13,7 +13,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
     {
         public async UniTask<ServiceResponse<List<InventoryItem>>> InventoryByOwnerAsync(string address, InventoryChain chain)
         {
-            string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address + "&chain=" + InventoryKeys.ChainToKey[chain];
+            string url = EmergenceSingleton.Instance.Configuration.InventoryURL + "byOwner?address=" + address + "&network=" + InventoryKeys.ChainToKey[chain];
             var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url);
             if(!response.Successful)
                 return new ServiceResponse<List<InventoryItem>>(false);

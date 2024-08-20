@@ -105,6 +105,10 @@ namespace EmergenceSDK.Runtime
         
         private void OpenOverlayFirstTime()
         {
+            if (!ui)
+            {
+                ui = transform.GetChild(0).gameObject;
+            }
             ui.SetActive(true);
             GameObject UIRoot = Instantiate(Resources.Load<GameObject>("Emergence Root"));
             UIRoot.name = "Emergence UI Overlay";
@@ -168,7 +172,10 @@ namespace EmergenceSDK.Runtime
                 return;
             }
 
-            ui = transform.GetChild(0).gameObject;
+            if (!ui)
+            {
+                ui = transform.GetChild(0).gameObject;
+            }
             ui.SetActive(false);
         }
 

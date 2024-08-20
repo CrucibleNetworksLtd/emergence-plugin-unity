@@ -26,34 +26,7 @@ namespace EmergenceSDK.Runtime.Internal.Utils
                 EmergenceLogger.LogInfo($"New URL is \"{NewURL}\"");
                 return NewURL;
             }
-
             return IPFSURL;
-        }
-
-        public static async UniTask<bool> IsWebsiteAlive(string url)
-        {
-            using (UnityWebRequest request = UnityWebRequest.Head(url))
-            {
-                request.timeout = 5; // set timeout to 5 seconds
-
-                try
-                {
-                    await request.SendWebRequest().ToUniTask();
-            
-                    // Check for successful response
-                    if (request.result == UnityWebRequest.Result.Success)
-                    {
-                        return true; // website is alive
-                    }
-
-                    return false; // website is down
-                }
-                catch (Exception e)
-                {
-                    EmergenceLogger.LogWarning("Error in IsWebsiteAlive: " + e.Message);
-                    return false; // website is down or error occurred
-                }
-            }
         }
     }
 }

@@ -11,7 +11,7 @@ using UnityEngine.UI;
 namespace EmergenceSDK.Samples.CoreSamples
 {
     /// <summary>
-    /// A minimalist implementation of a login widget to go with the <see cref="LoginManager"/><para/>
+    /// A minimalist implementation of a login widget. Here to support documentation and guidance on implementing your own LoginManager.<see cref="LoginManager"/><para/>
     /// </summary>
     public class SimpleLoginScreen : MonoBehaviour
     {
