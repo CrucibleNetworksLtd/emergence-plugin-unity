@@ -1,12 +1,8 @@
-using System;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime;
-using EmergenceSDK.Runtime.Internal.Services;
 using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace EmergenceSDK.Samples.CoreSamples
 {
@@ -79,6 +75,5 @@ namespace EmergenceSDK.Samples.CoreSamples
         {
             
         }
-        
     }
 }

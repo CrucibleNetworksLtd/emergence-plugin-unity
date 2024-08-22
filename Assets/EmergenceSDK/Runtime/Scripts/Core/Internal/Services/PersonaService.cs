@@ -44,8 +44,6 @@ namespace EmergenceSDK.Runtime.Internal.Services
         {
             return (currentPersona = CachedPersona) != null;
         }
-
-
         
         public async UniTask<ServiceResponse<List<Persona>, Persona>> GetPersonasAsync()
         {
