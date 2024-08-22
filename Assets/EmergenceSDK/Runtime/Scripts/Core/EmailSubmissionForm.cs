@@ -31,7 +31,7 @@ namespace EmergenceSDK.Runtime
     internal class EmailSubmissionForm : EditorWindow
     {
         private string email;
-        private static string baseUrl = "https://api.emailjs.com/api/v1.0/email/send";
+        private const string baseUrl = "https://api.emailjs.com/api/v1.0/email/send";
         private Vector2 scrollPosition;
         private const string EmailSubmissionFormHasOpened = "EmailSubmissionForm_hasOpened";
 

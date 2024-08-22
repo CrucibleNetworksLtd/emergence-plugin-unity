@@ -11,9 +11,16 @@ namespace EmergenceSDK.Runtime.Internal.UI
         public void SetItems(List<InventoryItem> itemsIn)
         {
             items.Clear();
+
             if (itemsIn != null && itemsIn.Count > 0)
             {
-                items.UnionWith(itemsIn.Where(item => item.Meta != null));
+                foreach (var item in itemsIn)
+                {
+                    if (item.Meta != null)
+                    {
+                        items.Add(item);
+                    }
+                }
             }
         }
 

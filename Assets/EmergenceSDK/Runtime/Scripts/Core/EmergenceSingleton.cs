@@ -72,6 +72,18 @@ namespace EmergenceSDK.Runtime
 
         private ReconnectionQR reconnectionQR;
         private ISessionService sessionService;
+        
+        private GameObject validatedUi
+        {
+            get
+            {
+                if (ui == null && transform.childCount > 0)
+                {
+                    ui = transform.GetChild(0).gameObject;
+                }
+                return ui;
+            }
+        }
 
         /// <summary>
         /// Opens the Emergence Overlay
@@ -105,14 +117,10 @@ namespace EmergenceSDK.Runtime
         
         private void OpenOverlayFirstTime()
         {
-            if (!ui)
-            {
-                ui = transform.GetChild(0).gameObject;
-            }
-            ui.SetActive(true);
+            validatedUi.SetActive(true);
             GameObject UIRoot = Instantiate(Resources.Load<GameObject>("Emergence Root"));
             UIRoot.name = "Emergence UI Overlay";
-            ui.SetActive(false);
+            validatedUi.SetActive(false);
             ScreenManager.Instance.gameObject.SetActive(true);
             ScreenManager.Instance.ShowWelcome().Forget();
             CursorHandler.SaveCursor();
@@ -171,12 +179,8 @@ namespace EmergenceSDK.Runtime
                 EmergenceLogger.LogError("Missing children");
                 return;
             }
-
-            if (!ui)
-            {
-                ui = transform.GetChild(0).gameObject;
-            }
-            ui.SetActive(false);
+            
+            validatedUi.SetActive(false);
         }
 
         void Update()
