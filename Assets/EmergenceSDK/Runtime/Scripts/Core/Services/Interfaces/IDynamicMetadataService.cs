@@ -56,26 +56,5 @@ namespace EmergenceSDK.Runtime.Services
         /// <param name="authorization">The authorization key of your app for the request</param>
         /// <returns>The transaction hash wrapped within a <see cref="ServiceResponse{T}"/></returns>
         UniTask<ServiceResponse<string>> WriteNewDynamicMetadataAsync(string network, string contract, string tokenId, string metadata, string authorization);
-        
-        
-        /// <summary>
-        /// Obsolete, see <see cref="WriteDynamicMetadata(string,string,string,string,string,EmergenceSDK.Runtime.Core.Types.Delegates.SuccessWriteDynamicMetadata,EmergenceSDK.Runtime.Core.Types.Delegates.ErrorCallback)"/>
-        /// </summary>
-        [Obsolete] UniTask WriteDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, ErrorCallback errorCallback);
-
-        /// <summary>
-        /// Obsolete, see <see cref="WriteDynamicMetadataAsync(string,string,string,string,string)"/>
-        /// </summary>
-        [Obsolete] UniTask<ServiceResponse<string>> WriteDynamicMetadataAsync(string network, string contract, string tokenId, string metadata);
-        
-        /// <summary>
-        /// Obsolete, see <see cref="WriteNewDynamicMetadata(string,string,string,string,string,EmergenceSDK.Runtime.Core.Types.Delegates.SuccessWriteDynamicMetadata,EmergenceSDK.Runtime.Core.Types.Delegates.ErrorCallback)"/>
-        /// </summary>
-        [Obsolete] UniTask WriteNewDynamicMetadata(string network, string contract, string tokenId, string metadata, SuccessWriteDynamicMetadata success, ErrorCallback errorCallback);
-
-        /// <summary>
-        /// Obsolete, see <see cref="WriteNewDynamicMetadataAsync(string,string,string,string,string)"/>
-        /// </summary>
-        [Obsolete] UniTask<ServiceResponse<string>> WriteNewDynamicMetadataAsync(string network, string contract, string tokenId, string metadata);
     }
 }

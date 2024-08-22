@@ -56,16 +56,5 @@ namespace EmergenceSDK.Runtime.Services
         /// <typeparam name="T">The type of the body to serialize</typeparam>
         /// <returns>A <see cref="WriteContractResponse"/> wrapped within a <see cref="ServiceResponse{T}"/> object</returns>
         UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsync<T>(ContractInfo contractInfo, string value, T parameters);
-        
-        /// <summary>
-        /// Obsolete, see <see cref="WriteMethod{T}(EmergenceSDK.Runtime.Core.Internal.Utils.ContractInfo,string,T,EmergenceSDK.Runtime.Core.Types.Delegates.WriteMethodSuccess,EmergenceSDK.Runtime.Core.Types.Delegates.ErrorCallback)"/>
-        /// </summary>
-        [Obsolete] UniTask WriteMethod<T>(ContractInfo contractInfo,  string localAccountNameIn, string gasPriceIn, string value, T parameters, WriteMethodSuccess success, ErrorCallback errorCallback);
-
-        /// <summary>
-        /// Obsolete, see <see cref="WriteMethodAsync{T}(EmergenceSDK.Runtime.Core.Internal.Utils.ContractInfo,string,T)"/>
-        /// </summary>
-        /// <returns>A <see cref="WriteContractResponse"/> wrapped within a <see cref="ServiceResponse{T}"/> object</returns>
-        [Obsolete] UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsync<T>(ContractInfo contractInfo, string localAccountNameIn, string gasPriceIn, string value, T parameters);
     }
 }

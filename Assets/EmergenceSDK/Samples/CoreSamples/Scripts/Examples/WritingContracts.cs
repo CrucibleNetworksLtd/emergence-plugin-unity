@@ -35,8 +35,7 @@ namespace EmergenceSDK.Samples.CoreSamples.Examples
             var contractInfo = new ContractInfo(deployedContract, "[METHOD NAME]");
 
             // Calls the ReadMethod method to execute the smart contract method defined in the ABI with an empty input parameter
-            contractService.WriteMethod(contractInfo, value, body,
-                OnWriteSuccess, EmergenceLogger.LogError);
+            contractService.WriteMethod(contractInfo, value, body, OnWriteSuccess, EmergenceLogger.LogError);
         }
 
         private void OnWriteSuccess(BaseResponse<string> response)
