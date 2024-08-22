@@ -37,15 +37,6 @@ namespace EmergenceSDK.Tests.UnitTests.Futureverse.Services
             EmergenceServiceProvider.Unload();
         }
         
-        [UnityTest][Obsolete]
-        public IEnumerator GetAssetTreeAsyncLegacy_PassesWithoutExceptions()
-        {
-            return UniTask.ToCoroutine(async () =>
-            {
-                using var forcedEnvironment = InternalFutureverseSingleton.ForcedEnvironment(EmergenceEnvironment.Staging);
-                await futureverseService.GetAssetTreeAsyncLegacy("473", "7672:root:303204");
-            });
-        }
 
         [UnityTest]
         public IEnumerator GetArtmStatusAsync_PassesWithoutExceptions()

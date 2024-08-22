@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Types;
 using EmergenceSDK.Runtime.Types.Delegates;
 
@@ -9,11 +10,6 @@ namespace EmergenceSDK.Runtime.Services
     public interface IPersonaService : IEmergenceService
     {
         /// <summary>
-        /// Whether or not the current persona has an access token.
-        /// <remarks>This can be used to determine if you are connected to a session</remarks>
-        /// </summary>
-        
-        /// <summary>
         /// Event fired when the current persona is updated.
         /// </summary>
         event PersonaUpdated OnCurrentPersonaUpdated;
@@ -24,5 +20,10 @@ namespace EmergenceSDK.Runtime.Services
         /// <param name="currentPersona">The retrieved persona</param>
         /// <returns>True if it was found, false otherwise</returns>
         bool GetCachedPersona(out Persona currentPersona);
+        
+        /// <summary>
+        /// Attempts to get the current persona from the web service and returns it in the SuccessGetCurrentPersona delegate
+        /// </summary>
+        UniTask GetCurrentPersona(SuccessGetCurrentPersona success, ErrorCallback errorCallback);
     }
 }

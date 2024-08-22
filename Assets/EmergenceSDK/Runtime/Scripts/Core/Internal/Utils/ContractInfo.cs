@@ -26,11 +26,11 @@ namespace EmergenceSDK.Runtime.Internal.Utils
         }
         
         public string ToReadUrl() => StaticConfig.APIBase + "readMethod?contractAddress=" + 
-                                 ContractAddress + "&methodName=" + MethodName + "&nodeUrl=" + NodeUrl + "&network=" + Network;
+                                 ContractAddress + "&methodName=" + MethodName + "&nodeUrl=" + NodeUrl + "&chainId=" + ChainId + "&network=" + Network;
         
         public string ToWriteUrl(string localAccountName, string gasPrice, string value) => 
             StaticConfig.APIBase + "writeMethod?contractAddress=" +
             ContractAddress + "&methodName=" + MethodName + localAccountName + gasPrice +
-            "&network=" + Network + "&nodeUrl=" + NodeUrl + "&value=" + value;
+            "&network=" + Network + "&nodeUrl=" + NodeUrl + "&chainId=" + ChainId + "&value=" + value;
     }
 }

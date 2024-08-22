@@ -8,6 +8,9 @@ For the time-being; this script will disable a PlayerInput's auto switch control
 */
 
 using UnityEngine;
+#if ENABLE_INPUT_SYSTEM && (UNITY_IOS || UNITY_ANDROID) && STARTER_ASSETS_PACKAGES_CHECKED
+using UnityEngine.InputSystem;
+#endif
 
 namespace EmergenceSDK.Plugins.StarterAssets.Mobile.Scripts.Utilities
 {

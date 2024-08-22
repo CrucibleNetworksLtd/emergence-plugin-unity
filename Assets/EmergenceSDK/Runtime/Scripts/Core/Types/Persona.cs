@@ -5,7 +5,6 @@ namespace EmergenceSDK.Runtime.Types
 {
     public class Persona
     {
-        // {Chain}:{Address}:{Token}:{GUID}
         public string avatarId;
 
         public string id;

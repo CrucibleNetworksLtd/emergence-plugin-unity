@@ -87,6 +87,8 @@ namespace EmergenceSDK.Runtime
         private CancellationTokenSource cts;
         private CancellationToken ct;
 
+        private Action triggerDisconnectEvents;
+
         /// <summary>
         /// Set the first-login flag to true
         /// </summary>
@@ -131,14 +133,14 @@ namespace EmergenceSDK.Runtime
                 ct = cts.Token;
 
                 InvokeEventAndCheckCancellationToken(loginStartedEvent, this, ct);
-
-                // TODO need to be able to generate test responses that don't hit any external endpoints in support of unit tests using #if UNITY_INCLUDE_TESTS
+                
                 await HandleQrCodeRequest(sessionServiceInternal);
                 await HandleHandshakeRequest(walletServiceInternal);
                 await HandleAccessTokenRequest(loginSettings, sessionServiceInternal);
                 await HandleFuturepassRequests(loginSettings, futureverseService);
 
                 sessionServiceInternal.RunConnectionEvents(loginSettings);
+                triggerDisconnectEvents = sessionServiceInternal.RunDisconnectionEvents;
                 loginSuccessfulEvent.Invoke(this, ((IWalletService)walletServiceInternal).ChecksummedWalletAddress);
             }
             catch (OperationCanceledException)
@@ -166,6 +168,12 @@ namespace EmergenceSDK.Runtime
         {
             if (!IsBusy) return;
             cts?.Cancel();
+        }
+
+        public async UniTask Disconnect()
+        {
+            await WaitUntilAvailable();
+            triggerDisconnectEvents?.Invoke();
         }
 
         /// <summary>
@@ -325,9 +333,7 @@ namespace EmergenceSDK.Runtime
             
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.QrCodeRequest, StepPhase.Success, ct);
         }
-
         
-        // TODO, Convert this to a single function that uses params rather than all these overloads
         private void InvokeEventAndCheckCancellationToken(UnityEvent unityEvent, CancellationToken ct)
         {
             unityEvent.Invoke();

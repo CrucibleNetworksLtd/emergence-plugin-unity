@@ -43,17 +43,6 @@ namespace EmergenceSDK.Runtime.Futureverse.Services
         UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturepassInformationAsync(string futurepass);
         
         /// <summary>
-        /// (OBSOLETE) Retrieve the asset tree for the Token ID and Collection ID
-        /// </summary>
-        /// <param name="tokenId">Token ID for tree retrieval</param>
-        /// <param name="collectionId">Collection ID for tree retrieval</param>
-        /// <returns>A <see cref="List{T}"/> of <see cref="AssetTreePathLegacy"/> objects</returns>
-        /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
-        /// <exception cref="FutureverseInvalidJsonStructureException">Thrown if the asset tree response doesn't match the expected JSON structure</exception>
-        [Obsolete]
-        UniTask<List<AssetTreePathLegacy>> GetAssetTreeAsyncLegacy(string tokenId, string collectionId);
-        
-        /// <summary>
         /// Retrieve the asset tree for the Token ID and Collection ID
         /// </summary>
         /// <param name="tokenId">Token ID for tree retrieval</param>

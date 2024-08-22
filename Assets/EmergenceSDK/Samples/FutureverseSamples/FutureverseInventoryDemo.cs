@@ -103,7 +103,7 @@ namespace EmergenceSDK.Samples.FutureverseSamples
             // Inventory By Owner
             fvInventoryService.InventoryByOwner(EmergenceServiceProvider.GetService<IWalletService>().WalletAddress, InventoryChain.AnyCompatible, SuccessInventoryByOwner, EmergenceLogger.LogError);
             
-            // Inventory By Owner And collection
+            // Uncomment this to perform Inventory By Owner And collection
             //fvInventoryService.InventoryByOwnerAndCollection(new List<string>{fvCollectionID}, SuccessInventoryByOwner, EmergenceLogger.LogError);
         }
         

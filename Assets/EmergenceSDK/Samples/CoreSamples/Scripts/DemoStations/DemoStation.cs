@@ -8,7 +8,6 @@ namespace EmergenceSDK.Samples.CoreSamples.DemoStations
 {
     public abstract class DemoStation<T> : SingletonComponent<T> where T : SingletonComponent<T>
     {
-        [FormerlySerializedAs("instructions")] 
         public GameObject instructionsGO;
 
         protected TextMeshProUGUI InstructionsText => instructionsText ??= instructionsGO.GetComponentInChildren<TextMeshProUGUI>();
@@ -19,6 +18,14 @@ namespace EmergenceSDK.Samples.CoreSamples.DemoStations
 
         protected bool isReady;
         
-        protected bool HasBeenActivated() => Keyboard.current.eKey.wasPressedThisFrame && instructionsGO.activeSelf;
+        protected bool HasBeenActivated()
+        {
+#if ENABLE_INPUT_SYSTEM
+            return Keyboard.current.eKey.wasPressedThisFrame && instructionsGO.activeSelf;
+#else
+            Debug.LogWarning("These samples are dependent on the new Input System package. Please enable the new Input System.");
+            return false;
+#endif
+        }
     }
 }

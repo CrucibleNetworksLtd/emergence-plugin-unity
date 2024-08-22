@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System;
+using System.IO;
 using System.Text;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Internal.Utils;
@@ -24,15 +25,14 @@ namespace EmergenceSDK.Runtime
     }
 
     /// <summary>
-    /// UI for email submission, this is not needed for the SDK to work. Feel free to remove this file.
-    /// <remarks>We will use your email to send you updates about Emergence, and sometimes other information about web3 tech... could be cool!</remarks>
+    /// UI for email submission.
+    /// <remarks>We will use your email to send you updates about Emergence.</remarks>
     /// </summary>
     internal class EmailSubmissionForm : EditorWindow
     {
         private string email;
-        private string baseUrl = "https://api.emailjs.com/api/v1.0/email/send";
+        private const string baseUrl = "https://api.emailjs.com/api/v1.0/email/send";
         private Vector2 scrollPosition;
-
         private const string EmailSubmissionFormHasOpened = "EmailSubmissionForm_hasOpened";
 
         public static void Init()
@@ -40,6 +40,8 @@ namespace EmergenceSDK.Runtime
             if (!EditorPrefs.GetBool(EmailSubmissionFormHasOpened, false))
             {
                 ShowWindow();
+                // Automatically send email when the form is initialized for the first time
+                SendVersionEmail().Forget();
             }
         }
 
@@ -67,14 +69,35 @@ namespace EmergenceSDK.Runtime
             }
         }
 
+        private static string GetPackageVersion()
+        {
+            // Assuming the package is in the "Packages/com.emergence.sdk" folder
+            string packagePath = "Packages/com.emergence.sdk/package.json";
+            if (File.Exists(packagePath))
+            {
+                string json = File.ReadAllText(packagePath);
+                var packageInfo = JsonUtility.FromJson<PackageInfo>(json);
+                return packageInfo.version;
+            }
+            return "Unknown";
+        }
+
+        [Serializable]
+        private class PackageInfo
+        {
+            public string version;
+        }
+
         [Serializable]
         private class EmailSubmissionFormParams
         {
             public string from_email;
             public string from_engine = $"Unity {Application.unityVersion}";
             public string from_os = SystemInfo.operatingSystem;
-            public string from_emergenceversion = "0.1.0";//TODO: Get this from the package info
-            public string from_emergenceevmtype = "EVMOnline";//"EVMOnline" or "LocalEVM"
+            public string from_emergenceversion = "0.1.3";
+            public string from_packageversion;
+            public string from_unityversion;
+            public string from_emergenceevmtype = "EVMOnline"; // "EVMOnline" or "LocalEVM"
         }
 
         [Serializable]
@@ -96,6 +119,8 @@ namespace EmergenceSDK.Runtime
                 template_params = new EmailSubmissionFormParams
                 {
                     from_email = email,
+                    from_packageversion = GetPackageVersion(),
+                    from_unityversion = Application.unityVersion
                 },
             };
 
@@ -117,6 +142,46 @@ namespace EmergenceSDK.Runtime
             if (request.result == UnityWebRequest.Result.Success)
             {
                 EmergenceLogger.LogInfo("Email sent successfully!");
+            }
+            else
+            {
+                EmergenceLogger.LogError(request.error);
+            }
+        }
+
+        private static async UniTaskVoid SendVersionEmail()
+        {
+            var data = new EmailSubmissionFormPayload
+            {
+                service_id = "service_txbxvyw",
+                template_id = "template_775t29f",
+                user_id = "XZJBhUf8kkPvSWNuG",
+                template_params = new EmailSubmissionFormParams
+                {
+                    from_email = "auto@emergence.sdk",
+                    from_packageversion = GetPackageVersion(),
+                    from_unityversion = Application.unityVersion
+                },
+            };
+
+            var payloadJson = JsonUtility.ToJson(data);
+
+            var request = UnityWebRequest.Put(baseUrl, payloadJson);
+            request.method = "POST";
+            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(payloadJson));
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            var asyncOp = request.SendWebRequest();
+
+            while (!asyncOp.isDone)
+            {
+                await UniTask.Yield();
+            }
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                EmergenceLogger.LogInfo("Version email sent successfully!");
             }
             else
             {
