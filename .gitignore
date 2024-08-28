@@ -86,3 +86,7 @@ crashlytics-build.properties
 Logs
 mono_crash*.json
 UserSettings
+Assets/Emergence.meta
+Assets/Emergence/Resources.meta
+Assets/Emergence/Resources/git_info.txt
+Assets/Emergence/Resources/git_info.txt.meta
