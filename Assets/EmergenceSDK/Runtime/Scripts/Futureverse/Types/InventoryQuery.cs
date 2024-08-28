@@ -13,6 +13,7 @@ namespace EmergenceSDK.Runtime.Futureverse.Types
                         metadata {
                             properties
                             attributes
+                            rawAttributes
                         }
                         collection {
                             chainId

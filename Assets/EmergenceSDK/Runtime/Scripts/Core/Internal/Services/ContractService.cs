@@ -125,10 +125,10 @@ namespace EmergenceSDK.Runtime.Internal.Services
             return new ServiceResponse<WriteContractResponse>(true, writeContractResponse.message);
         }
 
-        private async UniTask<ServiceResponse<WriteContractResponse>> HandleWriteMethodError<T>(WebResponse response, SerialisedWriteRequest<T> serialisedWriteRequest)
+        private UniTask<ServiceResponse<WriteContractResponse>> HandleWriteMethodError<T>(WebResponse response, SerialisedWriteRequest<T> serialisedWriteRequest)
         {
             var ret = new ServiceResponse<WriteContractResponse>(false);
-            return ret;
+            return UniTask.FromResult(ret);
         }
 
         private async UniTask CheckForTransactionSuccess(ContractInfo contractInfo, string transactionHash, int maxAttempts = 10)
