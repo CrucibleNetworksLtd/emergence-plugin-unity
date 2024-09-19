@@ -1,4 +1,4 @@
-name: Build and Deploy Unity Package
+name: Build and Deploy QA Unity Package
 
 on:
   workflow_dispatch: # Manual trigger
