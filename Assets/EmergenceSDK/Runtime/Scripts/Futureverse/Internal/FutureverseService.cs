@@ -47,13 +47,13 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
         public string GetFuturepassApiUrl()
         {
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
-            return "https://account-indexer.api.futurepass.futureverse.app/api/v1/";
+            return "https://account-indexer.pass.online/api/v1/";
 #else
             return FutureverseSingleton.Instance.Environment switch
             {
-                EmergenceEnvironment.Production => "https://account-indexer.api.futurepass.futureverse.app/api/v1/",
-                EmergenceEnvironment.Development => "https://account-indexer.api.futurepass.futureverse.dev/api/v1/",
-                EmergenceEnvironment.Staging => "https://account-indexer.api.futurepass.futureverse.dev/api/v1/",
+                EmergenceEnvironment.Production => "https://account-indexer.pass.online/api/v1/",
+                EmergenceEnvironment.Development => "https://account-indexer.passonline.dev/api/v1/",
+                EmergenceEnvironment.Staging => "https://account-indexer.passonline.dev/api/v1/",
                 _ => throw new ArgumentOutOfRangeException()
             };
 #endif
