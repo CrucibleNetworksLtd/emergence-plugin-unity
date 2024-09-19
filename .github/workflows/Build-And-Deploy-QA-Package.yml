@@ -1,0 +1,97 @@
+name: Build and Deploy Unity Package
+
+on:
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository containing Unity project
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Install Git LFS
+      - name: Install Git LFS
+        run: |
+          sudo apt-get install git-lfs
+          git lfs install
+
+      # Step 3: Pull LFS files
+      - name: Pull LFS files
+        run: |
+          git lfs pull
+
+      # Step 4: Run Unit Tests
+      - name: Run Unit Tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: Assets/EmergenceSDK
+          unityVersion: 2022.3.32f1
+          packageMode: true
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 5: Get the latest commit message
+      - name: Get Latest Commit Message
+        run: echo "LATEST_COMMIT_MSG=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+
+      # Step 6: Rename Samples Folder
+      - name: Rename Samples Folder
+        if: success()
+        run: |
+          mv Assets/EmergenceSDK/Samples Assets/EmergenceSDK/Samples~
+
+      # Step 7: Checkout Distro repo
+      - name: Checkout Distribution Repository
+        if: success()
+        uses: actions/checkout@v2
+        with:
+          repository: CrucibleNetworksLtd/EmergenceSDKUnity
+          ref: InternalQA
+          token: ${{ secrets.DISTRO_TOKEN }}
+          path: distribution-repo
+
+      # Step 8: Install Git LFS in Distribution Repo
+      - name: Install Git LFS in Distribution Repo
+        if: success()
+        run: |
+          sudo apt-get install git-lfs
+          git lfs install
+        working-directory: distribution-repo
+
+      # Step 9: Pull LFS files in Distribution Repo
+      - name: Pull LFS files in Distribution Repo
+        if: success()
+        run: |
+          git lfs pull
+        working-directory: distribution-repo
+
+      # Step 10: Clean up the Distribution Repo
+      - name: Clean up Distribution Repository
+        if: success()
+        run: |
+          rm -rf distribution-repo/*
+
+      # Step 11: Copy package to Distro Repo
+      - name: Copy Package to Distribution Repository
+        if: success()
+        run: |
+          cp -r Assets/EmergenceSDK/* distribution-repo/
+
+      # Step 12: Publish Package
+      - name: Commit and Push Package
+        if: success()
+        run: |
+          cd distribution-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "${{ env.LATEST_COMMIT_MSG }}"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.DISTRO_TOKEN }}
