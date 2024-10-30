@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using EmergenceSDK.Runtime.Services;
-using EmergenceSDK.Runtime.Types;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Web;
-using EmergenceSDK.Runtime.Internal.Utils;
-using EmergenceSDK.Runtime.Types.Exceptions.Login;
-using EmergenceSDK.Runtime.Types.Responses;
+using Cysharp.Threading.Tasks;
+using EmergenceSDK.Runtime.Services;
+using EmergenceSDK.Runtime.Types;
 using UnityEngine;
 
 namespace EmergenceSDK.Runtime.Internal.Services
 {
+    /// <summary>
+    /// Handles the custodial login process, including generating the necessary parameters 
+    /// for OAuth and exchanging authorization codes for access tokens.
+    /// </summary>
     internal class CustodialLoginService : ICustodialLoginService
     {
         private string cachedAccessToken;
@@ -26,10 +26,9 @@ namespace EmergenceSDK.Runtime.Internal.Services
         private const string RedirectUri = "http://localhost:3000/callback";
         private const string BaseUrl = "https://login.futureverse.cloud/";
 
-        public CustodialLoginService()
-        {
-        }
-
+        /// <summary>
+        /// Gets the client ID based on the current environment.
+        /// </summary>
         public string ClientID => EmergenceSingleton.Instance.Environment switch
         {
             EmergenceEnvironment.Development => DevelopmentClientID,
@@ -38,20 +37,23 @@ namespace EmergenceSDK.Runtime.Internal.Services
             _ => throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.Environment), "Unknown environment")
         };
 
+        /// <summary>
+        /// Starts the custodial login process, generating the necessary parameters and starting 
+        /// the local web server to handle OAuth callbacks.
+        /// </summary>
+        /// <param name="onSuccessfulLogin">Callback invoked when login is successful.</param>
+        /// <param name="ct">Cancellation token to manage async flow cancellation.</param>
+        /// <returns>A service response indicating the result of the login attempt.</returns>
         public async UniTask<ServiceResponse<string>> StartCustodialLoginAsync(Action<string,CancellationToken> onSuccessfulLogin,CancellationToken ct)
         {
-            // Generate state and code verifier for PKCE
             currentState = GenerateSecureRandomString(128);
             currentCodeVerifier = GenerateSecureRandomString(64);
             string codeChallenge = GenerateCodeChallenge(currentCodeVerifier);
 
-            // Set expected state in LocalWebServerHelper for validation
             LocalWebServerHelper.ExpectedState = currentState;
 
-            // Start local server listener before initiating the OAuth request
             LocalWebServerHelper.StartServer(async (authCode,state,expectedState) =>
             {
-                // Exchange the authorization code for an access token when received
                 cachedAccessToken = await OAuthHelper.ParseAndExchangeCodeForTokenAsync(BaseUrl, ClientID, currentCodeVerifier, authCode, RedirectUri, ct);
                 if (cachedAccessToken != null)
                 {
@@ -62,28 +64,31 @@ namespace EmergenceSDK.Runtime.Internal.Services
                     Debug.LogError("Failed to retrieve access token.");
                 }
             });
-            
+
             string nonce = GenerateSecureRandomString(128);
 
-            // Build the OAuth URL
             string authUrl = $"{BaseUrl}auth?" +
                              "response_type=code" +
                              $"&client_id={ClientID}" +
                              $"&redirect_uri={HttpUtility.UrlEncode(RedirectUri)}" +
                              "&scope=openid" +
                              $"&code_challenge={codeChallenge}" +
-                             "&code_challenge_method=S256"+
+                             "&code_challenge_method=S256" +
                              "&response_mode=query" +
-                             "&prompt=login"+
+                             "&prompt=login" +
                              $"&state={currentState}" +
                              $"&nonce={nonce}";
 
-            // Fire the request (browser or embedded, depending on environment)
-            await OAuthHelper.RequestAuthorizationCodeAsync(authUrl,ct);
+            await OAuthHelper.RequestAuthorizationCodeAsync(authUrl, ct);
 
-            return new ServiceResponse<string>(true, authUrl); // Returns the auth URL for testing or display purposes
+            return new ServiceResponse<string>(true, authUrl); 
         }
 
+        /// <summary>
+        /// Generates a secure random string of the specified length.
+        /// </summary>
+        /// <param name="length">The length of the random string.</param>
+        /// <returns>A secure random string.</returns>
         private string GenerateSecureRandomString(int length)
         {
             using (var rng = new RNGCryptoServiceProvider())
@@ -94,6 +99,11 @@ namespace EmergenceSDK.Runtime.Internal.Services
             }
         }
 
+        /// <summary>
+        /// Generates a code challenge based on the provided code verifier.
+        /// </summary>
+        /// <param name="codeVerifier">The code verifier used to create the challenge.</param>
+        /// <returns>The generated code challenge.</returns>
         private string GenerateCodeChallenge(string codeVerifier)
         {
             using (var sha256 = SHA256.Create())
