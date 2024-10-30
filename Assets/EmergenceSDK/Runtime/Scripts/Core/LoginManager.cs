@@ -122,25 +122,29 @@ namespace EmergenceSDK.Runtime
         public async UniTask StartLogin(LoginSettings loginSettings)
         {
             if (IsBusy) return;
-            
+
             try
             {
                 IsBusy = true;
                 var sessionServiceInternal = EmergenceServiceProvider.GetService<ISessionServiceInternal>();
                 var walletServiceInternal = EmergenceServiceProvider.GetService<IWalletServiceInternal>();
                 var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+                var custodialLoginService = EmergenceServiceProvider.GetService<ICustodialLoginService>();
+
                 cts = new CancellationTokenSource();
                 ct = cts.Token;
 
                 InvokeEventAndCheckCancellationToken(loginStartedEvent, this, ct);
-                
+
                 await HandleQrCodeRequest(sessionServiceInternal);
                 await HandleHandshakeRequest(walletServiceInternal);
+                await HandleCustodialRequests(loginSettings, custodialLoginService);
                 await HandleAccessTokenRequest(loginSettings, sessionServiceInternal);
                 await HandleFuturepassRequests(loginSettings, futureverseService);
 
                 sessionServiceInternal.RunConnectionEvents(loginSettings);
                 triggerDisconnectEvents = sessionServiceInternal.RunDisconnectionEvents;
+
                 loginSuccessfulEvent.Invoke(this, ((IWalletService)walletServiceInternal).ChecksummedWalletAddress);
             }
             catch (OperationCanceledException)
@@ -266,6 +270,33 @@ namespace EmergenceSDK.Runtime
                 InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.FuturepassRequests, StepPhase.Success, ct);
             }
         }
+        
+        private async UniTask HandleCustodialRequests(LoginSettings loginSettings, ICustodialLoginService custodialLoginService)
+        {
+            if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
+            {
+                InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.CustodialRequests, StepPhase.Start, ct);
+
+                try
+                {
+                    // Trigger the custodial login service to handle the login flow
+                    await custodialLoginService.StartCustodialLoginAsync(CacheCustodialBearerToken,ct);
+                }
+                catch (Exception ex)
+                {
+                    // Handle errors during custodial login
+                    InvokeLoginFailedEvent(ex);
+                    throw new TokenRequestFailedException("Custodial login failed.", null, ex);
+                }
+            }
+        }
+
+        private  void CacheCustodialBearerToken(string bearer, CancellationToken ct)
+        {
+            // Mark the custodial login step as successful
+            InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.CustodialRequests, StepPhase.Success, ct);
+        }
+
 
         private async UniTask HandleAccessTokenRequest(LoginSettings loginSettings, ISessionServiceInternal sessionServiceInternal)
         {

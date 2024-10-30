@@ -34,6 +34,16 @@ namespace EmergenceSDK.Runtime.Internal.UI
         public Button createFPass;
         public Button retryFPassCheck;
 
+        [Header("Custodial Login UI")] 
+        [SerializeField]
+        private GameObject custodialLoginScreen = null;
+        
+        [SerializeField]
+        private TMP_Text custodialLoginMessage = null;
+
+        [SerializeField] 
+        private Button custodialLoginBeginButton = null;
+
         private void SetTimeRemainingText(LoginManager _, EmergenceQrCode emergenceQrCode) => refreshCounterText.text = emergenceQrCode.TimeLeftInt.ToString("0");
 
         public static LogInScreen Instance;
@@ -74,6 +84,10 @@ namespace EmergenceSDK.Runtime.Internal.UI
                         break;
                     case LoginStep.AccessTokenRequest:
                     case LoginStep.FuturepassRequests:
+                        break;
+                    case LoginStep.CustodialRequests:
+                        
+                        custodialLoginMessage.text = "Successfully generated Custodial Bearer token";
                         // Nothing to do here in these cases
                         break;
                     default:
@@ -111,16 +125,45 @@ namespace EmergenceSDK.Runtime.Internal.UI
             }
         }
 
+        /// <summary>
+        /// Event bound to the LoginManager.loginStarted event, called after we call LoginManager.startLogin on enable
+        /// </summary>
+        /// <param name="_"></param>
         private void HandleLoginStarted(LoginManager _)
+        {
+            HideAllScreens();
+            switch (EmergenceSingleton.Instance.DefaultLoginFlow)
+            {
+                case LoginFlow.WalletConnect:
+                case LoginFlow.Futurepass:
+                    StartQRCodeDrivenLogin();
+                    break;
+                case LoginFlow.Custodial:
+                    break;
+            }
+
+        }
+
+        /// <summary>
+        /// Once login event is started we display the UI to power it, in this case we display the QR code for login methods that us it
+        /// </summary>
+        private void StartQRCodeDrivenLogin()
         {
             urlContainer.SetActive(true);
             copyUrlButton.interactable = false;
             urlInputField.text = "";
             rawQrImage.texture = null;
-            HideAllScreens();
             qrScreen.SetActive(true);
             refreshCounterText.text = "";
             refreshText.text = "Retrieving QR code...";
+        }
+
+        private void StartCustodialDrivenLogin()
+        {
+            custodialLoginScreen.SetActive(true);
+            custodialLoginBeginButton.interactable = true;
+            custodialLoginMessage.text = "Click To begin Custodial Login";
+            custodialLoginBeginButton.onClick.AddListener(ShowLoginWithCustodial);
         }
 
         private void HideAllScreens()
@@ -135,6 +178,20 @@ namespace EmergenceSDK.Runtime.Internal.UI
             UniTask.Void(async () =>
             {
                 await loginManager.StartLogin(LoginSettings.EnableFuturepass);
+            });
+        }
+        
+        /// <summary>
+        /// Called by the custodial login UI, will tell login manager to begin login process and create authentication request with FV
+        /// </summary>
+        private void ShowLoginWithCustodial()
+        {
+            custodialLoginMessage.text = "Please refer to your default browser to authenticate";
+            custodialLoginBeginButton.interactable = false;
+            EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
+            UniTask.Void(async () =>
+            {
+                await loginManager.StartLogin(LoginSettings.EnableCustodialLogin);
             });
         }
 
@@ -171,6 +228,9 @@ namespace EmergenceSDK.Runtime.Internal.UI
                     break;
                 case LoginFlow.WalletConnect:
                     ShowLoginWithWc();
+                    break;
+                case LoginFlow.Custodial:
+                    StartCustodialDrivenLogin();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.DefaultLoginFlow));

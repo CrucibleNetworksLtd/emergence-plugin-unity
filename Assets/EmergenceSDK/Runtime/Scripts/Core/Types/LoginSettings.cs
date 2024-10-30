@@ -19,6 +19,8 @@ namespace EmergenceSDK.Runtime.Types
         /// <summary>
         /// Enable retrieving Futurepass for the wallet and storing it
         /// </summary>
-        EnableFuturepass = 2
+        EnableFuturepass = 2,
+        
+        EnableCustodialLogin = 4
     }
 }
