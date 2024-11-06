@@ -36,6 +36,13 @@ namespace EmergenceSDK.Runtime.Futureverse.Services
         UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync();
         
         /// <summary>
+        /// Get the Futurepass linked to the specified EOA
+        /// </summary>
+        /// <returns>A <see cref="ServiceResponse{T}"/> object wrapping a <see cref="LinkedFuturepassResponse"/></returns>
+        /// <exception cref="InvalidWalletException">Thrown if there is no currently connected wallet</exception>
+        UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync(string eoa);
+        
+        /// <summary>
         /// Get the Futurepass information for the passed Futurepass
         /// </summary>
         /// <param name="futurepass">Futurepass address</param>

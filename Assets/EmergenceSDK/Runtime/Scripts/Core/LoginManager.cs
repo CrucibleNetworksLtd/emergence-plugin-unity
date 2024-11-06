@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Events.Login;
+using EmergenceSDK.Runtime.Futureverse.Internal;
 using EmergenceSDK.Runtime.Futureverse.Internal.Services;
 using EmergenceSDK.Runtime.Futureverse.Services;
 using EmergenceSDK.Runtime.Internal.Services;
@@ -10,6 +11,7 @@ using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types;
 using EmergenceSDK.Runtime.Types.Exceptions.Login;
 using EmergenceSDK.Runtime.Types.Responses;
+using UniJSON;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -136,9 +138,9 @@ namespace EmergenceSDK.Runtime
 
                 InvokeEventAndCheckCancellationToken(loginStartedEvent, this, ct);
 
-                await HandleQrCodeRequest(sessionServiceInternal);
-                await HandleHandshakeRequest(walletServiceInternal);
-                await HandleCustodialRequests(loginSettings, custodialLoginService);
+                await HandleQrCodeRequest(loginSettings, sessionServiceInternal);
+                await HandleCustodialRequests(loginSettings, custodialLoginService, sessionServiceInternal);
+                await HandleHandshakeRequest(walletServiceInternal, loginSettings);
                 await HandleAccessTokenRequest(loginSettings, sessionServiceInternal);
                 await HandleFuturepassRequests(loginSettings, futureverseService);
 
@@ -227,10 +229,9 @@ namespace EmergenceSDK.Runtime
 
         private async UniTask HandleFuturepassRequests(LoginSettings loginSettings, IFutureverseService futureverseService)
         {
-            if (loginSettings.HasFlag(LoginSettings.EnableFuturepass))
+            if (loginSettings.HasFlag(LoginSettings.EnableFuturepass) && !loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
             {
                 InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.FuturepassRequests, StepPhase.Start, ct);
-
                 ServiceResponse<LinkedFuturepassResponse> passResponse;
                 try
                 {
@@ -240,38 +241,17 @@ namespace EmergenceSDK.Runtime
                     {
                         throw new FuturepassRequestFailedException("Request was not successful", passResponse);
                     }
+                    var ownedFuturePass = passResponse.Result1.ownedFuturepass;
+                    await ProcessFuturePassResponse(futureverseService, ownedFuturePass);
                 }
                 catch (Exception e) when (e is not OperationCanceledException and not FuturepassRequestFailedException)
                 {
                     throw new FuturepassRequestFailedException("An exception caused the request to fail", null, e);
                 }
-                
-                try
-                {
-                    var passInformationResponse = await futureverseService.GetFuturepassInformationAsync(passResponse.Result1.ownedFuturepass);
-                    ct.ThrowIfCancellationRequested();
-                    if (!passInformationResponse.Successful || passInformationResponse.Result1 == null)
-                    {
-                        if (passInformationResponse.Successful && passInformationResponse.Result1 == null)
-                        {
-                            var exception = new NullReferenceException(nameof(passInformationResponse) + '.' + nameof(passInformationResponse.Result1) + "is null");
-                            throw new FuturepassInformationRequestFailedException("Request was successful but result is null!", passInformationResponse, exception);
-                        }
-                        
-                        throw new FuturepassInformationRequestFailedException("Request was not successful", passInformationResponse);
-                    }
-                    ((IFutureverseServiceInternal)futureverseService).CurrentFuturepassInformation = passInformationResponse.Result1;
-                }
-                catch (Exception e) when (e is not OperationCanceledException and not FuturepassInformationRequestFailedException)
-                {
-                    throw new FuturepassInformationRequestFailedException("An exception caused the request to fail", null, e);
-                }
-
-                InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.FuturepassRequests, StepPhase.Success, ct);
             }
         }
         
-        private async UniTask HandleCustodialRequests(LoginSettings loginSettings, ICustodialLoginService custodialLoginService)
+        private async UniTask HandleCustodialRequests(LoginSettings loginSettings, ICustodialLoginService custodialLoginService , ISessionServiceInternal sessionServiceInternal)
         {
             if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
             {
@@ -279,8 +259,9 @@ namespace EmergenceSDK.Runtime
 
                 try
                 {
+                    var qrCodeResponse = await sessionServiceInternal.GetQrCodeAsync(ct);
                     // Trigger the custodial login service to handle the login flow
-                    await custodialLoginService.StartCustodialLoginAsync(CacheCustodialBearerToken,ct);
+                    await custodialLoginService.StartCustodialLoginAsync(CacheCustodialResponse,ct);
                 }
                 catch (Exception ex)
                 {
@@ -291,12 +272,41 @@ namespace EmergenceSDK.Runtime
             }
         }
 
-        private  void CacheCustodialBearerToken(string bearer, CancellationToken ct)
+        private async UniTask CacheCustodialResponse(CustodialAccessTokenResponse response, CancellationToken ct)
         {
+            var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
             // Mark the custodial login step as successful
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.CustodialRequests, StepPhase.Success, ct);
+            var passResponse = await futureverseService.GetLinkedFuturepassAsync(response.DecodedToken.Eoa);
+            ct.ThrowIfCancellationRequested();
+            await ProcessFuturePassResponse(futureverseService, passResponse.Result1.ownedFuturepass);
         }
 
+        private async UniTask ProcessFuturePassResponse(IFutureverseService futureverseService, string ownedFuturePass)
+        {
+            try
+            {
+                var passInformationResponse = await futureverseService.GetFuturepassInformationAsync(ownedFuturePass);
+                ct.ThrowIfCancellationRequested();
+                if (!passInformationResponse.Successful || passInformationResponse.Result1 == null)
+                {
+                    if (passInformationResponse.Successful && passInformationResponse.Result1 == null)
+                    {
+                        var exception = new NullReferenceException(nameof(passInformationResponse) + '.' + nameof(passInformationResponse.Result1) + "is null");
+                        throw new FuturepassInformationRequestFailedException("Request was successful but result is null!", passInformationResponse, exception);
+                    }
+                        
+                    throw new FuturepassInformationRequestFailedException("Request was not successful", passInformationResponse);
+                }
+                ((IFutureverseServiceInternal)futureverseService).CurrentFuturepassInformation = passInformationResponse.Result1;
+            }
+            catch (Exception e) when (e is not OperationCanceledException and not FuturepassInformationRequestFailedException)
+            {
+                throw new FuturepassInformationRequestFailedException("An exception caused the request to fail", null, e);
+            }
+
+            InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.FuturepassRequests, StepPhase.Success, ct);
+        }
 
         private async UniTask HandleAccessTokenRequest(LoginSettings loginSettings, ISessionServiceInternal sessionServiceInternal)
         {
@@ -322,8 +332,10 @@ namespace EmergenceSDK.Runtime
             }
         }
 
-        private async UniTask HandleHandshakeRequest(IWalletServiceInternal walletServiceInternal)
+        private async UniTask HandleHandshakeRequest(IWalletServiceInternal walletServiceInternal, LoginSettings loginSettings)
         {
+            if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
+                return;
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.HandshakeRequest, StepPhase.Start, ct);
                 
             try
@@ -343,8 +355,13 @@ namespace EmergenceSDK.Runtime
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.HandshakeRequest, StepPhase.Success, ct);
         }
 
-        private async UniTask HandleQrCodeRequest(ISessionServiceInternal sessionServiceInternal)
+        private async UniTask HandleQrCodeRequest(LoginSettings loginSettings, ISessionServiceInternal sessionServiceInternal)
         {
+            if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
+            {
+                return;
+            }
+            
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.QrCodeRequest, StepPhase.Start, ct);
                 
             try

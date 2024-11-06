@@ -82,13 +82,11 @@ namespace EmergenceSDK.Runtime.Internal.UI
                         HeaderScreen.Instance.Refresh(((IWalletService)WalletServiceInternal).ChecksummedWalletAddress);
                         HeaderScreen.Instance.Show();
                         break;
+                    case LoginStep.CustodialRequests:
+                        custodialLoginMessage.text = "Successfully generated Custodial Bearer token";
+                        break;
                     case LoginStep.AccessTokenRequest:
                     case LoginStep.FuturepassRequests:
-                        break;
-                    case LoginStep.CustodialRequests:
-                        
-                        custodialLoginMessage.text = "Successfully generated Custodial Bearer token";
-                        // Nothing to do here in these cases
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(loginStep), loginStep, null);
@@ -131,14 +129,12 @@ namespace EmergenceSDK.Runtime.Internal.UI
         /// <param name="_"></param>
         private void HandleLoginStarted(LoginManager _)
         {
-            HideAllScreens();
+            
             switch (EmergenceSingleton.Instance.DefaultLoginFlow)
             {
                 case LoginFlow.WalletConnect:
                 case LoginFlow.Futurepass:
                     StartQRCodeDrivenLogin();
-                    break;
-                case LoginFlow.Custodial:
                     break;
             }
 
@@ -153,6 +149,7 @@ namespace EmergenceSDK.Runtime.Internal.UI
             copyUrlButton.interactable = false;
             urlInputField.text = "";
             rawQrImage.texture = null;
+            HideAllScreens();
             qrScreen.SetActive(true);
             refreshCounterText.text = "";
             refreshText.text = "Retrieving QR code...";
@@ -191,7 +188,7 @@ namespace EmergenceSDK.Runtime.Internal.UI
             EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
             UniTask.Void(async () =>
             {
-                await loginManager.StartLogin(LoginSettings.EnableCustodialLogin);
+                await loginManager.StartLogin(LoginSettings.EnableCustodialLogin | LoginSettings.EnableFuturepass);
             });
         }
 

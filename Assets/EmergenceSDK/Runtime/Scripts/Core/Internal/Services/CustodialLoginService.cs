@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Web;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Runtime.Futureverse.Internal;
 using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types;
 using UnityEngine;
@@ -16,12 +17,13 @@ namespace EmergenceSDK.Runtime.Internal.Services
     /// </summary>
     internal class CustodialLoginService : ICustodialLoginService
     {
-        private string cachedAccessToken;
+        public CustodialAccessTokenResponse CachedAccessTokenResponse { get; set; }
+
         private string currentState;
         private string currentCodeVerifier;
 
         private const string DevelopmentClientID = "3KMMFCuY59SA4DDV8ggwc";
-        private const string StagingClientID = "some-staging-client-id";
+        private const string StagingClientID = "3KMMFCuY59SA4DDV8ggwc";
         private const string ProductionClientID = "G9mOSDHNklm_dCN0DHvfX";
         private const string RedirectUri = "http://localhost:3000/callback";
         private const string BaseUrl = "https://login.futureverse.cloud/";
@@ -44,7 +46,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
         /// <param name="onSuccessfulLogin">Callback invoked when login is successful.</param>
         /// <param name="ct">Cancellation token to manage async flow cancellation.</param>
         /// <returns>A service response indicating the result of the login attempt.</returns>
-        public async UniTask<ServiceResponse<string>> StartCustodialLoginAsync(Action<string,CancellationToken> onSuccessfulLogin,CancellationToken ct)
+        public async UniTask<ServiceResponse<string>> StartCustodialLoginAsync(Func<CustodialAccessTokenResponse,CancellationToken, UniTask> onSuccessfulLogin,CancellationToken ct)
         {
             currentState = GenerateSecureRandomString(128);
             currentCodeVerifier = GenerateSecureRandomString(64);
@@ -54,10 +56,10 @@ namespace EmergenceSDK.Runtime.Internal.Services
 
             LocalWebServerHelper.StartServer(async (authCode,state,expectedState) =>
             {
-                cachedAccessToken = await OAuthHelper.ParseAndExchangeCodeForTokenAsync(BaseUrl, ClientID, currentCodeVerifier, authCode, RedirectUri, ct);
-                if (cachedAccessToken != null)
+                CachedAccessTokenResponse = await OAuthHelper.ParseAndExchangeCodeForCustodialResponseAsync(BaseUrl, ClientID, currentCodeVerifier, authCode, RedirectUri, ct);
+                if (CachedAccessTokenResponse != null)
                 {
-                    onSuccessfulLogin(cachedAccessToken, ct);
+                    await onSuccessfulLogin(CachedAccessTokenResponse, ct);
                 }
                 else
                 {

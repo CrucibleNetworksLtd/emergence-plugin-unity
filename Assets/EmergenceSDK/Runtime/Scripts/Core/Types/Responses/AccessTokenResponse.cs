@@ -1,16 +1,14 @@
-﻿using System;
-
-namespace EmergenceSDK.Runtime.Types.Responses
+﻿namespace EmergenceSDK.Runtime.Types.Responses
 {
     public class AccessTokenResponse
     {
-        public AccessToken AccessToken { get; set; }
+        public AccessToken AccessToken;
     }
 
     public class AccessToken
     {
-        public string Token { get; set; }         
-        public DateTime Expiration { get; set; }  
-        public string RefreshToken { get; set; } 
+        public string signedMessage;
+        public string message;
+        public string address;
     }
 }

@@ -79,6 +79,21 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
             return new ServiceResponse<LinkedFuturepassResponse>(response, true, fpResponse);
         }
 
+        public async UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync(string eoa)
+        {
+            var url = $"{GetFuturepassApiUrl()}linked-futurepass?eoa={EmergenceSingleton.Instance.Configuration.Chain.ChainID}:EVM:{eoa}";
+
+            var response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Get, url, timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
+            
+            if (!response.Successful)
+                return new ServiceResponse<LinkedFuturepassResponse>(response);
+
+            LinkedFuturepassResponse fpResponse =
+                SerializationHelper.Deserialize<LinkedFuturepassResponse>(response.ResponseText);
+
+            return new ServiceResponse<LinkedFuturepassResponse>(response, true, fpResponse);
+        }
+
         public async UniTask<ServiceResponse<FuturepassInformationResponse>> GetFuturepassInformationAsync(string futurepass)
         {
             var url = $"{GetFuturepassApiUrl()}linked-eoa?futurepass={futurepass}";
@@ -96,6 +111,7 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
                 SerializationHelper.Deserialize<FuturepassInformationResponse>(response.ResponseText);
             return new ServiceResponse<FuturepassInformationResponse>(response, true, fpResponse);
         }
+        
         public async UniTask<List<AssetTreePath>> GetAssetTreeAsync(string tokenId, string collectionId)
         {
             var body = BuildGetAssetTreeRequestBody(tokenId, collectionId);
