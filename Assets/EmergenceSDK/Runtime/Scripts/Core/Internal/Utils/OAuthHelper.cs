@@ -6,11 +6,12 @@ using System.Threading;
 using System.Web;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Futureverse.Internal;
+using EmergenceSDK.Runtime.Internal.Services;
 using EmergenceSDK.Runtime.Types;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace EmergenceSDK.Runtime.Internal.Services
+namespace EmergenceSDK.Runtime.Internal.Utils
 {
     /// <summary>
     /// Provides methods for handling OAuth authorization flow, including 

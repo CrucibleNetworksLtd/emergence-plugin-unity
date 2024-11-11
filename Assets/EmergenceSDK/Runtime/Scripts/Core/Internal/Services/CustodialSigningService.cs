@@ -1,13 +1,12 @@
-﻿using Cysharp.Threading.Tasks;
-using System;
+﻿using System;
 using System.Text;
-using EmergenceSDK.Runtime.Internal.Services;
+using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Internal.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
-namespace EmergenceSDK.Runtime.Services
+namespace EmergenceSDK.Runtime.Internal.Services
 {
     /// <summary>
     /// Service for signing messages with the custodial service.
