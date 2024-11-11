@@ -83,7 +83,7 @@ namespace EmergenceSDK.Runtime.Internal.UI
                         HeaderScreen.Instance.Show();
                         break;
                     case LoginStep.CustodialRequests:
-                        custodialLoginMessage.text = "Successfully generated Custodial Bearer token";
+                        custodialLoginMessage.text = "Successfully generated Custodial Bearer token, Connecting to Emergence Services";
                         break;
                     case LoginStep.AccessTokenRequest:
                     case LoginStep.FuturepassRequests:

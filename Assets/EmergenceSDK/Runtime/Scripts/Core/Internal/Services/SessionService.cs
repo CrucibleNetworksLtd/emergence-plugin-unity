@@ -189,6 +189,29 @@ namespace EmergenceSDK.Runtime.Internal.Services
             return new ServiceResponse<string>(true, EmergenceAccessToken);
         }
 
+        /// <summary>
+        /// Method for caching an Emergence Access Token using an external custodial signing service.
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async UniTask<ServiceResponse<string>> GetCustodialAccessToken(CancellationToken ct)
+        {
+            // Generate our timestamp used to create an EOT
+            DateTime oneDayFromNow = DateTime.UtcNow.AddDays(1);
+            long accessTokenTimestamp = new DateTimeOffset(oneDayFromNow).ToUnixTimeSeconds();
+            string accessTokenMessage = $"{{\"expires-on\":{accessTokenTimestamp}}}";
+            
+            var custodialSigningService = EmergenceServiceProvider.GetService<ICustodialSigningService>();
+            var custodialLoginService = EmergenceServiceProvider.GetService<ICustodialLoginService>();
+
+            string eoa = custodialLoginService.CachedAccessTokenResponse.DecodedToken.Eoa; // Get currently cached EOA/wallet address
+            // Use the external signing service to perform a signature request and return an emergence access token, caching it as part of the session.
+            EmergenceAccessToken =  await custodialSigningService.RequestToSignAsync(eoa, accessTokenMessage, accessTokenTimestamp.ToString());
+            
+            return new ServiceResponse<string>(true, EmergenceAccessToken);
+        }
+        
+
         public void HandleDisconnection(ISessionService sessionService)
         {
             EmergenceAccessToken = "";

@@ -120,6 +120,7 @@ namespace EmergenceSDK.Runtime.Services
             AddService(new ChainService());
             AddService(new PersonaService(sessionService));
             AddService(new CustodialLoginService());
+            AddService(new CustodialSigningService());
         }
     }
 }

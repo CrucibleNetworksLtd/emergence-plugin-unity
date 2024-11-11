@@ -5,6 +5,7 @@ using System.Threading;
 using System.Web;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Futureverse.Internal;
+using EmergenceSDK.Runtime.Internal.Utils;
 using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types;
 using UnityEngine;
@@ -52,18 +53,25 @@ namespace EmergenceSDK.Runtime.Internal.Services
             currentCodeVerifier = GenerateSecureRandomString(64);
             string codeChallenge = GenerateCodeChallenge(currentCodeVerifier);
 
-            LocalWebServerHelper.ExpectedState = currentState;
+            CustodialLocalWebServerHelper.ExpectedState = currentState;
+            
+            // Used to hold thread whilst awaiting callback from HTTP listener.
+            
+            var tcs = new UniTaskCompletionSource<bool>();
 
-            LocalWebServerHelper.StartServer(async (authCode,state,expectedState) =>
+            CustodialLocalWebServerHelper.StartTokenAuthListener(async (authCode,state,expectedState) =>
             {
                 CachedAccessTokenResponse = await OAuthHelper.ParseAndExchangeCodeForCustodialResponseAsync(BaseUrl, ClientID, currentCodeVerifier, authCode, RedirectUri, ct);
                 if (CachedAccessTokenResponse != null)
                 {
+                    // Call the callback method on the Login Manager
                     await onSuccessfulLogin(CachedAccessTokenResponse, ct);
+                    tcs.TrySetResult(true);
                 }
                 else
                 {
                     Debug.LogError("Failed to retrieve access token.");
+                    tcs.TrySetResult(false);
                 }
             });
 
@@ -82,7 +90,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
                              $"&nonce={nonce}";
 
             await OAuthHelper.RequestAuthorizationCodeAsync(authUrl, ct);
-
+            await tcs.Task; // Await external callback to trigger task completion.
             return new ServiceResponse<string>(true, authUrl); 
         }
 

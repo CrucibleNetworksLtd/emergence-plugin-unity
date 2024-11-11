@@ -251,6 +251,12 @@ namespace EmergenceSDK.Runtime
             }
         }
         
+        /// <summary>
+        /// Handles Custodial web login, built on the archetype provided by Futureverse to utilise their web login flow.
+        /// </summary>
+        /// <param name="loginSettings">The login settings for this session, used to determine whether to perform Custodial functionality</param>
+        /// <param name="custodialLoginService">The Emergence Service for handling Custodial Logins</param>
+        /// <param name="sessionServiceInternal">The emergence Service for handling the session</param>
         private async UniTask HandleCustodialRequests(LoginSettings loginSettings, ICustodialLoginService custodialLoginService , ISessionServiceInternal sessionServiceInternal)
         {
             if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
@@ -259,8 +265,9 @@ namespace EmergenceSDK.Runtime
 
                 try
                 {
-                    var qrCodeResponse = await sessionServiceInternal.GetQrCodeAsync(ct);
-                    // Trigger the custodial login service to handle the login flow
+                    // We need to call this to generate a Device ID through the backend.
+                    await sessionServiceInternal.GetQrCodeAsync(ct);
+                    // Trigger the custodial login service to handle the login flow.
                     await custodialLoginService.StartCustodialLoginAsync(CacheCustodialResponse,ct);
                 }
                 catch (Exception ex)
@@ -272,16 +279,28 @@ namespace EmergenceSDK.Runtime
             }
         }
 
+        /// <summary>
+        /// Callback method that initiates the exchange of a custodial bearer token for auth in other services.
+        /// </summary>
+        /// <param name="response"> The custodial Access token response sent to our local HTTP listener</param>
+        /// <param name="ct"> The cancellation Token</param>
         private async UniTask CacheCustodialResponse(CustodialAccessTokenResponse response, CancellationToken ct)
         {
             var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
             // Mark the custodial login step as successful
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.CustodialRequests, StepPhase.Success, ct);
             var passResponse = await futureverseService.GetLinkedFuturepassAsync(response.DecodedToken.Eoa);
+            InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.AccessTokenRequest, StepPhase.Success, ct);
             ct.ThrowIfCancellationRequested();
             await ProcessFuturePassResponse(futureverseService, passResponse.Result1.ownedFuturepass);
         }
 
+        /// <summary>
+        /// Processes a FV login response to get user information wth an associated Future Pass.
+        /// </summary>
+        /// <param name="futureverseService"></param>
+        /// <param name="ownedFuturePass"></param>
+        /// <exception cref="FuturepassInformationRequestFailedException"></exception>
         private async UniTask ProcessFuturePassResponse(IFutureverseService futureverseService, string ownedFuturePass)
         {
             try
@@ -316,12 +335,23 @@ namespace EmergenceSDK.Runtime
 
                 try
                 {
-                    var tokenResponse = await sessionServiceInternal.GetAccessTokenAsync();
-                    ct.ThrowIfCancellationRequested();
-                    if (!tokenResponse.Successful)
+                    if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
                     {
-                        throw new TokenRequestFailedException("Request was not successful", tokenResponse);
+                        var tokenResponse = await sessionServiceInternal.GetCustodialAccessToken(ct);
+                        if (!tokenResponse.Successful)
+                        {
+                            throw new TokenRequestFailedException("Request was not successful", tokenResponse);
+                        }
                     }
+                    else
+                    {
+                        var tokenResponse = await sessionServiceInternal.GetAccessTokenAsync();
+                        if (!tokenResponse.Successful)
+                        {
+                            throw new TokenRequestFailedException("Request was not successful", tokenResponse);
+                        }
+                    }
+                    ct.ThrowIfCancellationRequested();
                 }
                 catch (Exception e) when (e is not OperationCanceledException and not TokenRequestFailedException)
                 {
@@ -336,8 +366,8 @@ namespace EmergenceSDK.Runtime
         {
             if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
                 return;
+            
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.HandshakeRequest, StepPhase.Start, ct);
-                
             try
             {
                 var handshakeResponse = await walletServiceInternal.HandshakeAsync(ct: ct, timeout: qrCodeTimeout * 1000);

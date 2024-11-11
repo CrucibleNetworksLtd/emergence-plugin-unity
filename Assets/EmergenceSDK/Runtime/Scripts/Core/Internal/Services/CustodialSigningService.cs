@@ -1,11 +1,10 @@
 ﻿using Cysharp.Threading.Tasks;
-using EmergenceSDK.Runtime.Types;
 using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using EmergenceSDK.Runtime.Internal.Services;
+using EmergenceSDK.Runtime.Internal.Utils;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace EmergenceSDK.Runtime.Services
@@ -15,92 +14,133 @@ namespace EmergenceSDK.Runtime.Services
     /// </summary>
     public class CustodialSigningService : ICustodialSigningService
     {
-        private const string BaseUrl = "https://signer.futureverse.app/";
+        private const string BaseUrl = "https://signer.futureverse.cloud/";
         private const string CallbackPath = "signature-callback";
+        
+        private const string Base64Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
         /// <summary>
-        /// Initiates the signing process for a message using the custodial service.
+        /// UniTask for handling requests to proccess messages and send them to an external signing service.
         /// </summary>
-        /// <param name="custodialEOA">The Ethereum address for the custodial account.</param>
-        /// <param name="message">The message to be signed.</param>
-        /// <param name="ct">Cancellation token for managing async flow cancellation.</param>
-        /// <returns>A UniTask containing the signed message.</returns>
-        public async UniTask<ServiceResponse<string>> SignMessageAsync(string custodialEOA, string message, CancellationToken ct)
+        /// <param name="custodialEOA">The Custodial EOA or wallet to sign the message.</param>
+        /// <param name="messageToSign">The message to be signed.</param>
+        /// <param name="timestamp">The timestamp of the message being signed.</param>
+        /// <returns></returns>
+        public async UniTask<string> RequestToSignAsync(string custodialEOA, string messageToSign, string timestamp)
         {
-            if (string.IsNullOrEmpty(custodialEOA) || string.IsNullOrEmpty(message))
+            var tcs = new UniTaskCompletionSource<bool>();// Ensures the thread still awaits the callback from the external service
+            string signedMessage = "";
+            
+            // We start a local web listener and assign a method that will take a response and verify and convert it
+            CustodialLocalWebServerHelper.StartSigningServer(CallbackPath, (responseJson) =>
             {
-                return new ServiceResponse<string>(false, "Invalid parameters provided.");
-            }
-
-            LocalWebServerHelper.StartServer(async (authCode, state, expectedState) =>
-            {
-                if (state != LocalWebServerHelper.ExpectedState)
+                if (!string.IsNullOrEmpty(responseJson))
                 {
-                    Debug.LogError("State mismatch. Possible CSRF attack detected.");
-                    return;
-                }
-
-                var signedMessage = await OAuthHelper.SignMessageAsync(BaseUrl, custodialEOA, message, authCode, ct);
-                if (signedMessage != null)
-                {
-                    Debug.Log($"Successfully signed message: {signedMessage}");
+                    var data = ConvertFromBase64String(responseJson);
+                    string response = Encoding.UTF8.GetString(data);
+                    JObject jsonResponse = JObject.Parse(response);// As this data isn't reused we just use a JObject rather than a dedicated struct
+                    string signature = jsonResponse["result"]?["data"]?["signature"]?.ToString();
+                    signedMessage = ConvertCustodialSignedMessageToEmergenceAt(signature, custodialEOA, timestamp);
+                    tcs.TrySetResult(true); // The callback will mark itself as completed allowing the task to proceed and return a response.
                 }
                 else
                 {
-                    Debug.LogError("Failed to retrieve signed message.");
+                    tcs.TrySetResult(false);
+                    Debug.LogError("No response message received.");
                 }
-
-                LocalWebServerHelper.StopServer();
             });
 
-            string nonce = GenerateSecureRandomString(128);
-            string payload = CreateSigningPayload(custodialEOA, message);
-            string signUrl = $"{BaseUrl}?request={payload}&nonce={nonce}";
+            // Create our payload for the signing service.
+            string hexMessage = ConvertToHex(messageToSign);
+            var signTransactionPayload = new
+            {
+                account = custodialEOA,
+                message = hexMessage,
+                callbackUrl = "http://localhost:3000/signature-callback"
+            };
+            var encodedPayload = new
+            {
+                id = "client:2", // Must be formatted as `client:${ identifier number }`
+                tag = "fv/sign-msg", // Do not change this
+                payload = signTransactionPayload
+            };
 
-            Application.OpenURL(signUrl);
-            return new ServiceResponse<string>(true, "Signing process initiated.");
+            string jsonPayload = JsonConvert.SerializeObject(encodedPayload);
+            string base64Payload = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonPayload)).Replace('+', '-').Replace('/', '_').TrimEnd('=');
+            string url = $"{BaseUrl}?request={base64Payload}";
+            Application.OpenURL(url); // Contact external signing service with our encoded payload.
+            
+            await tcs.Task; // Await callback handler to be triggered by external service.
+            
+            return signedMessage;
         }
 
         /// <summary>
-        /// Creates a JSON payload for signing the message.
+        /// Converts a string to a hex string.
         /// </summary>
-        /// <param name="custodialEOA">The Ethereum address for the custodial account.</param>
-        /// <param name="message">The message to be signed.</param>
-        /// <returns>The JSON payload as a string.</returns>
-        private string CreateSigningPayload(string custodialEOA, string message)
-        {
-            string hexMessage = ConvertToHex(message);
-            return $"{{ \"account\": \"{custodialEOA}\", \"message\": \"{hexMessage}\" }}";
-        }
-
-        /// <summary>
-        /// Converts a message string to its hexadecimal representation.
-        /// </summary>
-        /// <param name="message">The message to convert.</param>
-        /// <returns>The hexadecimal representation of the message.</returns>
+        /// <param name="message">Message to be converted</param>
+        /// <returns></returns>
         private string ConvertToHex(string message)
         {
-            StringBuilder hex = new StringBuilder(message.Length * 2);
-            foreach (char c in message)
+            byte[] utf8Bytes = Encoding.UTF8.GetBytes(message);
+        
+            StringBuilder hexBuilder = new StringBuilder("0x");
+
+            foreach (byte b in utf8Bytes)
             {
-                hex.AppendFormat("{0:X2}", (int)c);
+                hexBuilder.AppendFormat("{0:X2}", b);
             }
-            return hex.ToString();
+
+            return hexBuilder.ToString().ToLower();
         }
 
         /// <summary>
-        /// Generates a secure random string of the specified length.
+        /// Custom function for Base 64 Conversion, because the .Net native one just fails without any output and kills the whole UniTask.
         /// </summary>
-        /// <param name="length">The length of the random string.</param>
-        /// <returns>A secure random string.</returns>
-        private string GenerateSecureRandomString(int length)
+        /// <param name="base64">The Base64 string to be converted.</param>
+        /// <returns></returns>
+        public static byte[] ConvertFromBase64String(string base64)
         {
-            using (var rng = new RNGCryptoServiceProvider())
+            base64 = base64.TrimEnd('=');
+            int padding = base64.Length % 4;
+            if (padding > 0)
             {
-                var data = new byte[length];
-                rng.GetBytes(data);
-                return Convert.ToBase64String(data).Replace('+', '-').Replace('/', '_').TrimEnd('=');
+                base64 += new string('=', 4 - padding);
             }
+
+            byte[] bytes = new byte[base64.Length * 3 / 4];
+            int byteIndex = 0;
+
+            for (int i = 0; i < base64.Length; i += 4)
+            {
+                int b1 = Base64Characters.IndexOf(base64[i]);
+                int b2 = Base64Characters.IndexOf(base64[i + 1]);
+                int b3 = Base64Characters.IndexOf(base64[i + 2]);
+                int b4 = Base64Characters.IndexOf(base64[i + 3]);
+
+                bytes[byteIndex++] = (byte)((b1 << 2) | (b2 >> 4));
+                if (b3 != -1)
+                    bytes[byteIndex++] = (byte)(((b2 & 0x0F) << 4) | (b3 >> 2));
+                if (b4 != -1)
+                    bytes[byteIndex++] = (byte)(((b3 & 0x03) << 6) | b4);
+            }
+
+            return bytes;
+        }
+
+        /// <summary>
+        /// Converts a Custodial response to an Emergence Access token
+        /// </summary>
+        /// <param name="signedMessage"></param>
+        /// <param name="eoa"></param>
+        /// <param name="timestamp"></param>
+        /// <returns></returns>
+        private string ConvertCustodialSignedMessageToEmergenceAt(string signedMessage, string eoa, string timestamp)
+        {
+            string eAccessToken = $"{{\"signedMessage\" : \"{signedMessage}\"," +
+                             $"\"message\" : \"{{\\\"expires-on\\\": {timestamp}}}\"," +
+                             $"\"address\" : \"{eoa}\"}}";
+            return eAccessToken;
         }
     }
 }
