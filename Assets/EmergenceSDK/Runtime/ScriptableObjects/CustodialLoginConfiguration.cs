@@ -2,6 +2,9 @@
 
 namespace EmergenceSDK.Runtime.ScriptableObjects
 {
+    /// <summary>
+    /// This SO is used to store details related to handling Custodial Web Wallets.
+    /// </summary>
     [CreateAssetMenu(fileName = "CustodialLoginConfiguration", menuName = "Custodial Login Configuration", order = 2)]
     public class CustodialLoginConfiguration : ScriptableObject
     {

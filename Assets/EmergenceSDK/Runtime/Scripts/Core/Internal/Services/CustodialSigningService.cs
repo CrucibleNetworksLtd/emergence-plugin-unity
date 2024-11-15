@@ -32,6 +32,10 @@ namespace EmergenceSDK.Runtime.Internal.Services
             _ => throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.Environment), "Unknown environment")
         };
 
+        /// <summary>
+        /// The constructor for this service will attempt to parse configuration details from a scriptable object in the Resources folder.
+        /// There is a default configuration object in EmergenceSDK/Runtime/Resources.
+        /// </summary>
         public CustodialSigningService()
         {
             var config = Resources.Load<CustodialLoginConfiguration>("CustodialServicesConfiguration");
