@@ -34,7 +34,7 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
             return "https://ar-api.futureverse.app/graphql";
 #else
-            return EmergenceSingleton.Instance.Environment switch
+            return FutureverseSingleton.Instance.Environment switch
             {
                 EmergenceEnvironment.Production => "https://ar-api.futureverse.app/graphql",
                 EmergenceEnvironment.Development => "https://ar-api.futureverse.dev/graphql",
