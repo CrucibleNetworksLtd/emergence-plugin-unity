@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 270fe065ee534a7a9abef8498e1eecd6, type: 3}
   m_Name: CustodialLoginConfiguration
   m_EditorClassIdentifier: 
-  DevelopmentClientID: 
-  StagingClientID: 
-  ProductionClientID: 
-  ProductionLoginBaseUrl: 
-  StagingLoginBaseUrl: 
-  ProductionSigningBaseUrl: 
-  StagingSigningBaseUrl: 
+  DevelopmentClientID: 3KMMFCuY59SA4DDV8ggwc
+  StagingClientID: 3KMMFCuY59SA4DDV8ggwc
+  ProductionClientID: G9mOSDHNklm_dCN0DHvfX
+  ProductionLoginBaseUrl: https://login.pass.online/
+  StagingLoginBaseUrl: https://login.passonline.cloud/
+  ProductionSigningBaseUrl: https://signer.pass.online/
+  StagingSigningBaseUrl: https://signer.passonline.cloud/
