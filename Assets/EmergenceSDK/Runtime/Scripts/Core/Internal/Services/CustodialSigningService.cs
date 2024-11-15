@@ -3,6 +3,7 @@ using System.Text;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Futureverse;
 using EmergenceSDK.Runtime.Internal.Utils;
+using EmergenceSDK.Runtime.ScriptableObjects;
 using EmergenceSDK.Runtime.Types;
 using EmergenceSDK.Runtime.Types.Responses;
 using Newtonsoft.Json;
@@ -17,8 +18,8 @@ namespace EmergenceSDK.Runtime.Internal.Services
     {
         private const string CallbackPath = "signature-callback";
         
-        private const string ProductionBaseUrl = "https://signer.pass.online/";
-        private const string StagingBaseUrl = "https://signer.passonline.cloud/";
+        private string ProductionBaseUrl = "https://signer.pass.online/";
+        private string StagingBaseUrl = "https://signer.passonline.cloud/";
         
         /// <summary>
         /// Gets the Login Base URL based on the current environment.
@@ -30,6 +31,22 @@ namespace EmergenceSDK.Runtime.Internal.Services
             EmergenceEnvironment.Production => ProductionBaseUrl,
             _ => throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.Environment), "Unknown environment")
         };
+
+        public CustodialSigningService()
+        {
+            var config = Resources.Load<CustodialLoginConfiguration>("CustodialServicesConfiguration");
+
+            if (config != null)
+            {
+                // Override hardcoded values with values from the ScriptableObject
+                ProductionBaseUrl = config.ProductionSigningBaseUrl;
+                StagingBaseUrl = config.StagingSigningBaseUrl;
+            }
+            else
+            {
+                EmergenceLogger.LogWarning("CustodialServicesConfiguration ScriptableObject not found. Using default values.");
+            }
+        }
 
         /// <summary>
         /// Unitask for handling the creation of an Emergence Access Token using a Custodial login.

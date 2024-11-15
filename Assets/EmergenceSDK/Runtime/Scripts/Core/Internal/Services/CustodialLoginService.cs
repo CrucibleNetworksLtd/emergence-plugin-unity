@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Futureverse;
 using EmergenceSDK.Runtime.Futureverse.Internal;
 using EmergenceSDK.Runtime.Internal.Utils;
+using EmergenceSDK.Runtime.ScriptableObjects;
 using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types;
 using UnityEngine;
@@ -25,11 +26,11 @@ namespace EmergenceSDK.Runtime.Internal.Services
         private string currentCodeVerifier;
 
         // Need to add support for Developer Custom URLs, lets use a serialised object.
-        private const string DevelopmentClientID = "3KMMFCuY59SA4DDV8ggwc";
-        private const string StagingClientID = "3KMMFCuY59SA4DDV8ggwc";
-        private const string ProductionClientID = "G9mOSDHNklm_dCN0DHvfX";
-        private const string ProductionBaseUrl = "https://login.pass.online/";
-        private const string StagingBaseUrl = "https://login.passonline.cloud/";
+        private string DevelopmentClientID = "3KMMFCuY59SA4DDV8ggwc";
+        private string StagingClientID = "3KMMFCuY59SA4DDV8ggwc";
+        private string ProductionClientID = "G9mOSDHNklm_dCN0DHvfX";
+        private string ProductionBaseUrl = "https://login.pass.online/";
+        private string StagingBaseUrl = "https://login.passonline.cloud/";
         
         private const string RedirectUri = "http://localhost:3000/callback";
 
@@ -54,6 +55,26 @@ namespace EmergenceSDK.Runtime.Internal.Services
             EmergenceEnvironment.Production => ProductionBaseUrl,
             _ => throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.Environment), "Unknown environment")
         };
+
+        public CustodialLoginService()
+        {
+            // Attempt to load the ScriptableObject
+            var config = Resources.Load<CustodialLoginConfiguration>("CustodialServicesConfiguration");
+
+            if (config != null)
+            {
+                // Override hardcoded values with values from the ScriptableObject
+                DevelopmentClientID = config.DevelopmentClientID;
+                StagingClientID = config.StagingClientID;
+                ProductionClientID = config.ProductionClientID;
+                ProductionBaseUrl = config.ProductionLoginBaseUrl;
+                StagingBaseUrl = config.StagingLoginBaseUrl;
+            }
+            else
+            {
+                EmergenceLogger.LogWarning("CustodialServicesConfiguration ScriptableObject not found. Using default values.");
+            }
+        }
 
         /// <summary>
         /// Starts the custodial login process, generating the necessary parameters and starting 
