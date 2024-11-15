@@ -25,7 +25,7 @@ namespace EmergenceSDK.Runtime
         
         public EmergenceConfiguration Configuration;
 
-        public bool IsCustodialLogin = false;
+        public bool IsCustodialLogin { get; set; } 
         
         [SerializeField] 
         private EmergenceEnvironment environment;
