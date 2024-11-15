@@ -21,5 +21,8 @@ namespace EmergenceSDK.Runtime.Types
 
         [JsonProperty("rpcUrl")]
         public string RpcUrl { get; set; }
+        
+        [JsonProperty("environment")]
+        public string Environment { get; set; }
     }
 }

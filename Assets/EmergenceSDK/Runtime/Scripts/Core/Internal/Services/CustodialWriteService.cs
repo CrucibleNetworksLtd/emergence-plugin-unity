@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Runtime.Futureverse;
 using EmergenceSDK.Runtime.Internal.Services;
 using EmergenceSDK.Runtime.Internal.Types;
 using EmergenceSDK.Runtime.Internal.Utils;
@@ -22,6 +24,14 @@ namespace EmergenceSDK.Runtime.Types
         private static string getEncodedDataEndpoint = "getEncodedData";
         private static string encodeTransactionEndpoint = "encode-transaction";
         private static string sendTransactionEndpoint = "send-transaction";
+        
+        private string signerServiceUrl => FutureverseSingleton.Instance.Environment switch
+        {
+            EmergenceEnvironment.Development => "Staging",
+            EmergenceEnvironment.Staging => "Staging",
+            EmergenceEnvironment.Production => "Production",
+            _ => throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.Environment), "Unknown environment")
+        };
 
         /// <summary>
         /// Perform the custodial write method by encoding data, requesting a transaction signature, and sending the transaction.
@@ -82,7 +92,8 @@ namespace EmergenceSDK.Runtime.Types
                 ToAddress = contractInfo.ContractAddress,
                 Value = inputValue,
                 Data = encodedData,
-                RpcUrl = contractInfo.NodeUrl
+                RpcUrl = contractInfo.NodeUrl,
+                Environment = signerServiceUrl
             };
             string stringifiedTransaction = JsonConvert.SerializeObject(transaction);
             string url = fvHelperServiceUrl + encodeTransactionEndpoint;

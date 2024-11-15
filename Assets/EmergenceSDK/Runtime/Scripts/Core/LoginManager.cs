@@ -300,6 +300,7 @@ namespace EmergenceSDK.Runtime
                 };
                 ct.ThrowIfCancellationRequested();
                 await ProcessFuturePassResponse(futureverseService, $"{response.DecodedToken.ChainId}:{chainName}:{response.DecodedToken.Futurepass}");
+                InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.HandshakeRequest, StepPhase.Success, ct);
             }
             catch (Exception ex)
             {
