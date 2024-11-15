@@ -23,7 +23,6 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
         public FuturepassInformationResponse CurrentFuturepassInformation { get; set; }
 
         private readonly IWalletService walletService;
-        private ICustodialSigningService custodialSigningService;
 
         public FutureverseService(IWalletService walletService)
         {
@@ -318,6 +317,7 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
                 }
                 else
                 {
+                    var custodialSigningService = EmergenceServiceProvider.GetService<ICustodialSigningService>();
                     signature = await custodialSigningService.RequestToSignAsync(walletService.WalletAddress,generatedArtm);
                 }
             }
