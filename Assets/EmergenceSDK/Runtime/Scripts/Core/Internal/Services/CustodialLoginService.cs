@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Web;
 using Cysharp.Threading.Tasks;
+using EmergenceSDK.Runtime.Futureverse;
 using EmergenceSDK.Runtime.Futureverse.Internal;
 using EmergenceSDK.Runtime.Internal.Utils;
 using EmergenceSDK.Runtime.Services;
@@ -23,20 +24,34 @@ namespace EmergenceSDK.Runtime.Internal.Services
         private string currentState;
         private string currentCodeVerifier;
 
+        // Need to add support for Developer Custom URLs, lets use a serialised object.
         private const string DevelopmentClientID = "3KMMFCuY59SA4DDV8ggwc";
         private const string StagingClientID = "3KMMFCuY59SA4DDV8ggwc";
         private const string ProductionClientID = "G9mOSDHNklm_dCN0DHvfX";
+        private const string ProductionBaseUrl = "https://login.pass.online/";
+        private const string StagingBaseUrl = "https://login.passonline.cloud/";
+        
         private const string RedirectUri = "http://localhost:3000/callback";
-        private const string BaseUrl = "https://login.futureverse.cloud/";
 
         /// <summary>
         /// Gets the client ID based on the current environment.
         /// </summary>
-        public string ClientID => EmergenceSingleton.Instance.Environment switch
+        public string ClientID => FutureverseSingleton.Instance.Environment switch
         {
             EmergenceEnvironment.Development => DevelopmentClientID,
             EmergenceEnvironment.Staging => StagingClientID,
             EmergenceEnvironment.Production => ProductionClientID,
+            _ => throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.Environment), "Unknown environment")
+        };
+        
+        /// <summary>
+        /// Gets the Login Base URL based on the current environment.
+        /// </summary>
+        public string BaseUrl => FutureverseSingleton.Instance.Environment switch
+        {
+            EmergenceEnvironment.Development => StagingBaseUrl,
+            EmergenceEnvironment.Staging => StagingBaseUrl,
+            EmergenceEnvironment.Production => ProductionBaseUrl,
             _ => throw new ArgumentOutOfRangeException(nameof(EmergenceSingleton.Instance.Environment), "Unknown environment")
         };
 
@@ -56,12 +71,14 @@ namespace EmergenceSDK.Runtime.Internal.Services
             CustodialLocalWebServerHelper.ExpectedState = currentState;
             
             // Used to hold thread whilst awaiting callback from HTTP listener.
-            
             var tcs = new UniTaskCompletionSource<bool>();
+            
+            var walletServiceInternal = EmergenceServiceProvider.GetService<IWalletServiceInternal>();
 
             CustodialLocalWebServerHelper.StartTokenAuthListener(async (authCode,state,expectedState) =>
             {
                 CachedAccessTokenResponse = await OAuthHelper.ParseAndExchangeCodeForCustodialResponseAsync(BaseUrl, ClientID, currentCodeVerifier, authCode, RedirectUri, ct);
+                walletServiceInternal.AssignCustodialWalletAddress(CachedAccessTokenResponse.DecodedToken.Eoa);
                 if (CachedAccessTokenResponse != null)
                 {
                     // Call the callback method on the Login Manager

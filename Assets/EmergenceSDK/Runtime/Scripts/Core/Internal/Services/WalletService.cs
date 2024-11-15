@@ -126,6 +126,13 @@ namespace EmergenceSDK.Runtime.Internal.Services
             return new ServiceResponse<string>(response, false);
         }
 
+        public void AssignCustodialWalletAddress(string eoa)
+        {
+            completedHandshake = true;
+            WalletAddress = eoa;
+            ChecksummedWalletAddress = eoa.ToUpper();
+        }
+
         public async UniTask Handshake(HandshakeSuccess success, ErrorCallback errorCallback, float timeout, CancellationCallback cancellationCallback,
             CancellationToken ct = default)
         {

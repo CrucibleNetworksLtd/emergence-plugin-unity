@@ -3,7 +3,6 @@
     public enum LoginFlow
     {
         Futurepass,
-        WalletConnect,
-        Custodial
+        WalletConnect
     }
 }

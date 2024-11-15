@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -16,6 +17,8 @@ namespace EmergenceSDK.Runtime.Internal.Utils
         private static bool isSigningServerStarted = false;
         private const int ServerPort = 3000;
         private const string CallbackPath = "/callback";
+        
+        private const string Base64Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
         /// <summary>
         /// The expected state value for validating CSRF protection.
@@ -38,8 +41,6 @@ namespace EmergenceSDK.Runtime.Internal.Utils
             httpListener.Prefixes.Add($"http://localhost:{ServerPort}{CallbackPath}/");
             httpListener.Start();
             isTokenAuthListenerStarted = true;
-
-            Debug.Log($"Local web server started on http://localhost:{ServerPort}{CallbackPath}");
 
             // Start listening for requests asynchronously
             Task.Run(() => ListenForTokenAuthRequests(onAuthCodeReceived));
@@ -103,7 +104,7 @@ namespace EmergenceSDK.Runtime.Internal.Utils
         {
             if (isSigningServerStarted)
             {
-                Debug.Log("Local web server is already started.");
+                EmergenceLogger.LogWarning("Local web server is already started.");
                 return;
             }
 
@@ -112,7 +113,6 @@ namespace EmergenceSDK.Runtime.Internal.Utils
             httpListener.Start();
             isSigningServerStarted = true;
 
-            Debug.Log($"Local web server started on http://localhost:{ServerPort}/{callbackPath}");
 
             // Start listening for requests asynchronously
             Task.Run(() => ListenForSigningRequests(callbackPath, onSigningResponseReceived));
@@ -138,18 +138,18 @@ namespace EmergenceSDK.Runtime.Internal.Utils
                     
                         if (!string.IsNullOrEmpty(responseJson))
                         {
-                            onSigningResponseReceived?.Invoke(responseJson);
+                            onSigningResponseReceived?.Invoke(Encoding.UTF8.GetString(ConvertFromBase64String(responseJson)));
                             StopSigningServer();
                         }
                         else
                         {
-                            Debug.LogError("No response message received.");
+                            EmergenceLogger.LogError("No response message received.");
                         }
                     }
                 }
                 catch (HttpListenerException ex)
                 {
-                    Debug.LogError("HttpListener exception: " + ex.Message);
+                    EmergenceLogger.LogError("HttpListener exception: " + ex.Message);
                 }
             }
         }
@@ -165,8 +165,41 @@ namespace EmergenceSDK.Runtime.Internal.Utils
                 httpListener.Stop();
                 httpListener.Close();
                 isSigningServerStarted = false;
-                Debug.Log("Local web server stopped.");
             }
+        }
+        
+        /// <summary>
+        /// Custom function to handle bit shifting for Base 64 Conversion, Necessary as the .Net function caused failures.
+        /// </summary>
+        /// <param name="base64">The Base64 string to be converted.</param>
+        /// <returns></returns>
+        public static byte[] ConvertFromBase64String(string base64)
+        {
+            base64 = base64.TrimEnd('=');
+            int padding = base64.Length % 4;
+            if (padding > 0)
+            {
+                base64 += new string('=', 4 - padding);
+            }
+
+            byte[] bytes = new byte[base64.Length * 3 / 4];
+            int byteIndex = 0;
+
+            for (int i = 0; i < base64.Length; i += 4)
+            {
+                int b1 = Base64Characters.IndexOf(base64[i]);
+                int b2 = Base64Characters.IndexOf(base64[i + 1]);
+                int b3 = Base64Characters.IndexOf(base64[i + 2]);
+                int b4 = Base64Characters.IndexOf(base64[i + 3]);
+
+                bytes[byteIndex++] = (byte)((b1 << 2) | (b2 >> 4));
+                if (b3 != -1)
+                    bytes[byteIndex++] = (byte)(((b2 & 0x0F) << 4) | (b3 >> 2));
+                if (b4 != -1)
+                    bytes[byteIndex++] = (byte)(((b3 & 0x03) << 6) | b4);
+            }
+
+            return bytes;
         }
     }
 }

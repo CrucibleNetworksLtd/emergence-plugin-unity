@@ -13,8 +13,16 @@ namespace EmergenceSDK.Runtime.Internal.Services
         /// </summary>
         /// <param name="custodialEOA">The Custodial EOA or wallet to sign the message.</param>
         /// <param name="messageToSign">The message to be signed.</param>
-        /// <param name="timestamp">The timestamp of the message being signed.</param>
         /// <returns></returns>
-        UniTask<string> RequestToSignAsync(string custodialEOA, string messageToSign, string timestamp);
+        UniTask<string> RequestToSignAsync(string custodialEOA, string messageToSign);
+        
+        /// <summary>
+        /// Unitask for handling the login process of a custodial account.
+        /// </summary>
+        /// <param name="custodialEOA"></param>
+        /// <param name="messageToSign"></param>
+        /// <param name="expirationTimestamp"></param>
+        /// <returns></returns>
+        UniTask<string> GenerateEAT(string custodialEOA, string messageToSign, string expirationTimestamp);
     }
 }

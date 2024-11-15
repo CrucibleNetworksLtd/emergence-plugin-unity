@@ -68,7 +68,7 @@ namespace EmergenceSDK.Runtime.Futureverse.Services
         /// <exception cref="InvalidWalletException">Thrown if there is no currently connected wallet</exception>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
         /// <exception cref="SignMessageFailedException">Thrown if the needed sign message request fails</exception>
-        Task<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus = true);
+        UniTask<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus = true);
         
         /// <summary>
         /// Get the status of a ARTM transaction by its hash
@@ -81,5 +81,11 @@ namespace EmergenceSDK.Runtime.Futureverse.Services
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the transaction status is unexpected</exception>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
         UniTask<ArtmStatus> GetArtmStatusAsync(string transactionHash, int initialDelay = 1000, int refetchInterval = 5000, int maxRetries = 3);
+        
+        /// <summary>
+        /// Method for informing the futureverse service whether custodial login was used.
+        /// </summary>
+        /// <param name="isCustodial"></param>
+        void SetCustodialStatus(bool isCustodial);
     }
 }

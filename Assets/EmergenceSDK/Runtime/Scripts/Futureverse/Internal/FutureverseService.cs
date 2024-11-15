@@ -23,6 +23,8 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
         public FuturepassInformationResponse CurrentFuturepassInformation { get; set; }
 
         private readonly IWalletService walletService;
+        private ICustodialSigningService custodialSigningService;
+        private bool isCustodialLogin = false;
 
         public FutureverseService(IWalletService walletService)
         {
@@ -278,7 +280,7 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
             return ArtmStatus.Pending;
         }
 
-        public async Task<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus)
+        public async UniTask<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus)
         {
             if (!walletService.IsValidWallet)
             {
@@ -305,19 +307,27 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
 
                 // Nonce is valid, request to sign
                 generatedArtm = ArtmBuilder.GenerateArtm(message, artmOperations, address, nonce);
-                var signatureResponse = await walletService.RequestToSignAsync(generatedArtm);
-                if (!signatureResponse.Successful)
+                if(!isCustodialLogin)
                 {
-                    throw new SignMessageFailedException(signatureResponse.Result1);
-                }
+                    var signatureResponse = await walletService.RequestToSignAsync(generatedArtm);
+                    if (!signatureResponse.Successful)
+                    {
+                        throw new SignMessageFailedException(signatureResponse.Result1);
+                    }
 
-                signature = signatureResponse.Result1;
+                    signature = signatureResponse.Result1;
+                }
+                else
+                {
+                    signature = await custodialSigningService.RequestToSignAsync(walletService.WalletAddress,generatedArtm);
+                }
             }
 
             string transactionHash;
             {
                 // In this scope we send the generated ARTM as well as the signature so that it can be verified as a valid transaction and queued
                 var body = BuildSubmitTransactionRequestBody(generatedArtm, signature);
+                await UniTask.SwitchToMainThread();
                 var submitResponse = await WebRequestService.SendAsyncWebRequest(
                     RequestMethod.Post,
                     GetArApiUrl(),
@@ -400,5 +410,14 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
         }
 
         public void HandleConnection(ISessionService sessionService) { }
+
+        public void SetCustodialStatus(bool isCustodial)
+        {
+            isCustodialLogin = isCustodial;
+            if (isCustodial && custodialSigningService == null)
+            {
+                custodialSigningService = EmergenceServiceProvider.GetService<ICustodialSigningService>();
+            }
+        }
     }
 }

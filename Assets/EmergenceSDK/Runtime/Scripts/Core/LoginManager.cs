@@ -146,7 +146,8 @@ namespace EmergenceSDK.Runtime
 
                 sessionServiceInternal.RunConnectionEvents(loginSettings);
                 triggerDisconnectEvents = sessionServiceInternal.RunDisconnectionEvents;
-
+                await UniTask.SwitchToMainThread();
+                
                 loginSuccessfulEvent.Invoke(this, ((IWalletService)walletServiceInternal).ChecksummedWalletAddress);
             }
             catch (OperationCanceledException)
@@ -286,13 +287,26 @@ namespace EmergenceSDK.Runtime
         /// <param name="ct"> The cancellation Token</param>
         private async UniTask CacheCustodialResponse(CustodialAccessTokenResponse response, CancellationToken ct)
         {
-            var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
-            // Mark the custodial login step as successful
-            InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.CustodialRequests, StepPhase.Success, ct);
-            var passResponse = await futureverseService.GetLinkedFuturepassAsync(response.DecodedToken.Eoa);
-            InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.AccessTokenRequest, StepPhase.Success, ct);
-            ct.ThrowIfCancellationRequested();
-            await ProcessFuturePassResponse(futureverseService, passResponse.Result1.ownedFuturepass);
+            try
+            {
+                var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+                // Mark the custodial login step as successful
+                InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.CustodialRequests, StepPhase.Success, ct);
+                // We need to prepend the chain data to our futurepass, so we use the chain ID to determine the chain name
+                string chainName = response.DecodedToken.ChainId switch
+                {
+                    7668 => "root",
+                    7672 => "root",
+                    _ => throw new ArgumentOutOfRangeException(response.DecodedToken.ChainId.ToString(), "Unknown chainID")
+                };
+                futureverseService.SetCustodialStatus(true);
+                ct.ThrowIfCancellationRequested();
+                await ProcessFuturePassResponse(futureverseService, $"{response.DecodedToken.ChainId}:{chainName}:{response.DecodedToken.Futurepass}");
+            }
+            catch (Exception ex)
+            {
+                InvokeLoginFailedEvent(ex);
+            }
         }
 
         /// <summary>
