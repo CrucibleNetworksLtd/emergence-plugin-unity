@@ -5,6 +5,7 @@ using EmergenceSDK.Runtime.Futureverse;
 using EmergenceSDK.Runtime.Internal.Utils;
 using EmergenceSDK.Runtime.ScriptableObjects;
 using EmergenceSDK.Runtime.Types;
+using EmergenceSDK.Runtime.Types.Exceptions.Login;
 using EmergenceSDK.Runtime.Types.Responses;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -62,6 +63,10 @@ namespace EmergenceSDK.Runtime.Internal.Services
         public async UniTask<string> GenerateEAT(string custodialEOA, string messageToSign, string expirationTimestamp)
         {
             string signature = await RequestToSignAsync(custodialEOA, messageToSign);
+            if (string.IsNullOrEmpty(signature))
+            {
+                return null;
+            }
             string signedMessage = ConvertCustodialSignedMessageToEmergenceAt(signature, custodialEOA, expirationTimestamp);
             return signedMessage;
         }
@@ -84,13 +89,22 @@ namespace EmergenceSDK.Runtime.Internal.Services
                 if (!string.IsNullOrEmpty(responseJson))
                 {
                     CustodialSignerServiceResponse signingServerResponse = JsonConvert.DeserializeObject<CustodialSignerServiceResponse>(responseJson);
-                    signature = signingServerResponse.Result.Data.Signature;
-                    tcs.TrySetResult(true); // The callback will mark itself as completed allowing the task to proceed and return a response.
+                    if (signingServerResponse.Result.Status == "success")
+                    {
+                        signature = signingServerResponse.Result.Data.Signature;
+                        tcs.TrySetResult(true); // The callback will mark itself as completed allowing the task to proceed and return a response.
+                    }
+                    else
+                    {
+                        tcs.TrySetResult(false);
+                        EmergenceLogger.LogError(signingServerResponse.Result.ToString());
+                        throw new TokenRequestFailedException("Invalid response from Custodial exchange");
+                    }
                 }
                 else
                 {
                     tcs.TrySetResult(false);
-                    Debug.LogError("No response message received.");
+                    EmergenceLogger.LogError("No response message received.");
                 }
             });
             // Create our payload for the signing service.
@@ -109,7 +123,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
             };
 
             string jsonPayload = JsonConvert.SerializeObject(encodedPayload);
-            string base64Payload = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonPayload)).Replace('+', '-').Replace('/', '_').TrimEnd('=');
+            string base64Payload = Convert.ToBase64String(Encoding.UTF8.GetBytes(jsonPayload));
             string url = $"{BaseUrl}?request={base64Payload}";
             Application.OpenURL(url); // Contact external signing service with our encoded payload.
             await tcs.Task; // Await callback handler to be triggered by external service.

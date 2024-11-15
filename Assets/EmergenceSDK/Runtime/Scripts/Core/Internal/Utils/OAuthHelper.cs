@@ -8,6 +8,7 @@ using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Futureverse.Internal;
 using EmergenceSDK.Runtime.Internal.Services;
 using EmergenceSDK.Runtime.Types;
+using EmergenceSDK.Runtime.Types.Exceptions.Login;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -65,7 +66,7 @@ namespace EmergenceSDK.Runtime.Internal.Utils
 
             if (!response.Successful)
             {
-                Debug.LogError("Failed to exchange authorization code for token.");
+                throw new TokenRequestFailedException("Invalid response from Custodial exchange");
                 return null;
             }
 
