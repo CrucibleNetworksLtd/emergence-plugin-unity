@@ -11,7 +11,6 @@ using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types;
 using EmergenceSDK.Runtime.Types.Exceptions.Login;
 using EmergenceSDK.Runtime.Types.Responses;
-using UniJSON;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -299,7 +298,6 @@ namespace EmergenceSDK.Runtime
                     7672 => "root",
                     _ => throw new ArgumentOutOfRangeException(response.DecodedToken.ChainId.ToString(), "Unknown chainID")
                 };
-                futureverseService.SetCustodialStatus(true);
                 ct.ThrowIfCancellationRequested();
                 await ProcessFuturePassResponse(futureverseService, $"{response.DecodedToken.ChainId}:{chainName}:{response.DecodedToken.Futurepass}");
             }

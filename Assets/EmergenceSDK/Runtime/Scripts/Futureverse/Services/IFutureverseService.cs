@@ -81,11 +81,5 @@ namespace EmergenceSDK.Runtime.Futureverse.Services
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the transaction status is unexpected</exception>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
         UniTask<ArtmStatus> GetArtmStatusAsync(string transactionHash, int initialDelay = 1000, int refetchInterval = 5000, int maxRetries = 3);
-        
-        /// <summary>
-        /// Method for informing the futureverse service whether custodial login was used.
-        /// </summary>
-        /// <param name="isCustodial"></param>
-        void SetCustodialStatus(bool isCustodial);
     }
 }

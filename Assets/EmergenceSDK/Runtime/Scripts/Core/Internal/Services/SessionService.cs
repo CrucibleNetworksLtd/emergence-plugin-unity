@@ -207,7 +207,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
             string eoa = custodialLoginService.CachedAccessTokenResponse.DecodedToken.Eoa; // Get currently cached EOA/wallet address
             // Use the external signing service to perform a signature request and return an emergence access token, caching it as part of the session.
             EmergenceAccessToken =  await custodialSigningService.GenerateEAT(eoa, accessTokenMessage, accessTokenTimestamp.ToString());
-            
+            EmergenceSingleton.Instance.IsCustodialLogin = true;
             return new ServiceResponse<string>(true, EmergenceAccessToken);
         }
         
@@ -215,6 +215,10 @@ namespace EmergenceSDK.Runtime.Internal.Services
         public void HandleDisconnection(ISessionService sessionService)
         {
             EmergenceAccessToken = "";
+            if (EmergenceSingleton.Instance.IsCustodialLogin)
+            {
+                EmergenceSingleton.Instance.IsCustodialLogin = false;
+            }
         }
         
         public void HandleConnection(ISessionService sessionService) { }

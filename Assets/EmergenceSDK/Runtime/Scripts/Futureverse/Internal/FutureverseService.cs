@@ -24,7 +24,6 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
 
         private readonly IWalletService walletService;
         private ICustodialSigningService custodialSigningService;
-        private bool isCustodialLogin = false;
 
         public FutureverseService(IWalletService walletService)
         {
@@ -36,7 +35,7 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
 #if !DEVELOPMENT_BUILD && !UNITY_EDITOR
             return "https://ar-api.futureverse.app/graphql";
 #else
-            return FutureverseSingleton.Instance.Environment switch
+            return EmergenceSingleton.Instance.Environment switch
             {
                 EmergenceEnvironment.Production => "https://ar-api.futureverse.app/graphql",
                 EmergenceEnvironment.Development => "https://ar-api.futureverse.dev/graphql",
@@ -307,7 +306,7 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
 
                 // Nonce is valid, request to sign
                 generatedArtm = ArtmBuilder.GenerateArtm(message, artmOperations, address, nonce);
-                if(!isCustodialLogin)
+                if(!EmergenceSingleton.Instance.IsCustodialLogin)
                 {
                     var signatureResponse = await walletService.RequestToSignAsync(generatedArtm);
                     if (!signatureResponse.Successful)
@@ -410,14 +409,6 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
         }
 
         public void HandleConnection(ISessionService sessionService) { }
-
-        public void SetCustodialStatus(bool isCustodial)
-        {
-            isCustodialLogin = isCustodial;
-            if (isCustodial && custodialSigningService == null)
-            {
-                custodialSigningService = EmergenceServiceProvider.GetService<ICustodialSigningService>();
-            }
-        }
+        
     }
 }

@@ -102,8 +102,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
         
         public async UniTask<ServiceResponse<WriteContractResponse>> WriteMethodAsyncImpl<T>(ContractInfo contractInfo, string value, T body, int attempt)
         {
-            var custodialWriteService = EmergenceServiceProvider.GetService<ICustodialWriteService>();
-            if (custodialWriteService == null)
+            if (!EmergenceSingleton.Instance.IsCustodialLogin)
             {
                 // We don't need to perform switch chain requests for custodial logins.
                 var switchChainResonse = await SwitchChain(contractInfo);
@@ -122,33 +121,35 @@ namespace EmergenceSDK.Runtime.Internal.Services
             var headers = new Dictionary<string, string>();
             headers.Add("deviceId", EmergenceSingleton.Instance.CurrentDeviceId);
             WebResponse response = null;
-            
-            // If its not a custodial write we can perform typical write method flow.
-            if (custodialWriteService == null)
+
+            // TODO this coupling is a little sticky, Look at having an alternate contract service for
+            if(EmergenceSingleton.Instance.IsCustodialLogin) // If custodial FV login we have to utilise the CustodialWriteService to interact with our Custodial supporting architecture.
+            {
+                var custodialWriteService = EmergenceServiceProvider.GetService<ICustodialWriteService>();
+                response = await custodialWriteService.PerformCustodialWriteMethod(contractInfo,value,dataString);
+            }
+            else// If its not a custodial write we can perform typical write method flow.
             {
                 response = await WebRequestService.SendAsyncWebRequest(RequestMethod.Post, url, dataString, headers);
             }
-            else // Otherwise we have to utilise the CustodialWriteService to interact with our Custodial supporting architecture.
+
+            if (!response.Successful)
             {
-                response = await custodialWriteService.PerformCustodialWriteMethod(contractInfo,value,dataString);
-            }
-            
-            if(!response.Successful)
                 return await HandleWriteMethodError(response,
                     new SerialisedWriteRequest<T>(contractInfo, value, body, attempt));
-            
+            }
             // Because the backend returns two different response types that don't deserialise the same we need to validate them differently.
-            if(custodialWriteService == null)
+            if(EmergenceSingleton.Instance.IsCustodialLogin)
+            {
+                var custodialWriteContractResponse = SerializationHelper.Deserialize<CustodialWriteContractResponse>(response.ResponseText);
+                CheckForTransactionSuccess(contractInfo, custodialWriteContractResponse.hash).Forget(); // Check the transaction hash as usual.
+                return new ServiceResponse<WriteContractResponse>(true);
+            }
+            else
             {
                 var writeContractResponse = SerializationHelper.Deserialize<BaseResponse<WriteContractResponse>>(response.ResponseText);
                 CheckForTransactionSuccess(contractInfo, writeContractResponse.message.transactionHash).Forget();
                 return new ServiceResponse<WriteContractResponse>(true, writeContractResponse.message);
-            }
-            else 
-            {
-                 var custodialWriteContractResponse = SerializationHelper.Deserialize<CustodialWriteContractResponse>(response.ResponseText);
-                 CheckForTransactionSuccess(contractInfo, custodialWriteContractResponse.hash).Forget(); // Check the transaction hash as usual.
-                 return new ServiceResponse<WriteContractResponse>(true);
             }
         }
 
