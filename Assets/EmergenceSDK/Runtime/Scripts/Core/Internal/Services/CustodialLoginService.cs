@@ -29,8 +29,8 @@ namespace EmergenceSDK.Runtime.Internal.Services
         private string DevelopmentClientID = "3KMMFCuY59SA4DDV8ggwc";
         private string StagingClientID = "3KMMFCuY59SA4DDV8ggwc";
         private string ProductionClientID = "G9mOSDHNklm_dCN0DHvfX";
-        private string ProductionBaseUrl = "https://login.pass.online/";
-        private string StagingBaseUrl = "https://login.passonline.cloud/";
+        private string ProductionBaseUrl = "https://login.pass.online";
+        private string StagingBaseUrl = "https://login.passonline.cloud";
         
         private const string RedirectUri = "http://localhost:3000/callback";
 
@@ -102,7 +102,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
 
             CustodialLocalWebServerHelper.StartTokenAuthListener(async (authCode,state,expectedState) =>
             {
-                CachedAccessTokenResponse = await OAuthHelper.ParseAndExchangeCodeForCustodialResponseAsync(BaseUrl, ClientID, currentCodeVerifier, authCode, RedirectUri, ct);
+                CachedAccessTokenResponse = await OAuthHelper.ParseAndExchangeCodeForCustodialResponseAsync(BaseUrl+"/", ClientID, currentCodeVerifier, authCode, RedirectUri, ct);
                 walletServiceInternal.AssignCustodialWalletAddress(CachedAccessTokenResponse.DecodedToken.Eoa);
                 if (CachedAccessTokenResponse != null)
                 {
@@ -119,7 +119,7 @@ namespace EmergenceSDK.Runtime.Internal.Services
 
             string nonce = GenerateSecureRandomString(128);
 
-            string authUrl = $"{BaseUrl}auth?" +
+            string authUrl = $"{BaseUrl}/auth?" +
                              "response_type=code" +
                              $"&client_id={ClientID}" +
                              $"&redirect_uri={HttpUtility.UrlEncode(RedirectUri)}" +
