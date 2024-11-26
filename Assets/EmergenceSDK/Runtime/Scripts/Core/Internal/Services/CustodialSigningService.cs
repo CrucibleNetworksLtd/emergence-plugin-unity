@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Futureverse;
 using EmergenceSDK.Runtime.Internal.Utils;
 using EmergenceSDK.Runtime.ScriptableObjects;
+using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types;
 using EmergenceSDK.Runtime.Types.Exceptions.Login;
 using EmergenceSDK.Runtime.Types.Responses;
@@ -21,6 +22,8 @@ namespace EmergenceSDK.Runtime.Internal.Services
         
         private string ProductionBaseUrl = "https://signer.pass.online/";
         private string StagingBaseUrl = "https://signer.passonline.cloud/";
+
+        private ICustodialLoginService custodialLoginService;
         
         /// <summary>
         /// Gets the Login Base URL based on the current environment.
@@ -113,7 +116,8 @@ namespace EmergenceSDK.Runtime.Internal.Services
             {
                 account = custodialEOA,
                 message = hexMessage,
-                callbackUrl = "http://localhost:3000/signature-callback"
+                callbackUrl = "http://localhost:3000/signature-callback",
+                idpUrl = EmergenceServiceProvider.GetService<CustodialLoginService>().BaseUrl // IDP URL should match the base URL of the login service.
             };
             var encodedPayload = new
             {
