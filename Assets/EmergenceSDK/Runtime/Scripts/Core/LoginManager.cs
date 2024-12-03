@@ -17,12 +17,7 @@ using UnityEngine.Events;
 namespace EmergenceSDK.Runtime
 {
     /// <summary>
-    /// This is designed to merely be a UI LoginManager, exposing the login flow for usage with custom UIs.<para/>
-    /// Performing any business logic with this class is not recommended, for connection and disconnection logic
-    /// you should take a look at <see cref="ISessionService"/>, specifically <see cref="ISessionService.OnSessionConnected"/>
-    /// and <see cref="ISessionService.OnSessionDisconnected"/>
-    /// <remarks>Note that while it is possible to configure whether the <see cref="LoginManager"/> should automatically cancel login attempts when getting disabled,
-    /// they will always be automatically cancelled when it gets destroyed.</remarks>
+    /// Manager/Controller for login flow, designed to be utilised by UI's to visually <para/>
     /// <seealso cref="ISessionService"/>
     /// </summary>
     public sealed class LoginManager : MonoBehaviour
@@ -31,51 +26,59 @@ namespace EmergenceSDK.Runtime
         /// The timeout in seconds that will be used for each QR code shown to the user.
         /// </summary>
         internal float qrCodeTimeout => EmergenceSingleton.Instance.QrCodeTimeout;
+        
         /// <summary>
         /// If true, when the MonoBehaviour gets disabled the login will automatically be canceled. 
         /// </summary>
         public bool cancelLoginsUponDisabling = true;
+        
         /// <summary>
         /// Whether the <see cref="LoginManager"/> is busy with another login session.
         /// </summary>
         public bool IsBusy { get; private set; }
+        
         /// <summary>
         /// The currently active instance of <see cref="EmergenceQrCode"/> for the login session.
         /// </summary>
         public EmergenceQrCode CurrentQrCode { get; internal set; }
+        
         /// <summary>
         /// Called after <see cref="StartLogin"/> is called, if <see cref="IsBusy"/> is false.
         /// <seealso cref="LoginStartedEvent"/>
         /// </summary>
         public LoginStartedEvent loginStartedEvent;
+        
         /// <summary>
         /// Called after <see cref="CancelLogin"/> is called, if <see cref="IsBusy"/> is true.
         /// <seealso cref="LoginCancelledEvent"/>
         /// </summary>
         public LoginCancelledEvent loginCancelledEvent;
+        
         /// <summary>
         /// Called when an error occurs during login.
         /// <seealso cref="LoginFailedEvent"/>
         /// </summary>
         public LoginFailedEvent loginFailedEvent;
+        
         /// <summary>
         /// Called after a successful login.<para/>
-        /// Do not use this event for business logic, as right after it is called, <see cref="ISessionService.OnSessionConnected"/> will also be called. That is where any business logic should go.
         /// <seealso cref="LoginSuccessfulEvent"/>
         /// </summary>
         public LoginSuccessfulEvent loginSuccessfulEvent;
+        
         /// <summary>
         /// Called at each login step, useful for updating the UI. It will be called twice, when the step begins and after it succeeds.
-        /// <remarks>There isn't a built-in way to keep track of the current login step, if you need this information you should store it yourself.</remarks>
         /// <seealso cref="LoginStepUpdatedEvent"/>
         /// </summary>
         public LoginStepUpdatedEvent loginStepUpdatedEvent;
+        
         /// <summary>
         /// Called when the login process ends, always, no matter the reason.
         /// <seealso cref="LoginEndedEvent"/>
         /// 
         /// </summary>
         public LoginEndedEvent loginEndedEvent;
+        
         /// <summary>
         /// Ticks every second after the QR code is retrieved. It begins ticking exactly after the <see cref="LoginStep.QrCodeRequest"/> <see cref="LoginStep"/> succeeds.
         /// <remarks>This keeps getting called even after the handshake is completed and is no longer needed, it only stops right before <see cref="loginEndedEvent"/> gets invoked.<para/>
