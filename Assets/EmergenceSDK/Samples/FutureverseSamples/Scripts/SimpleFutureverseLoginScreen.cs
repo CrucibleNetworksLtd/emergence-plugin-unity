@@ -118,7 +118,7 @@ namespace EmergenceSDK.Samples.FutureverseSamples
                     break;
 
                 case LoginStep.CustodialRequests:
-                    custodialWebLoginMessageText.text = "Successfully authenticated.";
+                    custodialWebLoginMessageText.text = "Custodial login in progress...";
                     Debug.Log("Custodial login in progress...");
                     break;
             }
