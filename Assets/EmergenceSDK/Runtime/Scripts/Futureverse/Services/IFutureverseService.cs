@@ -36,6 +36,13 @@ namespace EmergenceSDK.Runtime.Futureverse.Services
         UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync();
         
         /// <summary>
+        /// Get the Futurepass linked to the specified EOA
+        /// </summary>
+        /// <returns>A <see cref="ServiceResponse{T}"/> object wrapping a <see cref="LinkedFuturepassResponse"/></returns>
+        /// <exception cref="InvalidWalletException">Thrown if there is no currently connected wallet</exception>
+        UniTask<ServiceResponse<LinkedFuturepassResponse>> GetLinkedFuturepassAsync(string eoa);
+        
+        /// <summary>
         /// Get the Futurepass information for the passed Futurepass
         /// </summary>
         /// <param name="futurepass">Futurepass address</param>
@@ -61,7 +68,7 @@ namespace EmergenceSDK.Runtime.Futureverse.Services
         /// <exception cref="InvalidWalletException">Thrown if there is no currently connected wallet</exception>
         /// <exception cref="FutureverseAssetRegisterErrorException">Thrown if the Futureverse AssetRegister responds with an unexpected response</exception>
         /// <exception cref="SignMessageFailedException">Thrown if the needed sign message request fails</exception>
-        Task<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus = true);
+        UniTask<ArtmTransactionResponse> SendArtmAsync(string message, List<ArtmOperation> artmOperations, bool retrieveStatus = true);
         
         /// <summary>
         /// Get the status of a ARTM transaction by its hash

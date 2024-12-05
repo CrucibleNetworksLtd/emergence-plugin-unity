@@ -56,10 +56,10 @@ namespace EmergenceSDK.Samples.CoreSamples.DemoStations
         private void WriteMethodSuccess(WriteContractResponse response)
         {
             EmergenceLogger.LogInfo("WriteMethod finished", true);
-            var transactionHash = response.transactionHash;
+            //var transactionHash = response.transactionHash;
             ContractService.WriteMethodConfirmed += contractResponse =>
             {
-                if (contractResponse.transactionHash == transactionHash)
+                //if (contractResponse.transactionHash == transactionHash)
                 {
                     EmergenceLogger.LogInfo("Transaction confirmed at least 3 times on the blockchain", true);
                 }

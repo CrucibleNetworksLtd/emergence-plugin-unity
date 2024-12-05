@@ -45,9 +45,17 @@ namespace EmergenceSDK.Runtime.Internal.Services
         /// Attempts to get an access token
         /// </summary>
         UniTask<ServiceResponse<string>> GetAccessTokenAsync();
+        
+        /// <summary>
+        /// Attempts to get an access token using an external custodial login service.
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        UniTask<ServiceResponse<string>> GetCustodialAccessToken(CancellationToken ct);
 
         void RunConnectionEvents(LoginSettings loginSettings);
         
         void RunDisconnectionEvents();
+
     }
 }

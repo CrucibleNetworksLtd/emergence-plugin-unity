@@ -34,6 +34,19 @@ namespace EmergenceSDK.Runtime.Internal.UI
         public Button createFPass;
         public Button retryFPassCheck;
 
+        [Header("Futureverse Login UI")] 
+        [SerializeField]
+        private GameObject fVLoginScreen = null;
+        
+        [SerializeField]
+        private TMP_Text custodialLoginMessage = null;
+
+        [SerializeField] 
+        private Button fVWalletConnectLoginBeginButton = null;
+        
+        [SerializeField] 
+        private Button fVCustodialLoginBeginButton = null;
+
         private void SetTimeRemainingText(LoginManager _, EmergenceQrCode emergenceQrCode) => refreshCounterText.text = emergenceQrCode.TimeLeftInt.ToString("0");
 
         public static LogInScreen Instance;
@@ -72,9 +85,11 @@ namespace EmergenceSDK.Runtime.Internal.UI
                         HeaderScreen.Instance.Refresh(((IWalletService)WalletServiceInternal).ChecksummedWalletAddress);
                         HeaderScreen.Instance.Show();
                         break;
+                    case LoginStep.CustodialRequests:
+                        custodialLoginMessage.text = "Successfully generated Custodial Bearer token, Connecting to Emergence Services";
+                        break;
                     case LoginStep.AccessTokenRequest:
                     case LoginStep.FuturepassRequests:
-                        // Nothing to do here in these cases
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(loginStep), loginStep, null);
@@ -103,7 +118,9 @@ namespace EmergenceSDK.Runtime.Internal.UI
                     or FuturepassInformationRequestFailedException
                     or TokenRequestFailedException
                     or HandshakeRequestFailedException
-                    or QrCodeRequestFailedException:
+                    or QrCodeRequestFailedException
+                    or TokenRequestFailedException
+                    or OperationCanceledException:
                     exceptionContainer.HandleException();
                     EmergenceLogger.LogWarning(e);
                     SetupLogin().Forget();
@@ -111,7 +128,26 @@ namespace EmergenceSDK.Runtime.Internal.UI
             }
         }
 
+        /// <summary>
+        /// Event bound to the LoginManager.loginStarted event, called after we call LoginManager.startLogin on enable
+        /// </summary>
+        /// <param name="_"></param>
         private void HandleLoginStarted(LoginManager _)
+        {
+            
+            switch (EmergenceSingleton.Instance.DefaultLoginFlow)
+            {
+                case LoginFlow.WalletConnect:
+                    StartQRCodeDrivenLogin();
+                    break;
+            }
+
+        }
+
+        /// <summary>
+        /// Once login event is started we display the UI to power it, in this case we display the QR code for login methods that us it
+        /// </summary>
+        private void StartQRCodeDrivenLogin()
         {
             urlContainer.SetActive(true);
             copyUrlButton.interactable = false;
@@ -127,15 +163,49 @@ namespace EmergenceSDK.Runtime.Internal.UI
         {
             qrScreen.SetActive(false);
             futureverseScreen.SetActive(false);
+            fVLoginScreen.SetActive(false);
         }
 
         private void ShowLoginWithFv()
         {
             EmergenceServiceProvider.Load(ServiceProfile.Futureverse);
+            fVLoginScreen.SetActive(true);
+            fVCustodialLoginBeginButton.interactable = true;
+            fVWalletConnectLoginBeginButton.gameObject.SetActive(true);
+            custodialLoginMessage.text = "LOGIN WITH BROWSER";
+            fVCustodialLoginBeginButton.onClick.AddListener(StartFVCustodialLogin);
+            fVWalletConnectLoginBeginButton.onClick.AddListener(StartFVWalletConnectLogin);
+        }
+
+        public void StartFVWalletConnectLogin()
+        {
+            fVLoginScreen.SetActive(false);
+            StartQRCodeDrivenLogin();
             UniTask.Void(async () =>
             {
                 await loginManager.StartLogin(LoginSettings.EnableFuturepass);
             });
+        }
+        
+        /// <summary>
+        /// Called by the custodial login UI, will tell login manager to begin login process and create authentication request with FV
+        /// </summary>
+        public void StartFVCustodialLogin()
+        {
+            custodialLoginMessage.text = "Please refer to your default browser to authenticate";
+            fVCustodialLoginBeginButton.interactable = false;
+            fVWalletConnectLoginBeginButton.gameObject.SetActive(false);
+            try
+            {
+                UniTask.Void(async () =>
+                {
+                    await loginManager.StartLogin(LoginSettings.EnableCustodialLogin | LoginSettings.EnableFuturepass);
+                });
+            }
+            catch (Exception e)
+            {
+                HideAllScreens();
+            }
         }
 
         private void ShowLoginWithWc()

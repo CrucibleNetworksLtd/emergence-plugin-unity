@@ -119,6 +119,9 @@ namespace EmergenceSDK.Runtime.Services
             AddService(new ContractService());
             AddService(new ChainService());
             AddService(new PersonaService(sessionService));
+            AddService(new CustodialLoginService());
+            AddService(new CustodialSigningService());
+            AddService(new CustodialWriteService());
         }
     }
 }

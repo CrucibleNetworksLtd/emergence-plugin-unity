@@ -24,6 +24,8 @@ namespace EmergenceSDK.Runtime
         public UICursorHandler CursorHandler => cursorHandler ??= cursorHandler = new UICursorHandler();
         
         public EmergenceConfiguration Configuration;
+
+        public bool IsCustodialLogin { get; set; } 
         
         [SerializeField] 
         private EmergenceEnvironment environment;

@@ -4,6 +4,7 @@
     {
         public AccessToken AccessToken;
     }
+
     public class AccessToken
     {
         public string signedMessage;

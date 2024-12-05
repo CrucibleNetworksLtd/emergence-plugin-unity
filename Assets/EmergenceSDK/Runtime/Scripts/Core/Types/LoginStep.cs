@@ -21,6 +21,8 @@
         /// <summary>
         /// Requesting the Futurepass information
         /// </summary>
-        FuturepassRequests
+        FuturepassRequests,
+        
+        CustodialRequests
     }
 }

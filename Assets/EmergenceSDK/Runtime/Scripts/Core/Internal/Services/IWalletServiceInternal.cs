@@ -16,5 +16,11 @@ namespace EmergenceSDK.Runtime.Internal.Services
         /// Attempts to handshake with the Emergence server.
         /// </summary>
         UniTask<ServiceResponse<string>> HandshakeAsync(float timeout = WebRequestService.DefaultTimeoutMilliseconds, CancellationToken ct = default);
+
+        /// <summary>
+        /// Used by the custodial signing service to assign wallet data to teh wallet service.
+        /// </summary>
+        /// <param name="eoa"></param>
+        void AssignCustodialWalletAddress(string eoa);
     }
 }

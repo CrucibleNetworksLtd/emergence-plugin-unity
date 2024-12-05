@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Events.Login;
+using EmergenceSDK.Runtime.Futureverse.Internal;
 using EmergenceSDK.Runtime.Futureverse.Internal.Services;
 using EmergenceSDK.Runtime.Futureverse.Services;
 using EmergenceSDK.Runtime.Internal.Services;
@@ -16,12 +17,7 @@ using UnityEngine.Events;
 namespace EmergenceSDK.Runtime
 {
     /// <summary>
-    /// This is designed to merely be a UI LoginManager, exposing the login flow for usage with custom UIs.<para/>
-    /// Performing any business logic with this class is not recommended, for connection and disconnection logic
-    /// you should take a look at <see cref="ISessionService"/>, specifically <see cref="ISessionService.OnSessionConnected"/>
-    /// and <see cref="ISessionService.OnSessionDisconnected"/>
-    /// <remarks>Note that while it is possible to configure whether the <see cref="LoginManager"/> should automatically cancel login attempts when getting disabled,
-    /// they will always be automatically cancelled when it gets destroyed.</remarks>
+    /// Manager/Controller for login flow, designed to be utilised by UI's to visually <para/>
     /// <seealso cref="ISessionService"/>
     /// </summary>
     public sealed class LoginManager : MonoBehaviour
@@ -30,51 +26,59 @@ namespace EmergenceSDK.Runtime
         /// The timeout in seconds that will be used for each QR code shown to the user.
         /// </summary>
         internal float qrCodeTimeout => EmergenceSingleton.Instance.QrCodeTimeout;
+        
         /// <summary>
         /// If true, when the MonoBehaviour gets disabled the login will automatically be canceled. 
         /// </summary>
         public bool cancelLoginsUponDisabling = true;
+        
         /// <summary>
         /// Whether the <see cref="LoginManager"/> is busy with another login session.
         /// </summary>
         public bool IsBusy { get; private set; }
+        
         /// <summary>
         /// The currently active instance of <see cref="EmergenceQrCode"/> for the login session.
         /// </summary>
         public EmergenceQrCode CurrentQrCode { get; internal set; }
+        
         /// <summary>
         /// Called after <see cref="StartLogin"/> is called, if <see cref="IsBusy"/> is false.
         /// <seealso cref="LoginStartedEvent"/>
         /// </summary>
         public LoginStartedEvent loginStartedEvent;
+        
         /// <summary>
         /// Called after <see cref="CancelLogin"/> is called, if <see cref="IsBusy"/> is true.
         /// <seealso cref="LoginCancelledEvent"/>
         /// </summary>
         public LoginCancelledEvent loginCancelledEvent;
+        
         /// <summary>
         /// Called when an error occurs during login.
         /// <seealso cref="LoginFailedEvent"/>
         /// </summary>
         public LoginFailedEvent loginFailedEvent;
+        
         /// <summary>
         /// Called after a successful login.<para/>
-        /// Do not use this event for business logic, as right after it is called, <see cref="ISessionService.OnSessionConnected"/> will also be called. That is where any business logic should go.
         /// <seealso cref="LoginSuccessfulEvent"/>
         /// </summary>
         public LoginSuccessfulEvent loginSuccessfulEvent;
+        
         /// <summary>
         /// Called at each login step, useful for updating the UI. It will be called twice, when the step begins and after it succeeds.
-        /// <remarks>There isn't a built-in way to keep track of the current login step, if you need this information you should store it yourself.</remarks>
         /// <seealso cref="LoginStepUpdatedEvent"/>
         /// </summary>
         public LoginStepUpdatedEvent loginStepUpdatedEvent;
+        
         /// <summary>
         /// Called when the login process ends, always, no matter the reason.
         /// <seealso cref="LoginEndedEvent"/>
         /// 
         /// </summary>
         public LoginEndedEvent loginEndedEvent;
+        
         /// <summary>
         /// Ticks every second after the QR code is retrieved. It begins ticking exactly after the <see cref="LoginStep.QrCodeRequest"/> <see cref="LoginStep"/> succeeds.
         /// <remarks>This keeps getting called even after the handshake is completed and is no longer needed, it only stops right before <see cref="loginEndedEvent"/> gets invoked.<para/>
@@ -122,25 +126,30 @@ namespace EmergenceSDK.Runtime
         public async UniTask StartLogin(LoginSettings loginSettings)
         {
             if (IsBusy) return;
-            
+
             try
             {
                 IsBusy = true;
                 var sessionServiceInternal = EmergenceServiceProvider.GetService<ISessionServiceInternal>();
                 var walletServiceInternal = EmergenceServiceProvider.GetService<IWalletServiceInternal>();
                 var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+                var custodialLoginService = EmergenceServiceProvider.GetService<ICustodialLoginService>();
+
                 cts = new CancellationTokenSource();
                 ct = cts.Token;
 
                 InvokeEventAndCheckCancellationToken(loginStartedEvent, this, ct);
-                
-                await HandleQrCodeRequest(sessionServiceInternal);
-                await HandleHandshakeRequest(walletServiceInternal);
+
+                await HandleQrCodeRequest(loginSettings, sessionServiceInternal);
+                await HandleCustodialRequests(loginSettings, custodialLoginService, sessionServiceInternal);
+                await HandleHandshakeRequest(walletServiceInternal, loginSettings);
                 await HandleAccessTokenRequest(loginSettings, sessionServiceInternal);
                 await HandleFuturepassRequests(loginSettings, futureverseService);
 
                 sessionServiceInternal.RunConnectionEvents(loginSettings);
                 triggerDisconnectEvents = sessionServiceInternal.RunDisconnectionEvents;
+                await UniTask.SwitchToMainThread();
+                
                 loginSuccessfulEvent.Invoke(this, ((IWalletService)walletServiceInternal).ChecksummedWalletAddress);
             }
             catch (OperationCanceledException)
@@ -223,10 +232,9 @@ namespace EmergenceSDK.Runtime
 
         private async UniTask HandleFuturepassRequests(LoginSettings loginSettings, IFutureverseService futureverseService)
         {
-            if (loginSettings.HasFlag(LoginSettings.EnableFuturepass))
+            if (loginSettings.HasFlag(LoginSettings.EnableFuturepass) && !loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
             {
                 InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.FuturepassRequests, StepPhase.Start, ct);
-
                 ServiceResponse<LinkedFuturepassResponse> passResponse;
                 try
                 {
@@ -236,35 +244,103 @@ namespace EmergenceSDK.Runtime
                     {
                         throw new FuturepassRequestFailedException("Request was not successful", passResponse);
                     }
+                    var ownedFuturePass = passResponse.Result1.ownedFuturepass;
+                    await ProcessFuturePassResponse(futureverseService, ownedFuturePass);
                 }
                 catch (Exception e) when (e is not OperationCanceledException and not FuturepassRequestFailedException)
                 {
                     throw new FuturepassRequestFailedException("An exception caused the request to fail", null, e);
                 }
-                
+            }
+        }
+        
+        /// <summary>
+        /// Handles Custodial web login, built on the archetype provided by Futureverse to utilise their web login flow.
+        /// </summary>
+        /// <param name="loginSettings">The login settings for this session, used to determine whether to perform Custodial functionality</param>
+        /// <param name="custodialLoginService">The Emergence Service for handling Custodial Logins</param>
+        /// <param name="sessionServiceInternal">The emergence Service for handling the session</param>
+        private async UniTask HandleCustodialRequests(LoginSettings loginSettings, ICustodialLoginService custodialLoginService , ISessionServiceInternal sessionServiceInternal)
+        {
+            if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
+            {
+                InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.CustodialRequests, StepPhase.Start, ct);
+
                 try
                 {
-                    var passInformationResponse = await futureverseService.GetFuturepassInformationAsync(passResponse.Result1.ownedFuturepass);
-                    ct.ThrowIfCancellationRequested();
-                    if (!passInformationResponse.Successful || passInformationResponse.Result1 == null)
-                    {
-                        if (passInformationResponse.Successful && passInformationResponse.Result1 == null)
-                        {
-                            var exception = new NullReferenceException(nameof(passInformationResponse) + '.' + nameof(passInformationResponse.Result1) + "is null");
-                            throw new FuturepassInformationRequestFailedException("Request was successful but result is null!", passInformationResponse, exception);
-                        }
-                        
-                        throw new FuturepassInformationRequestFailedException("Request was not successful", passInformationResponse);
-                    }
-                    ((IFutureverseServiceInternal)futureverseService).CurrentFuturepassInformation = passInformationResponse.Result1;
+                    // We need to call this to generate a Device ID through the backend.
+                    await sessionServiceInternal.GetQrCodeAsync(ct);
+                    // Trigger the custodial login service to handle the login flow.
+                    await custodialLoginService.StartCustodialLoginAsync(CacheCustodialResponse,ct);
                 }
-                catch (Exception e) when (e is not OperationCanceledException and not FuturepassInformationRequestFailedException)
+                catch (Exception ex)
                 {
-                    throw new FuturepassInformationRequestFailedException("An exception caused the request to fail", null, e);
+                    // Handle errors during custodial login
+                    InvokeLoginFailedEvent(ex);
+                    throw new TokenRequestFailedException("Custodial login failed.", null, ex);
                 }
-
-                InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.FuturepassRequests, StepPhase.Success, ct);
             }
+        }
+
+        /// <summary>
+        /// Callback method that initiates the exchange of a custodial bearer token for auth in other services.
+        /// </summary>
+        /// <param name="response"> The custodial Access token response sent to our local HTTP listener</param>
+        /// <param name="ct"> The cancellation Token</param>
+        private async UniTask CacheCustodialResponse(CustodialAccessTokenResponse response, CancellationToken ct)
+        {
+            try
+            {
+                var futureverseService = EmergenceServiceProvider.GetService<IFutureverseService>();
+                // Mark the custodial login step as successful
+                InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.CustodialRequests, StepPhase.Success, ct);
+                // We need to prepend the chain data to our futurepass, so we use the chain ID to determine the chain name
+                string chainName = response.DecodedToken.ChainId switch
+                {
+                    7668 => "root",
+                    7672 => "root",
+                    _ => throw new ArgumentOutOfRangeException(response.DecodedToken.ChainId.ToString(), "Unknown chainID")
+                };
+                ct.ThrowIfCancellationRequested();
+                await ProcessFuturePassResponse(futureverseService, $"{response.DecodedToken.ChainId}:{chainName}:{response.DecodedToken.Futurepass}");
+                InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.HandshakeRequest, StepPhase.Success, ct);
+            }
+            catch (Exception ex)
+            {
+                InvokeLoginFailedEvent(ex);
+            }
+        }
+
+        /// <summary>
+        /// Processes a FV login response to get user information wth an associated Future Pass.
+        /// </summary>
+        /// <param name="futureverseService"></param>
+        /// <param name="ownedFuturePass"></param>
+        /// <exception cref="FuturepassInformationRequestFailedException"></exception>
+        private async UniTask ProcessFuturePassResponse(IFutureverseService futureverseService, string ownedFuturePass)
+        {
+            try
+            {
+                var passInformationResponse = await futureverseService.GetFuturepassInformationAsync(ownedFuturePass);
+                ct.ThrowIfCancellationRequested();
+                if (!passInformationResponse.Successful || passInformationResponse.Result1 == null)
+                {
+                    if (passInformationResponse.Successful && passInformationResponse.Result1 == null)
+                    {
+                        var exception = new NullReferenceException(nameof(passInformationResponse) + '.' + nameof(passInformationResponse.Result1) + "is null");
+                        throw new FuturepassInformationRequestFailedException("Request was successful but result is null!", passInformationResponse, exception);
+                    }
+                        
+                    throw new FuturepassInformationRequestFailedException("Request was not successful", passInformationResponse);
+                }
+                ((IFutureverseServiceInternal)futureverseService).CurrentFuturepassInformation = passInformationResponse.Result1;
+            }
+            catch (Exception e) when (e is not OperationCanceledException and not FuturepassInformationRequestFailedException)
+            {
+                throw new FuturepassInformationRequestFailedException("An exception caused the request to fail", null, e);
+            }
+
+            InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.FuturepassRequests, StepPhase.Success, ct);
         }
 
         private async UniTask HandleAccessTokenRequest(LoginSettings loginSettings, ISessionServiceInternal sessionServiceInternal)
@@ -275,12 +351,23 @@ namespace EmergenceSDK.Runtime
 
                 try
                 {
-                    var tokenResponse = await sessionServiceInternal.GetAccessTokenAsync();
-                    ct.ThrowIfCancellationRequested();
-                    if (!tokenResponse.Successful)
+                    if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
                     {
-                        throw new TokenRequestFailedException("Request was not successful", tokenResponse);
+                        var tokenResponse = await sessionServiceInternal.GetCustodialAccessToken(ct);
+                        if (!tokenResponse.Successful)
+                        {
+                            throw new TokenRequestFailedException("Request was not successful", tokenResponse);
+                        }
                     }
+                    else
+                    {
+                        var tokenResponse = await sessionServiceInternal.GetAccessTokenAsync();
+                        if (!tokenResponse.Successful)
+                        {
+                            throw new TokenRequestFailedException("Request was not successful", tokenResponse);
+                        }
+                    }
+                    ct.ThrowIfCancellationRequested();
                 }
                 catch (Exception e) when (e is not OperationCanceledException and not TokenRequestFailedException)
                 {
@@ -291,10 +378,12 @@ namespace EmergenceSDK.Runtime
             }
         }
 
-        private async UniTask HandleHandshakeRequest(IWalletServiceInternal walletServiceInternal)
+        private async UniTask HandleHandshakeRequest(IWalletServiceInternal walletServiceInternal, LoginSettings loginSettings)
         {
+            if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
+                return;
+            
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.HandshakeRequest, StepPhase.Start, ct);
-                
             try
             {
                 var handshakeResponse = await walletServiceInternal.HandshakeAsync(ct: ct, timeout: qrCodeTimeout * 1000);
@@ -312,8 +401,13 @@ namespace EmergenceSDK.Runtime
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.HandshakeRequest, StepPhase.Success, ct);
         }
 
-        private async UniTask HandleQrCodeRequest(ISessionServiceInternal sessionServiceInternal)
+        private async UniTask HandleQrCodeRequest(LoginSettings loginSettings, ISessionServiceInternal sessionServiceInternal)
         {
+            if (loginSettings.HasFlag(LoginSettings.EnableCustodialLogin))
+            {
+                return;
+            }
+            
             InvokeEventAndCheckCancellationToken(loginStepUpdatedEvent, this, LoginStep.QrCodeRequest, StepPhase.Start, ct);
                 
             try
