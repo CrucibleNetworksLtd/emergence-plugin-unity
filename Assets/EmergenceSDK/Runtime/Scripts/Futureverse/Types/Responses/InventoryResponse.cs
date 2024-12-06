@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using EmergenceSDK.Runtime.Internal.Utils;
+using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 
 namespace EmergenceSDK.Runtime.Futureverse.Types.Responses
@@ -27,27 +28,27 @@ namespace EmergenceSDK.Runtime.Futureverse.Types.Responses
                         {
                             public class Properties
                             {
-                                public string image { get; set; }
-                                public string base_image { get; set; }
-                                public Dictionary<string, string> models { get; set; }
-                                public string animation_url { get; set; }
-                                public string external_url { get; set; }
-                                public int tokenId { get; set; }
-                                public string transparent_image { get; set; }
-                                public string name { get; set; }
-                                public string last_name { get; set; }
-                                public string first_name { get; set; }
-                                public string description { get; set; }
+                                [CanBeNull] public string image { get; set; }
+                                [CanBeNull] public string base_image { get; set; }
+                                [CanBeNull] public Dictionary<string, string> models { get; set; }
+                                [CanBeNull] public string animation_url { get; set; }
+                                [CanBeNull] public string external_url { get; set; }
+                                public string tokenId { get; set; }
+                                [CanBeNull] public string transparent_image { get; set; }
+                                [CanBeNull] public string name { get; set; }
+                                [CanBeNull] public string last_name { get; set; }
+                                [CanBeNull] public string first_name { get; set; }
+                                [CanBeNull] public string description { get; set; }
                                 public string _id { get; set; }
                             }
                             
                             public Properties properties { get; set; }
-                            public Dictionary<string, string> attributes { get; set; }
+                            public Dictionary<string, object> attributes { get; set; }
                         }
 
-                        public string assetType { get; set; }
+                        [CanBeNull] public string assetType { get; set; }
                         public Collection collection { get; set; }
-                        public int tokenId { get; set; }
+                        public string tokenId { get; set; }
                         public string collectionId { get; set; }
                         public Metadata metadata { get; set; }
 
