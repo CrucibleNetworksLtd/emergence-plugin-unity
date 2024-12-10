@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using EmergenceSDK.Runtime.Futureverse.Services;
@@ -9,6 +10,8 @@ using EmergenceSDK.Runtime.Services;
 using EmergenceSDK.Runtime.Types;
 using EmergenceSDK.Runtime.Types.Delegates;
 using EmergenceSDK.Runtime.Types.Inventory;
+using Newtonsoft.Json;
+using UnityEngine;
 
 namespace EmergenceSDK.Runtime.Futureverse.Internal
 {
@@ -96,6 +99,46 @@ namespace EmergenceSDK.Runtime.Futureverse.Internal
             var fpResponse = SerializationHelper.Deserialize<InventoryResponse>(response.ResponseText);
             return new ServiceResponse<InventoryResponse>(response, true, fpResponse);
         }
+        
+        /// <summary>
+        /// Returns an inventory deserialised into type T, where T is a user provided record format.
+        /// An alternate to the SDK provided inventory record, allows users to dictate data consumption.
+        /// </summary>
+        /// <param name="addressList">Can be used to provide an override list of addresses</param>
+        /// <typeparam name="T">Record for data serialisation</typeparam>
+        /// <returns>Returns a service response of type T for easier interrogation.</returns>
+        public async UniTask<ServiceResponse<T>> GetInventoryAs<T>(List<string> addressList = null) where T : class, new()
+        {
+            var currentAddressList = addressList ?? CombinedAddress;
+            
+            var body = SerializationHelper.Serialize(new InventoryQuery(currentAddressList));
+            var response = await WebRequestService.SendAsyncWebRequest(
+                RequestMethod.Post,
+                futureverseService.GetArApiUrl(),
+                body,
+                timeout: FutureverseSingleton.Instance.RequestTimeout * 1000);
+    
+            if (!response.Successful)
+                return new ServiceResponse<T>(response, false, new T());
+            
+            try
+            {
+                var settings = new JsonSerializerSettings
+                {
+                    MissingMemberHandling = MissingMemberHandling.Ignore, // Ignore extra JSON fields
+                    NullValueHandling = NullValueHandling.Include,        // Include null values
+                };
+
+                var deserializedResponse = JsonConvert.DeserializeObject<T>(response.ResponseText, settings);
+                return new ServiceResponse<T>(response, true, deserializedResponse);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to deserialise response into type T, validate structure and try again");
+            }
+            return new ServiceResponse<T>(response, false, new T());
+        }
+
 
         private static InventoryItem ConvertFutureverseItemToInventoryItem(InventoryResponse.Data.Assets.Edge.Node node)
         {

@@ -23,5 +23,14 @@ namespace EmergenceSDK.Runtime.Futureverse.Services
         /// <param name="success">Callback method triggered on successful get inventory. Must take List<InventoryItem></param>
         /// <param name="errorCallback">Callback method triggered on error during operation. Must accept String: message and long: code</param>
         UniTask InventoryByOwnerAndCollection(List<string> collectionIds, SuccessInventoryByOwner success, ErrorCallback errorCallback);
+
+        /// <summary>
+        /// Returns an inventory deserialised into type T, where T is a user provided record format.
+        /// An alternate to the SDK provided inventory record, allows users to dictate data consumption.
+        /// </summary>
+        /// <param name="addressList">Can be used to provide an override list of addresses</param>
+        /// <typeparam name="T">Record for data serialisation</typeparam>
+        /// <returns>Returns a service response of type T for easier interrogation.</returns>
+        UniTask<ServiceResponse<T>> GetInventoryAs<T>(List<string> addressList = null) where T : class, new();
     }
 }
