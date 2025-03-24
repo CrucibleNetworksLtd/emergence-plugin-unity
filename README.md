@@ -1,4 +1,4 @@
-# Emergence Unity Plugin Working Repo
+# Emergence Unity Plugin
 
 This is the working repository for the Emergence Unity Plugin.
 
